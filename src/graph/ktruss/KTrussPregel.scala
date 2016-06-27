@@ -48,7 +48,7 @@ object KTrussPregel {
 
         // Create graph wit correct edge direction and edge attribute
         var graph = Graph(inputGraph.vertices, newEdges)
-        graph.edges.collect().foreach(println(_))
+//        graph.edges.collect().foreach(println(_))
         graph.persist()
 
         // In a loop we find triangles and then remove edges lower than specified support
@@ -68,16 +68,19 @@ object KTrussPregel {
             val graphT = graphN.outerJoinVertices(message)((vid, n, msg) => {
                 // Find triangles and make message
                 var thirdEdgesMsg = mutable.Map[Long, Array[Long]]()
-                msg.get.list.foreach { n1 =>
-                  // common neighbor between current node neighbors and sender node neighbors
-                    val commonEdges = n1.neighbors.intersect(n.get)
+                val msgs = msg.orNull
+                if (msgs != null) {
+                    msgs.list.foreach { n1 =>
+                        // common neighbor between current node neighbors and sender node neighbors
+                        val commonEdges = n1.neighbors.intersect(n.get)
 
-                    // report itself and other neighbors to the sender node
-                    val reportVertices = Array[Long](vid).union(commonEdges)
-                    thirdEdgesMsg += n1.vId -> reportVertices
+                        // report itself and other neighbors to the sender node
+                        val reportVertices = Array[Long](vid).union(commonEdges)
+                        thirdEdgesMsg += n1.vId -> reportVertices
 
-                    // send message to itself about triangle neighbors
-                    thirdEdgesMsg += vid -> commonEdges
+                        // send message to itself about triangle neighbors
+                        thirdEdgesMsg += vid -> commonEdges
+                    }
                 }
                 thirdEdgesMsg
             })
@@ -86,7 +89,9 @@ object KTrussPregel {
             val triangleMsg = graphT.aggregateMessages(sendTriangle, mergeTriangle)
             val graphK = graph.outerJoinVertices(triangleMsg)((vid, value, tMsg) => {
                 val edges = mutable.Map[Edge[Int], Int]()
-                tMsg.get.foreach(ne => edges += Edge(vid, ne, 0) -> 1)
+                val list = tMsg.orNull
+                if (list != null)
+                    list.foreach(ne => edges += Edge(vid, ne, 0) -> 1)
                 edges
             })
 
@@ -94,20 +99,23 @@ object KTrussPregel {
             val edgeCount = graphK.vertices.flatMap(t => t._2).reduceByKey((a, b) => a + b)
 
             // find edges which should be removed
-            val removeEdges = edgeCount.filter(ec => ec._2 < sup.value).map(ec => ec._1)
+            val removeEdges = edgeCount.filter(ec => ec._2 < sup.value).map(ec => (ec._1.srcId, ec._1.dstId))
 
             // find nodes not received any messages and should be removed
             val removeVertices = graphK.vertices.filter(t => t._2.isEmpty).map(t => (t._1, 0))
 
+            val reCount = removeEdges.count()
+            val rvCount = removeVertices.count()
             // If no extra edge as well as no extra vertex is found then exit from the loop
-            if (removeEdges.isEmpty() && removeVertices.isEmpty())
+            if (reCount == 0 && rvCount == 0)
                 complete = true
 
             // find remaining vertices
             val remainingVertices = graph.vertices.minus(removeVertices)
 
             // find remaining edges
-            val remainingEdges = graph.edges.subtract(removeEdges)
+            val remainingEdges = graph.edges.map(e => (e.srcId, e.dstId))
+              .subtract(removeEdges).map(e => Edge(e._1, e._2, 0))
 
             // build new graph based on new vertices and edges
             val newGraph = Graph(remainingVertices, remainingEdges)
@@ -117,6 +125,8 @@ object KTrussPregel {
 
             i += 1
         }
+
+        graph.edges.collect().foreach(println(_))
     }
 
     // Send neighborIds to a neighbor
