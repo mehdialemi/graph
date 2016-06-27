@@ -32,7 +32,7 @@ public class LocalCC {
         conf.setMaster("local[2]");
         conf.setAppName("CC-Fonl");
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-        conf.registerKryoClasses(new Class[] {GraphUtils.VertexDegree.class, long[].class});
+        conf.registerKryoClasses(new Class[] {GraphUtils.class, GraphUtils.VertexDegree.class, long[].class});
 
         JavaSparkContext sc = new JavaSparkContext(conf);
         Broadcast<Integer> bBatchSize = sc.broadcast(batchSize);
