@@ -28,10 +28,6 @@ public class GlobalCC {
         if (args.length > 1)
             partition = Integer.parseInt(args[1]);
 
-        int batchSize = 10;
-        if (args.length > 2)
-            batchSize = Integer.parseInt(args[2]);
-
         SparkConf conf = new SparkConf();
         if (args.length == 0)
             conf.setMaster("local[2]");
@@ -40,7 +36,6 @@ public class GlobalCC {
         conf.registerKryoClasses(new Class[]{GraphUtils.class, GraphUtils.VertexDegree.class, long[].class});
 
         JavaSparkContext sc = new JavaSparkContext(conf);
-        Broadcast<Integer> bBatchSize = sc.broadcast(batchSize);
 
         JavaRDD<String> input = sc.textFile(inputPath, partition);
 
@@ -67,7 +62,7 @@ public class GlobalCC {
                     }
                     return output;
                 }
-            }).repartition(partition).mapValues(t -> { // sort candidates
+            }).mapValues(t -> { // sort candidates
                     Arrays.sort(t);
                     return t;
                 });

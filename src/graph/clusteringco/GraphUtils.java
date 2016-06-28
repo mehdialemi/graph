@@ -6,12 +6,13 @@ import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  *
  */
-public class GraphUtils {
+public class GraphUtils implements Serializable {
 
     public static JavaPairRDD<Long, Long> loadUndirectedEdges(JavaRDD<String> input) {
         JavaPairRDD<Long, Long> edges = input.flatMapToPair(new PairFlatMapFunction<String, Long, Long>() {
@@ -36,9 +37,9 @@ public class GraphUtils {
     public static JavaPairRDD<Long, long[]> createFonl(JavaPairRDD<Long, Long> edges, int partition) {
         JavaPairRDD<Long, long[]> fonl =
             edges.groupByKey()
-                .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, Iterable<Long>>, Long, VertexDegree>() {
+                .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, Iterable<Long>>, Long, GraphUtils.VertexDegree>() {
                     @Override
-                    public Iterable<Tuple2<Long, VertexDegree>> call(Tuple2<Long, Iterable<Long>> t) throws Exception {
+                    public Iterable<Tuple2<Long, GraphUtils.VertexDegree>> call(Tuple2<Long, Iterable<Long>> t) throws Exception {
                         HashSet<Long> neighborSet = new HashSet<>();
                         for (Long neighbor : t._2) {
                             neighborSet.add(neighbor);
@@ -46,9 +47,9 @@ public class GraphUtils {
 
                         int degree = neighborSet.size();
 
-                        VertexDegree vd = new VertexDegree(t._1, degree);
+                        GraphUtils.VertexDegree vd = new GraphUtils.VertexDegree(t._1, degree);
 
-                        List<Tuple2<Long, VertexDegree>> degreeList = new ArrayList<>(degree);
+                        List<Tuple2<Long, GraphUtils.VertexDegree>> degreeList = new ArrayList<>(degree);
 
                         // Add degree information of the current vertex to its neighbor
                         for (Long neighbor : neighborSet) {
@@ -57,24 +58,23 @@ public class GraphUtils {
                         return degreeList;
                     }
                 }).groupByKey()
-                .repartition(partition)
-                .mapToPair(new PairFunction<Tuple2<Long, Iterable<VertexDegree>>, Long, long[]>() {
+                .mapToPair(new PairFunction<Tuple2<Long, Iterable<GraphUtils.VertexDegree>>, Long, long[]>() {
                     @Override
-                    public Tuple2<Long, long[]> call(Tuple2<Long, Iterable<VertexDegree>> v) throws Exception {
+                    public Tuple2<Long, long[]> call(Tuple2<Long, Iterable<GraphUtils.VertexDegree>> v) throws Exception {
                         int degree = 0;
                         // Iterate over neighbors to calculate degree of the current vertex
-                        for (VertexDegree vd : v._2) {
+                        for (GraphUtils.VertexDegree vd : v._2) {
                             degree++;
                         }
 
-                        List<VertexDegree> list = new ArrayList<VertexDegree>();
-                        for (VertexDegree vd : v._2)
+                        List<GraphUtils.VertexDegree> list = new ArrayList<GraphUtils.VertexDegree>();
+                        for (GraphUtils.VertexDegree vd : v._2)
                             if (vd.degree > degree || (vd.degree == degree && vd.vertex > v._1))
                                 list.add(vd);
 
-                        Collections.sort(list, new Comparator<VertexDegree> () {
+                        Collections.sort(list, new Comparator<GraphUtils.VertexDegree> () {
                             @Override
-                            public int compare(VertexDegree vd1, VertexDegree vd2) {
+                            public int compare(GraphUtils.VertexDegree vd1, GraphUtils.VertexDegree vd2) {
                                 return (vd1.degree != vd2.degree) ? vd1.degree - vd2.degree :
                                     (int) (vd1.vertex - vd2.vertex);
                             }
@@ -87,7 +87,8 @@ public class GraphUtils {
 
                         return new Tuple2<>(v._1, hDegs);
                     }
-                });
+                }).reduceByKey((a, b) -> a)
+                .cache();
         return fonl;
     }
 
