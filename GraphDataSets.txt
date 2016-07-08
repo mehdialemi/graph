@@ -1,0 +1,17 @@
+(Reference) GraphBig => https://github.com/graphbig/graphBIG/wiki/GraphBIG-Dataset
+	 => https://github.com/graphbig/GraphBIG-Doc
+(Synthetic) LDBC-SNB
+(Synthetic) SNAP
+(Synthetic) Graph500
+(Real) Yahoo Web Graph
+(Synthetic) GraphGen => http://www.cse.ust.hk/graphgen/
+(Reference) https://sites.google.com/site/xiaomengsite/research/resources/graph-dataset
+(Synthetic) http://graphstream-project.org/doc/Generators/Overview-of-generators/
+(Synthetic) https://github.com/facebookarchive/linkbench
+(Ready) http://atlarge.ewi.tudelft.nl/graphalytics/
+	=> https://github.com/tudelft-atlarge/graphalytics/
+
+
+
+
+
