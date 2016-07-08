@@ -1,11 +1,12 @@
 package graph.clusteringco;
 
+import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
-import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.*;
 
@@ -13,6 +14,18 @@ import java.util.*;
  *
  */
 public class GraphUtils implements Serializable {
+
+    public static void setAppName(SparkConf conf, String name, int defaultPartition, String inputPath) {
+        conf.setAppName(name + "-" + defaultPartition + "-" + new File(inputPath).getName());
+    }
+
+    public static void printOutputLCC(long nodes, float sumAvg, float lcc) {
+        System.out.println("Nodes = " + nodes + ", Sum_Avg_LCC = " + sumAvg + ", LCC = " + lcc);
+    }
+
+    public static void printOutputGCC(long nodes, long triangles, float gcc) {
+        System.out.println("Nodes = " + nodes + ", Triangles = " + triangles + ", GCC = " + gcc);
+    }
 
     public static JavaPairRDD<Long, Long> loadUndirectedEdges(JavaRDD<String> input) {
         JavaPairRDD<Long, Long> edges = input.flatMapToPair(new PairFlatMapFunction<String, Long, Long>() {
@@ -33,71 +46,27 @@ public class GraphUtils implements Serializable {
         return edges;
     }
 
-    // Key: vertex id, Value: degree, neighbors sorted by degree
-    public static JavaPairRDD<Long, long[]> createFonl(JavaPairRDD<Long, Long> edges, int partition) {
-        JavaPairRDD<Long, long[]> fonl =
-            edges.groupByKey()
-                .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, Iterable<Long>>, Long, GraphUtils.VertexDegree>() {
-                    @Override
-                    public Iterable<Tuple2<Long, GraphUtils.VertexDegree>> call(Tuple2<Long, Iterable<Long>> t) throws Exception {
-                        HashSet<Long> neighborSet = new HashSet<>();
-                        for (Long neighbor : t._2) {
-                            neighborSet.add(neighbor);
-                        }
+    public static JavaPairRDD<Integer, Integer> loadUndirectedEdgesInt(JavaRDD<String> input) {
+        JavaPairRDD<Integer, Integer> edges = input.flatMapToPair(new PairFlatMapFunction<String, Integer, Integer>() {
 
-                        int degree = neighborSet.size();
-
-                        GraphUtils.VertexDegree vd = new GraphUtils.VertexDegree(t._1, degree);
-
-                        List<Tuple2<Long, GraphUtils.VertexDegree>> degreeList = new ArrayList<>(degree);
-
-                        // Add degree information of the current vertex to its neighbor
-                        for (Long neighbor : neighborSet) {
-                            degreeList.add(new Tuple2<>(neighbor, vd));
-                        }
-                        return degreeList;
-                    }
-                }).groupByKey()
-                .mapToPair(new PairFunction<Tuple2<Long, Iterable<GraphUtils.VertexDegree>>, Long, long[]>() {
-                    @Override
-                    public Tuple2<Long, long[]> call(Tuple2<Long, Iterable<GraphUtils.VertexDegree>> v) throws Exception {
-                        int degree = 0;
-                        // Iterate over neighbors to calculate degree of the current vertex
-                        for (GraphUtils.VertexDegree vd : v._2) {
-                            degree++;
-                        }
-
-                        List<GraphUtils.VertexDegree> list = new ArrayList<GraphUtils.VertexDegree>();
-                        for (GraphUtils.VertexDegree vd : v._2)
-                            if (vd.degree > degree || (vd.degree == degree && vd.vertex > v._1))
-                                list.add(vd);
-
-                        Collections.sort(list, new Comparator<GraphUtils.VertexDegree> () {
-                            @Override
-                            public int compare(GraphUtils.VertexDegree vd1, GraphUtils.VertexDegree vd2) {
-                                return (vd1.degree != vd2.degree) ? vd1.degree - vd2.degree :
-                                    (int) (vd1.vertex - vd2.vertex);
-                            }
-                        });
-
-                        long[] hDegs = new long[list.size() + 1];
-                        hDegs[0] = degree;
-                        for (int i = 1 ; i < hDegs.length ; i ++)
-                            hDegs[i] = list.get(i - 1).vertex;
-
-                        return new Tuple2<>(v._1, hDegs);
-                    }
-                }).reduceByKey((a, b) -> a)
-                .cache();
-        return fonl;
-    }
-
-    static int sortedIntersectionCount(long[] hDegs, long[] forward) {
-        return sortedIntersectionCount(hDegs, forward, null, 0, 0);
+            @Override
+            public Iterable<Tuple2<Integer, Integer>> call(String line) throws Exception {
+                List<Tuple2<Integer, Integer>> list = new ArrayList<>();
+                if (line.startsWith("#"))
+                    return list;
+                String[] s = line.split("\\s+");
+                int e1 = Integer.parseInt(s[0]);
+                int e2 = Integer.parseInt(s[1]);
+                list.add(new Tuple2<>(e1, e2));
+                list.add(new Tuple2<>(e2, e1));
+                return list;
+            }
+        });
+        return edges;
     }
 
     static int sortedIntersectionCount(long[] hDegs, long[] forward, List<Tuple2<Long, Integer>> output, int hIndex,
-                                  int fIndex) {
+                                       int fIndex) {
         int fLen = forward.length;
         int hLen = hDegs.length;
 
@@ -147,6 +116,57 @@ public class GraphUtils implements Serializable {
         return count;
     }
 
+    static int sortedIntersectionCountInt(int[] hDegs, int[] forward, List<Tuple2<Integer, Integer>> output, int hIndex,
+                                       int fIndex) {
+        int fLen = forward.length;
+        int hLen = hDegs.length;
+
+        if (hDegs.length == 0 || fLen == 0)
+            return 0;
+
+        boolean leftRead = true;
+        boolean rightRead = true;
+
+        int h = 0;
+        int f = 0;
+        int count = 0;
+
+        boolean finish = false;
+        while (!finish) {
+
+            if (hIndex >= hLen && fIndex >= fLen)
+                break;
+
+            if ((hIndex >= hLen && !rightRead) || (fIndex >= fLen && !leftRead))
+                break;
+
+            if (leftRead && hIndex < hLen) {
+                h = hDegs[hIndex++];
+            }
+
+            if (rightRead && fIndex < fLen) {
+                f = forward[fIndex++];
+            }
+
+            if (h == f) {
+                if (output != null)
+                    output.add(new Tuple2<> (h, 1));
+                count++;
+                leftRead = true;
+                rightRead = true;
+            }
+            else if (h < f) {
+                leftRead = true;
+                rightRead = false;
+            }
+            else {
+                leftRead = false;
+                rightRead = true;
+            }
+        }
+        return count;
+    }
+
     public static class VertexDegree {
         long vertex;
         int degree;
@@ -156,5 +176,14 @@ public class GraphUtils implements Serializable {
         }
     }
 
+    public static class CandidateState {
+        int[] higherIds;
+        int firstNodeId;
+
+        public CandidateState(int nodeId, int[] neighbors) {
+            this.higherIds = neighbors;
+            this.firstNodeId = nodeId;
+        }
+    }
 
 }

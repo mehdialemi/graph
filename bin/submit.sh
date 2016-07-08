@@ -10,11 +10,15 @@ total_cores=4
 
 task=$1
 case $task in
-	"GCC") 	main_class="graph.clusteringco.GlobalCC"
+	"GCC_Deg") 	main_class="graph.clusteringco.FonlDegGCC"
 	;;
-	"LCC")	main_class="graph.clusteringco.LocalCC"
+	"LCC_Deg")	main_class="graph.clusteringco.FonlDegLCC"
 	;;
-	*)	echo "please determine your task in the argument [GCC|LCC]"
+	"GCC_Id")  main_class="graph.clusteringco.FonlIdGCC"
+	;;
+	"LCC_Id")  main_class="graph.clusteringco.FonlIdLCC"
+    ;;
+	*)	echo "please determine your task in the argument [GCC|LCC|GCC_Old|LCC_Old]"
 		exit 1
 esac
 

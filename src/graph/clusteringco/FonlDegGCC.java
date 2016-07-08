@@ -4,9 +4,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
-import org.apache.spark.broadcast.Broadcast;
 import scala.Tuple2;
 
 import java.util.ArrayList;
@@ -15,9 +13,12 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- *
+ * Calculate Global Clustering Coefficient (GCC) using fonl structure which is sorted based on degree of nodes. This
+ * causes that in all steps of program we could have a balanced workload. In finding GCC we only require total
+ * triangle count and we don't need to maintain triangle count per node. So, we could have better performance in
+ * comparison with Local Clustering Coefficient (LCC) which we should have number of triangles per node.
  */
-public class GlobalCC {
+public class FonlDegGCC {
 
     public static void main(String[] args) {
         String inputPath = "input.txt";
@@ -31,22 +32,19 @@ public class GlobalCC {
         SparkConf conf = new SparkConf();
         if (args.length == 0)
             conf.setMaster("local[2]");
-        conf.setAppName("GCC-Fonl");
-        conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+        GraphUtils.setAppName(conf, "Fonl-GCC-Deg", partition, inputPath);
         conf.registerKryoClasses(new Class[]{GraphUtils.class, GraphUtils.VertexDegree.class, long[].class});
-
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         JavaRDD<String> input = sc.textFile(inputPath, partition);
 
         JavaPairRDD<Long, Long> edges = GraphUtils.loadUndirectedEdges(input);
 
-        JavaPairRDD<Long, long[]> fonl = GraphUtils.createFonl(edges, partition);
-        fonl.cache();
+        JavaPairRDD<Long, long[]> fonl = FonlUtils.createFonlDegreeBased(edges, partition);
 
         // Partition based on degree. To balance workload, it is better to have a partitioning mechanism that
-        // for example a vertex with high number of neighbors (high deg) would be allocated besides vertex with
-        // low number of neighbors (high deg)
+        // for example a vertex with high number of higherIds (high deg) would be allocated besides vertex with
+        // low number of higherIds (high deg)
         JavaPairRDD<Long, long[]> candidates = fonl
             .filter(t -> t._2.length > 2)
             .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, long[]>, Long, long[]>() {
@@ -63,39 +61,35 @@ public class GlobalCC {
                     return output;
                 }
             }).mapValues(t -> { // sort candidates
-                    Arrays.sort(t);
-                    return t;
-                });
+                Arrays.sort(t);
+                return t;
+            });
 
-        Long totalTriangles = candidates.cogroup(fonl, partition)
-            .map(new Function<Tuple2<Long, Tuple2<Iterable<long[]>, Iterable<long[]>>>, Long>() {
+        long totalTriangles = candidates.cogroup(fonl, partition).map(t -> {
+                Iterator<long[]> iterator = t._2._2.iterator();
+                if (!iterator.hasNext())
+                    return 0L;
+                long[] hDegs = iterator.next();
 
-                @Override
-                public Long call(Tuple2<Long, Tuple2<Iterable<long[]>, Iterable<long[]>>> t) throws Exception {
-                    Iterator<long[]> iterator = t._2._2.iterator();
-                    if (!iterator.hasNext())
-                        return 0L;
-                    long[] hDegs = iterator.next();
+                iterator = t._2._1.iterator();
+                if (!iterator.hasNext())
+                    return 0L;
 
-                    iterator = t._2._1.iterator();
-                    if (!iterator.hasNext())
-                        return 0L;
+                Arrays.sort(hDegs, 1, hDegs.length);
+                long sum = 0;
 
-                    Arrays.sort(hDegs, 1, hDegs.length);
-                    long sum = 0;
+                do {
+                    long[] forward = iterator.next();
+                    int count = GraphUtils.sortedIntersectionCount(hDegs, forward, null, 1, 0);
+                    sum += count;
+                } while (iterator.hasNext());
 
-                    do {
-                        long[] forward = iterator.next();
-                        int count = GraphUtils.sortedIntersectionCount(hDegs, forward, null, 1, 0);
-                        sum += count;
-                    } while (iterator.hasNext());
-
-                    return sum;
-                }
+                return sum;
             }).reduce((a, b) -> a + b);
 
         long totalNodes = fonl.count();
         float globalCC = totalTriangles / (float) (totalNodes * (totalNodes - 1));
-        System.out.println("Total Triangles: " + totalTriangles + ", total Nodes: " + totalNodes + ", GCC = " + globalCC);
+        GraphUtils.printOutputGCC(totalNodes, totalTriangles, globalCC);
+        sc.close();
     }
 }
