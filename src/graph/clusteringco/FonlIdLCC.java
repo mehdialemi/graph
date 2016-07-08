@@ -1,5 +1,6 @@
 package graph.clusteringco;
 
+import graph.OutputUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -19,8 +20,7 @@ import java.util.List;
 public class FonlIdLCC {
 
     public static void main(String[] args) {
-//        String inputPath = "input.txt";
-        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
+        String inputPath = "input.txt";
         if (args != null && args.length > 0)
             inputPath = args[0];
 
@@ -120,7 +120,7 @@ public class FonlIdLCC {
             .reduce((a, b) -> a + b);
 
         float avgLCC = sumLCC / totalNodes;
-        GraphUtils.printOutputLCC(totalNodes, sumLCC, avgLCC);
+        OutputUtils.printOutputLCC(totalNodes, sumLCC, avgLCC);
 
         sc.close();
     }

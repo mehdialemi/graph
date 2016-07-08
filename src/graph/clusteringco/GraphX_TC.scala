@@ -7,10 +7,9 @@ import org.apache.spark.storage.StorageLevel
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
-  *
+  * Count total number of triangles in the graph using GraphX framework.
   */
-object GraphX_GCC {
-
+object GraphX_TC {
     def main(args: Array[String]) {
         var inputPath = "input.txt"
         if (args != null && args.length > 0)
@@ -33,11 +32,7 @@ object GraphX_GCC {
         val triangle3 = triangleGraph.vertices.reduce((v1,v2) => (0L , v1._2 + v2._2))
         val totalTriangles = triangle3._2.toInt / 3;
 
-        val nodes = graph.vertices.count();
-
-        val globalCC = totalTriangles / (nodes * (nodes - 1)).toFloat;
-
-        OutputUtils.printOutputGCC(nodes, totalTriangles, globalCC)
+        OutputUtils.printOutputTC(totalTriangles)
         sc.stop()
     }
 }

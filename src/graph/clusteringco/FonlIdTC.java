@@ -14,10 +14,9 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Calculate GCC with id based ordering. In this method we have no dealing with degree of nodes and to sort nodes in
- * the fonl just id of the nodes are taken into account.
+ * Counts total number of triangles in the given graph using degree based fonl. Copied from {@link FonlIdGCC}.
  */
-public class FonlIdGCC {
+public class FonlIdTC {
 
     public static void main(String[] args) {
         String inputPath = "input.txt";
@@ -35,20 +34,19 @@ public class FonlIdGCC {
         }
 
         SparkConf conf = new SparkConf();
+        conf.registerKryoClasses(new Class[]{GraphUtils.CandidateState.class, int[].class});
         if (args == null || args.length == 0)
             conf.setMaster("local[2]");
         GraphUtils.setAppName(conf, "Fonl-GCC-Id", partition, inputPath);
-        conf.registerKryoClasses(new Class[]{GraphUtils.CandidateState.class, int[].class});
         JavaSparkContext sc = new JavaSparkContext(conf);
-
-        JavaRDD<String> input = sc.textFile(inputPath, partition);
         Broadcast<Integer> batchSize = sc.broadcast(bSize);
 
+        JavaRDD<String> input = sc.textFile(inputPath, partition);
         JavaPairRDD<Integer, Integer> edges = GraphUtils.loadUndirectedEdgesInt(input);
 
         JavaPairRDD<Integer, int[]> fonl = FonlUtils.createFonlIdBasedInt(edges, partition);
 
-        long nodes = fonl.count();
+        long totalNodes = fonl.count();
 
         JavaPairRDD<Integer, GraphUtils.CandidateState> candidate = fonl
             .flatMapToPair(new PairFlatMapFunction<Tuple2<Integer, int[]>, Integer, GraphUtils.CandidateState>() {
@@ -89,9 +87,7 @@ public class FonlIdGCC {
             return triangleCount;
         }).repartition(partition).reduce((t1, t2) -> t1 + t2);
 
-        float globalCC = totalTriangles / (float) (nodes * (nodes - 1));
-
-        OutputUtils.printOutputGCC(nodes, totalTriangles, globalCC);
+        OutputUtils.printOutputTC(totalTriangles);
         sc.close();
     }
 }

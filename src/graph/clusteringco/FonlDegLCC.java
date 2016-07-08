@@ -1,5 +1,6 @@
 package graph.clusteringco;
 
+import graph.OutputUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -19,8 +20,7 @@ import java.util.List;
 public class FonlDegLCC {
 
     public static void main(String[] args) {
-//        String inputPath = "input.txt";
-        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
+        String inputPath = "input.txt";
         if (args.length > 0)
             inputPath = args[0];
 
@@ -36,7 +36,6 @@ public class FonlDegLCC {
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         JavaRDD<String> input = sc.textFile(inputPath, partition);
-
         JavaPairRDD<Long, Long> edges = GraphUtils.loadUndirectedEdges(input);
 
         JavaPairRDD<Long, long[]> fonl = FonlUtils.createFonlDegreeBased(edges, partition);
@@ -106,7 +105,7 @@ public class FonlDegLCC {
 
         long totalNodes = fonl.count();
         float avgLCC = sumLCC / totalNodes;
-        GraphUtils.printOutputLCC(totalNodes, sumLCC, avgLCC);
+        OutputUtils.printOutputLCC(totalNodes, sumLCC, avgLCC);
 
         sc.close();
     }

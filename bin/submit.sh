@@ -18,6 +18,10 @@ case $task in
 	;;
 	"LCC_Id")  main_class="graph.clusteringco.FonlIdLCC"
     ;;
+    "GCC_GraphX" main_class="graph.clusteringco.GraphX_GCC"
+    ;;
+    "LCC_GraphX" main_class="graph.clusteringco.GraphX_LCC"
+    ;;
 	*)	echo "please determine your task in the argument [GCC|LCC|GCC_Old|LCC_Old]"
 		exit 1
 esac

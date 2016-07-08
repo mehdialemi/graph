@@ -19,14 +19,6 @@ public class GraphUtils implements Serializable {
         conf.setAppName(name + "-" + defaultPartition + "-" + new File(inputPath).getName());
     }
 
-    public static void printOutputLCC(long nodes, float sumLCC, float avgLCC) {
-        System.out.println("Nodes = " + nodes + ", Sum_LCC = " + sumLCC + ", AVG_LCC = " + avgLCC);
-    }
-
-    public static void printOutputGCC(long nodes, long triangles, float gcc) {
-        System.out.println("Nodes = " + nodes + ", Triangles = " + triangles + ", GCC = " + gcc);
-    }
-
     public static JavaPairRDD<Long, Long> loadUndirectedEdges(JavaRDD<String> input) {
         JavaPairRDD<Long, Long> edges = input.flatMapToPair(new PairFlatMapFunction<String, Long, Long>() {
 

@@ -14,12 +14,9 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Calculate Global Clustering Coefficient (GCC) using fonl structure which is sorted based on degree of nodes. This
- * causes that in all steps of program we could have a balanced workload. In finding GCC we only require total
- * triangle count and we don't need to maintain triangle count per node. So, we could have better performance in
- * comparison with Local Clustering Coefficient (LCC) which we should have number of triangles per node.
+ * Counts total number of triangles in the given graph using degree based fonl. Copied from {@link FonlDegGCC}.
  */
-public class FonlDegGCC {
+public class FonlDegTC {
 
     public static void main(String[] args) {
         String inputPath = "input.txt";
@@ -66,30 +63,28 @@ public class FonlDegGCC {
             });
 
         long totalTriangles = candidates.cogroup(fonl, partition).map(t -> {
-                Iterator<long[]> iterator = t._2._2.iterator();
-                if (!iterator.hasNext())
-                    return 0L;
-                long[] hDegs = iterator.next();
+            Iterator<long[]> iterator = t._2._2.iterator();
+            if (!iterator.hasNext())
+                return 0L;
+            long[] hDegs = iterator.next();
 
-                iterator = t._2._1.iterator();
-                if (!iterator.hasNext())
-                    return 0L;
+            iterator = t._2._1.iterator();
+            if (!iterator.hasNext())
+                return 0L;
 
-                Arrays.sort(hDegs, 1, hDegs.length);
-                long sum = 0;
+            Arrays.sort(hDegs, 1, hDegs.length);
+            long sum = 0;
 
-                do {
-                    long[] forward = iterator.next();
-                    int count = GraphUtils.sortedIntersectionCount(hDegs, forward, null, 1, 0);
-                    sum += count;
-                } while (iterator.hasNext());
+            do {
+                long[] forward = iterator.next();
+                int count = GraphUtils.sortedIntersectionCount(hDegs, forward, null, 1, 0);
+                sum += count;
+            } while (iterator.hasNext());
 
-                return sum;
-            }).reduce((a, b) -> a + b);
+            return sum;
+        }).reduce((a, b) -> a + b);
 
-        long totalNodes = fonl.count();
-        float globalCC = totalTriangles / (float) (totalNodes * (totalNodes - 1));
-        OutputUtils.printOutputGCC(totalNodes, totalTriangles, globalCC);
+        OutputUtils.printOutputTC(totalTriangles);
         sc.close();
     }
 }
