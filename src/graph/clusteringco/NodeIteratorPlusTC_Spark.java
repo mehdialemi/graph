@@ -17,8 +17,7 @@ import java.util.*;
 public class NodeIteratorPlusTC_Spark {
 
     public static void main(String[] args) {
-//        String inputPath = "input.txt";
-        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
+        String inputPath = "input.txt";
         if (args.length > 0)
             inputPath = args[0];
 
@@ -29,7 +28,7 @@ public class NodeIteratorPlusTC_Spark {
         SparkConf conf = new SparkConf();
         if (args.length == 0)
             conf.setMaster("local[2]");
-        GraphUtils.setAppName(conf, "NodeIterPlus-TC-Spark", partition, inputPath);
+        GraphUtils.setAppName(conf, "NodeIterPlus-GCC-Spark", partition, inputPath);
         conf.registerKryoClasses(new Class[]{GraphUtils.class, GraphUtils.VertexDegree.class, long[].class});
         JavaSparkContext sc = new JavaSparkContext(conf);
 
@@ -49,15 +48,20 @@ public class NodeIteratorPlusTC_Spark {
                         throw new RuntimeException("invalid edge line " + line);
                     e2 = Long.parseLong(tokenizer.nextToken());
                     // Input contains reciprocal edges, only need one.
-                    if (e1 < e2) {
-                        return new Tuple2<>(e1, e2);
+                    if (e2 < e1) {
+                        return new Tuple2<>(e2, e1);
                     }
+                    return new Tuple2<>(e1, e2);
                 }
                 return null;
             }
         }).filter(t -> t != null);
 
-        JavaPairRDD<String, Long> triads = edges.groupByKey()
+        JavaPairRDD<Long, Iterable<Long>> neighborList = edges.groupByKey();
+
+        long nodes = neighborList.count();
+
+        JavaPairRDD<String, Long> triads = neighborList
             .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, Iterable<Long>>, String, Long>() {
             long zero = 0;
             int size = 0;
@@ -98,36 +102,23 @@ public class NodeIteratorPlusTC_Spark {
             }
         });
 
-        JavaRDD<Long> triangles = triads.flatMapToPair(new PairFlatMapFunction<Tuple2<String, Long>, String, Long>() {
-            @Override
-            public Iterable<Tuple2<String, Long>> call(Tuple2<String, Long> tuple) throws Exception {
-                List<Tuple2<String, Long>> output = new ArrayList<>();
-
-                String line = tuple._1;
-                StringTokenizer tokenizer = new StringTokenizer(line);
-                if (tokenizer.hasMoreTokens()) {
-                    String key = tokenizer.nextToken();
-                    if (!tokenizer.hasMoreTokens())
-                        throw new RuntimeException("invalid intermediate line " + line);
-                    output.add(new Tuple2<>(key, tuple._2));
+        JavaRDD<Long> triangles = triads.groupByKey().map(t -> {
+            long count = 0L;
+            boolean triangleFound = false;
+            for (Long value : t._2) {
+                count++;
+                if (value == 0) { // we have edge here
+                    triangleFound = true;
+                    count--;
                 }
-                return output;
             }
-        }).groupByKey().map(tuple -> {
-            long count = 0;
-            long c = 0, n = 0;
 
-            Iterator<Long> vs = tuple._2.iterator();
-            // Triad edge value=1, original edge value=0.
-            while (vs.hasNext()) {
-                c += vs.next();
-                ++n;
-            }
-            if (c != n) count += c;
-            return count;
+            if (triangleFound)
+                return count;
+            return 0L;
         });
 
-        Long count = triangles.reduce((a, b) -> a + b);
+        long count = triangles.reduce((a, b) -> a + b);
 
         OutputUtils.printOutputTC(count);
         sc.close();

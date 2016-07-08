@@ -17,7 +17,8 @@ import java.util.*;
 public class NodeIteratorPlusGCC_Spark {
 
     public static void main(String[] args) {
-        String inputPath = "input.txt";
+//        String inputPath = "input.txt";
+        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
         if (args.length > 0)
             inputPath = args[0];
 
@@ -33,61 +34,48 @@ public class NodeIteratorPlusGCC_Spark {
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         JavaRDD<String> input = sc.textFile(inputPath, partition);
-        JavaPairRDD<Long, Long> edges = input.mapToPair(new PairFunction<String, Long, Long>() {
+
+        JavaPairRDD<Long, Long> uEdges = GraphUtils.loadUndirectedEdges(input);
+        JavaPairRDD<Long, Long[]> neighborList = uEdges.groupByKey().mapToPair(new PairFunction<Tuple2<Long, Iterable<Long>>, Long, Long[]>() {
             @Override
-            public Tuple2<Long, Long> call(String line) throws Exception {
-                if (line.startsWith("#"))
-                    return null;
-
-                StringTokenizer tokenizer = new StringTokenizer(line);
-                long e1, e2;
-
-                if (tokenizer.hasMoreTokens()) {
-                    e1 = Long.parseLong(tokenizer.nextToken());
-                    if (!tokenizer.hasMoreTokens())
-                        throw new RuntimeException("invalid edge line " + line);
-                    e2 = Long.parseLong(tokenizer.nextToken());
-                    // Input contains reciprocal edges, only need one.
-                    if (e2 < e1) {
-                        return new Tuple2<>(e2, e1);
-                    }
-                    return new Tuple2<>(e1, e2);
-                }
-                return null;
+            public Tuple2<Long, Long[]> call(Tuple2<Long, Iterable<Long>> tuple) throws Exception {
+                HashSet<Long> set = new HashSet<>();
+                for (long neighbor : tuple._2)
+                    set.add(neighbor);
+                return new Tuple2<>(tuple._1, set.toArray(new Long[0]));
             }
-        }).filter(t -> t != null);
-
-        JavaPairRDD<Long, Iterable<Long>> neighborList = edges.groupByKey();
+        });
 
         long nodes = neighborList.count();
 
         JavaPairRDD<String, Long> triads = neighborList
-            .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, Iterable<Long>>, String, Long>() {
+            .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, Long[]>, String, Long>() {
             long zero = 0;
             int size = 0;
             long one = 1;
             long[] vArray = new long[4096];
 
             @Override
-            public Iterable<Tuple2<String, Long>> call(Tuple2<Long, Iterable<Long>> tuple) throws Exception {
+            public Iterable<Tuple2<String, Long>> call(Tuple2<Long, Long[]> tuple) throws Exception {
                 // Produce triads - all permutations of pairs where e1 < e2 (value=1).
                 // And all original edges (value=0).
                 // Sorted by value.
                 List<Tuple2<String, Long>> output = new ArrayList<>();
-                Iterable<Long> values = tuple._2;
+                Long[] vs = tuple._2;
                 Long key = tuple._1;
 
-                Iterator<Long> vs = values.iterator();
-                for (size = 0; vs.hasNext(); ) {
-                    if (vArray.length == size) {
-                        vArray = Arrays.copyOf(vArray, vArray.length * 2);
+                size = 0;
+                for (long e: vs) {
+                    if (e > key) {
+                        if (vArray.length == size) {
+                            vArray = Arrays.copyOf(vArray, vArray.length * 2);
+                        }
+
+                        vArray[size++] = e;
+
+                        // Original edge.
+                        output.add(new Tuple2<>(key + " " + Long.toString(e), zero));
                     }
-
-                    long e = vs.next();
-                    vArray[size++] = e;
-
-                    // Original edge.
-                    output.add(new Tuple2<>(key + " " + Long.toString(e), zero));
                 }
 
                 Arrays.sort(vArray, 0, size);
@@ -102,36 +90,23 @@ public class NodeIteratorPlusGCC_Spark {
             }
         });
 
-        JavaRDD<Long> triangles = triads.flatMapToPair(new PairFlatMapFunction<Tuple2<String, Long>, String, Long>() {
-            @Override
-            public Iterable<Tuple2<String, Long>> call(Tuple2<String, Long> tuple) throws Exception {
-                List<Tuple2<String, Long>> output = new ArrayList<>();
-
-                String line = tuple._1;
-                StringTokenizer tokenizer = new StringTokenizer(line);
-                if (tokenizer.hasMoreTokens()) {
-                    String key = tokenizer.nextToken();
-                    if (!tokenizer.hasMoreTokens())
-                        throw new RuntimeException("invalid intermediate line " + line);
-                    output.add(new Tuple2<>(key, tuple._2));
+        JavaRDD<Long> triangles = triads.groupByKey().map(t -> {
+            long count = 0L;
+            boolean triangleFound = false;
+            for (Long value : t._2) {
+                count++;
+                if (value == 0) { // we have edge here
+                    triangleFound = true;
+                    count--;
                 }
-                return output;
             }
-        }).groupByKey().map(tuple -> {
-            long count = 0;
-            long c = 0, n = 0;
 
-            Iterator<Long> vs = tuple._2.iterator();
-            // Triad edge value=1, original edge value=0.
-            while (vs.hasNext()) {
-                c += vs.next();
-                ++n;
-            }
-            if (c != n) count += c;
-            return count;
+            if (triangleFound)
+                return count;
+            return 0L;
         });
 
-        Long totalTriangles = triangles.reduce((a, b) -> a + b);
+        long totalTriangles = triangles.reduce((a, b) -> a + b);
         float globalCC = totalTriangles / (float) (nodes * (nodes - 1));
 
         OutputUtils.printOutputGCC(nodes, totalTriangles, globalCC);

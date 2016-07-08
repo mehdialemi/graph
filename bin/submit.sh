@@ -14,13 +14,23 @@ case $task in
 	;;
 	"LCC_Deg")	main_class="graph.clusteringco.FonlDegLCC"
 	;;
+    "TC_Deg")   main_class="graph.clusteringco.FonlDegTC"
+    ;;
 	"GCC_Id")  main_class="graph.clusteringco.FonlIdGCC"
 	;;
 	"LCC_Id")  main_class="graph.clusteringco.FonlIdLCC"
     ;;
-    "GCC_GraphX" main_class="graph.clusteringco.GraphX_GCC"
+    "TC_Id")    main_class="graph.clusteringco.FonlIdTC"
     ;;
-    "LCC_GraphX" main_class="graph.clusteringco.GraphX_LCC"
+    "GCC_GraphX") main_class="graph.clusteringco.GraphX_GCC"
+    ;;
+    "LCC_GraphX") main_class="graph.clusteringco.GraphX_LCC"
+    ;;
+    "TC_GraphX") main_class="graph.clusteringco.GraphX_TC"
+    ;;
+    "GCC_NodeIter") main_class="graph.clusteringco.NodeIteratorPlusGCC_Spark"
+    ;;
+    "TC_NodeIter")  main_class="graph.clusteringco.NodeIteratorPlusTC_Spark"
     ;;
 	*)	echo "please determine your task in the argument [GCC|LCC|GCC_Old|LCC_Old]"
 		exit 1
