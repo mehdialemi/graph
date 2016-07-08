@@ -22,7 +22,7 @@ object GraphX_TC {
         val conf = new SparkConf()
         if (args == null || args.length == 0)
             conf.setMaster("local[2]")
-        GraphUtils.setAppName(conf, "GraphX-GCC", partition, inputPath);
+        GraphUtils.setAppName(conf, "GraphX-TC", partition, inputPath);
         val sc = new SparkContext(conf)
 
         val graph = GraphLoader.edgeListFile(sc, inputPath, numEdgePartitions=partition,

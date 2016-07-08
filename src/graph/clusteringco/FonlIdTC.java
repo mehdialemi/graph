@@ -37,7 +37,7 @@ public class FonlIdTC {
         conf.registerKryoClasses(new Class[]{GraphUtils.CandidateState.class, int[].class});
         if (args == null || args.length == 0)
             conf.setMaster("local[2]");
-        GraphUtils.setAppName(conf, "Fonl-GCC-Id", partition, inputPath);
+        GraphUtils.setAppName(conf, "Fonl-TC-Id", partition, inputPath);
         JavaSparkContext sc = new JavaSparkContext(conf);
         Broadcast<Integer> batchSize = sc.broadcast(bSize);
 
