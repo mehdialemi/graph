@@ -8,6 +8,10 @@ run_command() {
 input="graph-data/cit-Patents.txt"
 partitions=20
 
+bakdir=logs/bak/`date +%s`
+mkdir $bakdir
+mv logs/*.log $bakdir
+
 for i in {1..5}
 do
     run_command "bin/submit.sh GCC_Deg $input $partitions" $i
