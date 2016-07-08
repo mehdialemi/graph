@@ -27,7 +27,7 @@ object GraphX_LCC {
         val sc = new SparkContext(conf)
 
         val graph = GraphLoader.edgeListFile(sc, inputPath, numEdgePartitions=partition,
-            edgeStorageLevel=StorageLevel.MEMORY_AND_DISK, vertexStorageLevel=StorageLevel.MEMORY_AND_DISK)
+            edgeStorageLevel=StorageLevel.MEMORY_ONLY, vertexStorageLevel=StorageLevel.MEMORY_ONLY)
 
         val triangleGraph = TriangleCount.run(graph)
 
