@@ -19,7 +19,8 @@ import java.util.List;
 public class FonlIdLCC {
 
     public static void main(String[] args) {
-        String inputPath = "input.txt";
+//        String inputPath = "input.txt";
+        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
         if (args != null && args.length > 0)
             inputPath = args[0];
 
@@ -53,15 +54,20 @@ public class FonlIdLCC {
                 @Override
                 public Iterable<Tuple2<Integer, GraphUtils.CandidateState>> call(Tuple2<Integer, int[]> tuple) throws Exception {
                     List<Tuple2<Integer, GraphUtils.CandidateState>> output = new ArrayList<>();
-                    GraphUtils.CandidateState candidateState = new GraphUtils.CandidateState(tuple._1, tuple._2);
+                    int[] higherIds = new int[tuple._2.length - 1];
+                    if (higherIds.length < 2)
+                        return output;
+                    System.arraycopy(tuple._2, 1, higherIds, 0, higherIds.length);
+
+                    GraphUtils.CandidateState candidateState = new GraphUtils.CandidateState(tuple._1, higherIds);
                     Integer bSize = batchSize.getValue();
                     int size = tuple._2.length - 1;
                     for (int index = 1; index < size; index++) {
                         if (bSize != 0) {
                             if (index % bSize == 0) {
-                                int blockSize = tuple._2.length - index + 1;
+                                int blockSize = tuple._2.length - (index + 1);
                                 int[] block = new int[blockSize];
-                                System.arraycopy(tuple._2, index + 1, block, 0, block.length);
+                                System.arraycopy(tuple._2, index + 1, block, 0, blockSize);
                                 candidateState = new GraphUtils.CandidateState(tuple._1, block);
                             }
                         }
@@ -95,7 +101,6 @@ public class FonlIdLCC {
                         sum += count;
                         output.add(new Tuple2<>(candidates.firstNodeId, count));
                     }
-
                 } while (candidateIter.hasNext());
 
                 if (sum > 0) {
@@ -105,13 +110,18 @@ public class FonlIdLCC {
             }
         }).reduceByKey((a, b) -> a + b);
 
-        Float avg = localTriangleCount.filter(t -> t._2 > 0).join(fonl, partition)
+        List<Tuple2<Integer, Integer>> local = localTriangleCount.collect();
+
+        List<Tuple2<Integer, int[]>> localFonl = fonl.collect();
+
+        Float sumLCC = localTriangleCount.filter(t -> t._2 > 0).join(fonl, partition)
             .mapValues(t -> 2 * t._1 / (float) (t._2[0] * (t._2[0] - 1)))
             .map(t -> t._2)
             .reduce((a, b) -> a + b);
 
-        float lcc = avg / totalNodes;
-        GraphUtils.printOutputLCC(totalNodes, avg, lcc);
+        float avgLCC = sumLCC / totalNodes;
+        GraphUtils.printOutputLCC(totalNodes, sumLCC, avgLCC);
+
         sc.close();
     }
 }

@@ -19,8 +19,8 @@ public class GraphUtils implements Serializable {
         conf.setAppName(name + "-" + defaultPartition + "-" + new File(inputPath).getName());
     }
 
-    public static void printOutputLCC(long nodes, float sumAvg, float lcc) {
-        System.out.println("Nodes = " + nodes + ", Sum_Avg_LCC = " + sumAvg + ", LCC = " + lcc);
+    public static void printOutputLCC(long nodes, float sumLCC, float avgLCC) {
+        System.out.println("Nodes = " + nodes + ", Sum_LCC = " + sumLCC + ", AVG_LCC = " + avgLCC);
     }
 
     public static void printOutputGCC(long nodes, long triangles, float gcc) {

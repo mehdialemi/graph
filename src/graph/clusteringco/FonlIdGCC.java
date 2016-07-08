@@ -62,7 +62,7 @@ public class FonlIdGCC {
                     for (int index = 1; index < size; index++) {
                         if (bSize != 0) {
                             if (index % bSize == 0) {
-                                int blockSize = tuple._2.length - index + 1;
+                                int blockSize = tuple._2.length - (index + 1);
                                 int[] block = new int[blockSize];
                                 System.arraycopy(tuple._2, index + 1, block, 0, block.length);
                                 candidateState = new GraphUtils.CandidateState(tuple._1, block);

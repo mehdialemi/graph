@@ -29,12 +29,15 @@ object GraphX_GCC {
             edgeStorageLevel=StorageLevel.MEMORY_AND_DISK, vertexStorageLevel=StorageLevel.MEMORY_AND_DISK)
         val triangles = TriangleCount.run(graph)
 
-        val totalTriangles = triangles.vertices.reduce((v1,v2) => (0L , v1._2 + v2._2))
+        val triangle3 = triangles.vertices.reduce((v1,v2) => (0L , v1._2 + v2._2))
+        val totalTriangles = triangle3._2.toInt / 3;
 
         val totalNodes = graph.vertices.count();
 
-        val globalCC = totalTriangles._2 / (totalNodes * (totalNodes - 1)).toFloat;
+        val globalCC = totalTriangles / (totalNodes * (totalNodes - 1)).toFloat;
 
-        GraphUtils.printOutputGCC(totalNodes, totalTriangles._2, globalCC)
+        GraphUtils.printOutputGCC(totalNodes, totalNodes, globalCC)
+
+        sc.stop()
     }
 }

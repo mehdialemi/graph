@@ -19,7 +19,8 @@ import java.util.List;
 public class FonlDegLCC {
 
     public static void main(String[] args) {
-        String inputPath = "input.txt";
+//        String inputPath = "input.txt";
+        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
         if (args.length > 0)
             inputPath = args[0];
 
@@ -79,8 +80,8 @@ public class FonlDegLCC {
                         return output;
 
                     Arrays.sort(hDegs, 1, hDegs.length);
-                    int sum = 0;
 
+                    int sum = 0;
                     do {
                         long[] forward = iterator.next();
                         int count = GraphUtils.sortedIntersectionCount(hDegs, forward, output, 1, 1);
@@ -88,7 +89,6 @@ public class FonlDegLCC {
                             sum += count;
                             output.add(new Tuple2<>(forward[0], count));
                         }
-
                     } while (iterator.hasNext());
 
                     if (sum > 0) {
@@ -99,14 +99,14 @@ public class FonlDegLCC {
             })
             .reduceByKey((a, b) -> a + b);
 
-        Float avg = localTriangleCount.filter(t -> t._2 > 0).join(fonl, partition)
+        Float sumLCC = localTriangleCount.filter(t -> t._2 > 0).join(fonl, partition)
             .mapValues(t -> 2 * t._1 / (float) (t._2[0] * (t._2[0] - 1)))
             .map(t -> t._2)
             .reduce((a, b) -> a + b);
 
-        long vertexCount = fonl.count();
-        float lcc = avg / vertexCount;
-        GraphUtils.printOutputLCC(vertexCount, avg, lcc);
+        long totalNodes = fonl.count();
+        float avgLCC = sumLCC / totalNodes;
+        GraphUtils.printOutputLCC(totalNodes, sumLCC, avgLCC);
 
         sc.close();
     }
