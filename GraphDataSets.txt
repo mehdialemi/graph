@@ -3,7 +3,9 @@
 (Synthetic) LDBC-SNB
 (Synthetic) SNAP
 (Synthetic) Graph500
-(Real) Yahoo Web Graph
+(Real) http://law.di.unimi.it/datasets.php  (twitter is available here)
+(Real) Web graph => http://webdatacommons.org/hyperlinkgraph/
+(Real) Yahoo Web Graph => https://webscope.sandbox.yahoo.com/catalog.php?datatype=g
 (Synthetic) GraphGen => http://www.cse.ust.hk/graphgen/
 (Reference) https://sites.google.com/site/xiaomengsite/research/resources/graph-dataset
 (Synthetic) http://graphstream-project.org/doc/Generators/Overview-of-generators/
