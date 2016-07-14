@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="graph-processing:jar">
+    <output-path>$PROJECT_DIR$/bin</output-path>
+    <root id="archive" name="graph-processing.jar">
+      <element id="module-output" name="graph-processing" />
+    </root>
+  </artifact>
+</component>

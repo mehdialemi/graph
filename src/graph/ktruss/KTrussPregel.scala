@@ -4,7 +4,7 @@ import org.apache.spark.graphx._
 import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.mutable
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.ListBuffer
 
 /**
   * Find ktruss subgraph using pregel like procedure.
@@ -16,15 +16,15 @@ object KTrussPregel {
 
     case class NeighborMessage(list: ListBuffer[OneNeighborMsg])
 
-    val support = 4
 
     def main(args: Array[String]): Unit = {
         val input = "input.txt"
+        val outputPath = "output.txt"
         val config = new SparkConf()
         config.setAppName("ktruss-pregel")
         config.setMaster("local")
         val sc = SparkContext.getOrCreate(config)
-        val sup = sc.broadcast(support - 2)
+        val support = 1
 
         // Load int graph which is as a list of edges
         val inputGraph = GraphLoader.edgeListFile(sc, input)
@@ -36,137 +36,91 @@ object KTrussPregel {
 
         // Set degree of each vertex in the property.
         val graphVD = inputGraph.outerJoinVertices(inputGraph.degrees)((vid, v, deg) => deg)
-        graphVD.vertices.foreach(println(_))
 
         // Find new edges with correct direction. A direction from a lower degree node to a higher degree node.
         val newEdges = graphVD.triplets.map { et =>
             if (et.srcAttr.get <= et.dstAttr.get)
-                Edge(et.srcId, et.dstId, et.dstAttr.get)
+                Edge(et.srcId, et.dstId, true)
             else
-                Edge(et.dstId, et.srcId, et.srcAttr.get)
+                Edge(et.dstId, et.srcId, true)
         }
 
-        val localNewEdges = newEdges.collect()
+        val empty = sc.makeRDD(Array[(Long, Boolean)]())
 
         // Create graph with edge direction from lower degree to higher degree node and edge attribute.
-        var graph = Graph(inputGraph.vertices, newEdges)
-//        graph.edges.collect().foreach(println(_))
-        graph.persist()
+        var graph = Graph(empty, newEdges)
 
         // In a loop we find triangles and then remove edges lower than specified support
         var i = 0
-        var complete = false
-        while (i < 100 && !complete) {
-            // phase 1: Send message about completing the third edges
-            val idToDstMsg = graph.aggregateMessages(sendId, mergeIds)
-            val graphLN = graph.outerJoinVertices(idToDstMsg)((vid, value, n) => n)
-
-            // Find neighbors
-            val neighbors = graph.collectNeighborIds(EdgeDirection.Out)
-            val localNeighbors = neighbors.collect()
-
-            // Update each nodes with its neighbors
-            val graphN = graph.outerJoinVertices(neighbors)((vid, value, n) => n)
-            val localGraphN = graphN.vertices.collect()
-
-            // Send neighborIds to each neighbor
-            val message = graphN.aggregateMessages(sendNeighbors, mergeNeighborIds)
-            val localMsg = message.collect()
-
-            // phase 2: Find triangles
-            // Each node create and store messages to be sent to the neighbors about triangle
-            val graphT = graphN.outerJoinVertices(message)((vid, n, msg) => {
-                // Find triangles and make message
-                var thirdEdgesMsg = mutable.Map[Long, Array[Long]]()
-                val msgs = msg.orNull
-                if (msgs != null) {
-                    msgs.list.foreach { n1 =>
-                        // common neighbor between current node neighbors and sender node neighbors
-                        val commonNeighbors = n1.neighbors.intersect(n.get)
-
-                        // report itself and other neighbors to the sender node
-//                        val reportVertices = Array[Long](vid).union(commonNeighbors)
-                        thirdEdgesMsg += n1.vId -> commonNeighbors
-
-                        // send message to itself about triangle neighbors
-//                        thirdEdgesMsg += vid -> commonNeighbors
-                    }
-                }
-                thirdEdgesMsg
-            })
-            val localGraphT = graphT.vertices.collect()
-
-            // phase 3: send messages in order to count edges and report them
-            val triangleMsg = graphT.aggregateMessages(sendTriangle, mergeTriangle)
-            val localTriangleMsg = triangleMsg.collect()
-
-            val graphK = graph.outerJoinVertices(triangleMsg)((vid, value, tMsg) => {
-                val edges = mutable.Map[Edge[Int], Int]()
-                val list = tMsg.orNull
-                if (list != null)
-                    list.foreach(ne => edges += Edge(vid, ne, 0) -> 1)
-                edges
-            })
-            val localGraphK = graphK.vertices.collect()
-
-            // count edge occurrence
-            val edgeCount = graphK.vertices.flatMap(t => t._2).reduceByKey((a, b) => a + b)
-            val lec = edgeCount.collect()
-
-            // find edges which should be removed
-            val removeEdges = edgeCount.filter(ec => ec._2.toLong < sup.value).map(ec => (ec._1.srcId, ec._1.dstId))
-            val lre = removeEdges.collect()
-
-            // find nodes not received any messages and should be removed
-            val graphActiveVertices = graphK.subgraph(vpred = (id, attr) => !attr.isEmpty)
-//            val removeVertices = graphK.vertices.filter(t => t._2.isEmpty).map(t => (t._1, 0))
-//            val lrv = removeVertices.collect()
-            val reCount = removeEdges.count()
-            val rvCount = graphActiveVertices.vertices.count()
-            // If no extra edge as well as no extra vertex is found then exit from the loop
-            if (reCount == 0 && rvCount == 0)
-                complete = true
-
-            // find remaining vertices
-//            val remainingVertices = graph.vertices.minus(removeVertices)
-//            val localRV = remainingVertices.collect()
-
-
-            // find remaining edges
-            val remainingEdges = graph.edges.map(e => (e.srcId, e.dstId))
-              .subtract(removeEdges)
-              .map(e => Edge(e._1, e._2, 0))
-              .intersection(graphActiveVertices.edges)
-
-            val localRE = remainingEdges.collect()
-
-            // build new graph based on new vertices and edges
-            val newGraph = Graph(sc.parallelize(Array((-1L, 0))), remainingEdges, (0))
-            graph.unpersist() // unpersist previous graph
-            graph = newGraph
+        var stop = false
+        while (i < 100 && !stop) {
             graph.persist()
+            // =======================================================
+            // phase 1: Send message about completing the third edges.
+            // =======================================================
 
+            // Find outlink neighbors ids
+            val neighborIds = graph.collectNeighborIds(EdgeDirection.Out)
+
+            // Update each nodes with its outlink neighbors' id.
+            val graphWithOutlinks = graph.outerJoinVertices(neighborIds)((vid, _, nId) => nId.getOrElse(Array[Long]()))
+
+            // Send neighborIds of a node to all other its neighbors.
+            val message = graphWithOutlinks.aggregateMessages(sendNeighborIds, mergeNeighborIds)
+
+            // =======================================================
+            // phase 2: Find triangles
+            // =======================================================
+            // At first each node receive messages from its neighbor telling their neighbors' id.
+            // Then check that if receiving neighborIds have a common with its neighbors.
+            // If there was any common neighbors then it report back telling the sender the completing nodes to make
+            // a triangle through it.
+            val triangleMsg = graphWithOutlinks.vertices.join(message).flatMap{ case (vid, (n, msg)) =>
+                val map1 = msg.list.map(ids => (ids.vId, n.intersect(ids.neighbors))).filter(_._2.length > 0)
+                val map2 = map1.map(vid_ids => (vid_ids._1, Array[Long](vid)))
+                map1.union(map2)
+            }.groupByKey()
+
+            // In this step tgraph have information about the common neighbors per neighbor as the follow:
+            // (neighborId, array of common neighbors with neighborId)
+            val tgraph = graphWithOutlinks.outerJoinVertices(triangleMsg)((vid, n, msg) => msg)
+
+            // =======================================================
+            // phase 3: Collate messages for each edge
+            // =======================================================
+
+            // here there is a graph which nodes on it contains valid edges
+            val validEdgeGraph = tgraph.mapVertices((vid, nMsgs) => nMsgs.getOrElse(Iterable[Array[Long]]()).flatten
+              .map((vid, _)).groupBy(identity).mapValues(_.size).filter(_._2 >= support)
+            )
+
+            // activeEdgeMsg determine nodes and edges to be held to the next step.
+            val activeEdgeMsg = validEdgeGraph.aggregateMessages(
+                (ctx: EdgeContext[Map[(Long, Long), Int], Boolean,Boolean]) => {
+                if (ctx.srcAttr.contains((ctx.srcId, ctx.dstId)))
+                    ctx.sendToDst(true)
+                ctx.sendToSrc(true)
+            }, (a: Boolean, b: Boolean) => true)
+
+            // this is a graph which boolean values in the nodes and edges indicate valid and invalid ones.
+            val egraph = tgraph.outerJoinVertices(activeEdgeMsg)((vid, value, v) => v.getOrElse(false))
+
+            val oldEdgeCount = graph.edges.count()
+            graph = egraph.subgraph(e => e.srcAttr && e.dstAttr, (vid, v) => v)
+            val newEdgeCount = graph.edges.count()
+
+            if (newEdgeCount == 0 || newEdgeCount == oldEdgeCount)
+                stop = true
             i += 1
         }
 
-        graph.edges.collect().foreach(println(_))
+        graph.edges.saveAsTextFile(outputPath)
     }
 
-    def sendId(ctx: EdgeContext[Int, Int, ListBuffer[Long]]): Unit = {
-        val msg = new ListBuffer[Long]()
-        msg += ctx.srcId
-        ctx.sendToDst(msg)
-    }
-
-    def mergeIds(msg1: ListBuffer[Long], msg2: ListBuffer[Long]): Unit = {
-        msg1 ++= msg2
-        msg1
-    }
-
-    // Send neighborIds to a neighbor
-    def sendNeighbors(ctx: EdgeContext[Option[Array[Long]], Int, NeighborMessage]): Unit = {
+    // Send neighborIds to all neighbors
+    def sendNeighborIds(ctx: EdgeContext[Array[Long], Boolean, NeighborMessage]): Unit = {
         val msg = new ListBuffer[OneNeighborMsg]()
-        msg += OneNeighborMsg(ctx.srcId, ctx.srcAttr.get)
+        msg += OneNeighborMsg(ctx.srcId, ctx.srcAttr)
         ctx.sendToDst(NeighborMessage(msg))
     }
 
@@ -189,5 +143,12 @@ object KTrussPregel {
     def mergeTriangle(msg1: ListBuffer[Long], msg2: ListBuffer[Long]): ListBuffer[Long] = {
         msg1 ++= msg2
         msg1
+    }
+
+    // Send true to src and dst node of an edge if that edge can be found in the map of the src node.
+    def sendEdge(ctx: EdgeContext[(Map[(Long, Long), Int]), Boolean, Boolean]): Unit = {
+        if (ctx.srcAttr.contains((ctx.srcId, ctx.dstId)))
+            ctx.sendToDst(true)
+        ctx.sendToSrc(true)
     }
 }
