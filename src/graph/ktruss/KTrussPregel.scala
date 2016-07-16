@@ -1,9 +1,10 @@
 package graph.ktruss
 
+import java.io.File
+
 import org.apache.spark.graphx._
 import org.apache.spark.{SparkConf, SparkContext}
 
-import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 /**
@@ -18,16 +19,17 @@ object KTrussPregel {
 
 
     def main(args: Array[String]): Unit = {
-        val input = "input.txt"
-        val outputPath = "output.txt"
+        val inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt"
+        val outputPath = "/home/mehdi/graph-data/output-pregel"
         val config = new SparkConf()
         config.setAppName("ktruss-pregel")
-        config.setMaster("local")
+        config.setMaster("local[2]")
         val sc = SparkContext.getOrCreate(config)
-        val support = 1
+        val k = 5
+        val support = k - 2
 
         // Load int graph which is as a list of edges
-        val inputGraph = GraphLoader.edgeListFile(sc, input)
+        val inputGraph = GraphLoader.edgeListFile(sc, inputPath)
 
         // Change direction from lower degree node to a higher node
         // First find degree of each node
@@ -51,9 +53,8 @@ object KTrussPregel {
         var graph = Graph(empty, newEdges)
 
         // In a loop we find triangles and then remove edges lower than specified support
-        var i = 0
         var stop = false
-        while (i < 100 && !stop) {
+        while (!stop) {
             graph.persist()
             // =======================================================
             // phase 1: Send message about completing the third edges.
@@ -66,7 +67,15 @@ object KTrussPregel {
             val graphWithOutlinks = graph.outerJoinVertices(neighborIds)((vid, _, nId) => nId.getOrElse(Array[Long]()))
 
             // Send neighborIds of a node to all other its neighbors.
-            val message = graphWithOutlinks.aggregateMessages(sendNeighborIds, mergeNeighborIds)
+            val message = graphWithOutlinks.aggregateMessages(
+                (ctx: EdgeContext[Array[Long], Boolean,NeighborMessage]) => {
+                val msg = new ListBuffer[OneNeighborMsg]()
+                msg += OneNeighborMsg(ctx.srcId, ctx.srcAttr)
+                ctx.sendToDst(NeighborMessage(msg))
+            }, (msg1: NeighborMessage, msg2: NeighborMessage) => {
+                msg1.list ++= msg2.list
+                msg1
+            })
 
             // =======================================================
             // phase 2: Find triangles
@@ -111,44 +120,10 @@ object KTrussPregel {
 
             if (newEdgeCount == 0 || newEdgeCount == oldEdgeCount)
                 stop = true
-            i += 1
         }
 
+        new File(outputPath).delete()
+        println("Remaining graph edge count: " + graph.edges.count())
         graph.edges.saveAsTextFile(outputPath)
-    }
-
-    // Send neighborIds to all neighbors
-    def sendNeighborIds(ctx: EdgeContext[Array[Long], Boolean, NeighborMessage]): Unit = {
-        val msg = new ListBuffer[OneNeighborMsg]()
-        msg += OneNeighborMsg(ctx.srcId, ctx.srcAttr)
-        ctx.sendToDst(NeighborMessage(msg))
-    }
-
-    def mergeNeighborIds(msg1: NeighborMessage, msg2: NeighborMessage): NeighborMessage = {
-        msg1.list ++= msg2.list
-        msg1
-    }
-
-    // Send completing node to the neighbor
-    def sendTriangle(ctx: EdgeContext[mutable.Map[Long, Array[Long]], Int, ListBuffer[Long]]): Unit = {
-        ctx.dstAttr.get(ctx.srcId) match {
-            case Some(s) =>
-                val nodes = ListBuffer[Long]()
-                nodes ++= s
-                ctx.sendToSrc(nodes)
-            case None =>
-        }
-    }
-
-    def mergeTriangle(msg1: ListBuffer[Long], msg2: ListBuffer[Long]): ListBuffer[Long] = {
-        msg1 ++= msg2
-        msg1
-    }
-
-    // Send true to src and dst node of an edge if that edge can be found in the map of the src node.
-    def sendEdge(ctx: EdgeContext[(Map[(Long, Long), Int]), Boolean, Boolean]): Unit = {
-        if (ctx.srcAttr.contains((ctx.srcId, ctx.dstId)))
-            ctx.sendToDst(true)
-        ctx.sendToSrc(true)
     }
 }

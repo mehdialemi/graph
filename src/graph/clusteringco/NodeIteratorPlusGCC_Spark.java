@@ -1,5 +1,6 @@
 package graph.clusteringco;
 
+import graph.GraphUtils;
 import graph.OutputUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;

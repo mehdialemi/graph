@@ -1,6 +1,6 @@
 package graph.clusteringco
 
-import graph.OutputUtils
+import graph.{GraphUtils, OutputUtils}
 import org.apache.spark.graphx.GraphLoader
 import org.apache.spark.graphx.lib.TriangleCount
 import org.apache.spark.storage.StorageLevel

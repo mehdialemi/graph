@@ -1,16 +1,20 @@
 package graph.clusteringco;
 
+import graph.GraphUtils;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * Utility class to create fonl sorted based on degree or ids
  */
-public class FonlUtils {
+public class FonlUtils implements Serializable {
 
     /**
      * Create a fonl in key-value structure. Here, key is a vertex id and value is an array which first element of it
@@ -107,5 +111,11 @@ public class FonlUtils {
                     return new Tuple2<>(vertex, higherIds);
                 }
             }).reduceByKey((a, b) -> a).repartition(partition).cache();
+    }
+
+    public static JavaPairRDD<Long, long[]> loadFonl(JavaSparkContext sc, String inputPath, int partition) {
+        JavaRDD<String> input = sc.textFile(inputPath, partition);
+        JavaPairRDD<Long, Long> edges = GraphUtils.loadUndirectedEdges(input);
+        return FonlUtils.createFonlDegreeBased(edges, partition);
     }
 }
