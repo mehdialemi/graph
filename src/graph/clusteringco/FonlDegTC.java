@@ -24,21 +24,18 @@ public class FonlDegTC {
 
     public static JavaPairRDD<Long, long[]> createCandidates(JavaPairRDD<Long, long[]> fonl) {
         return fonl.filter(t -> t._2.length > 2)
-            .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, long[]>, Long, long[]>() {
-                @Override
-                public Iterable<Tuple2<Long, long[]>> call(Tuple2<Long, long[]> t) throws Exception {
-                    int size = t._2.length - 1;
-                    List<Tuple2<Long, long[]>> output = new ArrayList<>(size);
-                    for (int index = 1; index < size; index++) {
-                        int len = size - index;
-                        long[] forward = new long[len + 1];
-                        forward[0] = t._1; // First vertex in the triangle
-                        System.arraycopy(t._2, index + 1, forward, 1, len);
-                        Arrays.sort(forward, 1, forward.length); // sort to comfort with fonl
-                        output.add(new Tuple2<>(t._2[index], forward));
-                    }
-                    return output;
+            .flatMapToPair((PairFlatMapFunction<Tuple2<Long, long[]>, Long, long[]>) t -> {
+                int size = t._2.length - 1;
+                List<Tuple2<Long, long[]>> output = new ArrayList<>(size);
+                for (int index = 1; index < size; index++) {
+                    int len = size - index;
+                    long[] forward = new long[len + 1];
+                    forward[0] = t._1; // First vertex in the triangle
+                    System.arraycopy(t._2, index + 1, forward, 1, len);
+                    Arrays.sort(forward, 1, forward.length); // sort to comfort with fonl
+                    output.add(new Tuple2<>(t._2[index], forward));
                 }
+                return output;
             });
     }
 

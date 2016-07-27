@@ -61,6 +61,8 @@ public class FonlIdGCC {
                     GraphUtils.CandidateState candidateState = new GraphUtils.CandidateState(tuple._1, tuple._2);
                     Integer bSize = batchSize.getValue();
                     int size = tuple._2.length - 1;
+                    if (size > 1000)
+                        bSize = Integer.MAX_VALUE;
                     for (int index = 1; index < size; index++) {
                         if (bSize != 0) {
                             if (index % bSize == 0) {
@@ -88,7 +90,7 @@ public class FonlIdGCC {
                 triangleCount += GraphUtils.sortedIntersectionCountInt(higherIds, can.higherIds, null, 1, 0);
             }
             return triangleCount;
-        }).repartition(partition).reduce((t1, t2) -> t1 + t2);
+        }).reduce((t1, t2) -> t1 + t2);
 
         float globalCC = totalTriangles / (float) (nodes * (nodes - 1));
 

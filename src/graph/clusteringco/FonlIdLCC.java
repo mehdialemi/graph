@@ -38,7 +38,7 @@ public class FonlIdLCC {
         SparkConf conf = new SparkConf();
         if (args == null || args.length == 0)
             conf.setMaster("local[2]");
-        GraphUtils.setAppName(conf, "Fonl-GCC-Id", partition,inputPath);
+        GraphUtils.setAppName(conf, "Fonl-LCC-Id", partition,inputPath);
         conf.registerKryoClasses(new Class[]{GraphUtils.CandidateState.class, int[].class});
         JavaSparkContext sc = new JavaSparkContext(conf);
         Broadcast<Integer> batchSize = sc.broadcast(bSize);
@@ -47,7 +47,6 @@ public class FonlIdLCC {
         JavaPairRDD<Integer, Integer> edges = GraphUtils.loadUndirectedEdgesInt(input);
 
         JavaPairRDD<Integer, int[]> fonl = FonlUtils.createFonlIdBasedInt(edges, partition);
-
         long totalNodes = fonl.count();
 
         JavaPairRDD<Integer, GraphUtils.CandidateState> candidates = fonl
@@ -110,10 +109,6 @@ public class FonlIdLCC {
                 return output;
             }
         }).reduceByKey((a, b) -> a + b);
-
-        List<Tuple2<Integer, Integer>> local = localTriangleCount.collect();
-
-        List<Tuple2<Integer, int[]>> localFonl = fonl.collect();
 
         Float sumLCC = localTriangleCount.filter(t -> t._2 > 0).join(fonl, partition)
             .mapValues(t -> 2 * t._1 / (float) (t._2[0] * (t._2[0] - 1)))

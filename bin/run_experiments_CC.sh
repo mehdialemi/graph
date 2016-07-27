@@ -5,8 +5,12 @@ run_command() {
 	nohup $1 > logs/$name-$2.log 2>&1
 }
 
-input="graph-data/cit-Patents.txt"
-partitions=20
+input="com-friendster.ungraph.txt"
+partitions=1000
+
+if [ ! -d "logs" ]; then
+    mkdir logs
+fi
 
 bakdir=logs/bak/`date +%s`
 mkdir $bakdir

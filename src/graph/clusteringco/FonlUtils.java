@@ -71,7 +71,7 @@ public class FonlUtils implements Serializable {
 
                         return new Tuple2<>(v._1, higherDegs);
                     }
-                }).reduceByKey((a, b) -> a).repartition(partition)
+                }).reduceByKey((a, b) -> a)
                 .cache();
     }
 

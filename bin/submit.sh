@@ -1,12 +1,12 @@
 #!/bin/bash
 
-SPARK_HOME="/home/$USER/Software/spark-1.6.1-bin-hadoop2.6"
+SPARK_HOME="/home/$USER/Software/spark-1.6.2-bin-hadoop2.6"
 
 jar_path="$PWD/bin/graph-processing.jar"
 main_class=""
-master="localhost"
-exe_mem="1G"
-total_cores=4
+master="malemi-2"
+exe_mem="10G"
+total_cores=20
 
 task=$1
 case $task in

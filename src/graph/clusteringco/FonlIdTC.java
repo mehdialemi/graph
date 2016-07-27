@@ -47,8 +47,6 @@ public class FonlIdTC {
 
         JavaPairRDD<Integer, int[]> fonl = FonlUtils.createFonlIdBasedInt(edges, partition);
 
-        long totalNodes = fonl.count();
-
         JavaPairRDD<Integer, GraphUtils.CandidateState> candidate = fonl
             .flatMapToPair(new PairFlatMapFunction<Tuple2<Integer, int[]>, Integer, GraphUtils.CandidateState>() {
                 private static final long serialVersionUID = 1L;

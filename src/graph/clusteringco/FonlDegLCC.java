@@ -40,15 +40,14 @@ public class FonlDegLCC {
         JavaPairRDD<Long, Long> edges = GraphUtils.loadUndirectedEdges(input);
 
         JavaPairRDD<Long, long[]> fonl = FonlUtils.createFonlDegreeBased(edges, partition);
+        long totalNodes = fonl.count();
 
         // Partition based on degree. To balance workload, it is better to have a partitioning mechanism that
         // for example a vertex with high number of higherIds (high deg) would be allocated besides vertex with
         // low number of higherIds (high deg)
         JavaPairRDD<Long, long[]> candidates = fonl
             .filter(t -> t._2.length > 2)
-            .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, long[]>, Long, long[]>() {
-            @Override
-            public Iterable<Tuple2<Long, long[]>> call(Tuple2<Long, long[]> t) throws Exception {
+            .flatMapToPair((PairFlatMapFunction<Tuple2<Long, long[]>, Long, long[]>) t -> {
                 int size = t._2.length - 1;
                 List<Tuple2<Long, long[]>> output = new ArrayList<>(size);
                 for (int index = 1; index < size; index++) {
@@ -60,8 +59,7 @@ public class FonlDegLCC {
                     output.add(new Tuple2<>(t._2[index], forward));
                 }
                 return output;
-            }
-        });
+            });
 
         JavaPairRDD<Long, Integer> localTriangleCount = candidates.cogroup(fonl, partition)
             .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, Tuple2<Iterable<long[]>, Iterable<long[]>>>, Long, Integer>() {
@@ -104,7 +102,6 @@ public class FonlDegLCC {
             .map(t -> t._2)
             .reduce((a, b) -> a + b);
 
-        long totalNodes = fonl.count();
         float avgLCC = sumLCC / totalNodes;
         OutputUtils.printOutputLCC(totalNodes, sumLCC, avgLCC);
 

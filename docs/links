@@ -1,0 +1,12 @@
+http://stackoverflow.com/questions/29850784/what-are-the-likely-causes-of-org-apache-spark-shuffle-metadatafetchfailedexcept
+http://apache-spark-user-list.1001560.n3.nabble.com/IOError-Errno-2-No-such-file-or-directory-tmp-spark-9e23f17e-2e23-4c26-9621-3cb4d8b832da-tmp3i3xno-td21076.html
+http://apache-spark-user-list.1001560.n3.nabble.com/FileNotFoundException-in-appcache-shuffle-files-td17605.html
+
+Spark tunning
+http://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-2/
+
+Possible solutions to overcome FileNotFoundException
+1: remove GC pauses
+2: increase partitions granularity
+3: use persist instead of cache
+
