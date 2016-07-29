@@ -8,15 +8,15 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="scala-sdk-2.10.6" level="application" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/Software/spark-1.6.2-bin-hadoop2.6/lib/spark-assembly-1.6.2-hadoop2.6.0.jar!/" />
+          <root url="jar://$USER_HOME$/Software/spark-1.6.1-bin-hadoop2.6/lib/spark-assembly-1.6.1-hadoop2.6.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/Software/spark-1.6.2-bin-hadoop2.6/lib/spark-assembly-1.6.2-hadoop2.6.0.jar!/" />
-          <root url="file://$USER_HOME$/Software/spark-1.6.2" />
+          <root url="jar://$USER_HOME$/Software/spark-1.6.1-bin-hadoop2.6/lib/spark-assembly-1.6.1-hadoop2.6.0.jar!/" />
           <root url="file://$USER_HOME$/Software/spark-1.6.2/bagel/src/main/scala" />
           <root url="file://$USER_HOME$/Software/spark-1.6.2/core/src/main/java" />
           <root url="file://$USER_HOME$/Software/spark-1.6.2/core/src/main/scala" />
@@ -62,7 +62,6 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="library" name="scala-sdk-2.10.6" level="application" />
     <orderEntry type="module-library">
       <library name="JUnit4">
         <CLASSES>

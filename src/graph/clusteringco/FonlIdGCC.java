@@ -60,6 +60,7 @@ public class FonlIdGCC {
                     List<Tuple2<Integer, GraphUtils.CandidateState>> output = new ArrayList<>();
                     GraphUtils.CandidateState candidateState = new GraphUtils.CandidateState(tuple._1, tuple._2);
                     Integer bSize = batchSize.getValue();
+
                     int size = tuple._2.length - 1;
                     if (size > 1000)
                         bSize = Integer.MAX_VALUE;
