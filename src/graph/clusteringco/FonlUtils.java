@@ -6,6 +6,7 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.io.Serializable;
@@ -26,26 +27,23 @@ public class FonlUtils implements Serializable {
      */
     public static JavaPairRDD<Long, long[]> createFonlDegreeBased(JavaPairRDD<Long, Long> edges, int partition) {
         return edges.groupByKey()
-                .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, Iterable<Long>>, Long, GraphUtils.VertexDegree>() {
-                    @Override
-                    public Iterable<Tuple2<Long, GraphUtils.VertexDegree>> call(Tuple2<Long, Iterable<Long>> t) throws Exception {
-                        HashSet<Long> neighborSet = new HashSet<>();
-                        for (Long neighbor : t._2) {
-                            neighborSet.add(neighbor);
-                        }
-
-                        int degree = neighborSet.size();
-
-                        GraphUtils.VertexDegree vd = new GraphUtils.VertexDegree(t._1, degree);
-
-                        List<Tuple2<Long, GraphUtils.VertexDegree>> degreeList = new ArrayList<>(degree);
-
-                        // Add degree information of the current vertex to its neighbor
-                        for (Long neighbor : neighborSet) {
-                            degreeList.add(new Tuple2<>(neighbor, vd));
-                        }
-                        return degreeList;
+                .flatMapToPair((PairFlatMapFunction<Tuple2<Long, Iterable<Long>>, Long, GraphUtils.VertexDegree>) t -> {
+                    HashSet<Long> neighborSet = new HashSet<>();
+                    for (Long neighbor : t._2) {
+                        neighborSet.add(neighbor);
                     }
+
+                    int degree = neighborSet.size();
+
+                    GraphUtils.VertexDegree vd = new GraphUtils.VertexDegree(t._1, degree);
+
+                    List<Tuple2<Long, GraphUtils.VertexDegree>> degreeList = new ArrayList<>(degree);
+
+                    // Add degree information of the current vertex to its neighbor
+                    for (Long neighbor : neighborSet) {
+                        degreeList.add(new Tuple2<>(neighbor, vd));
+                    }
+                    return degreeList;
                 }).groupByKey()
                 .mapToPair(new PairFunction<Tuple2<Long, Iterable<GraphUtils.VertexDegree>>, Long, long[]>() {
                     @Override
@@ -71,8 +69,8 @@ public class FonlUtils implements Serializable {
 
                         return new Tuple2<>(v._1, higherDegs);
                     }
-                }).reduceByKey((a, b) -> a)
-                .cache();
+                }).reduceByKey((a, b) -> a, partition)
+                .persist(StorageLevel.MEMORY_ONLY_SER());
     }
 
     /**
