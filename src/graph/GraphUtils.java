@@ -22,39 +22,35 @@ public class GraphUtils implements Serializable {
     }
 
     public static JavaPairRDD<Long, Long> loadUndirectedEdges(JavaRDD<String> input) {
-        JavaPairRDD<Long, Long> edges = input.flatMapToPair(new PairFlatMapFunction<String, Long, Long>() {
-
-            @Override
-            public Iterable<Tuple2<Long, Long>> call(String line) throws Exception {
-                List<Tuple2<Long, Long>> list = new ArrayList<>();
-                if (line.startsWith("#"))
-                    return list;
-                String[] s = line.split("\\s+");
+        JavaPairRDD<Long, Long> edges = input.flatMapToPair((PairFlatMapFunction<String, Long, Long>) line -> {
+            List<Tuple2<Long, Long>> list = new ArrayList<>();
+            if (line.startsWith("#"))
+                return list;
+            String[] s = line.split("\\s+");
+            try {
                 long e1 = Long.parseLong(s[0]);
                 long e2 = Long.parseLong(s[1]);
                 list.add(new Tuple2<>(e1, e2));
                 list.add(new Tuple2<>(e2, e1));
-                return list;
+            } catch (Throwable e) {
+                System.out.println("Could not parse line " + line);
             }
+            return list;
         });
         return edges;
     }
 
     public static JavaPairRDD<Integer, Integer> loadUndirectedEdgesInt(JavaRDD<String> input) {
-        JavaPairRDD<Integer, Integer> edges = input.flatMapToPair(new PairFlatMapFunction<String, Integer, Integer>() {
-
-            @Override
-            public Iterable<Tuple2<Integer, Integer>> call(String line) throws Exception {
-                List<Tuple2<Integer, Integer>> list = new ArrayList<>();
-                if (line.startsWith("#"))
-                    return list;
-                String[] s = line.split("\\s+");
-                int e1 = Integer.parseInt(s[0]);
-                int e2 = Integer.parseInt(s[1]);
-                list.add(new Tuple2<>(e1, e2));
-                list.add(new Tuple2<>(e2, e1));
+        JavaPairRDD<Integer, Integer> edges = input.flatMapToPair((PairFlatMapFunction<String, Integer, Integer>) line -> {
+            List<Tuple2<Integer, Integer>> list = new ArrayList<>();
+            if (line.startsWith("#"))
                 return list;
-            }
+            String[] s = line.split("\\s+");
+            int e1 = Integer.parseInt(s[0]);
+            int e2 = Integer.parseInt(s[1]);
+            list.add(new Tuple2<>(e1, e2));
+            list.add(new Tuple2<>(e2, e1));
+            return list;
         });
         return edges;
     }

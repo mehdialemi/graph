@@ -4,6 +4,7 @@ http://apache-spark-user-list.1001560.n3.nabble.com/FileNotFoundException-in-app
 
 Spark tunning
 http://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-2/
+http://www.slideshare.net/SandyRyza/spark-job-failures-talk
 
 Possible solutions to overcome FileNotFoundException
 1: remove GC pauses

@@ -7,19 +7,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/bin/graph-processing.jar" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/codeStyleSettings.xml" afterPath="$PROJECT_DIR$/.idea/codeStyleSettings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/run_experiments_CC.sh" afterPath="$PROJECT_DIR$/bin/run_experiments_CC.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/submit.sh" afterPath="$PROJECT_DIR$/bin/submit.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/graph-processing.iml" afterPath="$PROJECT_DIR$/graph-processing.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlDegGCC.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlDegGCC.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlDegLCC.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlDegLCC.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlDegTC.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlDegTC.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlIdGCC.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlIdGCC.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlIdLCC.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlIdLCC.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlIdTC.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlIdTC.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/datasets" afterPath="$PROJECT_DIR$/docs/datasets" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/links" afterPath="$PROJECT_DIR$/docs/links" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/GraphUtils.java" afterPath="$PROJECT_DIR$/src/graph/GraphUtils.java" />
     </list>
     <ignored path="graph-processing.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -57,7 +47,17 @@
         <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlDegGCC.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="88" column="35" selection-start-line="88" selection-start-column="35" selection-end-line="88" selection-end-column="35" />
+              <caret line="35" column="28" selection-start-line="35" selection-start-column="28" selection-end-line="35" selection-end-column="28" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GraphUtils.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/graph/GraphUtils.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.485755">
+              <caret line="33" column="47" selection-start-line="33" selection-start-column="47" selection-end-line="33" selection-end-column="47" />
               <folding />
             </state>
           </provider>
@@ -92,9 +92,7 @@
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
               <caret line="30" column="44" selection-start-line="30" selection-start-column="44" selection-end-line="30" selection-end-column="44" />
-              <folding>
-                <element signature="e#28#66#0" expanded="false" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -133,21 +131,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FonlDegTC.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlDegTC.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="27" column="12" selection-start-line="27" selection-start-column="12" selection-end-line="27" selection-end-column="12" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FonlIdGCC.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="FonlIdGCC.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlIdGCC.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.8817664">
-              <caret line="98" column="5" selection-start-line="98" selection-start-column="5" selection-end-line="98" selection-end-column="5" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="80" column="59" selection-start-line="80" selection-start-column="59" selection-end-line="80" selection-end-column="59" />
               <folding />
             </state>
           </provider>
@@ -213,7 +201,6 @@
         <option value="$PROJECT_DIR$/src/graph/ktruss/KTrussSpark.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/Tuple3.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/Triangle.java" />
-        <option value="$PROJECT_DIR$/src/graph/GraphUtils.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/Test.java" />
         <option value="$PROJECT_DIR$/src/graph/ktruss/TestScala.scala" />
         <option value="$PROJECT_DIR$/src/graph/ktruss/KTrussBucket.java" />
@@ -227,6 +214,7 @@
         <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlIdLCC.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlIdTC.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlIdGCC.java" />
+        <option value="$PROJECT_DIR$/src/graph/GraphUtils.java" />
       </list>
     </option>
   </component>
@@ -442,7 +430,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$USER_HOME$/projects/graph" />
     <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -1246,16 +1234,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/graph/GraphUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="227" column="42" selection-start-line="227" selection-start-column="42" selection-end-line="227" selection-end-column="42" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/graph/ktruss/KTrussSparkJava.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1358,16 +1336,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/GraphX_GCC.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="30" column="44" selection-start-line="30" selection-start-column="44" selection-end-line="30" selection-end-column="44" />
-          <folding>
-            <element signature="e#28#66#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/GraphX_LCC.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1396,18 +1364,34 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlDegGCC.java">
+    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlIdGCC.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="88" column="35" selection-start-line="88" selection-start-column="35" selection-end-line="88" selection-end-column="35" />
+          <caret line="80" column="59" selection-start-line="80" selection-start-column="59" selection-end-line="80" selection-end-column="59" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlIdGCC.java">
+    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/GraphX_GCC.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.8817664">
-          <caret line="98" column="5" selection-start-line="98" selection-start-column="5" selection-end-line="98" selection-end-column="5" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="30" column="44" selection-start-line="30" selection-start-column="44" selection-end-line="30" selection-end-column="44" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlDegGCC.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="35" column="28" selection-start-line="35" selection-start-column="28" selection-end-line="35" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/graph/GraphUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.485755">
+          <caret line="33" column="47" selection-start-line="33" selection-start-column="47" selection-end-line="33" selection-end-column="47" />
           <folding />
         </state>
       </provider>
