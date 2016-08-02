@@ -6,12 +6,7 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/GraphUtils.java" afterPath="$PROJECT_DIR$/src/graph/GraphUtils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlDegTC.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlDegTC.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java" />
-    </list>
+    <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="" />
     <ignored path="graph-processing.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="$PROJECT_DIR$/out/" />

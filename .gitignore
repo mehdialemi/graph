@@ -2,3 +2,4 @@ out
 target/
 logs/*
 .idea/*
+.idea/workspace.xml
