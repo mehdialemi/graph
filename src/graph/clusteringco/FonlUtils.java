@@ -114,7 +114,7 @@ public class FonlUtils implements Serializable {
 
                 return new Tuple2<>(t._1._1, higherDegs);
             }
-        }).repartition(partition).persist(StorageLevel.MEMORY_AND_DISK());
+        }).repartition(partition).persist(StorageLevel.MEMORY_ONLY_2());
     }
 
     /**
