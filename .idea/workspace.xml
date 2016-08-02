@@ -7,9 +7,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/graph/stat/GraphStat.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/graph-processing.jar" afterPath="$PROJECT_DIR$/bin/graph-processing.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlDegGCC.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlDegGCC.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java" />
     </list>
@@ -43,22 +40,24 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FonlDegGCC.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="FonlDegGCC.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlDegGCC.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="16" column="3" selection-start-line="16" selection-start-column="3" selection-end-line="16" selection-end-column="3" />
+            <state relative-caret-position="301">
+              <caret line="33" column="41" selection-start-line="33" selection-start-column="41" selection-end-line="33" selection-end-column="41" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FonlUtils.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="FonlUtils.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="175" column="44" selection-start-line="175" selection-start-column="44" selection-end-line="175" selection-end-column="44" />
-              <folding />
+            <state relative-caret-position="312">
+              <caret line="30" column="23" selection-start-line="30" selection-start-column="23" selection-end-line="30" selection-end-column="23" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -213,8 +212,8 @@
         <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlDegTC.java" />
         <option value="$PROJECT_DIR$/src/graph/GraphUtils.java" />
         <option value="$PROJECT_DIR$/src/graph/stat/GraphStat.java" />
-        <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlDegGCC.java" />
+        <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java" />
       </list>
     </option>
   </component>
@@ -897,6 +896,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39967898" sideWeight="0.50293255" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2866242" sideWeight="0.4941349" order="2" side_tool="false" content_ui="tabs" x="0" y="72" width="1366" height="628" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -905,14 +905,13 @@
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32423756" sideWeight="0.49706745" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.7078652" sideWeight="0.4941349" order="2" side_tool="false" content_ui="tabs" x="0" y="72" width="1366" height="628" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32744783" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32423756" sideWeight="0.49706745" order="3" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -1346,19 +1345,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java">
+    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlDegGCC.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="175" column="44" selection-start-line="175" selection-start-column="44" selection-end-line="175" selection-end-column="44" />
+        <state relative-caret-position="301">
+          <caret line="33" column="41" selection-start-line="33" selection-start-column="41" selection-end-line="33" selection-end-column="41" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlDegGCC.java">
+    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="16" column="3" selection-start-line="16" selection-start-column="3" selection-end-line="16" selection-end-column="3" />
-          <folding />
+        <state relative-caret-position="312">
+          <caret line="30" column="23" selection-start-line="30" selection-start-column="23" selection-end-line="30" selection-end-column="23" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

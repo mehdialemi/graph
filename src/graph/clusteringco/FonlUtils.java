@@ -9,7 +9,6 @@ import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
-import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.*;
 
@@ -18,54 +17,24 @@ import java.util.*;
  */
 public class FonlUtils implements Serializable {
 
-    static class EVD { // Edge Vertex Degree
-        long x1;
-        long x2;
-        boolean isEdge;
-
-        EVD(long x1, long x2, boolean isEdge) {
-            this.x1 = x1;
-            this.x2 = x2;
-            this.isEdge = isEdge;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null)
-                return false;
-            EVD evd = (EVD) obj;
-            if (isEdge && evd.isEdge)
-                return x1 == evd.x1 && x2 == evd.x2;
-            if (!isEdge && evd.isEdge)
-                return x1 == evd.x1 || x1 == evd.x2;
-            if (isEdge && !evd.isEdge)
-                return evd.x1 == x1 || evd.x1 == x2;
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return (int) (x1);
-        }
-
-        @Override
-        public String toString() {
-            return "(" + x1 + " , " + x2 + ", " + isEdge + ")";
-        }
-    }
-
+    /**
+     * This utility function causes more load balancing and tries to prevent out of memory error by reducing the size
+     * of required memory when calling reduce by key function. It does its work by first finding degree of each
+     * vertex. Then it create an edge list which in it each edge has vertices such that lower degree vertex is the
+     * key and higher degree vertex is value. The final data structure is fonl which in it key is a vertex and value
+     * is its neighbors sorted by their degree.
+     * @param edges
+     * @param partition
+     * @return
+     */
     public static JavaPairRDD<Long, long[]> createFonlDegreeBased2(JavaPairRDD<Long, Long> edges, int partition) {
         // edges direction from low node id to high node id to prevent edge repetition.
-        JavaRDD<Tuple2<Long, Long>> sthEdge =
+        JavaRDD<Tuple2<Long, Long>> lthEdge =
             edges.map(t -> t._1 < t._2 ? new Tuple2<>(t._1, t._2) : new Tuple2<>(t._2, t._1)).distinct();
-        sthEdge.cache();
-        List<Tuple2<Long, Long>> list = sthEdge.collect();
-        for (Tuple2<Long, Long> l : list)
-            if (l._2 == 357444 || l._1 == 357444 || l._1 == 455266 || l._2 == 455266)
-                System.out.println(l);
+        lthEdge.cache();
 
         // Get degree of each vertex.
-        JavaPairRDD<EVD, EVD> vertexDegree = sthEdge
+        JavaPairRDD<Long, Long> vertexDegree = lthEdge
             .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, Long>, Long, Long>() {
                 @Override
                 public Iterable<Tuple2<Long, Long>> call(Tuple2<Long, Long> t) throws Exception {
@@ -74,66 +43,52 @@ public class FonlUtils implements Serializable {
                     list.add(new Tuple2<>(t._2, 1L));
                     return list;
                 }
-            }).reduceByKey((a, b) -> a + b).mapToPair(new PairFunction<Tuple2<Long, Long>, EVD, EVD>() {
+            }).reduceByKey((a, b) -> a + b);
+
+        // Each vertex in the each edge has its degree beside itself. Each edge direction is from lower node degree
+        // to higher node degree.
+        JavaPairRDD<Tuple2<Long, Long>, Tuple2<Long, Long>> degreeSortedEdges =
+            lthEdge.keyBy(t -> t._1).join(vertexDegree) // send vertex degree to left vertex in the edge.
+            .mapToPair(new PairFunction<Tuple2<Long, Tuple2<Tuple2<Long, Long>, Long>>, Long, Tuple2<Long, Long>>() {
+
                 @Override
-                public Tuple2<EVD, EVD> call(Tuple2<Long, Long> t) throws Exception {
-                    EVD evd = new EVD(t._1, t._2, false);
-                    return new Tuple2<>(evd, evd);
+                public Tuple2<Long, Tuple2<Long, Long>> call(Tuple2<Long, Tuple2<Tuple2<Long, Long>, Long>> t)
+                    throws Exception {
+                    return new Tuple2<>(t._2._1._2, new Tuple2<>(t._1, t._2._2));
+                }
+            }).join(vertexDegree) // send vertex degree to the right vertex in the edge.
+                .mapToPair(new PairFunction<Tuple2<Long, Tuple2<Tuple2<Long, Long>, Long>>, Tuple2<Long, Long>,
+                    Tuple2<Long, Long>>() {
+                @Override
+                public Tuple2<Tuple2<Long, Long>, Tuple2<Long, Long>> call(Tuple2<Long, Tuple2<Tuple2<Long, Long>, Long>> t) throws Exception {
+                    long v1 = t._1;
+                    long d1 = t._2._2;
+                    long v2 = t._2._1._1;
+                    long d2 = t._2._1._2;
+                    Tuple2<Long, Long> t1 = new Tuple2<>(v1, d1);
+                    Tuple2<Long, Long> t2 = t._2._1;
+                    if (d1 < d2)
+                        return new Tuple2<>(t1, t2);
+                    if (d1 > d2)
+                        return new Tuple2<>(t2, t1);
+                    if (v1 < v2)
+                        return new Tuple2<>(t1, t2);
+                    return new Tuple2<>(t2, t1);
                 }
             });
+        lthEdge.unpersist();
 
-        // This is a neighbor list which key node is a node id and value contains its neighbors with higher degree.
-        JavaPairRDD<Long, Iterable<Tuple2<Long, Long>>> neighborWithDegree =
-            sthEdge.mapToPair(new PairFunction<Tuple2<Long, Long>, EVD, Byte>() {
-                @Override
-                public Tuple2<EVD, Byte> call(Tuple2<Long, Long> t) throws Exception {
-                    EVD evd = new EVD(t._1, t._2, true);
-                    return new Tuple2<>(evd, (byte) 0);
-                }
-            }).cogroup(vertexDegree) // Find right direction from lower degree to higher degree node.
-                .mapToPair(new PairFunction<Tuple2<EVD, Tuple2<Iterable<Byte>, Iterable<EVD>>>, Long, Tuple2<Long, Long>>() {
-                    @Override
-                    public Tuple2<Long, Tuple2<Long, Long>> call(Tuple2<EVD, Tuple2<Iterable<Byte>, Iterable<EVD>>> t)
-                        throws Exception {
-                        if (!t._1.isEdge)
-                            return null;
-
-                        Iterator<EVD> iterator = t._2._2.iterator();
-                        if (!iterator.hasNext())
-                            System.out.println("no next for " + t._1);
-                        EVD vertexDeg1 = iterator.next();
-                        EVD vertexDeg2 = null;
-                        if (iterator.hasNext())
-                            vertexDeg2 = iterator.next();
-                        else
-                            System.out.println(t._2);
-
-                        if (vertexDeg1.x2 < vertexDeg2.x2)
-                            return new Tuple2<>(vertexDeg1.x1, new Tuple2<>(vertexDeg2.x1, vertexDeg2.x2));
-                        else if (vertexDeg2.x2 < vertexDeg1.x2)
-                            return new Tuple2<>(vertexDeg2.x1, new Tuple2<>(vertexDeg1.x1, vertexDeg1.x2));
-                        else if (vertexDeg1.x1 < vertexDeg2.x1)
-                            return new Tuple2<>(vertexDeg1.x1, new Tuple2<>(vertexDeg2.x1, vertexDeg2.x2));
-                        else
-                            return new Tuple2<>(vertexDeg2.x1, new Tuple2<>(vertexDeg1.x1, vertexDeg1.x2));
-                    }
-                }).filter(t -> t != null).groupByKey();
-        sthEdge.unpersist();
-        // Sort neighbor list based on the degree.
-        return neighborWithDegree.mapToPair(new PairFunction<Tuple2<Long, Iterable<Tuple2<Long, Long>>>, Long, long[]>() {
+        // Since vertices of each edge are from lower degree to higher degree then its neighbors are already sorted.
+        return degreeSortedEdges.groupByKey().mapToPair(new PairFunction<Tuple2<Tuple2<Long,Long>,Iterable<Tuple2<Long,
+            Long>>>, Long, long[]>() {
             @Override
-            public Tuple2<Long, long[]> call(Tuple2<Long, Iterable<Tuple2<Long, Long>>> t) throws Exception {
-                int degree = 0;
-                // Iterate over higherIds to calculate degree of the current vertex
-                for (Tuple2<Long, Long> vd : t._2) {
-                    degree++;
-                }
-
+            public Tuple2<Long, long[]> call(Tuple2<Tuple2<Long, Long>, Iterable<Tuple2<Long, Long>>> t) throws
+                Exception {
                 List<Tuple2<Long, Long>> list = new ArrayList<>();
-                for (Tuple2<Long, Long> vd : t._2)
-                    if (vd._2 > degree || (vd._2 == degree && vd._1 > t._1))
-                        list.add(vd);
+                for(Tuple2<Long, Long> vd : t._2)
+                    list.add(vd);
 
+                // Sort neighbors based on their degree.
                 Collections.sort(list, (a, b) -> {
                     int x, y;
                     if (a._2 != b._2) {
@@ -155,11 +110,11 @@ public class FonlUtils implements Serializable {
                 });
 
                 long[] higherDegs = new long[list.size() + 1];
-                higherDegs[0] = degree;
+                higherDegs[0] = list.size();
                 for (int i = 1; i < higherDegs.length; i++)
                     higherDegs[i] = list.get(i - 1)._1;
 
-                return new Tuple2<>(t._1, higherDegs);
+                return new Tuple2<>(t._1._1, higherDegs);
             }
         });
     }
