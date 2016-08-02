@@ -41,16 +41,20 @@ public class GraphUtils implements Serializable {
     }
 
     public static JavaPairRDD<Integer, Integer> loadUndirectedEdgesInt(JavaRDD<String> input) {
-        JavaPairRDD<Integer, Integer> edges = input.flatMapToPair((PairFlatMapFunction<String, Integer, Integer>) line -> {
-            List<Tuple2<Integer, Integer>> list = new ArrayList<>();
-            if (line.startsWith("#"))
+        JavaPairRDD<Integer, Integer> edges = input.flatMapToPair(new PairFlatMapFunction<String, Integer, Integer>() {
+
+            @Override
+            public Iterable<Tuple2<Integer, Integer>> call(String line) throws Exception {
+                List<Tuple2<Integer, Integer>> list = new ArrayList<>();
+                if (line.startsWith("#"))
+                    return list;
+                String[] s = line.split("\\s+");
+                int e1 = Integer.parseInt(s[0]);
+                int e2 = Integer.parseInt(s[1]);
+                list.add(new Tuple2<>(e1, e2));
+                list.add(new Tuple2<>(e2, e1));
                 return list;
-            String[] s = line.split("\\s+");
-            int e1 = Integer.parseInt(s[0]);
-            int e2 = Integer.parseInt(s[1]);
-            list.add(new Tuple2<>(e1, e2));
-            list.add(new Tuple2<>(e2, e1));
-            return list;
+            }
         });
         return edges;
     }

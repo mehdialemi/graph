@@ -21,7 +21,6 @@ import java.util.List;
  */
 public class FonlDegTC {
 
-
     public static JavaPairRDD<Long, long[]> createCandidates(JavaPairRDD<Long, long[]> fonl) {
         return fonl.filter(t -> t._2.length > 2)
             .flatMapToPair((PairFlatMapFunction<Tuple2<Long, long[]>, Long, long[]>) t -> {
