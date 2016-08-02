@@ -4,7 +4,7 @@ SPARK_HOME="/home/$USER/Software/spark-1.6.2-bin-hadoop2.6"
 
 jar_path="$PWD/bin/graph-processing.jar"
 main_class=""
-master="malemi-2"
+master="localhost"
 exe_mem="10G"
 total_cores=20
 
@@ -47,6 +47,7 @@ cd $SPARK_HOME
 
 echo "Running $main_class on $master with partitions $p"
 bin/spark-submit --class $main_class --executor-memory $exe_mem --total-executor-cores $total_cores --master spark://$master:7077 $jar_path $dataset $p
-
+bin/spark-submit --class graph.clusteringco.FonlDegGCC --master spark://127.0.0.1:7077
+/home/mehdi/IdeaProjects/graph-processing/bin/graph-processing.jar /home/mehdi/graph-data/com-amazon.ungraph.txt 20
 
 

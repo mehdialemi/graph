@@ -5,16 +5,16 @@ run_command() {
 	nohup $1 > logs/$name-$2.log 2>&1
 }
 
-input="com-friendster.ungraph.txt"
-partitions=1000
+#input="com-friendster.ungraph.txt"
+input="com-amazon.ungraph.txt"
+partitions=200
 
 if [ ! -d "logs" ]; then
     mkdir logs
 fi
-
-bakdir=logs/bak/`date +%s`
-mkdir $bakdir
-mv logs/*.log $bakdir
+d=`date +%s`
+logdir=logs/"$input-$d"
+mkdir $logdir
 
 for i in {1..5}
 do

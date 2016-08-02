@@ -28,8 +28,7 @@ public class FonlUtils implements Serializable {
     public static JavaPairRDD<Long, long[]> createFonlDegreeBased2(JavaPairRDD<Long, Long> edges, int partition) {
         // edges direction from low node id to high node id to prevent edge repetition.
         JavaRDD<Tuple2<Long, Long>> lthEdge =
-            edges.map(t -> t._1 < t._2 ? new Tuple2<>(t._1, t._2) : new Tuple2<>(t._2, t._1)).distinct();
-        lthEdge.cache();
+            edges.map(t -> t._1 < t._2 ? new Tuple2<>(t._1, t._2) : new Tuple2<>(t._2, t._1)).distinct().cache();
 
         // Get degree of each vertex.
         JavaPairRDD<Long, Long> vertexDegree = lthEdge
@@ -41,7 +40,7 @@ public class FonlUtils implements Serializable {
                     list.add(new Tuple2<>(t._2, 1L));
                     return list;
                 }
-            }).reduceByKey((a, b) -> a + b);
+            }).reduceByKey((a, b) -> a + b).cache();
 
         // Each vertex in the each edge has its degree beside itself. Each edge direction is from lower node degree
         // to higher node degree.
@@ -75,6 +74,7 @@ public class FonlUtils implements Serializable {
                 }
             });
         lthEdge.unpersist();
+        vertexDegree.unpersist();
 
         // Since vertices of each edge are from lower degree to higher degree then its neighbors are already sorted.
         return degreeSortedEdges.groupByKey().mapToPair(new PairFunction<Tuple2<Tuple2<Long,Long>,Iterable<Tuple2<Long,
@@ -114,7 +114,7 @@ public class FonlUtils implements Serializable {
 
                 return new Tuple2<>(t._1._1, higherDegs);
             }
-        });
+        }).repartition(partition).persist(StorageLevel.MEMORY_AND_DISK());
     }
 
     /**
