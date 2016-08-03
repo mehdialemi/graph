@@ -7,12 +7,11 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
+import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Calculate Global Clustering Coefficient (GCC) using fonl structure which is sorted based on degree of nodes. This
@@ -41,8 +40,66 @@ public class FonlDegGCC {
         JavaRDD<String> input = sc.textFile(inputPath, partition);
         JavaPairRDD<Long, Long> edges = GraphUtils.loadUndirectedEdges(input);
 
-        JavaPairRDD<Long, long[]> fonl = FonlUtils.createFonlDegreeBased(edges, partition);
-        long totalNodes = fonl.count();
+        JavaPairRDD<Long, long[]> fonl = edges.groupByKey()
+            .flatMapToPair((PairFlatMapFunction<Tuple2<Long, Iterable<Long>>, Long, GraphUtils.VertexDegree>) t -> {
+                HashSet<Long> neighborSet = new HashSet<>();
+                for (Long neighbor : t._2) {
+                    neighborSet.add(neighbor);
+                }
+
+                int degree = neighborSet.size();
+
+                GraphUtils.VertexDegree vd = new GraphUtils.VertexDegree(t._1, degree);
+
+                List<Tuple2<Long, GraphUtils.VertexDegree>> degreeList = new ArrayList<>(degree);
+
+                // Add degree information of the current vertex to its neighbor
+                for (Long neighbor : neighborSet) {
+                    degreeList.add(new Tuple2<>(neighbor, vd));
+                }
+                return degreeList;
+            }).groupByKey()
+            .mapToPair(new PairFunction<Tuple2<Long, Iterable<GraphUtils.VertexDegree>>, Long, long[]>() {
+                @Override
+                public Tuple2<Long, long[]> call(Tuple2<Long, Iterable<GraphUtils.VertexDegree>> v) throws Exception {
+                    int degree = 0;
+                    // Iterate over higherIds to calculate degree of the current vertex
+                    for (GraphUtils.VertexDegree vd : v._2) {
+                        degree++;
+                    }
+
+                    List<GraphUtils.VertexDegree> list = new ArrayList<>();
+                    for (GraphUtils.VertexDegree vd : v._2)
+                        if (vd.degree > degree || (vd.degree == degree && vd.vertex > v._1))
+                            list.add(vd);
+
+
+                    Collections.sort(list, (a, b) -> {
+                        int x, y;
+                        if (a.degree != b.degree) {
+                            x = a.degree;
+                            y = b.degree;
+                        } else {
+                            x = (int) (a.vertex >> 32);
+                            y = (int) (b.vertex >> 32);
+                            if (x == y) {
+                                x = (int) ((long) a.vertex);
+                                y = (int) ((long) b.vertex);
+                            }
+                        }
+                        return x - y;
+                    });
+
+                    long[] higherDegs = new long[list.size() + 1];
+                    higherDegs[0] = degree;
+                    for (int i = 1; i < higherDegs.length; i++)
+                        higherDegs[i] = list.get(i - 1).vertex;
+
+                    return new Tuple2<>(v._1, higherDegs);
+                }
+            }).repartition(partition).persist(StorageLevel.DISK_ONLY_2());
+
+//        JavaPairRDD<Long, long[]> fonl = FonlUtils.createFonlDegreeBased(edges, partition);
 
         // Partition based on degree. To balance workload, it is better to have a partitioning mechanism that
         // for example a vertex with high number of higherIds (high deg) would be allocated besides vertex with
@@ -88,6 +145,7 @@ public class FonlDegGCC {
             return sum;
         }).reduce((a, b) -> a + b);
 
+        long totalNodes = fonl.count();
         float globalCC = totalTriangles / (float) (totalNodes * (totalNodes - 1));
         OutputUtils.printOutputGCC(totalNodes, totalTriangles, globalCC);
         sc.close();
