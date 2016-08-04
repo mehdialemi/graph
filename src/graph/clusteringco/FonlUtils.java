@@ -25,7 +25,7 @@ public class FonlUtils implements Serializable {
      * structure is fonl which in it key is a vertex and value is its neighbors sorted by their degree.
      * @return
      */
-    public static JavaPairRDD<Long, long[]> createFonlDegreeBased2(JavaPairRDD<Long, Long> edges, int partition) {
+    public static JavaPairRDD<Long, long[]> createWith2Join(JavaPairRDD<Long, Long> edges, int partition) {
         // edges direction from low node id to high node id to prevent edge repetition.
         JavaRDD<Tuple2<Long, Long>> lthEdge =
             edges.map(t -> t._1 < t._2 ? new Tuple2<>(t._1, t._2) : new Tuple2<>(t._2, t._1)).distinct().cache();
@@ -126,7 +126,7 @@ public class FonlUtils implements Serializable {
      * @param partition number of partition to the final fonl.
      * @return Key: vertex id, Value: degree, Neighbor vertices sorted by their degree.
      */
-    public static JavaPairRDD<Long, long[]> createFonlDegreeBased(JavaPairRDD<Long, Long> edges, int partition) {
+    public static JavaPairRDD<Long, long[]> createWith2Reduce(JavaPairRDD<Long, Long> edges, int partition) {
         return edges.groupByKey()
             .flatMapToPair((PairFlatMapFunction<Tuple2<Long, Iterable<Long>>, Long, GraphUtils.VertexDegree>) t -> {
                 HashSet<Long> neighborSet = new HashSet<>();
@@ -189,6 +189,76 @@ public class FonlUtils implements Serializable {
 
     /**
      * Create a fonl in key-value structure. Here, key is a vertex id and value is an array which first element of it
+     * stores degree of the key vertex and the other elements are neighbor vertices with higher degree than the key
+     * vertex.
+     *
+     * @param edges     undirected edges of graph.
+     * @param partition number of partition to the final fonl.
+     * @return Key: vertex id, Value: degree, Neighbor vertices sorted by their degree.
+     */
+    public static JavaPairRDD<Long, long[]> createWith2ReduceNoSort(JavaPairRDD<Long, Long> edges, int partition) {
+        return edges.groupByKey()
+            .flatMapToPair((PairFlatMapFunction<Tuple2<Long, Iterable<Long>>, Long, GraphUtils.VertexDegree>) t -> {
+                HashSet<Long> neighborSet = new HashSet<>();
+                for (Long neighbor : t._2) {
+                    neighborSet.add(neighbor);
+                }
+
+                int degree = neighborSet.size();
+
+                GraphUtils.VertexDegree vd = new GraphUtils.VertexDegree(t._1, degree);
+
+                List<Tuple2<Long, GraphUtils.VertexDegree>> degreeList = new ArrayList<>(degree);
+
+                // Add degree information of the current vertex to its neighbor
+                for (Long neighbor : neighborSet) {
+                    degreeList.add(new Tuple2<>(neighbor, vd));
+                }
+                return degreeList;
+            }).groupByKey()
+            .mapToPair(new PairFunction<Tuple2<Long, Iterable<GraphUtils.VertexDegree>>, Long, long[]>() {
+                @Override
+                public Tuple2<Long, long[]> call(Tuple2<Long, Iterable<GraphUtils.VertexDegree>> v) throws Exception {
+                    int degree = 0;
+                    // Iterate over higherIds to calculate degree of the current vertex
+                    for (GraphUtils.VertexDegree vd : v._2) {
+                        degree++;
+                    }
+
+                    SortedSet<GraphUtils.VertexDegree> list = new TreeSet<>((a, b) -> {
+                        int x, y;
+                        if (a.degree != b.degree) {
+                            x = a.degree;
+                            y = b.degree;
+                        } else {
+                            x = (int) (a.vertex >> 32);
+                            y = (int) (b.vertex >> 32);
+                            if (x == y) {
+                                x = (int) ((long) a.vertex);
+                                y = (int) ((long) b.vertex);
+                            }
+                        }
+                        return x - y;
+                    });
+
+                    for (GraphUtils.VertexDegree vd : v._2)
+                        if (vd.degree > degree || (vd.degree == degree && vd.vertex > v._1))
+                            list.add(vd);
+
+                    long[] higherDegs = new long[list.size() + 1];
+                    higherDegs[0] = degree;
+                    int i = 0;
+                    for(GraphUtils.VertexDegree vertex : list) {
+                        higherDegs[++i] = vertex.vertex;
+                    }
+
+                    return new Tuple2<>(v._1, higherDegs);
+                }
+            }).repartition(partition).persist(StorageLevel.DISK_ONLY_2());
+    }
+
+    /**
+     * Create a fonl in key-value structure. Here, key is a vertex id and value is an array which first element of it
      * stores degree of the key vertex and the other elements are neighbor vertices with higher ids than the key vertex.
      *
      * @param edges     undirected edges of graph.
@@ -229,6 +299,6 @@ public class FonlUtils implements Serializable {
     public static JavaPairRDD<Long, long[]> loadFonl(JavaSparkContext sc, String inputPath, int partition) {
         JavaRDD<String> input = sc.textFile(inputPath, partition);
         JavaPairRDD<Long, Long> edges = GraphUtils.loadUndirectedEdges(input);
-        return FonlUtils.createFonlDegreeBased(edges, partition);
+        return FonlUtils.createWith2Reduce(edges, partition);
     }
 }

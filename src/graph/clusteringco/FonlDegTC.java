@@ -95,7 +95,7 @@ public class FonlDegTC {
         JavaRDD<String> input = sc.textFile(inputPath, partition);
         JavaPairRDD<Long, Long> edges = GraphUtils.loadUndirectedEdges(input);
 
-        JavaPairRDD<Long, long[]> fonl = FonlUtils.createFonlDegreeBased2(edges, partition);
+        JavaPairRDD<Long, long[]> fonl = FonlUtils.createWith2Join(edges, partition);
 
         // Partition based on degree. To balance workload, it is better to have a partitioning mechanism that
         // for example a vertex with high number of higherIds (high deg) would be allocated besides vertex with

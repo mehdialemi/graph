@@ -39,7 +39,7 @@ public class FonlDegLCC {
         JavaRDD<String> input = sc.textFile(inputPath, partition);
         JavaPairRDD<Long, Long> edges = GraphUtils.loadUndirectedEdges(input);
 
-        JavaPairRDD<Long, long[]> fonl = FonlUtils.createFonlDegreeBased2(edges, partition);
+        JavaPairRDD<Long, long[]> fonl = FonlUtils.createWith2Join(edges, partition);
         long totalNodes = fonl.count();
 
         // Partition based on degree. To balance workload, it is better to have a partitioning mechanism that
