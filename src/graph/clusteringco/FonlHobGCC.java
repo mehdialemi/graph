@@ -33,7 +33,8 @@ public class FonlHobGCC {
             minHobDegree = Integer.parseInt(args[2]);
 
         final int minHobDeg = minHobDegree;
-
+        System.out.println("Configure minHobDeg is " + minHobDeg);
+        
         SparkConf conf = new SparkConf();
         if (args.length == 0)
             conf.setMaster("local[2]");
