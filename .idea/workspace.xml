@@ -8,8 +8,8 @@
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/graph-processing.jar" afterPath="$PROJECT_DIR$/bin/graph-processing.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/run_experiments_CC.sh" afterPath="$PROJECT_DIR$/bin/run_experiments_CC.sh" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlHobGCC.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlHobGCC.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java" />
     </list>
     <ignored path="graph-processing.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -43,11 +43,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FonlHobGCC.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="FonlHobGCC.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlHobGCC.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="36" column="8" selection-start-line="36" selection-start-column="8" selection-end-line="36" selection-end-column="8" />
+            <state relative-caret-position="406">
+              <caret line="48" column="67" selection-start-line="48" selection-start-column="67" selection-end-line="48" selection-end-column="67" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -177,12 +177,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FonlUtils.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="FonlUtils.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3555">
-              <caret line="247" column="0" selection-start-line="247" selection-start-column="0" selection-end-line="247" selection-end-column="0" />
-              <folding />
+            <state relative-caret-position="405">
+              <caret line="256" column="72" selection-start-line="256" selection-start-column="72" selection-end-line="256" selection-end-column="72" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -265,7 +267,6 @@
         <option value="$PROJECT_DIR$/src/graph/stat/GraphStat.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlDegLCC.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlDegTC.java" />
-        <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/Fonl2GCC.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlDegGCC.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/Fonl2CC.java" />
@@ -274,6 +275,7 @@
         <option value="$PROJECT_DIR$/bin/submit.sh" />
         <option value="$PROJECT_DIR$/bin/run_experiments_CC.sh" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlHobGCC.java" />
+        <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java" />
       </list>
     </option>
   </component>
@@ -1007,19 +1009,19 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/graph/clusteringco/FonlHobGCC.java</url>
-          <line>50</line>
+          <line>51</line>
           <properties />
           <option name="timeStamp" value="81" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/graph/clusteringco/FonlHobGCC.java</url>
-          <line>86</line>
+          <line>87</line>
           <properties />
           <option name="timeStamp" value="84" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/graph/clusteringco/FonlHobGCC.java</url>
-          <line>132</line>
+          <line>133</line>
           <properties />
           <option name="timeStamp" value="85" />
         </line-breakpoint>
@@ -1237,6 +1239,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1080">
           <caret line="82" column="0" selection-start-line="82" selection-start-column="0" selection-end-line="82" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1244,6 +1247,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1200">
           <caret line="92" column="0" selection-start-line="92" selection-start-column="0" selection-end-line="92" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1279,6 +1283,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="990">
           <caret line="78" column="0" selection-start-line="78" selection-start-column="0" selection-end-line="78" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1301,6 +1306,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="435">
           <caret line="41" column="66" selection-start-line="41" selection-start-column="66" selection-end-line="41" selection-end-column="66" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1350,14 +1358,6 @@
             <element signature="n#!!doc" expanded="false" />
             <element signature="e#828#876#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3555">
-          <caret line="247" column="0" selection-start-line="247" selection-start-column="0" selection-end-line="247" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1472,8 +1472,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlHobGCC.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="36" column="8" selection-start-line="36" selection-start-column="8" selection-end-line="36" selection-end-column="8" />
+        <state relative-caret-position="406">
+          <caret line="48" column="67" selection-start-line="48" selection-start-column="67" selection-end-line="48" selection-end-column="67" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="405">
+          <caret line="256" column="72" selection-start-line="256" selection-start-column="72" selection-end-line="256" selection-end-column="72" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

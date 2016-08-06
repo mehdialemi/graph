@@ -34,17 +34,18 @@ public class FonlHobGCC {
 
         final int minHobDeg = minHobDegree;
         System.out.println("Configure minHobDeg is " + minHobDeg);
-        
+
         SparkConf conf = new SparkConf();
         if (args.length == 0)
             conf.setMaster("local[2]");
 
         GraphUtils.setAppName(conf, "Fonl-GCC-Deg", partition, inputPath);
-        conf.registerKryoClasses(new Class[]{GraphUtils.class, GraphUtils.VertexDegree.class, long[].class});
+        conf.registerKryoClasses(new Class[]{GraphUtils.class, GraphUtils.VertexDegree.class, long[].class, Map.class});
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         JavaRDD<String> input = sc.textFile(inputPath, partition);
         JavaPairRDD<Long, Long> edges = GraphUtils.loadUndirectedEdges(input);
+
         JavaPairRDD<Long, long[]> fonl = FonlUtils.createWith2ReduceNoSort(edges, partition);
 
         Map<Long, long[]> hobs = fonl.filter(t -> t._2[0] > minHobDeg).collectAsMap();
