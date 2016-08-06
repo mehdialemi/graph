@@ -50,6 +50,6 @@ fi
 cd $SPARK_HOME
 
 echo "Running $main_class on $master with partitions $p"
-bin/spark-submit --class $main_class --executor-memory $exe_mem --total-executor-cores $total_cores --master spark://$master:7077 $jar_path $dataset $p
+bin/spark-submit --class $main_class --executor-memory $exe_mem --total-executor-cores $total_cores --master spark://$master:7077 $jar_path $dataset $p $4
 
 

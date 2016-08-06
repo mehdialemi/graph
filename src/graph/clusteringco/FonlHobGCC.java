@@ -2,7 +2,6 @@ package graph.clusteringco;
 
 import graph.GraphUtils;
 import graph.OutputUtils;
-import groovy.lang.Tuple;
 import org.apache.spark.Accumulator;
 import org.apache.spark.AccumulatorParam;
 import org.apache.spark.SparkConf;
@@ -10,9 +9,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
-import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.broadcast.Broadcast;
-import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.util.*;
@@ -31,9 +28,16 @@ public class FonlHobGCC {
         if (args.length > 1)
             partition = Integer.parseInt(args[1]);
 
+        int minHobDegree = 100;
+        if (args.length > 2)
+            minHobDegree = Integer.parseInt(args[2]);
+
+        final int minHobDeg = minHobDegree;
+
         SparkConf conf = new SparkConf();
         if (args.length == 0)
             conf.setMaster("local[2]");
+
         GraphUtils.setAppName(conf, "Fonl-GCC-Deg", partition, inputPath);
         conf.registerKryoClasses(new Class[]{GraphUtils.class, GraphUtils.VertexDegree.class, long[].class});
         JavaSparkContext sc = new JavaSparkContext(conf);
@@ -42,8 +46,7 @@ public class FonlHobGCC {
         JavaPairRDD<Long, Long> edges = GraphUtils.loadUndirectedEdges(input);
         JavaPairRDD<Long, long[]> fonl = FonlUtils.createWith2ReduceNoSort(edges, partition);
 
-        long minHopeDegree = 100;
-        Map<Long, long[]> hobs = fonl.filter(t -> t._2[0] > minHopeDegree).collectAsMap();
+        Map<Long, long[]> hobs = fonl.filter(t -> t._2[0] > minHobDeg).collectAsMap();
         Broadcast<Map<Long, long[]>> hobBD = sc.broadcast(hobs);
         Accumulator<Long> triangleCount = sc.accumulator((long) 0, "triangles", new AccumulatorParam<Long>() {
 
@@ -64,7 +67,7 @@ public class FonlHobGCC {
         });
 
         JavaPairRDD<Long, long[]> candidates = fonl
-            .filter(t -> t._2[0] <= minHopeDegree && t._2.length > 2)
+            .filter(t -> t._2[0] <= minHobDeg && t._2.length > 2)
             .flatMapToPair((PairFlatMapFunction<Tuple2<Long, long[]>, Long, long[]>) t -> {
                 // find the first hobs.
                 int size = t._2.length - 1;
