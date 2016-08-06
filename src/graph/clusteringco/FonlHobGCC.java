@@ -40,7 +40,8 @@ public class FonlHobGCC {
             conf.setMaster("local[2]");
 
         GraphUtils.setAppName(conf, "Fonl-GCC-Deg", partition, inputPath);
-        conf.registerKryoClasses(new Class[]{GraphUtils.class, GraphUtils.VertexDegree.class, long[].class, Map.class});
+        conf.registerKryoClasses(new Class[]{GraphUtils.class, GraphUtils.VertexDegree.class, long[].class,
+            Map.class, HashMap.class});
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         JavaRDD<String> input = sc.textFile(inputPath, partition);
@@ -49,7 +50,9 @@ public class FonlHobGCC {
         JavaPairRDD<Long, long[]> fonl = FonlUtils.createWith2ReduceNoSort(edges, partition);
 
         Map<Long, long[]> hobs = fonl.filter(t -> t._2[0] > minHobDeg).collectAsMap();
-        Broadcast<Map<Long, long[]>> hobBD = sc.broadcast(hobs);
+        Map<Long, long[]> hobsMap = new HashMap<>(hobs);
+
+        Broadcast<Map<Long, long[]>> hobBD = sc.broadcast(hobsMap);
         Accumulator<Long> triangleCount = sc.accumulator((long) 0, "triangles", new AccumulatorParam<Long>() {
 
             @Override
