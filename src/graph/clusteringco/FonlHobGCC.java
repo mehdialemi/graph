@@ -51,6 +51,7 @@ public class FonlHobGCC {
 
         Map<Long, long[]> hobs = fonl.filter(t -> t._2[0] > minHobDeg).collectAsMap();
         Map<Long, long[]> hobsMap = new HashMap<>(hobs);
+        System.out.println("HobsMap is created with " + hobsMap.size() + " items.");
 
         Broadcast<Map<Long, long[]>> hobBD = sc.broadcast(hobsMap);
         Accumulator<Long> triangleCount = sc.accumulator((long) 0, "triangles", new AccumulatorParam<Long>() {
