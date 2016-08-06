@@ -1,15 +1,18 @@
 #!/bin/bash
 
-SPARK_HOME="/home/$USER/Software/spark-1.6.2-bin-hadoop2.6"
+if [ -z ${SPARK_HOME+X} ]; then
+    SPARK_HOME="/home/$USER/spark-1.6.2"
+fi
 
 jar_path="$PWD/bin/graph-processing.jar"
-main_class=""
-master="localhost"
-exe_mem="10G"
-total_cores=20
+master="malemi-2"
+exe_mem="25G"
+total_cores=120
 
 task=$1
 case $task in
+    "GCC_Hob")  main_class="graph.clusteringco.FonlHobGCC"
+    ;;
 	"GCC_Deg") 	main_class="graph.clusteringco.FonlDegGCC"
 	;;
 	"LCC_Deg")	main_class="graph.clusteringco.FonlDegLCC"
@@ -32,7 +35,8 @@ case $task in
 	;;
 	"TC_NodeIter")  main_class="graph.clusteringco.NodeIteratorPlusTC_Spark"
 	;;
-	*)	echo "please determine your task in the argument [GCC|LCC|GCC_Old|LCC_Old]"
+	*)	echo "please determine your task in the argument
+	[GCC_Hob|GCC_Deg|LCC_Deg|TC_Deg|GCC_Id|LCC_Id|GCC_GraphX|LCC_GraphX|TC_GraphX|GCC_NodeIter|TC_NodeIter"
 		exit 1
 esac
 
@@ -47,7 +51,5 @@ cd $SPARK_HOME
 
 echo "Running $main_class on $master with partitions $p"
 bin/spark-submit --class $main_class --executor-memory $exe_mem --total-executor-cores $total_cores --master spark://$master:7077 $jar_path $dataset $p
-bin/spark-submit --class graph.clusteringco.FonlDegGCC --master spark://127.0.0.1:7077
-/home/mehdi/IdeaProjects/graph-processing/bin/graph-processing.jar /home/mehdi/graph-data/com-amazon.ungraph.txt 20
 
 

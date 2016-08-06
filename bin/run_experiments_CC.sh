@@ -7,47 +7,24 @@ run_command() {
 
 #input="com-friendster.ungraph.txt"
 input="com-amazon.ungraph.txt"
-partitions=200
 
 if [ ! -d "logs" ]; then
     mkdir logs
 fi
+
 d=`date +%s`
 logdir=logs/"$input-$d"
 mkdir $logdir
 
-for i in {1..5}
-do
-    run_command "bin/submit.sh GCC_Deg $input $partitions" $i
-	sleep 3
-	
-	run_command "bin/submit.sh GCC_Id $input $partitions" $i
-	sleep 3
-	
-	run_command "bin/submit.sh GCC_GraphX $input $partitions" $i
-	sleep 3
-	
-	run_command "bin/submit.sh GCC_NodeIter $input $partitions" $i
-	sleep 3
-	
-	run_command "bin/submit.sh LCC_Deg $input $partitions" $i
-	sleep 3
-	
-	run_command "bin/submit.sh LCC_Id $input $partitions" $i
-	sleep 3
-	
-	run_command "bin/submit.sh LCC_GraphX $input $partitions" $i
-	sleep 3
-	
-	run_command "bin/submit.sh TC_Deg $input $partitions" $i
-	sleep 3
-	
-	run_command "bin/submit.sh TC_Id $input $partitions" $i
-	sleep 3
-	
-	run_command "bin/submit.sh TC_GraphX $input $partitions" $i
-	sleep 3
-    
-	run_command "bin/submit.sh TC_NodeIter $input $partitions" $i
-	sleep 3
+p=1200
+
+IFS=',' read -ra TASKS <<< $1
+for i in {1..3}; do
+    for task in "${TASKS[@]}"; do
+        SECONDS=0
+        run_command "bin/submit.sh $task $input $p" $i  "$task-$logdir"
+        echo "`LANG=de_DE date` Task=$task, Input=$input, Partitions=$p, Duration=$SECONDS, Log=$task-$logdir" >> logs/results.txt
+        sleep 3
+        p=$(( p*2 ))
+	done
 done
