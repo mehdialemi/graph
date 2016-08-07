@@ -1,9 +1,11 @@
 package graph;
 
+import java.io.Serializable;
+
 /**
  * Print standard outputs in order we could extract required information for output console.
  */
-public class OutputUtils {
+public class OutUtils implements Serializable {
 
     public static void printOutputLCC(long nodes, float sumLCC, float avgLCC) {
         System.out.println("Nodes = " + nodes + ", Sum_LCC = " + sumLCC + ", AVG_LCC = " + avgLCC);

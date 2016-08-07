@@ -1,6 +1,6 @@
 package graph.clusteringco
 
-import graph.{GraphUtils, OutputUtils}
+import graph.{GraphUtils, OutUtils}
 import org.apache.spark.graphx.GraphLoader
 import org.apache.spark.graphx.lib.TriangleCount
 import org.apache.spark.storage.StorageLevel
@@ -39,7 +39,7 @@ object GraphX_LCC {
         val totalNodes = graph.vertices.count()
         val avgLCC = sumLCC / totalNodes
 
-        OutputUtils.printOutputLCC(totalNodes, sumLCC, avgLCC)
+        OutUtils.printOutputLCC(totalNodes, sumLCC, avgLCC)
         sc.stop()
     }
 }

@@ -1,7 +1,7 @@
 package graph.clusteringco;
 
 import graph.GraphUtils;
-import graph.OutputUtils;
+import graph.OutUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -110,7 +110,7 @@ public class NodeIteratorPlusGCC_Spark {
         long totalTriangles = triangles.reduce((a, b) -> a + b);
         float globalCC = totalTriangles / (float) (nodes * (nodes - 1));
 
-        OutputUtils.printOutputGCC(nodes, totalTriangles, globalCC);
+        OutUtils.printOutputGCC(nodes, totalTriangles, globalCC);
         sc.close();
     }
 }

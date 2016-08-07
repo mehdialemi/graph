@@ -1,7 +1,7 @@
 package graph.clusteringco;
 
 import graph.GraphUtils;
-import graph.OutputUtils;
+import graph.OutUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -86,7 +86,7 @@ public class FonlIdTC {
             return triangleCount;
         }).repartition(partition).reduce((t1, t2) -> t1 + t2);
 
-        OutputUtils.printOutputTC(totalTriangles);
+        OutUtils.printOutputTC(totalTriangles);
         sc.close();
     }
 }

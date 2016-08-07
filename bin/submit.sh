@@ -35,6 +35,8 @@ case $task in
 	;;
 	"TC_NodeIter")  main_class="graph.clusteringco.NodeIteratorPlusTC_Spark"
 	;;
+	"TC_Cohen") main_class="graph.clusteringco.CohenTriangleCounting"
+	;;
 	*)	echo "please determine your task in the argument
 	[GCC_Hob|GCC_Deg|LCC_Deg|TC_Deg|GCC_Id|LCC_Id|GCC_GraphX|LCC_GraphX|TC_GraphX|GCC_NodeIter|TC_NodeIter"
 		exit 1
@@ -51,5 +53,3 @@ cd $SPARK_HOME
 
 echo "Running $main_class on $master with partitions $p"
 bin/spark-submit --class $main_class --executor-memory $exe_mem --total-executor-cores $total_cores --master spark://$master:7077 $jar_path $dataset $p $4
-
-

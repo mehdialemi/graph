@@ -1,7 +1,7 @@
 package graph.clusteringco;
 
 import graph.GraphUtils;
-import graph.OutputUtils;
+import graph.OutUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -103,7 +103,7 @@ public class FonlDegLCC {
             .reduce((a, b) -> a + b);
 
         float avgLCC = sumLCC / totalNodes;
-        OutputUtils.printOutputLCC(totalNodes, sumLCC, avgLCC);
+        OutUtils.printOutputLCC(totalNodes, sumLCC, avgLCC);
 
         sc.close();
     }

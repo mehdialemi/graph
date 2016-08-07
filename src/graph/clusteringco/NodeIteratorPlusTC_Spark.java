@@ -1,7 +1,7 @@
 package graph.clusteringco;
 
 import graph.GraphUtils;
-import graph.OutputUtils;
+import graph.OutUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -121,7 +121,7 @@ public class NodeIteratorPlusTC_Spark {
 
         long count = triangles.reduce((a, b) -> a + b);
 
-        OutputUtils.printOutputTC(count);
+        OutUtils.printOutputTC(count);
         sc.close();
     }
 }

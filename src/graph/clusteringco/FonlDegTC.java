@@ -1,7 +1,7 @@
 package graph.clusteringco;
 
 import graph.GraphUtils;
-import graph.OutputUtils;
+import graph.OutUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -142,7 +142,7 @@ public class FonlDegTC {
             return sum;
         }).reduce((a, b) -> a + b);
 
-        OutputUtils.printOutputTC(totalTriangles);
+        OutUtils.printOutputTC(totalTriangles);
         sc.close();
     }
 }

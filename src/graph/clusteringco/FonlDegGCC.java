@@ -1,7 +1,7 @@
 package graph.clusteringco;
 
 import graph.GraphUtils;
-import graph.OutputUtils;
+import graph.OutUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -84,7 +84,7 @@ public class FonlDegGCC {
 
         long totalNodes = fonl.count();
         float globalCC = totalTriangles / (float) (totalNodes * (totalNodes - 1));
-        OutputUtils.printOutputGCC(totalNodes, totalTriangles, globalCC);
+        OutUtils.printOutputGCC(totalNodes, totalTriangles, globalCC);
         sc.close();
     }
 }

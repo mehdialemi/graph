@@ -1,7 +1,7 @@
 package graph.clusteringco;
 
 import graph.GraphUtils;
-import graph.OutputUtils;
+import graph.OutUtils;
 import org.apache.spark.Accumulator;
 import org.apache.spark.AccumulatorParam;
 import org.apache.spark.SparkConf;
@@ -143,7 +143,7 @@ public class FonlHobGCC {
 
         long totalTriangles = triangle1 + triangleWithHobs + sumHobe;
         float globalCC = totalTriangles / (float) (totalNodes * (totalNodes - 1));
-        OutputUtils.printOutputGCC(totalNodes, totalTriangles, globalCC);
+        OutUtils.printOutputGCC(totalNodes, totalTriangles, globalCC);
 
     }
 

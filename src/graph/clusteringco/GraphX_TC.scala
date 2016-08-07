@@ -1,6 +1,6 @@
 package graph.clusteringco
 
-import graph.{GraphUtils, OutputUtils}
+import graph.{GraphUtils, OutUtils}
 import org.apache.spark.graphx.GraphLoader
 import org.apache.spark.graphx.lib.TriangleCount
 import org.apache.spark.storage.StorageLevel
@@ -31,7 +31,7 @@ object GraphX_TC {
         val triangle3 = triangleGraph.vertices.reduce((v1,v2) => (0L , v1._2 + v2._2))
         val totalTriangles = triangle3._2.toInt / 3;
 
-        OutputUtils.printOutputTC(totalTriangles)
+        OutUtils.printOutputTC(totalTriangles)
         sc.stop()
     }
 }
