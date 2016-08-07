@@ -28,13 +28,6 @@ public class FonlHobGCC {
         if (args.length > 1)
             partition = Integer.parseInt(args[1]);
 
-        int minHobDegree = 100;
-        if (args.length > 2)
-            minHobDegree = Integer.parseInt(args[2]);
-
-        final int minHobDeg = minHobDegree;
-        System.out.println("Configure minHobDeg is " + minHobDeg);
-
         SparkConf conf = new SparkConf();
         if (args.length == 0)
             conf.setMaster("local[2]");
@@ -48,6 +41,12 @@ public class FonlHobGCC {
         JavaPairRDD<Long, Long> edges = GraphUtils.loadUndirectedEdges(input);
 
         JavaPairRDD<Long, long[]> fonl = FonlUtils.createWith2ReduceNoSort(edges, partition);
+        Long sumDegree = fonl.map(t -> t._2[0]).reduce((a, b) -> a + b);
+        long totalNodes = fonl.count();
+        double avgDeg = sumDegree / (double) fonl.count();
+        final int minHobDeg = (int) (avgDeg * totalNodes * 0.01);
+
+        System.out.println("Configure minHobDeg is " + minHobDeg);
 
         Map<Long, long[]> hobs = fonl.filter(t -> t._2[0] > minHobDeg).collectAsMap();
         Map<Long, long[]> hobsMap = new HashMap<>(hobs);
@@ -106,7 +105,7 @@ public class FonlHobGCC {
                 return output;
             });
 
-        long triangle1 = candidates.cogroup(fonl, partition).map(t -> {
+        long triangle1 = candidates.cogroup(fonl, partition * 2).map(t -> {
             Iterator<long[]> iterator = t._2._2.iterator();
             if (!iterator.hasNext()) {
                 return 0L;
@@ -143,7 +142,6 @@ public class FonlHobGCC {
         }
 
         long totalTriangles = triangle1 + triangleWithHobs + sumHobe;
-        long totalNodes = fonl.count();
         float globalCC = totalTriangles / (float) (totalNodes * (totalNodes - 1));
         OutputUtils.printOutputGCC(totalNodes, totalTriangles, globalCC);
 

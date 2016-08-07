@@ -9,7 +9,6 @@ run_command() {
 #input="com-amazon.ungraph.txt"
 
 input="twitter.txt"
-minHobDeg=10000
 
 if [ ! -d "logs" ]; then
     mkdir logs
@@ -31,7 +30,7 @@ for task in "${TASKS[@]}"; do
 
     for i in {1..3}; do
         SECONDS=0
-        run_command "bin/submit.sh $task $input $p $minHobDeg"  $logDir
+        run_command "bin/submit.sh $task $input $p"  $logDir
         echo "`LANG=de_DE date` Task=$task, Input=$input, Partitions=$p, Duration=$SECONDS, Log=$logDir" >> logs/results.txt
         sleep 3
         p=$(( p*2 ))
