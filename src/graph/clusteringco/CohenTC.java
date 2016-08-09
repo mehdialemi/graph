@@ -16,7 +16,7 @@ import java.util.*;
 /**
  * Cohen Triangle listing implementation on Apache Spark
  */
-public class CohenTriangleCounting {
+public class CohenTC {
     public static void main(String[] args) {
         String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
         if (args.length > 0)
@@ -252,6 +252,7 @@ public class CohenTriangleCounting {
 
         long totalTriangles = triangles.count();
         OutUtils.printOutputTC(totalTriangles);
+        sc.stop();
     }
 
     static class VertexDegree implements Serializable {

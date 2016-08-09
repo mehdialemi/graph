@@ -35,7 +35,9 @@ case $task in
 	;;
 	"TC_NodeIter")  main_class="graph.clusteringco.NodeIteratorPlusTC_Spark"
 	;;
-	"TC_Cohen") main_class="graph.clusteringco.CohenTriangleCounting"
+	"TC_Cohen") main_class="graph.clusteringco.CohenTC"
+	;;
+	"TC_Pregel") main_class="graph.clusteringco.PregelTC"
 	;;
 	*)	echo "please determine your task in the argument
 	[GCC_Hob|GCC_Deg|LCC_Deg|TC_Deg|GCC_Id|LCC_Id|GCC_GraphX|LCC_GraphX|TC_GraphX|GCC_NodeIter|TC_NodeIter"
