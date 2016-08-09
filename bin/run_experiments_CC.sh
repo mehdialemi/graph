@@ -20,7 +20,7 @@ fi
 
 d=`date +%s`
 
-p=300
+p=240
 IFS=',' read -ra TASKS <<< $1
 for task in "${TASKS[@]}"; do
      logDir="logs/$task/$input"

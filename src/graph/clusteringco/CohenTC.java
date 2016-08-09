@@ -38,12 +38,14 @@ public class CohenTC {
         JavaRDD<String> input = sc.textFile(inputPath, partition);
         // Convert edges to the appropriate structure.
         JavaRDD<Edge> currentEdges = input.map(line -> {
+            if (line.startsWith("#"))
+                return null;
             String[] e = line.split("\\s+");
             long v1 = Long.parseLong(e[0]);
             long v2 = Long.parseLong(e[1]);
             Edge edge = new Edge(v1, v2);
             return edge;
-        });
+        }).filter(t -> t != null);
 
             // Find vertices and their corresponding edges. A key-value item contains a vertex as key and an edge as value.
             JavaPairRDD<Long, Edge> vertexEdge = currentEdges.flatMapToPair(new PairFlatMapFunction<Edge, Long, Edge>() {
