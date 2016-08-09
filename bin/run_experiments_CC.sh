@@ -20,7 +20,7 @@ fi
 
 d=`date +%s`
 
-p=2400
+p=300
 IFS=',' read -ra TASKS <<< $1
 for task in "${TASKS[@]}"; do
      logDir="logs/$task/$input"
@@ -28,12 +28,8 @@ for task in "${TASKS[@]}"; do
         mkdir -p $logDir
     fi
 
-    for i in {1..3}; do
-        SECONDS=0
-        run_command "bin/submit.sh $task $input $p"  $logDir
-        echo "`LANG=de_DE date` Task=$task, Input=$input, Partitions=$p, Duration=$SECONDS, Log=$logDir" >> logs/results.txt
-        sleep 3
-        p=$(( p*2 ))
-    done
-
+    SECONDS=0
+    run_command "bin/submit.sh $task $input $p"  $logDir
+    echo "`LANG=de_DE date` Task=$task, Input=$input, Partitions=$p, Duration=$SECONDS, Log=$logDir" >> logs/results.txt
+    sleep 3
 done
