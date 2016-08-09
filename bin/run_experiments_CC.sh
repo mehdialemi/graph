@@ -1,14 +1,14 @@
 #!/bin/bash
 
 run_command() {
-    d=`date +%s`
-    nohup $1 > $2/"$d.log" 2>&1
+
+    nohup $1 > $2 2>&1
 }
 
 #input="com-friendster.ungraph.txt"
 #input="com-amazon.ungraph.txt"
-
-input="twitter.txt"
+input="liveJournal"
+#input="twitter.txt"
 
 if [ ! -d "logs" ]; then
     mkdir logs
@@ -29,7 +29,8 @@ for task in "${TASKS[@]}"; do
     fi
 
     SECONDS=0
-    run_command "bin/submit.sh $task $input $p"  $logDir
-    echo "`LANG=de_DE date` Task=$task, Input=$input, Partitions=$p, Duration=$SECONDS, Log=$logDir" >> logs/results.txt
+    d=`date +%s`
+    run_command "bin/submit.sh $task $input $p"  $logDir/"$d.log"
+    echo "`LANG=de_DE date` Task=$task, Input=$input, Partitions=$p, Duration=$SECONDS, Log=$logDir/$d.log" >> logs/results.txt
     sleep 3
 done
