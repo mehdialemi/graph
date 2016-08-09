@@ -86,18 +86,11 @@ object PregelTC {
         // Then check that if receiving neighborIds have a common with its neighbors.
         // If there was any common neighbors then it report back telling the sender the completing nodes to make
         // a triangle through it.
-        val triangleMsg = graphWithOutlinks.vertices.join(message).flatMap { case (vid, (n, msg)) =>
-            val map1 = msg.list.map(ids => (ids.vId, n.intersect(ids.neighbors))).filter(_._2.length > 0)
-            val map2 = map1.map(vid_ids => (vid_ids._1, Array[Long](vid)))
-            map1.union(map2)
-        }.groupByKey()
+        val tCount = graphWithOutlinks.vertices.join(message).flatMap { case (vid, (n, msg)) =>
+            msg.list.map(ids => (n.intersect(ids.neighbors))).filter(_.length > 0)
+        }.map(t => t.length).reduce((a, b) => a + b)
 
-        // In this step tgraph has information about the common neighbors per neighbor as the follow:
-        // (neighborId, array of common neighbors with neighborId)
-        val tgraph = graphWithOutlinks.outerJoinVertices(triangleMsg)((vid, n, msg) => msg)
-
-        val triangles = tgraph.vertices.map(n => n._2.getOrElse(Iterator()).size).reduce((a, b) => a + b)
-        OutUtils.printOutputTC(triangles)
+        OutUtils.printOutputTC(tCount)
 
         sc.stop()
     }
