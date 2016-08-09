@@ -30,7 +30,7 @@ object PregelTC {
         val conf = new SparkConf()
         if (args == null || args.length == 0)
             conf.setMaster("local[2]")
-        GraphUtils.setAppName(conf, "GraphX-GCC", partition, inputPath);
+        GraphUtils.setAppName(conf, "Pregel-TC", partition, inputPath);
 
         val sc = new SparkContext(conf)
 

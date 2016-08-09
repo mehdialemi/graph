@@ -29,7 +29,7 @@ public class NodeIteratorPlusTC_Spark {
         SparkConf conf = new SparkConf();
         if (args.length == 0)
             conf.setMaster("local[2]");
-        GraphUtils.setAppName(conf, "NodeIterPlus-TC-Spark", partition, inputPath);
+        GraphUtils.setAppName(conf, "NodeIter-TC-Spark", partition, inputPath);
         conf.registerKryoClasses(new Class[]{GraphUtils.class, GraphUtils.VertexDegree.class, long[].class});
         JavaSparkContext sc = new JavaSparkContext(conf);
 
