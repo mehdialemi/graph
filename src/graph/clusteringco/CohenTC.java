@@ -78,12 +78,16 @@ public class CohenTC {
                     vd.v = ve._1;
 
                     // Calculate degree and construct output key-value.
+                    Set<Edge> set = new HashSet<>();
                     while (iter.hasNext()) {
                         Edge e = iter.next();
+                        if (set.contains(e))
+                            continue;
                         Tuple2<Edge, VertexDegree> t = new Tuple2<>(e, vd);
                         list.add(t);
                         degree++;
                     }
+                    set.clear();
 
                     // Assign degree of the current vertex to all edges.
                     for (Tuple2<Edge, VertexDegree> t : list) {
