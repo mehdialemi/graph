@@ -197,7 +197,7 @@ public class FonlUtils implements Serializable {
      * @return Key: vertex id, Value: degree, Neighbor vertices sorted by their degree.
      */
     public static JavaPairRDD<Long, long[]> createWith2ReduceNoSort(JavaPairRDD<Long, Long> edges, int partition) {
-        return edges.groupByKey()
+        return edges.groupByKey(partition / 2)
             .flatMapToPair((PairFlatMapFunction<Tuple2<Long, Iterable<Long>>, Long, GraphUtils.VertexDegree>) t -> {
                 HashSet<Long> neighborSet = new HashSet<>();
                 for (Long neighbor : t._2) {
