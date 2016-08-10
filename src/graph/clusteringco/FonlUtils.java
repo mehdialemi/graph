@@ -293,7 +293,7 @@ public class FonlUtils implements Serializable {
 
                     return new Tuple2<>(vertex, higherIds);
                 }
-            }).reduceByKey((a, b) -> a).repartition(partition).cache();
+            }).repartition(partition).cache();
     }
 
     public static JavaPairRDD<Long, long[]> loadFonl(JavaSparkContext sc, String inputPath, int partition) {

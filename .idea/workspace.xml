@@ -8,10 +8,7 @@
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/graph-processing.jar" afterPath="$PROJECT_DIR$/bin/graph-processing.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/CohenTC.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/CohenTC.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/NodeIteratorPlusGCC_Spark.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/NodeIteratorPlusGCC_Spark.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/NodeIteratorPlusTC_Spark.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/NodeIteratorPlusTC_Spark.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/PregelTC.scala" afterPath="$PROJECT_DIR$/src/graph/clusteringco/PregelTC.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java" />
     </list>
     <ignored path="graph-processing.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -33,16 +30,6 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="FonlDegGCC.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlDegGCC.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="FonlDegLCC.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlDegLCC.java">
           <provider selected="true" editor-type-id="text-editor">
@@ -103,11 +90,23 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NodeIteratorPlusGCC_Spark.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="FonlUtils.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="180">
+              <caret line="122" column="14" selection-start-line="122" selection-start-column="14" selection-end-line="122" selection-end-column="14" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NodeIteratorPlusGCC_Spark.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/NodeIteratorPlusGCC_Spark.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="32" column="45" selection-start-line="32" selection-start-column="45" selection-end-line="32" selection-end-column="45" />
+            <state relative-caret-position="497">
+              <caret line="116" column="0" selection-start-line="116" selection-start-column="0" selection-end-line="116" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -201,12 +200,12 @@
         <option value="$PROJECT_DIR$/src/graph/OuفUtils.java" />
         <option value="$PROJECT_DIR$/src/graph/OutUtils.java" />
         <option value="$PROJECT_DIR$/bin/submit.sh" />
-        <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java" />
         <option value="$PROJECT_DIR$/bin/run_experiments_CC.sh" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/CohenTC.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/PregelTC.scala" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/NodeIteratorPlusTC_Spark.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/NodeIteratorPlusGCC_Spark.java" />
+        <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java" />
       </list>
     </option>
   </component>
@@ -1337,16 +1336,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="256" column="72" selection-start-line="256" selection-start-column="72" selection-end-line="256" selection-end-column="72" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/bin/run_experiments_CC.sh">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="347">
@@ -1413,14 +1402,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/NodeIterator_TC_Hadoop.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="30" column="6" selection-start-line="30" selection-start-column="6" selection-end-line="30" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/PregelTC.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="390">
@@ -1439,9 +1420,27 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/NodeIteratorPlusGCC_Spark.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="32" column="45" selection-start-line="32" selection-start-column="45" selection-end-line="32" selection-end-column="45" />
+        <state relative-caret-position="497">
+          <caret line="116" column="0" selection-start-line="116" selection-start-column="0" selection-end-line="116" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/NodeIterator_TC_Hadoop.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="30" column="6" selection-start-line="30" selection-start-column="6" selection-end-line="30" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="122" column="14" selection-start-line="122" selection-start-column="14" selection-end-line="122" selection-end-column="14" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
