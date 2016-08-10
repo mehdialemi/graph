@@ -2,6 +2,7 @@ package graph.clusteringco;
 
 import graph.GraphUtils;
 import graph.OutUtils;
+import org.apache.commons.math3.geometry.spherical.twod.Vertex;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -78,20 +79,21 @@ public class CohenTC {
                     vd.v = ve._1;
 
                     // Calculate degree and construct output key-value.
-                    Set<Edge> set = new HashSet<>();
+                    Map<Edge, VertexDegree> map = new HashMap<>();
                     while (iter.hasNext()) {
                         Edge e = iter.next();
-                        if (set.contains(e))
+                        if (map.containsKey(e))
                             continue;
-                        Tuple2<Edge, VertexDegree> t = new Tuple2<>(e, vd);
-                        list.add(t);
+                        map.put(e, vd);
                         degree++;
                     }
-                    set.clear();
 
                     // Assign degree of the current vertex to all edges.
-                    for (Tuple2<Edge, VertexDegree> t : list) {
-                        t._2.deg = degree;
+                    Set<Map.Entry<Edge, VertexDegree>> entrySet = map.entrySet();
+                    for(Map.Entry<Edge, VertexDegree> entry : entrySet) {
+                        VertexDegree vertexDegree = entry.getValue();
+                        vertexDegree.deg = degree;
+                        list.add(new Tuple2<>(entry.getKey(), vertexDegree));
                     }
                     return list;
                 }
