@@ -19,7 +19,7 @@ import java.util.*;
  * Cohen Triangle listing implementation on Apache Spark
  */
 public class CohenTC {
-    public static void main(String[] args) {
+    public static <W> void main(String[] args) {
         String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
         if (args.length > 0)
             inputPath = args[0];
@@ -39,24 +39,29 @@ public class CohenTC {
 
         JavaRDD<String> input = sc.textFile(inputPath, partition);
         // Convert edges to the appropriate structure.
-        JavaRDD<Edge> currentEdges = input.map(line -> {
+        JavaRDD<Tuple2<Long, Long>> currentEdges = input.map(line -> {
             if (line.startsWith("#"))
                 return null;
             String[] e = line.split("\\s+");
             long v1 = Long.parseLong(e[0]);
             long v2 = Long.parseLong(e[1]);
-            Edge edge = new Edge(v1, v2);
-            return edge;
+            if (v1 < v2)
+                return new Tuple2<>(v1, v2);
+            else if (v1 > v2)
+                return new Tuple2<>(v2, v1);
+            return null; // no self loop is accepted
         }).filter(t -> t != null);
 
         // Find vertices and their corresponding edges. A key-value item contains a vertex as key and an edge as value.
-        JavaPairRDD<Long, Edge> vertexEdge = currentEdges.flatMapToPair(new PairFlatMapFunction<Edge, Long, Edge>() {
+        JavaPairRDD<Long, Tuple2<Long, Long>> vertexEdge = currentEdges.flatMapToPair(
+            new PairFlatMapFunction<Tuple2<Long, Long>, Long, Tuple2<Long, Long>>() {
             @Override
-            public Iterable<Tuple2<Long, Edge>> call(Edge edge) throws Exception {
-                List<Tuple2<Long, Edge>> list = new ArrayList<>(2);
+            public Iterable<Tuple2<Long, Tuple2<Long, Long>>> call(Tuple2<Long, Long> edge) throws
+                Exception {
+                List<Tuple2<Long, Tuple2<Long, Long>>> list = new ArrayList<>(2);
 
-                list.add(new Tuple2<>(edge.v1, edge));
-                list.add(new Tuple2<>(edge.v2, edge));
+                list.add(new Tuple2<>(edge._1, edge));
+                list.add(new Tuple2<>(edge._2, edge));
                 return list;
             }
         });
@@ -66,22 +71,22 @@ public class CohenTC {
         // Second, since all neighbors of the current vertex are aggregated here, calculate degree of the vertex.
         // Third, construct key-value <Edge, VertexDegree> which each edge of the current vertex is as a key (Edge) and
         // the value (VertexDegree) is the degree of the current vertex. Here, values for all the keys are the same.
-        JavaPairRDD<Edge, VertexDegree> edgeVertexDegree = vertexEdge.groupByKey()
-            .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, Iterable<Edge>>, Edge, VertexDegree>() {
+        JavaPairRDD<Tuple2<Long, Long>, VertexDegree> edgeVertexDegree = vertexEdge.groupByKey()
+            .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, Iterable<Tuple2<Long, Long>>>, Tuple2<Long, Long>, VertexDegree>() {
                 @Override
-                public Iterable<Tuple2<Edge, VertexDegree>> call(Tuple2<Long, Iterable<Edge>> ve) throws
+                public Iterable<Tuple2<Tuple2<Long, Long>, VertexDegree>> call(Tuple2<Long, Iterable<Tuple2<Long, Long>>> ve) throws
                     Exception {
-                    List<Tuple2<Edge, VertexDegree>> list = new ArrayList<>();
+                    List<Tuple2<Tuple2<Long, Long>, VertexDegree>> list = new ArrayList<>();
                     int degree = 0;
-                    Iterator<Edge> iter = ve._2.iterator();
+                    Iterator<Tuple2<Long, Long>> iter = ve._2.iterator();
 
                     VertexDegree vd = new VertexDegree();
                     vd.v = ve._1;
 
                     // Calculate degree and construct output key-value.
-                    Map<Edge, VertexDegree> map = new HashMap<>();
+                    Map<Tuple2<Long, Long>, VertexDegree> map = new HashMap<>();
                     while (iter.hasNext()) {
-                        Edge e = iter.next();
+                        Tuple2<Long, Long> e = iter.next();
                         if (map.containsKey(e))
                             continue;
                         map.put(e, vd);
@@ -89,8 +94,8 @@ public class CohenTC {
                     }
 
                     // Assign degree of the current vertex to all edges.
-                    Set<Map.Entry<Edge, VertexDegree>> entrySet = map.entrySet();
-                    for(Map.Entry<Edge, VertexDegree> entry : entrySet) {
+                    Set<Map.Entry<Tuple2<Long, Long>, VertexDegree>> entrySet = map.entrySet();
+                    for(Map.Entry<Tuple2<Long, Long>, VertexDegree> entry : entrySet) {
                         VertexDegree vertexDegree = entry.getValue();
                         vertexDegree.deg = degree;
                         list.add(new Tuple2<>(entry.getKey(), vertexDegree));
@@ -101,12 +106,12 @@ public class CohenTC {
 
         // Find each edge and its corresponding degree of vertices. Here, key is an edge and value includes two integer that first one
         // is the degree of first vertex of the edge and second one is the degree of the second vertex of the edge.
-        JavaPairRDD<Edge, Integer[]> edgeVertex2Degree = edgeVertexDegree.groupByKey()
-            .mapToPair(new PairFunction<Tuple2<Edge, Iterable<VertexDegree>>, Edge, Integer[]>() {
+        JavaPairRDD<Tuple2<Long, Long>, Integer[]> edgeVertex2Degree = edgeVertexDegree.groupByKey()
+            .mapToPair(new PairFunction<Tuple2<Tuple2<Long, Long>, Iterable<VertexDegree>>, Tuple2<Long, Long>, Integer[]>() {
                 @Override
-                public Tuple2<Edge, Integer[]> call(Tuple2<Edge, Iterable<VertexDegree>> e) throws
+                public Tuple2<Tuple2<Long, Long>, Integer[]> call(Tuple2<Tuple2<Long, Long>, Iterable<VertexDegree>> e) throws
                     Exception {
-                    Edge edge = e._1;  // edge as key.
+                    Tuple2<Long, Long> edge = e._1;  // edge as key.
 
                     // There should be degree information of two vertices of the current edge.
                     Iterator<VertexDegree> iter = e._2.iterator();
@@ -117,7 +122,7 @@ public class CohenTC {
 
                     // If this VertexDegree is related to first vertex of the edge
                     // then add degree to the first index else add it to the second one.
-                    if (vd.v == edge.v1)
+                    if (vd.v == edge._1)
                         degrees[0] = vd.deg;
                     else
                         degrees[1] = vd.deg;
@@ -125,7 +130,7 @@ public class CohenTC {
                     iter.hasNext();
                     vd = iter.next();
                     // Again find appropriate index for the second VertexDegree.
-                    if (vd.v == edge.v1)
+                    if (vd.v == edge._1)
                         degrees[0] = vd.deg;
                     else
                         degrees[1] = vd.deg;
@@ -136,33 +141,35 @@ public class CohenTC {
 
         // Filter out vertices with higher degree.
         JavaPairRDD<Long, VertexDegree[]> filteredVertexDegree = edgeVertex2Degree
-            .mapToPair(new PairFunction<Tuple2<Edge, Integer[]>, Long, VertexDegree[]>() {
+            .mapToPair(new PairFunction<Tuple2<Tuple2<Long, Long>, Integer[]>, Long, VertexDegree[]>() {
                 @Override
-                public Tuple2<Long, VertexDegree[]> call(Tuple2<Edge, Integer[]> e) throws Exception {
+                public Tuple2<Long, VertexDegree[]> call(Tuple2<Tuple2<Long, Long>, Integer[]> e) throws Exception {
                     VertexDegree[] vd = new VertexDegree[2];
                     vd[0] = new VertexDegree();
-                    vd[0].v = e._1.v1;
+                    vd[0].v = e._1._1;
                     vd[0].deg = e._2[0];
 
                     vd[1] = new VertexDegree();
-                    vd[1].v = e._1.v2;
+                    vd[1].v = e._1._2;
                     vd[1].deg = e._2[1];
 
                     if (e._2[0] <= e._2[1])
-                        return new Tuple2<>(e._1.v1, vd);
-                    return new Tuple2<>(e._1.v2, vd);
+                        return new Tuple2<>(e._1._1, vd);
+                    return new Tuple2<>(e._1._2, vd);
                 }
             });
 
         // Extract two connected edges as value and a synthetic edge constructed from uncommon vertices of these two edges.
         // Each key-value should contain an (synthetic) edge as key and two edges as value.
         // To do so, group all edges of a vertex together. Synthetic edges are created by all combinations of the aggregated edges.
-        JavaPairRDD<Edge, Edge[]> syntheticEdges = filteredVertexDegree.groupByKey()
-            .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, Iterable<VertexDegree[]>>, Edge, Edge[]>() {
+        JavaPairRDD<Tuple2<Long, Long>, List<Tuple2<Long, Long>>> syntheticEdges = filteredVertexDegree.groupByKey()
+            .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, Iterable<VertexDegree[]>>, Tuple2<Long, Long>,
+                List<Tuple2<Long, Long>>>() {
                 @Override
-                public Iterable<Tuple2<Edge, Edge[]>> call(Tuple2<Long, Iterable<VertexDegree[]>> e)
+                public Iterable<Tuple2<Tuple2<Long, Long>, List<Tuple2<Long, Long>>>> call(Tuple2<Long,
+                    Iterable<VertexDegree[]>> e)
                     throws Exception {
-                    List<Tuple2<Edge, Edge[]>> list = new ArrayList<>();
+                    List<Tuple2<Tuple2<Long, Long>, List<Tuple2<Long, Long>>>> list = new ArrayList<>();
                     Long key = e._1;
 
                     // First, add all edges to a list.
@@ -176,14 +183,14 @@ public class CohenTC {
                     for (int i = 0; i < edges.size(); i++)
                         for (int j = i + 1; j < edges.size(); j++) {
                             // Select two edges.
-                            Edge[] simpleEdges = new Edge[2];
+                            List<Tuple2<Long, Long>> simpleEdges = new ArrayList<> (2);
                             VertexDegree vd1_1 = edges.get(i)[0];
                             VertexDegree vd1_2 = edges.get(i)[1];
                             VertexDegree vd2_1 = edges.get(j)[0];
                             VertexDegree vd2_2 = edges.get(j)[1];
 
-                            simpleEdges[0] = new Edge(vd1_1.v, vd1_2.v);
-                            simpleEdges[1] = new Edge(vd2_1.v, vd2_2.v);
+                            simpleEdges.add(new Tuple2<>(vd1_1.v, vd1_2.v));
+                            simpleEdges.add(new Tuple2<>(vd2_1.v, vd2_2.v));
 
                             // Find uncommon vertices of the selected two edges in the previous instructions.
                             VertexDegree vd1;
@@ -198,16 +205,16 @@ public class CohenTC {
                             else
                                 vd2 = vd2_2;
 
-                            Edge syntheticEdge;
+                            Tuple2<Long, Long> syntheticEdge;
                             if (vd1.deg < vd2.deg)
-                                syntheticEdge = new Edge(vd1.v, vd2.v);
+                                syntheticEdge = new Tuple2<>(vd1.v, vd2.v);
                             else if (vd1.deg == vd2.deg) {
                                 if (vd1.v < vd2.v)
-                                    syntheticEdge = new Edge(vd1.v, vd2.v);
+                                    syntheticEdge = new Tuple2<>(vd1.v, vd2.v);
                                 else
-                                    syntheticEdge = new Edge(vd2.v, vd1.v);
+                                    syntheticEdge = new Tuple2<>(vd2.v, vd1.v);
                             } else
-                                syntheticEdge = new Edge(vd2.v, vd1.v);
+                                syntheticEdge = new Tuple2<>(vd2.v, vd1.v);
 
                             list.add(new Tuple2<>(syntheticEdge, simpleEdges));
                         }
@@ -218,15 +225,15 @@ public class CohenTC {
         syntheticEdges.persist(StorageLevel.DISK_ONLY());
 
         // Extract every two connected edges.
-        JavaPairRDD<Edge, Edge> connectedEdges = edgeVertex2Degree
-            .mapToPair(new PairFunction<Tuple2<Edge, Integer[]>, Edge, Edge>() {
+        JavaPairRDD<Tuple2<Long, Long>, Tuple2<Long, Long>> connectedEdges = edgeVertex2Degree
+            .mapToPair(new PairFunction<Tuple2<Tuple2<Long, Long>, Integer[]>, Tuple2<Long, Long>, Tuple2<Long, Long>>() {
                 @Override
-                public Tuple2<Edge, Edge> call(Tuple2<Edge, Integer[]> e) throws Exception {
+                public Tuple2<Tuple2<Long, Long>, Tuple2<Long, Long>> call(Tuple2<Tuple2<Long, Long>, Integer[]> e) throws Exception {
                     if (e._2[0] > e._2[1])
-                        return new Tuple2<>(e._1.reverse(), e._1);
+                        return new Tuple2<>(new Tuple2<> (e._1._2, e._1._1), e._1);
                     else if (e._2[0] == e._2[1]) {
-                        if (e._1.v1 > e._1.v2)
-                            return new Tuple2<>(e._1.reverse(), e._1);
+                        if (e._1._1 > e._1._2)
+                            return new Tuple2<>(new Tuple2<> (e._1._2, e._1._1), e._1);
                         else
                             return new Tuple2<>(e._1, e._1);
                     }
@@ -235,26 +242,26 @@ public class CohenTC {
             });
 
         // Find triangles
-        JavaRDD<Edge[]> triangles = syntheticEdges.cogroup(connectedEdges).flatMap(m -> {
-            Edge e1;
-            Edge e2;
-            Edge e3;
-            List<Edge[]> list = new ArrayList<>();
+        JavaRDD<List<Tuple2<Long, Long>>> triangles = syntheticEdges.cogroup(connectedEdges).flatMap(m -> {
+            Tuple2<Long, Long> e1;
+            Tuple2<Long, Long> e2;
+            Tuple2<Long, Long> e3;
+            List<List<Tuple2<Long, Long>>> list = new ArrayList<>();
 
             // If syntheticEdges and connectedEdges of the same key (edge) contain some values at the same time, then a triangle would
             // be created as a 3-length array of the Edge
-            Iterator<Edge> oneEdgeIter = m._2._2.iterator();
+            Iterator<Tuple2<Long, Long>> oneEdgeIter = m._2._2.iterator();
             if (!oneEdgeIter.hasNext())
                 return list;
 
             e1 = m._1;
-            Iterator<Edge[]> twoEdgesIter = m._2._1.iterator();
+            Iterator<List<Tuple2<Long, Long>>> twoEdgesIter = m._2._1.iterator();
             while (twoEdgesIter.hasNext()) {
-                Edge[] edges = twoEdgesIter.next();
-                e2 = edges[0];
-                e3 = edges[1];
+                List<Tuple2<Long, Long>> edges = twoEdgesIter.next();
+                e2 = edges.get(0);
+                e3 = edges.get(1);
 
-                Edge[] triangleEdges = new Edge[]{e1, e2, e3};
+                List<Tuple2<Long, Long>> triangleEdges = Arrays.asList(e1, e2, e3);
                 list.add(triangleEdges);
             }
 
@@ -275,40 +282,6 @@ public class CohenTC {
         @Override
         public String toString() {
             return "v: " + v + " deg: " + deg;
-        }
-    }
-
-    static class Edge implements Serializable {
-        private static final long serialVersionUID = 1L;
-
-        public long v1;
-        public long v2;
-
-        public Edge(long v1, long v2) {
-            this.v1 = v1;
-            this.v2 = v2;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null)
-                return false;
-            Edge e = (Edge) obj;
-            return (v1 == e.v1 && v2 == e.v2) || (v1 == e.v2 && v2 == e.v1);
-        }
-
-        @Override
-        public int hashCode() {
-            return (int) (v1 + v2);
-        }
-
-        public Edge reverse() {
-            return new Edge(v2, v1);
-        }
-
-        @Override
-        public String toString() {
-            return "(" + v1 + "," + v2 + ")";
         }
     }
 }
