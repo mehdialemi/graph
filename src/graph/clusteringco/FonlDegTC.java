@@ -120,7 +120,7 @@ public class FonlDegTC {
                 return t;
             });
 
-        long totalTriangles = candidates.cogroup(fonl, partition * 2).map(t -> {
+        long totalTriangles = candidates.cogroup(fonl, partition).map(t -> {
             Iterator<long[]> iterator = t._2._2.iterator();
             if (!iterator.hasNext())
                 return 0L;
