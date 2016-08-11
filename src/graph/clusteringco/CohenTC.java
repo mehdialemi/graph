@@ -64,7 +64,7 @@ public class CohenTC {
                 list.add(new Tuple2<>(edge._2, edge));
                 return list;
             }
-        });
+        }).repartition(partition);
 
         // Find an edge and degree related to one of its vertices.
         // First, collect all edges connected to a vertex by groupByKey() operator.
@@ -102,7 +102,7 @@ public class CohenTC {
                     }
                     return list;
                 }
-            });
+            }).repartition(partition);
 
         // Find each edge and its corresponding degree of vertices. Here, key is an edge and value includes two integer that first one
         // is the degree of first vertex of the edge and second one is the degree of the second vertex of the edge.
@@ -157,7 +157,7 @@ public class CohenTC {
                         return new Tuple2<>(e._1._1, vd);
                     return new Tuple2<>(e._1._2, vd);
                 }
-            });
+            }).repartition(partition);
 
         // Extract two connected edges as value and a synthetic edge constructed from uncommon vertices of these two edges.
         // Each key-value should contain an (synthetic) edge as key and two edges as value.
