@@ -4,6 +4,7 @@ import java.io.File
 
 import graph.{GraphUtils, OutUtils}
 import org.apache.spark.graphx._
+import org.apache.spark.storage.StorageLevel
 import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.mutable.ListBuffer
@@ -67,17 +68,14 @@ object PregelTC {
 
         // Update each nodes with its outlink neighbors' id.
         val graphWithOutlinks = graph.outerJoinVertices(neighborIds)((vid, _, nId) => nId.getOrElse(Array[Long]()))
+        graphWithOutlinks.vertices.repartition(numPartitions = partition).persist(StorageLevel.DISK_ONLY)
 
         // Send neighborIds of a node to all other its neighbors.
         val message = graphWithOutlinks.aggregateMessages(
-            (ctx: EdgeContext[Array[Long], Boolean, NeighborMessage]) => {
-                val msg = new ListBuffer[OneNeighborMsg]()
-                msg += OneNeighborMsg(ctx.srcId, ctx.srcAttr)
-                ctx.sendToDst(NeighborMessage(msg))
-            }, (msg1: NeighborMessage, msg2: NeighborMessage) => {
-                msg1.list ++= msg2.list
-                msg1
-            })
+            (ctx: EdgeContext[Array[Long], Boolean, List[(Long, Array[Long])]]) => {
+                val msg = List((ctx.srcId, ctx.srcAttr))
+                ctx.sendToDst(msg)
+            }, (msg1: List[(Long, Array[Long])], msg2: List[(Long, Array[Long])]) => msg1 ::: msg2)
 
         // =======================================================
         // phase 2: Find triangles
@@ -87,8 +85,8 @@ object PregelTC {
         // If there was any common neighbors then it report back telling the sender the completing nodes to make
         // a triangle through it.
         val tCount = graphWithOutlinks.vertices.join(message).flatMap { case (vid, (n, msg)) =>
-            msg.list.map(ids => (n.intersect(ids.neighbors))).filter(_.length > 0)
-        }.map(t => t.length).reduce((a, b) => a + b)
+            msg.map(ids => (n.intersect(ids._2))).filter(_.size > 0)
+        }.map(t => t.size).reduce((a, b) => a + b)
 
         OutUtils.printOutputTC(tCount)
 
