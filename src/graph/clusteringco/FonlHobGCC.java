@@ -102,7 +102,7 @@ public class FonlHobGCC {
                     Arrays.sort(forward);
                     output.add(new Tuple2<>(t._2[index], forward));
                 }
-                return output;
+                return output.iterator();
             });
 
         long triangle1 = candidates.cogroup(fonl, partition * 2).map(t -> {

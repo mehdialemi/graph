@@ -41,13 +41,13 @@ public class KCore implements Serializable {
             expiredVertices = expiredVertices.cache();
             JavaPairRDD<Long, Iterable<Long>> subtractList = expiredVertices.flatMapToPair(new PairFlatMapFunction<Tuple2<Long, FdValue>, Long, Long>() {
                 @Override
-                public Iterable<Tuple2<Long, Long>> call(Tuple2<Long, FdValue> v) throws Exception {
+                public Iterator<Tuple2<Long, Long>> call(Tuple2<Long, FdValue> v) throws Exception {
                     List<Tuple2<Long, Long>> affectedNeighbors = new ArrayList<>();
                     for (long vertex : v._2.lowDegs)
                         affectedNeighbors.add(new Tuple2<>(vertex, v._1));
                     for (long vertex : v._2.highDegs)
                         affectedNeighbors.add(new Tuple2<>(vertex, v._1));
-                    return affectedNeighbors;
+                    return affectedNeighbors.iterator();
                 }
             }).groupByKey(); // All expired neighbors related to a vertex are grouped together
 

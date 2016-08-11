@@ -14,6 +14,7 @@ import scala.Tuple3;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -54,12 +55,12 @@ public class KTrussSparkJava {
             JavaPairRDD<KEdge, Integer> edgeCounts = triangles
                 .flatMapToPair(new PairFlatMapFunction<Tuple3<Long, Long, Long>, KEdge, Integer>() {
                     @Override
-                    public Iterable<Tuple2<KEdge, Integer>> call(Tuple3<Long, Long, Long> t) throws Exception {
+                    public Iterator<Tuple2<KEdge, Integer>> call(Tuple3<Long, Long, Long> t) throws Exception {
                         List<Tuple2<KEdge, Integer>> list = new ArrayList<>(3);
                         list.add(new Tuple2<>(new KEdge(t._1(), t._2(), t._3()), 1));
                         list.add(new Tuple2<>(new KEdge(t._1(), t._3(), t._2()), 1));
                         list.add(new Tuple2<>(new KEdge(t._2(), t._3(), t._1()), 1));
-                        return list;
+                        return list.iterator();
                     }
                 }).reduceByKey((a, b) -> a + b);
 
@@ -84,7 +85,7 @@ public class KTrussSparkJava {
             list.add(new Tuple2<>(t._1(), t._2()));
             list.add(new Tuple2<>(t._1(), t._3()));
             list.add(new Tuple2<>(t._2(), t._3()));
-            return list;
+            return list.iterator();
         }).distinct();
 
         System.out.println("Remaining graph edge count: " + edges.count());

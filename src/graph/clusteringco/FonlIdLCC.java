@@ -52,11 +52,12 @@ public class FonlIdLCC {
         JavaPairRDD<Integer, GraphUtils.CandidateState> candidates = fonl
             .flatMapToPair(new PairFlatMapFunction<Tuple2<Integer, int[]>, Integer, GraphUtils.CandidateState>() {
                 @Override
-                public Iterable<Tuple2<Integer, GraphUtils.CandidateState>> call(Tuple2<Integer, int[]> tuple) throws Exception {
+                public Iterator<Tuple2<Integer, GraphUtils.CandidateState>> call(Tuple2<Integer, int[]> tuple) throws
+                    Exception {
                     List<Tuple2<Integer, GraphUtils.CandidateState>> output = new ArrayList<>();
                     int[] higherIds = new int[tuple._2.length - 1];
                     if (higherIds.length < 2)
-                        return output;
+                        return output.iterator();
                     System.arraycopy(tuple._2, 1, higherIds, 0, higherIds.length);
 
                     GraphUtils.CandidateState candidateState = new GraphUtils.CandidateState(tuple._1, higherIds);
@@ -73,7 +74,7 @@ public class FonlIdLCC {
                         }
                         output.add(new Tuple2<>(tuple._2[index], candidateState));
                     }
-                    return output;
+                    return output.iterator();
                 }
             });
 
@@ -81,17 +82,17 @@ public class FonlIdLCC {
             .flatMapToPair(new PairFlatMapFunction<Tuple2<Integer,
             Tuple2<Iterable<GraphUtils.CandidateState>, Iterable<int[]>>>, Integer, Integer>() {
             @Override
-            public Iterable<Tuple2<Integer, Integer>> call(Tuple2<Integer, Tuple2<Iterable<GraphUtils.CandidateState>,
+            public Iterator<Tuple2<Integer, Integer>> call(Tuple2<Integer, Tuple2<Iterable<GraphUtils.CandidateState>,
                 Iterable<int[]>>> t) throws Exception {
                 Iterator<int[]> higherIdsIter = t._2._2.iterator();
                 List<Tuple2<Integer, Integer>> output = new ArrayList<>();
                 if (!higherIdsIter.hasNext())
-                    return output;
+                    return output.iterator();
                 int[] higherIds = higherIdsIter.next();
 
                 Iterator<GraphUtils.CandidateState> candidateIter = t._2._1.iterator();
                 if (!candidateIter.hasNext())
-                    return output;
+                    return output.iterator();
 
                 int sum = 0;
                 do {
@@ -106,7 +107,7 @@ public class FonlIdLCC {
                 if (sum > 0) {
                     output.add(new Tuple2<>(t._1, sum));
                 }
-                return output;
+                return output.iterator();
             }
         }).reduceByKey((a, b) -> a + b);
 

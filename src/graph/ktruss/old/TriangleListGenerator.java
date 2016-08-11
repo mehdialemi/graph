@@ -39,7 +39,7 @@ public class TriangleListGenerator implements Serializable {
         JavaPairRDD<Long, CandidateState> candidates = fonl
             .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, long[]>, Long, CandidateState>() {
                 @Override
-                public Iterable<Tuple2<Long, CandidateState>> call(Tuple2<Long, long[]> t) throws Exception {
+                public Iterator<Tuple2<Long, CandidateState>> call(Tuple2<Long, long[]> t) throws Exception {
                     List<Tuple2<Long, CandidateState>> output = new ArrayList<>();
 
                     long[] candidateNeighbors = new long[t._2.length];
@@ -51,7 +51,7 @@ public class TriangleListGenerator implements Serializable {
                         output.add(new Tuple2<>(neighbor, candidateState));
                     }
 
-                    return output;
+                    return output.iterator();
                 }
             });
 
@@ -60,7 +60,7 @@ public class TriangleListGenerator implements Serializable {
 
             Iterator<long[]> fonlItemIter = t._2._2.iterator();
             if (!fonlItemIter.hasNext())
-                return triangles;
+                return triangles.iterator();
 
             long[] higherDegreeNeighbors = fonlItemIter.next();
             Arrays.sort(higherDegreeNeighbors);
@@ -69,7 +69,7 @@ public class TriangleListGenerator implements Serializable {
             for (CandidateState candidateState : allCandidates) {
                 updateTriangles(triangles, candidateState.vertexId, t._1, higherDegreeNeighbors, candidateState.candidateNeighbors);
             }
-            return triangles;
+            return triangles.iterator();
 
         });
 

@@ -56,7 +56,8 @@ public class FonlIdGCC {
                 private static final long serialVersionUID = 1L;
 
                 @Override
-                public Iterable<Tuple2<Integer, GraphUtils.CandidateState>> call(Tuple2<Integer, int[]> tuple) throws Exception {
+                public Iterator<Tuple2<Integer, GraphUtils.CandidateState>> call(Tuple2<Integer, int[]> tuple) throws
+                    Exception {
                     List<Tuple2<Integer, GraphUtils.CandidateState>> output = new ArrayList<>();
                     GraphUtils.CandidateState candidateState = new GraphUtils.CandidateState(tuple._1, tuple._2);
                     Integer bSize = batchSize.getValue();
@@ -75,7 +76,7 @@ public class FonlIdGCC {
                         }
                         output.add(new Tuple2<>(tuple._2[index], candidateState));
                     }
-                    return output;
+                    return output.iterator();
                 }
             });
 

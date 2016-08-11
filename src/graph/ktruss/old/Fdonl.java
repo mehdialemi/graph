@@ -41,7 +41,7 @@ public class Fdonl implements Serializable {
 		JavaPairRDD<Long, Iterable<VertexDegree>> vdNeighborList = neighborList
             .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, Iterable<Long>>, Long, VertexDegree>() {
 			@Override
-			public Iterable<Tuple2<Long, VertexDegree>> call(Tuple2<Long, Iterable<Long>> t) throws
+			public Iterator<Tuple2<Long, VertexDegree>> call(Tuple2<Long, Iterable<Long>> t) throws
 				Exception {
 				HashSet<Long> neighborSet = new HashSet<Long>();
 				for (Long neighbor : t._2) {
@@ -58,7 +58,7 @@ public class Fdonl implements Serializable {
 				for (Long neighbor : neighborSet) {
 					degreeList.add(new Tuple2<>(neighbor, vd));
 				}
-				return degreeList;
+				return degreeList.iterator();
 			}
 		}).groupByKey(); // A neighbor list that each neighbor has its degree
 		

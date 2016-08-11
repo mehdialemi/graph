@@ -34,7 +34,7 @@ public class FonlDegTC {
                     Arrays.sort(forward, 1, forward.length); // sort to comfort with fonl
                     output.add(new Tuple2<>(t._2[index], forward));
                 }
-                return output;
+                return output.iterator();
             });
     }
 
@@ -47,33 +47,33 @@ public class FonlDegTC {
         // low number of higherIds (high deg)
 
         JavaPairRDD<Long, long[]> candidates = createCandidates(fonl);
-
         return candidates.cogroup(fonl, partition)
-            .flatMap((FlatMapFunction<Tuple2<Long, Tuple2<Iterable<long[]>, Iterable<long[]>>>,
-                Tuple3<Long, Long, Long>>) t -> {
-                List<Tuple3<Long, Long, Long>> triangles = new ArrayList<>();
-                Iterator<long[]> iterator = t._2._2.iterator();
-                if (!iterator.hasNext())
-                    return triangles;
+            .flatMap((FlatMapFunction<Tuple2<Long, Tuple2<Iterable<long[]>, Iterable<long[]>>>, Tuple3<Long, Long, Long>>) t -> {
+            List<Tuple3<Long, Long, Long>> triangles = new ArrayList<>();
+            Iterator<long[]> iterator = t._2._2.iterator();
+            if (!iterator.hasNext())
+                return triangles.iterator();
 
-                long[] hDegs = iterator.next();
+            long[] hDegs = iterator.next();
 
-                iterator = t._2._1.iterator();
-                if (!iterator.hasNext())
-                    return triangles;
+            iterator = t._2._1.iterator();
+            if (!iterator.hasNext())
+                return triangles.iterator();
 
-                Arrays.sort(hDegs, 1, hDegs.length);
+            Arrays.sort(hDegs, 1, hDegs.length);
 
-                do {
-                    long[] forward = iterator.next();
-                    List<Long> common = GraphUtils.sortedIntersection(hDegs, forward, 1, 1);
-                    for (long v : common)
-                        triangles.add(GraphUtils.createSorted(forward[0], t._1, v));
-                } while (iterator.hasNext());
+            do {
+                long[] forward = iterator.next();
+                List<Long> common = GraphUtils.sortedIntersection(hDegs, forward, 1, 1);
+                for (long v : common)
+                    triangles.add(GraphUtils.createSorted(forward[0], t._1, v));
+            } while (iterator.hasNext());
 
-                return triangles;
-            });
+            return triangles.iterator();
+        });
+
     }
+
 
     public static void main(String[] args) {
 //        String inputPath = "input.txt";
@@ -104,7 +104,7 @@ public class FonlDegTC {
             .filter(t -> t._2.length > 2)
             .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, long[]>, Long, long[]>() {
                 @Override
-                public Iterable<Tuple2<Long, long[]>> call(Tuple2<Long, long[]> t) throws Exception {
+                public Iterator<Tuple2<Long, long[]>> call(Tuple2<Long, long[]> t) throws Exception {
                     int size = t._2.length - 1;
                     List<Tuple2<Long, long[]>> output = new ArrayList<>(size - 1);
                     for (int index = 1; index < size; index++) {
@@ -113,7 +113,7 @@ public class FonlDegTC {
                         System.arraycopy(t._2, index + 1, forward, 0, len);
                         output.add(new Tuple2<>(t._2[index], forward));
                     }
-                    return output;
+                    return output.iterator();
                 }
             }).mapValues(t -> { // sort candidates
                 Arrays.sort(t);

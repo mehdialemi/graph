@@ -55,7 +55,7 @@ public class FonlDegGCC {
                     Arrays.sort(forward);
                     output.add(new Tuple2<>(t._2[index], forward));
                 }
-                return output;
+                return output.iterator();
             });
 
         long totalTriangles = candidates.cogroup(fonl, partition).map(t -> {

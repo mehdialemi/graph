@@ -58,24 +58,24 @@ public class FonlDegLCC {
                     Arrays.sort(forward, 1, forward.length); // sort to comfort with fonl
                     output.add(new Tuple2<>(t._2[index], forward));
                 }
-                return output;
+                return output.iterator();
             });
 
         JavaPairRDD<Long, Integer> localTriangleCount = candidates.cogroup(fonl, partition)
             .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, Tuple2<Iterable<long[]>, Iterable<long[]>>>, Long, Integer>() {
                 @Override
-                public Iterable<Tuple2<Long, Integer>> call(Tuple2<Long, Tuple2<Iterable<long[]>, Iterable<long[]>>> t)
+                public Iterator<Tuple2<Long, Integer>> call(Tuple2<Long, Tuple2<Iterable<long[]>, Iterable<long[]>>> t)
                     throws Exception {
                     Iterator<long[]> iterator = t._2._2.iterator();
                     List<Tuple2<Long, Integer>> output = new ArrayList<>();
                     if (!iterator.hasNext())
-                        return output;
+                        return output.iterator();
 
                     long[] hDegs = iterator.next();
 
                     iterator = t._2._1.iterator();
                     if (!iterator.hasNext())
-                        return output;
+                        return output.iterator();
 
                     Arrays.sort(hDegs, 1, hDegs.length);
 
@@ -92,7 +92,7 @@ public class FonlDegLCC {
                     if (sum > 0) {
                         output.add(new Tuple2<>(t._1, sum));
                     }
-                    return output;
+                    return output.iterator();
                 }
             })
             .reduceByKey((a, b) -> a + b);

@@ -34,11 +34,11 @@ public class FonlUtils implements Serializable {
         JavaPairRDD<Long, Long> vertexDegree = lthEdge
             .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, Long>, Long, Long>() {
                 @Override
-                public Iterable<Tuple2<Long, Long>> call(Tuple2<Long, Long> t) throws Exception {
+                public Iterator<Tuple2<Long, Long>> call(Tuple2<Long, Long> t) throws Exception {
                     List<Tuple2<Long, Long>> list = new ArrayList<>(2);
                     list.add(new Tuple2<>(t._1, 1L));
                     list.add(new Tuple2<>(t._2, 1L));
-                    return list;
+                    return list.iterator();
                 }
             }).reduceByKey((a, b) -> a + b).cache();
 
@@ -144,7 +144,7 @@ public class FonlUtils implements Serializable {
                 for (Long neighbor : neighborSet) {
                     degreeList.add(new Tuple2<>(neighbor, vd));
                 }
-                return degreeList;
+                return degreeList.iterator();
             }).groupByKey()
             .mapToPair(new PairFunction<Tuple2<Long, Iterable<GraphUtils.VertexDegree>>, Long, long[]>() {
                 @Override
@@ -214,7 +214,7 @@ public class FonlUtils implements Serializable {
                 for (Long neighbor : neighborSet) {
                     degreeList.add(new Tuple2<>(neighbor, vd));
                 }
-                return degreeList;
+                return degreeList.iterator();
             }).groupByKey()
             .mapToPair(new PairFunction<Tuple2<Long, Iterable<GraphUtils.VertexDegree>>, Long, long[]>() {
                 @Override

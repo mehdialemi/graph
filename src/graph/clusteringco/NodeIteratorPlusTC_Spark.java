@@ -70,7 +70,7 @@ public class NodeIteratorPlusTC_Spark {
             long[] vArray = new long[4096];
 
             @Override
-            public Iterable<Tuple2<String, Long>> call(Tuple2<Long, Iterable<Long>> tuple) throws Exception {
+            public Iterator<Tuple2<String, Long>> call(Tuple2<Long, Iterable<Long>> tuple) throws Exception {
                 // Produce triads - all permutations of pairs where e1 < e2 (value=1).
                 // And all original edges (value=0).
                 // Sorted by value.
@@ -99,7 +99,7 @@ public class NodeIteratorPlusTC_Spark {
                         output.add(new Tuple2<>(Long.toString(vArray[i]) + " " + Long.toString(vArray[j]), one));
                     }
                 }
-                return output;
+                return output.iterator();
             }
         });
 

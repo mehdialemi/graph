@@ -11,6 +11,7 @@ import scala.Tuple2;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class KTruss2 implements Serializable {
@@ -30,12 +31,12 @@ public class KTruss2 implements Serializable {
 			JavaPairRDD<Edge, Integer> edgeCount = triangles
 				.flatMapToPair(new PairFlatMapFunction<Triangle, Edge, Integer>() {
 				@Override
-				public Iterable<Tuple2<Edge, Integer>> call(Triangle t) throws Exception {
+				public Iterator<Tuple2<Edge, Integer>> call(Triangle t) throws Exception {
 					List<Tuple2<Edge, Integer>> edge = new ArrayList<>();
 					edge.add(new Tuple2<>(new Edge(t.first, t.second, t.third), 1));
 					edge.add(new Tuple2<>(new Edge(t.first, t.third, t.second), 1));
 					edge.add(new Tuple2<>(new Edge(t.second, t.third, t.first), 1));
-					return edge;
+					return edge.iterator();
 				}
 			});
 
@@ -56,7 +57,7 @@ public class KTruss2 implements Serializable {
 			edgeList.add(new SimpleEdge(t.first, t.second));
 			edgeList.add(new SimpleEdge(t.first, t.third));
 			edgeList.add(new SimpleEdge(t.second, t.third));
-			return edgeList;
+			return edgeList.iterator();
 		}).distinct();
 	}
 

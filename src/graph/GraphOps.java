@@ -1,6 +1,7 @@
 package graph;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import graph.ktruss.old.FdValue;
@@ -78,11 +79,11 @@ public class GraphOps {
     public static JavaPairRDD<Long, Long> createEdgeList(JavaRDD<String> lines) {
         JavaPairRDD<Long, Long> edges = lines.map(line -> line.split("\\s+")).flatMapToPair(new PairFlatMapFunction<String[], Long, Long>() {
             @Override
-            public Iterable<Tuple2<Long, Long>> call(String[] str) throws Exception {
+            public Iterator<Tuple2<Long, Long>> call(String[] str) throws Exception {
                 List<Tuple2<Long, Long>> list = new ArrayList<> ();
                 list.add(new Tuple2<>(Long.parseLong(str[0]), Long.parseLong(str[1])));
                 list.add(new Tuple2<>(Long.parseLong(str[1]), Long.parseLong(str[0])));
-                return list;
+                return list.iterator();
             }
         });
         return edges;
