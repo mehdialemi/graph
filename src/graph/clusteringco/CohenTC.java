@@ -2,7 +2,6 @@ package graph.clusteringco;
 
 import graph.GraphUtils;
 import graph.OutUtils;
-import org.apache.commons.math3.geometry.spherical.twod.Vertex;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -19,7 +18,7 @@ import java.util.*;
  * Cohen Triangle listing implementation on Apache Spark
  */
 public class CohenTC {
-    public static <W> void main(String[] args) {
+    public static void main(String[] args) {
         String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
         if (args.length > 0)
             inputPath = args[0];

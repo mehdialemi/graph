@@ -32,7 +32,7 @@ public class KTrussBucket {
         SparkConf conf = new SparkConf();
         conf.setAppName("KTruss MapReduce");
         conf.setMaster("local[2]");
-        conf.registerKryoClasses(new Class[]{KTrussMapReduce.VertexDegree.class, long[].class});
+        conf.registerKryoClasses(new Class[]{GraphUtils.VertexDegree.class, long[].class});
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
         JavaSparkContext sc = new JavaSparkContext(conf);
 
