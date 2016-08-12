@@ -7,6 +7,9 @@ fi
 jar_path="$PWD/bin/graph-processing.jar"
 master="malemi-2"
 total_cores=110
+persistOnDisk="false"
+repartition="true"
+userSort="true"
 
 task=$1
 case $task in
@@ -53,4 +56,4 @@ fi
 cd $SPARK_HOME
 
 echo "Running $main_class on $master with partitions $p"
-bin/spark-submit --class $main_class --total-executor-cores $total_cores --master spark://$master:7077 $jar_path $dataset $p $4
+bin/spark-submit --class $main_class --total-executor-cores $total_cores --master spark://$master:7077 $jar_path $dataset $p $4 $persistOnDisk $repartition $userSort
