@@ -34,28 +34,25 @@ public class NodeIteratorPlusTC_Spark {
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         JavaRDD<String> input = sc.textFile(inputPath, partition);
-        JavaPairRDD<Long, Long> edges = input.mapToPair(new PairFunction<String, Long, Long>() {
-            @Override
-            public Tuple2<Long, Long> call(String line) throws Exception {
-                if (line.startsWith("#"))
-                    return null;
-
-                StringTokenizer tokenizer = new StringTokenizer(line);
-                long e1, e2;
-
-                if (tokenizer.hasMoreTokens()) {
-                    e1 = Long.parseLong(tokenizer.nextToken());
-                    if (!tokenizer.hasMoreTokens())
-                        throw new RuntimeException("invalid edge line " + line);
-                    e2 = Long.parseLong(tokenizer.nextToken());
-                    // Input contains reciprocal edges, only need one.
-                    if (e2 < e1) {
-                        return new Tuple2<>(e2, e1);
-                    }
-                    return new Tuple2<>(e1, e2);
-                }
+        JavaPairRDD<Long, Long> edges = input.mapToPair(line -> {
+            if (line.startsWith("#"))
                 return null;
+
+            StringTokenizer tokenizer = new StringTokenizer(line);
+            long e1, e2;
+
+            if (tokenizer.hasMoreTokens()) {
+                e1 = Long.parseLong(tokenizer.nextToken());
+                if (!tokenizer.hasMoreTokens())
+                    throw new RuntimeException("invalid edge line " + line);
+                e2 = Long.parseLong(tokenizer.nextToken());
+                // Input contains reciprocal edges, only need one.
+                if (e2 < e1) {
+                    return new Tuple2<>(e2, e1);
+                }
+                return new Tuple2<>(e1, e2);
             }
+            return null;
         }).filter(t -> t != null);
 
         JavaPairRDD<Long, Iterable<Long>> neighborList = edges.groupByKey();

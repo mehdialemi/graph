@@ -1,7 +1,7 @@
 package graph.ktruss;
 
 import graph.GraphUtils;
-import graph.clusteringco.FonlDegTC;
+import graph.clusteringco.FonlUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -14,6 +14,7 @@ import scala.Tuple3;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class KTrussSparkJava {
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         int partition = 2;
-        JavaRDD<Tuple3<Long, Long, Long>> triangles = FonlDegTC.listTriangles(sc, inputPath, partition);
+        JavaRDD<Tuple3<Long, Long, Long>> triangles = listTriangles(sc, inputPath, partition);
 
         int iteration = 0;
         while (true) {
@@ -52,17 +53,13 @@ public class KTrussSparkJava {
             long triangleCount = triangles.count();
             System.out.println("Triangle Count: " + triangleCount);
 
-            JavaPairRDD<KEdge, Integer> edgeCounts = triangles
-                .flatMapToPair(new PairFlatMapFunction<Tuple3<Long, Long, Long>, KEdge, Integer>() {
-                    @Override
-                    public Iterator<Tuple2<KEdge, Integer>> call(Tuple3<Long, Long, Long> t) throws Exception {
-                        List<Tuple2<KEdge, Integer>> list = new ArrayList<>(3);
-                        list.add(new Tuple2<>(new KEdge(t._1(), t._2(), t._3()), 1));
-                        list.add(new Tuple2<>(new KEdge(t._1(), t._3(), t._2()), 1));
-                        list.add(new Tuple2<>(new KEdge(t._2(), t._3(), t._1()), 1));
-                        return list.iterator();
-                    }
-                }).reduceByKey((a, b) -> a + b);
+            JavaPairRDD<KEdge, Integer> edgeCounts = triangles.flatMapToPair(t -> {
+                List<Tuple2<KEdge, Integer>> list = new ArrayList<>(3);
+                list.add(new Tuple2<>(new KEdge(t._1(), t._2(), t._3()), 1));
+                list.add(new Tuple2<>(new KEdge(t._1(), t._3(), t._2()), 1));
+                list.add(new Tuple2<>(new KEdge(t._2(), t._3(), t._1()), 1));
+                return list.iterator();
+            }).reduceByKey((a, b) -> a + b);
 
             JavaPairRDD<KEdge, Integer> invalidEdges = edgeCounts.filter(ec -> ec._2 < support);
             long invalidEdgeCount = invalidEdges.count();
@@ -80,7 +77,7 @@ public class KTrussSparkJava {
             triangles = newTriangles;
         }
 
-        JavaRDD<Tuple2<Long, Long>> edges = triangles.flatMap((FlatMapFunction<Tuple3<Long, Long, Long>, Tuple2<Long, Long>>) t -> {
+        JavaRDD<Tuple2<Long, Long>> edges = triangles.flatMap(t -> {
             List<Tuple2<Long, Long>> list = new ArrayList<>(3);
             list.add(new Tuple2<>(t._1(), t._2()));
             list.add(new Tuple2<>(t._1(), t._3()));
@@ -119,6 +116,58 @@ public class KTrussSparkJava {
         public Tuple3<Long, Long, Long> createTuple3() {
             return GraphUtils.createSorted(v1, v2, v3);
         }
+    }
+
+    public static JavaPairRDD<Long, long[]> createCandidates(JavaPairRDD<Long, long[]> fonl) {
+        return fonl.filter(t -> t._2.length > 2)
+            .flatMapToPair((PairFlatMapFunction<Tuple2<Long, long[]>, Long, long[]>) t -> {
+                int size = t._2.length - 1;
+                List<Tuple2<Long, long[]>> output = new ArrayList<>(size);
+                for (int index = 1; index < size; index++) {
+                    int len = size - index;
+                    long[] forward = new long[len + 1];
+                    forward[0] = t._1; // First vertex in the triangle
+                    System.arraycopy(t._2, index + 1, forward, 1, len);
+                    Arrays.sort(forward, 1, forward.length); // sort to comfort with fonl
+                    output.add(new Tuple2<>(t._2[index], forward));
+                }
+                return output.iterator();
+            });
+    }
+
+    public static JavaRDD<Tuple3<Long, Long, Long>> listTriangles(JavaSparkContext sc, String inputPath,
+                                                                  int partition) {
+        JavaPairRDD<Long, long[]> fonl = FonlUtils.loadFonl(sc, inputPath, partition);
+
+        // Partition based on degree. To balance workload, it is better to have a partitioning mechanism that
+        // for example a vertex with high number of higherIds (high deg) would be allocated besides vertex with
+        // low number of higherIds (high deg)
+
+        JavaPairRDD<Long, long[]> candidates = createCandidates(fonl);
+        return candidates.cogroup(fonl, partition)
+            .flatMap((FlatMapFunction<Tuple2<Long, Tuple2<Iterable<long[]>, Iterable<long[]>>>, Tuple3<Long, Long, Long>>) t -> {
+                List<Tuple3<Long, Long, Long>> triangles = new ArrayList<>();
+                Iterator<long[]> iterator = t._2._2.iterator();
+                if (!iterator.hasNext())
+                    return triangles.iterator();
+
+                long[] hDegs = iterator.next();
+
+                iterator = t._2._1.iterator();
+                if (!iterator.hasNext())
+                    return triangles.iterator();
+
+                Arrays.sort(hDegs, 1, hDegs.length);
+
+                do {
+                    long[] forward = iterator.next();
+                    List<Long> common = GraphUtils.sortedIntersection(hDegs, forward, 1, 1);
+                    for (long v : common)
+                        triangles.add(GraphUtils.createSorted(forward[0], t._1, v));
+                } while (iterator.hasNext());
+
+                return triangles.iterator();
+            });
     }
 
 }

@@ -22,48 +22,7 @@ public class GraphUtils implements Serializable {
         conf.setAppName(name + "-" + defaultPartition + "-" + new File(inputPath).getName());
     }
 
-    public static JavaPairRDD<Long, Long> loadUndirectedEdges(JavaRDD<String> input) {
-        JavaPairRDD<Long, Long> edges = input.flatMapToPair(new PairFlatMapFunction<String, Long, Long> () {
-            @Override
-            public Iterator<Tuple2<Long, Long>> call(String line) throws Exception {
-                List<Tuple2<Long, Long>> list = new ArrayList<>();
-                if (line.startsWith("#"))
-                    return list.iterator();
-                String[] s = line.split("\\s+");
-                try {
-                    long e1 = Long.parseLong(s[0]);
-                    long e2 = Long.parseLong(s[1]);
-                    list.add(new Tuple2<>(e1, e2));
-                    list.add(new Tuple2<>(e2, e1));
-                } catch (Throwable e) {
-                    System.out.println("Could not parse line " + line);
-                }
-                return list.iterator();
-            }
-        });
-        return edges;
-    }
-
-    public static JavaPairRDD<Integer, Integer> loadUndirectedEdgesInt(JavaRDD<String> input) {
-        JavaPairRDD<Integer, Integer> edges = input.flatMapToPair(new PairFlatMapFunction<String, Integer, Integer>() {
-
-            @Override
-            public Iterator<Tuple2<Integer, Integer>> call(String line) throws Exception {
-                List<Tuple2<Integer, Integer>> list = new ArrayList<>();
-                if (line.startsWith("#"))
-                    return list.iterator();
-                String[] s = line.split("\\s+");
-                int e1 = Integer.parseInt(s[0]);
-                int e2 = Integer.parseInt(s[1]);
-                list.add(new Tuple2<>(e1, e2));
-                list.add(new Tuple2<>(e2, e1));
-                return list.iterator();
-            }
-        });
-        return edges;
-    }
-
-    public static int sortedIntersectionCount(long[] hDegs, long[] forward, List<Tuple2<Long, Integer>> output, int
+     public static int sortedIntersectionCount(long[] hDegs, long[] forward, List<Tuple2<Long, Integer>> output, int
         hIndex,
                                        int fIndex) {
         int fLen = forward.length;

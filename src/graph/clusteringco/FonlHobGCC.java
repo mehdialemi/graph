@@ -1,5 +1,6 @@
 package graph.clusteringco;
 
+import graph.GraphLoader;
 import graph.GraphUtils;
 import graph.OutUtils;
 import org.apache.spark.Accumulator;
@@ -8,7 +9,6 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.apache.spark.broadcast.Broadcast;
 import scala.Tuple2;
 
@@ -38,7 +38,7 @@ public class FonlHobGCC {
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         JavaRDD<String> input = sc.textFile(inputPath, partition);
-        JavaPairRDD<Long, Long> edges = GraphUtils.loadUndirectedEdges(input);
+        JavaPairRDD<Long, Long> edges = GraphLoader.loadEdges(input);
 
         JavaPairRDD<Long, long[]> fonl = FonlUtils.createWith2ReduceNoSort(edges, partition);
         Long sumDegree = fonl.map(t -> t._2[0]).reduce((a, b) -> a + b);
@@ -72,8 +72,7 @@ public class FonlHobGCC {
         });
 
         JavaPairRDD<Long, long[]> candidates = fonl
-            .filter(t -> t._2[0] <= minHobDeg && t._2.length > 2)
-            .flatMapToPair((PairFlatMapFunction<Tuple2<Long, long[]>, Long, long[]>) t -> {
+            .filter(t -> t._2[0] <= minHobDeg && t._2.length > 2).flatMapToPair(t -> {
                 // find the first hobs.
                 int size = t._2.length - 1;
                 Map<Long, long[]> map = hobBD.getValue();
@@ -105,7 +104,7 @@ public class FonlHobGCC {
                 return output.iterator();
             });
 
-        long triangle1 = candidates.cogroup(fonl, partition * 2).map(t -> {
+        long triangle1 = candidates.cogroup(fonl, partition).map(t -> {
             Iterator<long[]> iterator = t._2._2.iterator();
             if (!iterator.hasNext()) {
                 return 0L;

@@ -1,5 +1,6 @@
 package graph.clusteringco;
 
+import graph.GraphLoader;
 import graph.GraphUtils;
 import graph.OutUtils;
 import org.apache.spark.SparkConf;
@@ -21,7 +22,7 @@ import java.util.List;
 public class FonlIdLCC {
 
     public static void main(String[] args) {
-        String inputPath = "input.txt";
+        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
         if (args != null && args.length > 0)
             inputPath = args[0];
 
@@ -44,46 +45,37 @@ public class FonlIdLCC {
         Broadcast<Integer> batchSize = sc.broadcast(bSize);
 
         JavaRDD<String> input = sc.textFile(inputPath, partition);
-        JavaPairRDD<Integer, Integer> edges = GraphUtils.loadUndirectedEdgesInt(input);
+        JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
 
         JavaPairRDD<Integer, int[]> fonl = FonlUtils.createFonlIdBasedInt(edges, partition);
         long totalNodes = fonl.count();
 
-        JavaPairRDD<Integer, GraphUtils.CandidateState> candidates = fonl
-            .flatMapToPair(new PairFlatMapFunction<Tuple2<Integer, int[]>, Integer, GraphUtils.CandidateState>() {
-                @Override
-                public Iterator<Tuple2<Integer, GraphUtils.CandidateState>> call(Tuple2<Integer, int[]> tuple) throws
-                    Exception {
-                    List<Tuple2<Integer, GraphUtils.CandidateState>> output = new ArrayList<>();
-                    int[] higherIds = new int[tuple._2.length - 1];
-                    if (higherIds.length < 2)
-                        return output.iterator();
-                    System.arraycopy(tuple._2, 1, higherIds, 0, higherIds.length);
-
-                    GraphUtils.CandidateState candidateState = new GraphUtils.CandidateState(tuple._1, higherIds);
-                    Integer bSize = batchSize.getValue();
-                    int size = tuple._2.length - 1;
-                    for (int index = 1; index < size; index++) {
-                        if (bSize != 0) {
-                            if (index % bSize == 0) {
-                                int blockSize = tuple._2.length - (index + 1);
-                                int[] block = new int[blockSize];
-                                System.arraycopy(tuple._2, index + 1, block, 0, blockSize);
-                                candidateState = new GraphUtils.CandidateState(tuple._1, block);
-                            }
-                        }
-                        output.add(new Tuple2<>(tuple._2[index], candidateState));
-                    }
+        JavaPairRDD<Integer, GraphUtils.CandidateState> candidates = fonl.flatMapToPair(tuple -> {
+                List<Tuple2<Integer, GraphUtils.CandidateState>> output = new ArrayList<>();
+                int[] higherIds = new int[tuple._2.length - 1];
+                if (higherIds.length < 2)
                     return output.iterator();
+                System.arraycopy(tuple._2, 1, higherIds, 0, higherIds.length);
+
+                GraphUtils.CandidateState candidateState = new GraphUtils.CandidateState(tuple._1, higherIds);
+                Integer bSize1 = batchSize.getValue();
+                int size = tuple._2.length - 1;
+                for (int index = 1; index < size; index++) {
+                    if (bSize1 != 0) {
+                        if (index % bSize1 == 0) {
+                            int blockSize = tuple._2.length - (index + 1);
+                            int[] block = new int[blockSize];
+                            System.arraycopy(tuple._2, index + 1, block, 0, blockSize);
+                            candidateState = new GraphUtils.CandidateState(tuple._1, block);
+                        }
+                    }
+                    output.add(new Tuple2<>(tuple._2[index], candidateState));
                 }
+                return output.iterator();
             });
 
         JavaPairRDD<Integer, Integer> localTriangleCount = candidates.cogroup(fonl, partition)
-            .flatMapToPair(new PairFlatMapFunction<Tuple2<Integer,
-            Tuple2<Iterable<GraphUtils.CandidateState>, Iterable<int[]>>>, Integer, Integer>() {
-            @Override
-            public Iterator<Tuple2<Integer, Integer>> call(Tuple2<Integer, Tuple2<Iterable<GraphUtils.CandidateState>,
-                Iterable<int[]>>> t) throws Exception {
+            .flatMapToPair(t -> {
                 Iterator<int[]> higherIdsIter = t._2._2.iterator();
                 List<Tuple2<Integer, Integer>> output = new ArrayList<>();
                 if (!higherIdsIter.hasNext())
@@ -96,11 +88,11 @@ public class FonlIdLCC {
 
                 int sum = 0;
                 do {
-                    GraphUtils.CandidateState candidates = candidateIter.next();
-                    int count = GraphUtils.sortedIntersectionCountInt(higherIds, candidates.higherIds, output, 0, 0);
+                    GraphUtils.CandidateState candidates1 = candidateIter.next();
+                    int count = GraphUtils.sortedIntersectionCountInt(higherIds, candidates1.higherIds, output, 0, 0);
                     if (count > 0) {
                         sum += count;
-                        output.add(new Tuple2<>(candidates.firstNodeId, count));
+                        output.add(new Tuple2<>(candidates1.firstNodeId, count));
                     }
                 } while (candidateIter.hasNext());
 
@@ -108,8 +100,7 @@ public class FonlIdLCC {
                     output.add(new Tuple2<>(t._1, sum));
                 }
                 return output.iterator();
-            }
-        }).reduceByKey((a, b) -> a + b);
+            }).reduceByKey((a, b) -> a + b);
 
         Float sumLCC = localTriangleCount.filter(t -> t._2 > 0).join(fonl, partition)
             .mapValues(t -> 2 * t._1 / (float) (t._2[0] * (t._2[0] - 1)))

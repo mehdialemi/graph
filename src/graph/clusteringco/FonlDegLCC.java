@@ -1,5 +1,6 @@
 package graph.clusteringco;
 
+import graph.GraphLoader;
 import graph.GraphUtils;
 import graph.OutUtils;
 import org.apache.spark.SparkConf;
@@ -21,7 +22,7 @@ import java.util.List;
 public class FonlDegLCC {
 
     public static void main(String[] args) {
-        String inputPath = "input.txt";
+        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
         if (args.length > 0)
             inputPath = args[0];
 
@@ -37,9 +38,9 @@ public class FonlDegLCC {
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         JavaRDD<String> input = sc.textFile(inputPath, partition);
-        JavaPairRDD<Long, Long> edges = GraphUtils.loadUndirectedEdges(input);
+        JavaPairRDD<Long, Long> edges = GraphLoader.loadEdges(input);
 
-        JavaPairRDD<Long, long[]> fonl = FonlUtils.createWith2Join(edges, partition);
+        JavaPairRDD<Long, long[]> fonl = FonlUtils.createWith2Reduce(edges, partition);
         long totalNodes = fonl.count();
 
         // Partition based on degree. To balance workload, it is better to have a partitioning mechanism that
@@ -47,7 +48,7 @@ public class FonlDegLCC {
         // low number of higherIds (high deg)
         JavaPairRDD<Long, long[]> candidates = fonl
             .filter(t -> t._2.length > 2)
-            .flatMapToPair((PairFlatMapFunction<Tuple2<Long, long[]>, Long, long[]>) t -> {
+            .flatMapToPair(t -> {
                 int size = t._2.length - 1;
                 List<Tuple2<Long, long[]>> output = new ArrayList<>(size);
                 for (int index = 1; index < size; index++) {
@@ -62,38 +63,34 @@ public class FonlDegLCC {
             });
 
         JavaPairRDD<Long, Integer> localTriangleCount = candidates.cogroup(fonl, partition)
-            .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, Tuple2<Iterable<long[]>, Iterable<long[]>>>, Long, Integer>() {
-                @Override
-                public Iterator<Tuple2<Long, Integer>> call(Tuple2<Long, Tuple2<Iterable<long[]>, Iterable<long[]>>> t)
-                    throws Exception {
-                    Iterator<long[]> iterator = t._2._2.iterator();
-                    List<Tuple2<Long, Integer>> output = new ArrayList<>();
-                    if (!iterator.hasNext())
-                        return output.iterator();
-
-                    long[] hDegs = iterator.next();
-
-                    iterator = t._2._1.iterator();
-                    if (!iterator.hasNext())
-                        return output.iterator();
-
-                    Arrays.sort(hDegs, 1, hDegs.length);
-
-                    int sum = 0;
-                    do {
-                        long[] forward = iterator.next();
-                        int count = GraphUtils.sortedIntersectionCount(hDegs, forward, output, 1, 1);
-                        if (count > 0) {
-                            sum += count;
-                            output.add(new Tuple2<>(forward[0], count));
-                        }
-                    } while (iterator.hasNext());
-
-                    if (sum > 0) {
-                        output.add(new Tuple2<>(t._1, sum));
-                    }
+            .flatMapToPair(t -> {
+                Iterator<long[]> iterator = t._2._2.iterator();
+                List<Tuple2<Long, Integer>> output = new ArrayList<>();
+                if (!iterator.hasNext())
                     return output.iterator();
+
+                long[] hDegs = iterator.next();
+
+                iterator = t._2._1.iterator();
+                if (!iterator.hasNext())
+                    return output.iterator();
+
+                Arrays.sort(hDegs, 1, hDegs.length);
+
+                int sum = 0;
+                do {
+                    long[] forward = iterator.next();
+                    int count = GraphUtils.sortedIntersectionCount(hDegs, forward, output, 1, 1);
+                    if (count > 0) {
+                        sum += count;
+                        output.add(new Tuple2<>(forward[0], count));
+                    }
+                } while (iterator.hasNext());
+
+                if (sum > 0) {
+                    output.add(new Tuple2<>(t._1, sum));
                 }
+                return output.iterator();
             })
             .reduceByKey((a, b) -> a + b);
 

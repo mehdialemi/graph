@@ -1,10 +1,10 @@
 package graph.clusteringco;
 
+import graph.GraphLoader;
 import graph.GraphUtils;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
@@ -31,33 +31,20 @@ public class FonlUtils implements Serializable {
             edges.map(t -> t._1 < t._2 ? new Tuple2<>(t._1, t._2) : new Tuple2<>(t._2, t._1)).distinct().cache();
 
         // Get degree of each vertex.
-        JavaPairRDD<Long, Long> vertexDegree = lthEdge
-            .flatMapToPair(new PairFlatMapFunction<Tuple2<Long, Long>, Long, Long>() {
-                @Override
-                public Iterator<Tuple2<Long, Long>> call(Tuple2<Long, Long> t) throws Exception {
-                    List<Tuple2<Long, Long>> list = new ArrayList<>(2);
-                    list.add(new Tuple2<>(t._1, 1L));
-                    list.add(new Tuple2<>(t._2, 1L));
-                    return list.iterator();
-                }
+        JavaPairRDD<Long, Long> vertexDegree = lthEdge.flatMapToPair(t -> {
+                List<Tuple2<Long, Long>> list = new ArrayList<>(2);
+                list.add(new Tuple2<>(t._1, 1L));
+                list.add(new Tuple2<>(t._2, 1L));
+                return list.iterator();
             }).reduceByKey((a, b) -> a + b).cache();
 
         // Each vertex in the each edge has its degree beside itself. Each edge direction is from lower node degree
         // to higher node degree.
         JavaPairRDD<Tuple2<Long, Long>, Tuple2<Long, Long>> degreeSortedEdges =
             lthEdge.keyBy(t -> t._1).join(vertexDegree) // send vertex degree to left vertex in the edge.
-            .mapToPair(new PairFunction<Tuple2<Long, Tuple2<Tuple2<Long, Long>, Long>>, Long, Tuple2<Long, Long>>() {
-
-                @Override
-                public Tuple2<Long, Tuple2<Long, Long>> call(Tuple2<Long, Tuple2<Tuple2<Long, Long>, Long>> t)
-                    throws Exception {
-                    return new Tuple2<>(t._2._1._2, new Tuple2<>(t._1, t._2._2));
-                }
-            }).join(vertexDegree) // send vertex degree to the right vertex in the edge.
-                .mapToPair(new PairFunction<Tuple2<Long, Tuple2<Tuple2<Long, Long>, Long>>, Tuple2<Long, Long>,
-                    Tuple2<Long, Long>>() {
-                @Override
-                public Tuple2<Tuple2<Long, Long>, Tuple2<Long, Long>> call(Tuple2<Long, Tuple2<Tuple2<Long, Long>, Long>> t) throws Exception {
+            .mapToPair(t -> new Tuple2<>(t._2._1._2, new Tuple2<>(t._1, t._2._2)))
+                .join(vertexDegree) // send vertex degree to the right vertex in the edge.
+                .mapToPair(t -> {
                     long v1 = t._1;
                     long d1 = t._2._2;
                     long v2 = t._2._1._1;
@@ -71,8 +58,7 @@ public class FonlUtils implements Serializable {
                     if (v1 < v2)
                         return new Tuple2<>(t1, t2);
                     return new Tuple2<>(t2, t1);
-                }
-            });
+                });
         lthEdge.unpersist();
         vertexDegree.unpersist();
 
@@ -127,8 +113,7 @@ public class FonlUtils implements Serializable {
      * @return Key: vertex id, Value: degree, Neighbor vertices sorted by their degree.
      */
     public static JavaPairRDD<Long, long[]> createWith2Reduce(JavaPairRDD<Long, Long> edges, int partition) {
-        return edges.groupByKey()
-            .flatMapToPair((PairFlatMapFunction<Tuple2<Long, Iterable<Long>>, Long, GraphUtils.VertexDegree>) t -> {
+        return edges.groupByKey().flatMapToPair(t -> {
                 HashSet<Long> neighborSet = new HashSet<>();
                 for (Long neighbor : t._2) {
                     neighborSet.add(neighbor);
@@ -145,45 +130,41 @@ public class FonlUtils implements Serializable {
                     degreeList.add(new Tuple2<>(neighbor, vd));
                 }
                 return degreeList.iterator();
-            }).groupByKey()
-            .mapToPair(new PairFunction<Tuple2<Long, Iterable<GraphUtils.VertexDegree>>, Long, long[]>() {
-                @Override
-                public Tuple2<Long, long[]> call(Tuple2<Long, Iterable<GraphUtils.VertexDegree>> v) throws Exception {
-                    int degree = 0;
-                    // Iterate over higherIds to calculate degree of the current vertex
-                    for (GraphUtils.VertexDegree vd : v._2) {
-                        degree++;
-                    }
-
-                    List<GraphUtils.VertexDegree> list = new ArrayList<>();
-                    for (GraphUtils.VertexDegree vd : v._2)
-                        if (vd.degree > degree || (vd.degree == degree && vd.vertex > v._1))
-                            list.add(vd);
-
-
-                    Collections.sort(list, (a, b) -> {
-                        int x, y;
-                        if (a.degree != b.degree) {
-                            x = a.degree;
-                            y = b.degree;
-                        } else {
-                            x = (int) (a.vertex >> 32);
-                            y = (int) (b.vertex >> 32);
-                            if (x == y) {
-                                x = (int) ((long) a.vertex);
-                                y = (int) ((long) b.vertex);
-                            }
-                        }
-                        return x - y;
-                    });
-
-                    long[] higherDegs = new long[list.size() + 1];
-                    higherDegs[0] = degree;
-                    for (int i = 1; i < higherDegs.length; i++)
-                        higherDegs[i] = list.get(i - 1).vertex;
-
-                    return new Tuple2<>(v._1, higherDegs);
+            }).groupByKey().mapToPair(v -> {
+                int degree = 0;
+                // Iterate over higherIds to calculate degree of the current vertex
+                for (GraphUtils.VertexDegree vd : v._2) {
+                    degree++;
                 }
+
+                List<GraphUtils.VertexDegree> list = new ArrayList<>();
+                for (GraphUtils.VertexDegree vd : v._2)
+                    if (vd.degree > degree || (vd.degree == degree && vd.vertex > v._1))
+                        list.add(vd);
+
+
+                Collections.sort(list, (a, b) -> {
+                    int x, y;
+                    if (a.degree != b.degree) {
+                        x = a.degree;
+                        y = b.degree;
+                    } else {
+                        x = (int) (a.vertex >> 32);
+                        y = (int) (b.vertex >> 32);
+                        if (x == y) {
+                            x = (int) ((long) a.vertex);
+                            y = (int) ((long) b.vertex);
+                        }
+                    }
+                    return x - y;
+                });
+
+                long[] higherDegs = new long[list.size() + 1];
+                higherDegs[0] = degree;
+                for (int i = 1; i < higherDegs.length; i++)
+                    higherDegs[i] = list.get(i - 1).vertex;
+
+                return new Tuple2<>(v._1, higherDegs);
             }).repartition(partition).persist(StorageLevel.DISK_ONLY());
     }
 
@@ -197,8 +178,7 @@ public class FonlUtils implements Serializable {
      * @return Key: vertex id, Value: degree, Neighbor vertices sorted by their degree.
      */
     public static JavaPairRDD<Long, long[]> createWith2ReduceNoSort(JavaPairRDD<Long, Long> edges, int partition) {
-        return edges.groupByKey()
-            .flatMapToPair((PairFlatMapFunction<Tuple2<Long, Iterable<Long>>, Long, GraphUtils.VertexDegree>) t -> {
+        return edges.groupByKey().flatMapToPair(t -> {
                 HashSet<Long> neighborSet = new HashSet<>();
                 for (Long neighbor : t._2) {
                     neighborSet.add(neighbor);
@@ -216,44 +196,41 @@ public class FonlUtils implements Serializable {
                 }
                 return degreeList.iterator();
             }).groupByKey()
-            .mapToPair(new PairFunction<Tuple2<Long, Iterable<GraphUtils.VertexDegree>>, Long, long[]>() {
-                @Override
-                public Tuple2<Long, long[]> call(Tuple2<Long, Iterable<GraphUtils.VertexDegree>> v) throws Exception {
-                    int degree = 0;
-                    // Iterate over higherIds to calculate degree of the current vertex
-                    for (GraphUtils.VertexDegree vd : v._2) {
-                        degree++;
-                    }
-
-                    SortedSet<GraphUtils.VertexDegree> list = new TreeSet<>((a, b) -> {
-                        int x, y;
-                        if (a.degree != b.degree) {
-                            x = a.degree;
-                            y = b.degree;
-                        } else {
-                            x = (int) (a.vertex >> 32);
-                            y = (int) (b.vertex >> 32);
-                            if (x == y) {
-                                x = (int) ((long) a.vertex);
-                                y = (int) ((long) b.vertex);
-                            }
-                        }
-                        return x - y;
-                    });
-
-                    for (GraphUtils.VertexDegree vd : v._2)
-                        if (vd.degree > degree || (vd.degree == degree && vd.vertex > v._1))
-                            list.add(vd);
-
-                    long[] higherDegs = new long[list.size() + 1];
-                    higherDegs[0] = degree;
-                    int i = 0;
-                    for(GraphUtils.VertexDegree vertex : list) {
-                        higherDegs[++i] = vertex.vertex;
-                    }
-
-                    return new Tuple2<>(v._1, higherDegs);
+            .mapToPair(v -> {
+                int degree = 0;
+                // Iterate over higherIds to calculate degree of the current vertex
+                for (GraphUtils.VertexDegree vd : v._2) {
+                    degree++;
                 }
+
+                SortedSet<GraphUtils.VertexDegree> list = new TreeSet<>((a, b) -> {
+                    int x, y;
+                    if (a.degree != b.degree) {
+                        x = a.degree;
+                        y = b.degree;
+                    } else {
+                        x = (int) (a.vertex >> 32);
+                        y = (int) (b.vertex >> 32);
+                        if (x == y) {
+                            x = (int) ((long) a.vertex);
+                            y = (int) ((long) b.vertex);
+                        }
+                    }
+                    return x - y;
+                });
+
+                for (GraphUtils.VertexDegree vd : v._2)
+                    if (vd.degree > degree || (vd.degree == degree && vd.vertex > v._1))
+                        list.add(vd);
+
+                long[] higherDegs = new long[list.size() + 1];
+                higherDegs[0] = degree;
+                int i = 0;
+                for(GraphUtils.VertexDegree vertex : list) {
+                    higherDegs[++i] = vertex.vertex;
+                }
+
+                return new Tuple2<>(v._1, higherDegs);
             }).repartition(partition).persist(StorageLevel.DISK_ONLY_2());
     }
 
@@ -298,7 +275,7 @@ public class FonlUtils implements Serializable {
 
     public static JavaPairRDD<Long, long[]> loadFonl(JavaSparkContext sc, String inputPath, int partition) {
         JavaRDD<String> input = sc.textFile(inputPath, partition);
-        JavaPairRDD<Long, Long> edges = GraphUtils.loadUndirectedEdges(input);
+        JavaPairRDD<Long, Long> edges = GraphLoader.loadEdges(input);
         return FonlUtils.createWith2Reduce(edges, partition);
     }
 }

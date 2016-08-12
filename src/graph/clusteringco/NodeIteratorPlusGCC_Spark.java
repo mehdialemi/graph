@@ -1,5 +1,6 @@
 package graph.clusteringco;
 
+import graph.GraphLoader;
 import graph.GraphUtils;
 import graph.OutUtils;
 import org.apache.spark.SparkConf;
@@ -7,7 +8,6 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
-import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 
 import java.util.*;
@@ -36,15 +36,12 @@ public class NodeIteratorPlusGCC_Spark {
 
         JavaRDD<String> input = sc.textFile(inputPath, partition);
 
-        JavaPairRDD<Long, Long> uEdges = GraphUtils.loadUndirectedEdges(input);
-        JavaPairRDD<Long, Long[]> neighborList = uEdges.groupByKey().mapToPair(new PairFunction<Tuple2<Long, Iterable<Long>>, Long, Long[]>() {
-            @Override
-            public Tuple2<Long, Long[]> call(Tuple2<Long, Iterable<Long>> tuple) throws Exception {
-                HashSet<Long> set = new HashSet<>();
-                for (long neighbor : tuple._2)
-                    set.add(neighbor);
-                return new Tuple2<>(tuple._1, set.toArray(new Long[0]));
-            }
+        JavaPairRDD<Long, Long> uEdges = GraphLoader.loadEdges(input);
+        JavaPairRDD<Long, Long[]> neighborList = uEdges.groupByKey().mapToPair(tuple -> {
+            HashSet<Long> set = new HashSet<>();
+            for (long neighbor : tuple._2)
+                set.add(neighbor);
+            return new Tuple2<>(tuple._1, set.toArray(new Long[0]));
         });
 
         long nodes = neighborList.count();
