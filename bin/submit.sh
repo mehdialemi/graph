@@ -1,13 +1,12 @@
 #!/bin/bash
 
 if [ -z ${SPARK_HOME+X} ]; then
-    SPARK_HOME="/home/$USER/spark-1.6.2"
+    SPARK_HOME="/home/$USER/spark-2"
 fi
 
 jar_path="$PWD/bin/graph-processing.jar"
 master="malemi-2"
-exe_mem="25G"
-total_cores=120
+total_cores=110
 
 task=$1
 case $task in
@@ -54,4 +53,4 @@ fi
 cd $SPARK_HOME
 
 echo "Running $main_class on $master with partitions $p"
-bin/spark-submit --class $main_class --executor-memory $exe_mem --total-executor-cores $total_cores --master spark://$master:7077 $jar_path $dataset $p $4
+bin/spark-submit --class $main_class --total-executor-cores $total_cores --master spark://$master:7077 $jar_path $dataset $p $4
