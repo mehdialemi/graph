@@ -11,6 +11,10 @@ input="friendster"
 #input="orkut"
 #input="soc-LiveJournal"
 #input="twitter"
+if [ -z ${GRAPH_INPUT+X} ]; then
+    GRAPH_INPUT="$input"
+fi
+
 
 if [ ! -d "logs" ]; then
     mkdir logs
@@ -25,15 +29,15 @@ d=`date +%s`
 p=1000
 IFS=',' read -ra TASKS <<< $1
 for task in "${TASKS[@]}"; do
-     logDir="logs/$task/$input"
+     logDir="logs/$task/$GRAPH_INPUT"
     if [ ! -d $logDir ]; then
         mkdir -p $logDir
     fi
 
     SECONDS=0
     d=`date +%s`
-    echo "`LANG=de_DE date` Running Task=$task, Input=$input, Partitions=$p, Log=$logDir/$d.log"
-    run_command "bin/submit.sh $task $input $p"  $logDir/"$d.log"
-    echo "`LANG=de_DE date` Task=$task, Input=$input, Partitions=$p, Duration=$SECONDS, Log=$logDir/$d.log" >> logs/results.txt
+    echo "`LANG=de_DE date` Running Task=$task, Input=$GRAPH_INPUT, Partitions=$p, Log=$logDir/$d.log"
+    run_command "bin/submit.sh $task $GRAPH_INPUT $p"  $logDir/"$d.log"
+    echo "`LANG=de_DE date` Task=$task, Input=$GRAPH_INPUT, Partitions=$p, Duration=$SECONDS, Log=$logDir/$d.log" >> logs/results.txt
     sleep 3
 done
