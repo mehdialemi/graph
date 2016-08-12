@@ -146,7 +146,6 @@ public class FonlUtils implements Serializable {
                 if (vd.degree > degree || (vd.degree == degree && vd.vertex > v._1))
                     list.add(vd);
 
-
             Collections.sort(list, (a, b) -> {
                 int x, y;
                 if (a.degree != b.degree) {

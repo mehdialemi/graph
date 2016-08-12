@@ -36,7 +36,7 @@ public class FonlDegTC {
         if (args.length > 3)
             repartitionFonl = Boolean.parseBoolean(args[3]);
 
-        boolean useSort = false;
+        boolean useSort = true;
         if (args.length > 4)
             useSort = Boolean.parseBoolean(args[4]);
 
