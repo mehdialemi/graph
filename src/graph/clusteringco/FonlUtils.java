@@ -103,6 +103,9 @@ public class FonlUtils implements Serializable {
         }).repartition(partition).persist(StorageLevel.MEMORY_ONLY_2());
     }
 
+    public static JavaPairRDD<Long, long[]> createWith2Reduce(JavaPairRDD<Long, Long> edges, int partition) {
+        return createWith2Reduce(edges, partition, false, true);
+    }
     /**
      * Create a fonl in key-value structure. Here, key is a vertex id and value is an array which first element of it
      * stores degree of the key vertex and the other elements are neighbor vertices with higher degree than the key
@@ -112,60 +115,68 @@ public class FonlUtils implements Serializable {
      * @param partition number of partition to the final fonl.
      * @return Key: vertex id, Value: degree, Neighbor vertices sorted by their degree.
      */
-    public static JavaPairRDD<Long, long[]> createWith2Reduce(JavaPairRDD<Long, Long> edges, int partition) {
-        return edges.groupByKey().flatMapToPair(t -> {
-                HashSet<Long> neighborSet = new HashSet<>();
-                for (Long neighbor : t._2) {
-                    neighborSet.add(neighbor);
-                }
+    public static JavaPairRDD<Long, long[]> createWith2Reduce(JavaPairRDD<Long, Long> edges, int partition, boolean
+        persistOnDisk, boolean repartition) {
+        JavaPairRDD<Long, long[]> fonl = edges.groupByKey().flatMapToPair(t -> {
+            HashSet<Long> neighborSet = new HashSet<>();
+            for (Long neighbor : t._2) {
+                neighborSet.add(neighbor);
+            }
 
-                int degree = neighborSet.size();
+            int degree = neighborSet.size();
 
-                GraphUtils.VertexDegree vd = new GraphUtils.VertexDegree(t._1, degree);
+            GraphUtils.VertexDegree vd = new GraphUtils.VertexDegree(t._1, degree);
 
-                List<Tuple2<Long, GraphUtils.VertexDegree>> degreeList = new ArrayList<>(degree);
+            List<Tuple2<Long, GraphUtils.VertexDegree>> degreeList = new ArrayList<>(degree);
 
-                // Add degree information of the current vertex to its neighbor
-                for (Long neighbor : neighborSet) {
-                    degreeList.add(new Tuple2<>(neighbor, vd));
-                }
-                return degreeList.iterator();
-            }).groupByKey().mapToPair(v -> {
-                int degree = 0;
-                // Iterate over higherIds to calculate degree of the current vertex
-                for (GraphUtils.VertexDegree vd : v._2) {
-                    degree++;
-                }
+            // Add degree information of the current vertex to its neighbor
+            for (Long neighbor : neighborSet) {
+                degreeList.add(new Tuple2<>(neighbor, vd));
+            }
+            return degreeList.iterator();
+        }).groupByKey().mapToPair(v -> {
+            int degree = 0;
+            // Iterate over higherIds to calculate degree of the current vertex
+            for (GraphUtils.VertexDegree vd : v._2) {
+                degree++;
+            }
 
-                List<GraphUtils.VertexDegree> list = new ArrayList<>();
-                for (GraphUtils.VertexDegree vd : v._2)
-                    if (vd.degree > degree || (vd.degree == degree && vd.vertex > v._1))
-                        list.add(vd);
+            List<GraphUtils.VertexDegree> list = new ArrayList<>();
+            for (GraphUtils.VertexDegree vd : v._2)
+                if (vd.degree > degree || (vd.degree == degree && vd.vertex > v._1))
+                    list.add(vd);
 
 
-                Collections.sort(list, (a, b) -> {
-                    int x, y;
-                    if (a.degree != b.degree) {
-                        x = a.degree;
-                        y = b.degree;
-                    } else {
-                        x = (int) (a.vertex >> 32);
-                        y = (int) (b.vertex >> 32);
-                        if (x == y) {
-                            x = (int) ((long) a.vertex);
-                            y = (int) ((long) b.vertex);
-                        }
+            Collections.sort(list, (a, b) -> {
+                int x, y;
+                if (a.degree != b.degree) {
+                    x = a.degree;
+                    y = b.degree;
+                } else {
+                    x = (int) (a.vertex >> 32);
+                    y = (int) (b.vertex >> 32);
+                    if (x == y) {
+                        x = (int) ((long) a.vertex);
+                        y = (int) ((long) b.vertex);
                     }
-                    return x - y;
-                });
+                }
+                return x - y;
+            });
 
-                long[] higherDegs = new long[list.size() + 1];
-                higherDegs[0] = degree;
-                for (int i = 1; i < higherDegs.length; i++)
-                    higherDegs[i] = list.get(i - 1).vertex;
+            long[] higherDegs = new long[list.size() + 1];
+            higherDegs[0] = degree;
+            for (int i = 1; i < higherDegs.length; i++)
+                higherDegs[i] = list.get(i - 1).vertex;
 
-                return new Tuple2<>(v._1, higherDegs);
-            }).repartition(partition).persist(StorageLevel.DISK_ONLY());
+            return new Tuple2<>(v._1, higherDegs);
+        });
+        if (repartition)
+            fonl = fonl.repartition(partition);
+        if (persistOnDisk)
+            fonl.persist(StorageLevel.DISK_ONLY());
+        else
+            fonl.cache();
+        return fonl;
     }
 
     /**
@@ -231,7 +242,7 @@ public class FonlUtils implements Serializable {
                 }
 
                 return new Tuple2<>(v._1, higherDegs);
-            }).repartition(partition).persist(StorageLevel.DISK_ONLY_2());
+            }).repartition(partition).persist(StorageLevel.DISK_ONLY());
     }
 
     /**
