@@ -48,7 +48,7 @@ object PregelTC {
 
         // Find new edges with correct direction. A direction from a lower degree node to a higher degree node.
         val newEdges = graphVD.triplets.map { et =>
-            if (et.srcAttr.get <= et.dstAttr.get)
+            if (et.srcAttr.getOrElse(0) <= et.dstAttr.getOrElse(0))
                 Edge(et.srcId, et.dstId, true)
             else
                 Edge(et.dstId, et.srcId, true)

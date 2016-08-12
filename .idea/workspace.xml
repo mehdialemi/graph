@@ -8,10 +8,7 @@
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/graph-processing.jar" afterPath="$PROJECT_DIR$/bin/graph-processing.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlIdGCC.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlIdGCC.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlIdLCC.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlIdLCC.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlIdTC.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlIdTC.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/PregelTC.scala" afterPath="$PROJECT_DIR$/src/graph/clusteringco/PregelTC.scala" />
     </list>
     <ignored path="graph-processing.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -103,7 +100,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FonlIdGCC.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="FonlIdGCC.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlIdGCC.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="526">
@@ -113,11 +110,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FonlDegLCC.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlDegLCC.java">
+      <file leaf-file-name="PregelTC.scala" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/PregelTC.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="525">
-              <caret line="48" column="47" selection-start-line="48" selection-start-column="47" selection-end-line="48" selection-end-column="47" />
+            <state relative-caret-position="556">
+              <caret line="62" column="65" selection-start-line="62" selection-start-column="65" selection-end-line="62" selection-end-column="65" />
               <folding />
             </state>
           </provider>
@@ -184,7 +181,6 @@
         <option value="$PROJECT_DIR$/src/graph/OuفUtils.java" />
         <option value="$PROJECT_DIR$/src/graph/OutUtils.java" />
         <option value="$PROJECT_DIR$/src/graph/GraphConverter.java" />
-        <option value="$PROJECT_DIR$/src/graph/clusteringco/PregelTC.scala" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/PersistedGraphXTC.scala" />
         <option value="$PROJECT_DIR$/src/graph/ktruss/CohenKTruss.java" />
         <option value="$PROJECT_DIR$/src/graph/ktruss/KTrussBucket.java" />
@@ -212,6 +208,7 @@
         <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlIdTC.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlIdLCC.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlIdGCC.java" />
+        <option value="$PROJECT_DIR$/src/graph/clusteringco/PregelTC.scala" />
       </list>
     </option>
   </component>
@@ -1000,13 +997,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/PregelTC.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="406">
-          <caret line="88" column="19" selection-start-line="88" selection-start-column="19" selection-end-line="88" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Software/spark-1.6.2/graphx/src/main/scala/org/apache/spark/graphx/package.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="315">
@@ -1315,6 +1305,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="526">
           <caret line="43" column="111" selection-start-line="43" selection-start-column="111" selection-end-line="43" selection-end-column="111" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/PregelTC.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="556">
+          <caret line="62" column="65" selection-start-line="62" selection-start-column="65" selection-end-line="62" selection-end-column="65" />
           <folding />
         </state>
       </provider>
