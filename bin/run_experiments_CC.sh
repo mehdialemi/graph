@@ -15,7 +15,11 @@ if [ -z ${GRAPH_INPUT+X} ]; then
     GRAPH_INPUT="$input"
 fi
 
-
+if [ -z ${PARTITIONS+X} ]; then
+    p=$PARTITIONS
+else
+    p=400
+fi
 if [ ! -d "logs" ]; then
     mkdir logs
 fi
@@ -26,7 +30,6 @@ fi
 
 d=`date +%s`
 
-p=1000
 IFS=',' read -ra TASKS <<< $1
 for task in "${TASKS[@]}"; do
      logDir="logs/$task/$GRAPH_INPUT"
