@@ -24,10 +24,7 @@ public class FonlIdGCC {
             partition = Integer.parseInt(args[1]);
         }
 
-        int splitSize = 10;
-        if (args != null && args.length > 2) {
-            splitSize = Integer.parseInt(args[2]);
-        }
+        final int batchSize = 1000;
 
         SparkConf conf = new SparkConf();
         if (args == null || args.length == 0)
@@ -44,7 +41,7 @@ public class FonlIdGCC {
 
         long nodes = fonl.count();
 
-        JavaPairRDD<Integer, GraphUtils.CandidateState> candidate = FonlIdTC.generateCandidates(fonl, splitSize);
+        JavaPairRDD<Integer, GraphUtils.CandidateState> candidate = FonlIdTC.generateCandidates(fonl, batchSize);
 
         long totalTriangles = FonlIdTC.countTriangles(candidate, fonl, partition);
 

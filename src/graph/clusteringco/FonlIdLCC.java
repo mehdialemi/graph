@@ -7,8 +7,6 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.PairFlatMapFunction;
-import org.apache.spark.broadcast.Broadcast;
 import scala.Tuple2;
 
 import java.util.ArrayList;
@@ -31,18 +29,14 @@ public class FonlIdLCC {
             partition = Integer.parseInt(args[1]);
         }
 
-        int bSize = 10;
-        if (args != null && args.length > 2) {
-            bSize = Integer.parseInt(args[2]);
-        }
+        final int batchSize = 1000;
 
         SparkConf conf = new SparkConf();
         if (args == null || args.length == 0)
             conf.setMaster("local[2]");
-        GraphUtils.setAppName(conf, "Fonl-LCC-Id", partition,inputPath);
+        GraphUtils.setAppName(conf, "Fonl-LCC-Id", partition, inputPath);
         conf.registerKryoClasses(new Class[]{GraphUtils.CandidateState.class, int[].class});
         JavaSparkContext sc = new JavaSparkContext(conf);
-        Broadcast<Integer> batchSize = sc.broadcast(bSize);
 
         JavaRDD<String> input = sc.textFile(inputPath, partition);
         JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
@@ -51,28 +45,30 @@ public class FonlIdLCC {
         long totalNodes = fonl.count();
 
         JavaPairRDD<Integer, GraphUtils.CandidateState> candidates = fonl.flatMapToPair(tuple -> {
-                List<Tuple2<Integer, GraphUtils.CandidateState>> output = new ArrayList<>();
-                int[] higherIds = new int[tuple._2.length - 1];
-                if (higherIds.length < 2)
-                    return output.iterator();
-                System.arraycopy(tuple._2, 1, higherIds, 0, higherIds.length);
-
-                GraphUtils.CandidateState candidateState = new GraphUtils.CandidateState(tuple._1, higherIds);
-                Integer bSize1 = batchSize.getValue();
-                int size = tuple._2.length - 1;
-                for (int index = 1; index < size; index++) {
-                    if (bSize1 != 0) {
-                        if (index % bSize1 == 0) {
-                            int blockSize = tuple._2.length - (index + 1);
-                            int[] block = new int[blockSize];
-                            System.arraycopy(tuple._2, index + 1, block, 0, blockSize);
-                            candidateState = new GraphUtils.CandidateState(tuple._1, block);
-                        }
-                    }
-                    output.add(new Tuple2<>(tuple._2[index], candidateState));
-                }
+            List<Tuple2<Integer, GraphUtils.CandidateState>> output = new ArrayList<>();
+            int[] higherIds = new int[tuple._2.length - 1];
+            if (higherIds.length < 2)
                 return output.iterator();
-            });
+            System.arraycopy(tuple._2, 1, higherIds, 0, higherIds.length);
+
+            GraphUtils.CandidateState candidateState = new GraphUtils.CandidateState(tuple._1, higherIds);
+            int size = tuple._2.length - 1;
+            int split = batchSize;
+            if (size < 1000)
+                split = Integer.MAX_VALUE;
+            for (int index = 1; index < size; index++) {
+                if (split != 0) {
+                    if (index % split == 0) {
+                        int blockSize = tuple._2.length - (index + 1);
+                        int[] block = new int[blockSize];
+                        System.arraycopy(tuple._2, index + 1, block, 0, blockSize);
+                        candidateState = new GraphUtils.CandidateState(tuple._1, block);
+                    }
+                }
+                output.add(new Tuple2<>(tuple._2[index], candidateState));
+            }
+            return output.iterator();
+        });
 
         JavaPairRDD<Integer, Integer> localTriangleCount = candidates.cogroup(fonl, partition)
             .flatMapToPair(t -> {

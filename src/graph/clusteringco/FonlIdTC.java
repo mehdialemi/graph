@@ -29,10 +29,7 @@ public class FonlIdTC {
             partition = Integer.parseInt(args[1]);
         }
 
-        int bSize = 10;
-        if (args != null && args.length > 2) {
-            bSize = Integer.parseInt(args[2]);
-        }
+        final int batchSize = 1000;
 
         SparkConf conf = new SparkConf();
         conf.registerKryoClasses(new Class[]{GraphUtils.CandidateState.class, int[].class});
@@ -40,7 +37,6 @@ public class FonlIdTC {
             conf.setMaster("local[2]");
         GraphUtils.setAppName(conf, "Fonl-TC-Id", partition, inputPath);
         JavaSparkContext sc = new JavaSparkContext(conf);
-        final int batchSize = bSize;
 
         JavaRDD<String> input = sc.textFile(inputPath, partition);
 
@@ -83,8 +79,8 @@ public class FonlIdTC {
                         Exception {
                         List<Tuple2<Integer, GraphUtils.CandidateState>> output = new ArrayList<>();
                         GraphUtils.CandidateState candidateState = new GraphUtils.CandidateState(tuple._1, tuple._2);
-                        int split = splitSize;
                         int size = tuple._2.length - 1;
+                        int split = splitSize;
                         if (size < 1000)
                              split = Integer.MAX_VALUE;
                         for (int index = 1; index < size; index++) {

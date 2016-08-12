@@ -7,8 +7,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/run_all_inputs.sh" afterPath="$PROJECT_DIR$/bin/run_all_inputs.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/run_experiments_CC.sh" afterPath="$PROJECT_DIR$/bin/run_experiments_CC.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/graph-processing.jar" afterPath="$PROJECT_DIR$/bin/graph-processing.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlIdGCC.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlIdGCC.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlIdLCC.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlIdLCC.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/FonlIdTC.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/FonlIdTC.java" />
     </list>
     <ignored path="graph-processing.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -43,7 +46,7 @@
       <file leaf-file-name="FonlUtils.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
+            <state relative-caret-position="2055">
               <caret line="147" column="0" selection-start-line="147" selection-start-column="0" selection-end-line="147" selection-end-column="0" />
               <folding />
             </state>
@@ -53,14 +56,14 @@
       <file leaf-file-name="run_experiments_CC.sh" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/bin/run_experiments_CC.sh">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="181">
+            <state relative-caret-position="255">
               <caret line="17" column="20" selection-start-line="17" selection-start-column="10" selection-end-line="17" selection-end-column="20" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="run_all_inputs.sh" pinned="false" current-in-tab="true">
+      <file leaf-file-name="run_all_inputs.sh" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/bin/run_all_inputs.sh">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="405">
@@ -83,30 +86,28 @@
       <file leaf-file-name="FonlIdTC.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlIdTC.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="945">
-              <caret line="75" column="66" selection-start-line="75" selection-start-column="66" selection-end-line="75" selection-end-column="66" />
+            <state relative-caret-position="345">
+              <caret line="86" column="41" selection-start-line="86" selection-start-column="41" selection-end-line="86" selection-end-column="41" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CohenTC.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/CohenTC.java">
+      <file leaf-file-name="FonlIdLCC.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlIdLCC.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="375">
-              <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="31">
+              <caret line="31" column="35" selection-start-line="31" selection-start-column="8" selection-end-line="31" selection-end-column="35" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FonlDegGCC.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlDegGCC.java">
+      <file leaf-file-name="FonlIdGCC.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlIdGCC.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="585">
-              <caret line="49" column="48" selection-start-line="49" selection-start-column="48" selection-end-line="49" selection-end-column="48" />
+            <state relative-caret-position="526">
+              <caret line="43" column="111" selection-start-line="43" selection-start-column="111" selection-end-line="43" selection-end-column="111" />
               <folding />
             </state>
           </provider>
@@ -200,17 +201,17 @@
         <option value="$PROJECT_DIR$/src/graph/clusteringco/NodeIteratorPlusGCC_Spark.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/NodeIteratorPlusTC_Spark.java" />
         <option value="$PROJECT_DIR$/src/graph/ktruss/KTrussSpark.scala" />
-        <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlIdLCC.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlDegLCC.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlDegGCC.java" />
-        <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlIdTC.java" />
-        <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlIdGCC.java" />
         <option value="$PROJECT_DIR$/src/graph/ktruss/KTrussSparkJava.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlDegTC.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java" />
         <option value="$PROJECT_DIR$/bin/submit.sh" />
         <option value="$PROJECT_DIR$/bin/run_experiments_CC.sh" />
         <option value="$PROJECT_DIR$/bin/run_all_inputs.sh" />
+        <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlIdTC.java" />
+        <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlIdLCC.java" />
+        <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlIdGCC.java" />
       </list>
     </option>
   </component>
@@ -341,12 +342,6 @@
     </navigator>
     <panes>
       <pane id="Scratches" />
-      <pane id="Scope">
-        <subPane subId="Problems" />
-      </pane>
-      <pane id="PackagesPane">
-        <subPane />
-      </pane>
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -401,47 +396,17 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="search" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="graph-processing" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="graph-processing" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="graph" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="clusteringco" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="graph-processing" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="graph-processing" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="bin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
+      </pane>
+      <pane id="PackagesPane">
+        <subPane />
+      </pane>
+      <pane id="Scope">
+        <subPane subId="Problems" />
       </pane>
     </panes>
   </component>
@@ -938,7 +903,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/graph/clusteringco/FonlIdLCC.java</url>
-          <line>107</line>
+          <line>103</line>
           <properties />
           <option name="timeStamp" value="27" />
         </line-breakpoint>
@@ -1241,31 +1206,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="375">
           <caret line="29" column="43" selection-start-line="29" selection-start-column="43" selection-end-line="29" selection-end-column="43" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlIdGCC.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="600">
-          <caret line="46" column="90" selection-start-line="46" selection-start-column="90" selection-end-line="46" selection-end-column="90" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlIdLCC.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="29" column="46" selection-start-line="29" selection-start-column="46" selection-end-line="29" selection-end-column="46" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlIdTC.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="945">
-          <caret line="75" column="66" selection-start-line="75" selection-start-column="66" selection-end-line="75" selection-end-column="66" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1312,13 +1252,12 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="4" column="6" selection-start-line="4" selection-start-column="6" selection-end-line="4" selection-end-column="6" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
+        <state relative-caret-position="2055">
           <caret line="147" column="0" selection-start-line="147" selection-start-column="0" selection-end-line="147" selection-end-column="0" />
           <folding />
         </state>
@@ -1342,7 +1281,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/bin/run_experiments_CC.sh">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="181">
+        <state relative-caret-position="255">
           <caret line="17" column="20" selection-start-line="17" selection-start-column="10" selection-end-line="17" selection-end-column="20" />
           <folding />
         </state>
@@ -1352,6 +1291,30 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="405">
           <caret line="27" column="23" selection-start-line="27" selection-start-column="23" selection-end-line="27" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlIdTC.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="86" column="41" selection-start-line="86" selection-start-column="41" selection-end-line="86" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlIdLCC.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="31">
+          <caret line="31" column="35" selection-start-line="31" selection-start-column="8" selection-end-line="31" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlIdGCC.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="526">
+          <caret line="43" column="111" selection-start-line="43" selection-start-column="111" selection-end-line="43" selection-end-column="111" />
           <folding />
         </state>
       </provider>
