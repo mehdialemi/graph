@@ -137,6 +137,9 @@ public class FonlUtils implements Serializable {
         }).groupByKey().mapToPair(v -> {
             int degree = 0;
             // Iterate over higherIds to calculate degree of the current vertex
+            if (v._2 == null)
+                return new Tuple2<>(v._1, new long[] {0});
+
             for (GraphUtils.VertexDegree vd : v._2) {
                 degree++;
             }
