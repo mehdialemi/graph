@@ -193,6 +193,7 @@ public class FonlUtils implements Serializable {
     public static JavaPairRDD<Long, long[]> createWith2ReduceNoSort(JavaPairRDD<Long, Long> edges, int partition) {
         return edges.groupByKey().flatMapToPair(t -> {
                 HashSet<Long> neighborSet = new HashSet<>();
+
                 for (Long neighbor : t._2) {
                     neighborSet.add(neighbor);
                 }
@@ -211,6 +212,10 @@ public class FonlUtils implements Serializable {
             }).groupByKey()
             .mapToPair(v -> {
                 int degree = 0;
+
+                if (v._2 == null)
+                    return new Tuple2<>(v._1, new long[] {0});
+
                 // Iterate over higherIds to calculate degree of the current vertex
                 for (GraphUtils.VertexDegree vd : v._2) {
                     degree++;
