@@ -7,6 +7,7 @@ import scala.Tuple2;
 import scala.actors.threadpool.Arrays;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -59,11 +60,12 @@ public class GraphLoader {
     public static JavaRDD<Tuple2<Long, Long>> loadEdgeListSorted(JavaRDD<String> input) {
         return input.flatMap(line -> {
             if (line.startsWith("#"))
-                return new ArrayList<Tuple2<Long, Long>>().iterator();
+                return Collections.emptyIterator();
+
             List<Tuple2<Long, Long>> list = new ArrayList<>(1);
             String[] e = line.split("\\s+");
             if (e == null || e.length != 2)
-                return new ArrayList<Tuple2<Long, Long>>().iterator();
+                return Collections.emptyIterator();
 
             long v1 = Long.parseLong(e[0]);
             long v2 = Long.parseLong(e[1]);

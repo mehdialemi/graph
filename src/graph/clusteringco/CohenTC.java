@@ -86,6 +86,9 @@ public class CohenTC {
                 for (Tuple2<Long, Long> edge : edges)
                     list.add(new Tuple2<>(edge, vd));
 
+                if (list.size() == 0)
+                    return Collections.emptyIterator();
+
                 return list.iterator();
             });
 
@@ -218,6 +221,10 @@ public class CohenTC {
 
                         list.add(new Tuple2<>(syntheticEdge, simpleEdges));
                     }
+
+                if (list.size() == 0)
+                    Collections.emptyIterator();
+
                 return list.iterator();
             });
 
@@ -235,7 +242,7 @@ public class CohenTC {
             // be created as a 3-length array of the Edge
             Iterator<Tuple2<Long, Long>> oneEdgeIter = m._2._2.iterator();
             if (!oneEdgeIter.hasNext())
-                return list.iterator();
+                return Collections.emptyIterator();
 
             e1 = m._1;
             Iterator<List<Tuple2<Long, Long>>> twoEdgesIter = m._2._1.iterator();
@@ -247,6 +254,9 @@ public class CohenTC {
                 List<Tuple2<Long, Long>> triangleEdges = Arrays.asList(e1, e2, e3);
                 list.add(triangleEdges);
             }
+
+            if (list.size() == 0)
+                return Collections.emptyIterator();
 
             return list.iterator();
         });
