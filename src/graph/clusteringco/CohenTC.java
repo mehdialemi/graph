@@ -67,29 +67,25 @@ public class CohenTC {
         JavaPairRDD<Tuple2<Long, Long>, VertexDegree> edgeVertexDegree = vertexEdge.groupByKey()
             .flatMapToPair(ve -> {
                 List<Tuple2<Tuple2<Long, Long>, VertexDegree>> list = new ArrayList<>();
-                int degree = 0;
-                Iterator<Tuple2<Long, Long>> iter = ve._2.iterator();
+                Iterator<Tuple2<Long, Long>> it = ve._2.iterator();
+
+                // Calculate degree and construct output key-value.
+                HashSet<Tuple2<Long, Long>> edges = new HashSet<>();
+                while (it.hasNext()) {
+                    Tuple2<Long, Long> e = it.next();
+                    edges.add(e);
+                }
 
                 VertexDegree vd = new VertexDegree();
                 vd.vertex = ve._1;
+                vd.degree = edges.size();
 
-                // Calculate degree and construct output key-value.
-                Map<Tuple2<Long, Long>, VertexDegree> map = new HashMap<>();
-                while (iter.hasNext()) {
-                    Tuple2<Long, Long> e = iter.next();
-                    if (map.containsKey(e))
-                        continue;
-                    map.put(e, vd);
-                    degree++;
-                }
+                if (vd.degree == 0)
+                    throw new Exception("Vertex " + vd.vertex + " has no edge!!!");
 
-                // Assign degree of the current vertex to all edges.
-                Set<Map.Entry<Tuple2<Long, Long>, VertexDegree>> entrySet = map.entrySet();
-                for (Map.Entry<Tuple2<Long, Long>, VertexDegree> entry : entrySet) {
-                    VertexDegree vertexDegree = entry.getValue();
-                    vertexDegree.degree = degree;
-                    list.add(new Tuple2<>(entry.getKey(), vertexDegree));
-                }
+                for (Tuple2<Long, Long> edge : edges)
+                    list.add(new Tuple2<>(edge, vd));
+
                 return list.iterator();
             });
 
@@ -104,23 +100,27 @@ public class CohenTC {
                 Integer[] degrees = new Integer[2];
 
                 iter.hasNext();
-                VertexDegree vd = iter.next();  // A VertexDegree object contains a vertex and its degree.
+                VertexDegree vd1 = iter.next();  // A VertexDegree object contains a vertex and its degree.
+                if (vd1 == null)
+                    throw new NullPointerException("Vertex1 degree for edge " + edge + " is null!!!");
+
+                iter.hasNext();
+                VertexDegree vd2 = iter.next();
+                if (vd2 == null)
+                    throw new NullPointerException("Vertex2 degree for edge " + edge + " is null!!!");
+
+                if (vd1 == vd2)
+                    throw new Exception("Self loop detected for edge " + edge);
 
                 // If this VertexDegree is related to first vertex of the edge
                 // then add degree to the first index else add it to the second one.
-                if (vd.vertex == edge._1)
-                    degrees[0] = vd.degree;
-                else
-                    degrees[1] = vd.degree;
-
-                iter.hasNext();
-                vd = iter.next();
-                // Again find appropriate index for the second VertexDegree.
-                if (vd.vertex == edge._1)
-                    degrees[0] = vd.degree;
-                else
-                    degrees[1] = vd.degree;
-
+                if (vd1.vertex == edge._1) {
+                    degrees[0] = vd1.degree;
+                    degrees[1] = vd2.degree;
+                } else {
+                    degrees[0] = vd2.degree;
+                    degrees[1] = vd1.degree;
+                }
                 return new Tuple2<>(edge, degrees);
             });
 
@@ -136,9 +136,9 @@ public class CohenTC {
                 vd[1].vertex = e._1._2;
                 vd[1].degree = e._2[1];
 
-                if (e._2[0] <= e._2[1])
-                    return new Tuple2<>(e._1._1, vd);
-                return new Tuple2<>(e._1._2, vd);
+                if (vd[0].degree <= vd[1].degree)
+                    return new Tuple2<>(vd[0].vertex, vd);
+                return new Tuple2<>(vd[1].vertex, vd);
             });
 
         // Extract two connected edges as value and a synthetic edge constructed from uncommon vertices of these two edges.
@@ -182,7 +182,7 @@ public class CohenTC {
                         else
                             vd2 = vd2_2;
 
-                        Tuple2<Long, Long> syntheticEdge;-
+                        Tuple2<Long, Long> syntheticEdge;
                         if (vd1.degree < vd2.degree)
                             syntheticEdge = new Tuple2<>(vd1.vertex, vd2.vertex);
                         else if (vd1.degree == vd2.degree) {

@@ -62,6 +62,9 @@ public class GraphLoader {
                 return new ArrayList<Tuple2<Long, Long>>().iterator();
             List<Tuple2<Long, Long>> list = new ArrayList<>(1);
             String[] e = line.split("\\s+");
+            if (e == null || e.length != 2)
+                return new ArrayList<Tuple2<Long, Long>>().iterator();
+
             long v1 = Long.parseLong(e[0]);
             long v2 = Long.parseLong(e[1]);
             if (v1 < v2)
