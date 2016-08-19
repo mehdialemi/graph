@@ -124,6 +124,22 @@ public class CohenTC {
                 return new Tuple2<>(edge, degrees);
             });
 
+        // Extract every two connected edges. key: degree based sorted, value: vertex based sorted
+        JavaPairRDD<Tuple2<Long, Long>, Tuple2<Long, Long>> connectedEdges = edgeVertex2Degree
+            .mapToPair(e -> {
+                if (e._2[0] > e._2[1])
+                    return new Tuple2<>(new Tuple2<>(e._1._2, e._1._1), e._1);
+                else if (e._2[0] == e._2[1]) {
+                    if (e._1._1 > e._1._2)
+                        return new Tuple2<>(new Tuple2<>(e._1._2, e._1._1), e._1);
+                    else
+                        return new Tuple2<>(e._1, e._1);
+                }
+                return new Tuple2<>(e._1, e._1);
+            });
+
+        connectedEdges.cache();
+
         // Filter out vertices with higher degree.
         JavaPairRDD<Long, VertexDegree[]> filteredVertexDegree = edgeVertex2Degree
             .mapToPair(e -> {
@@ -147,13 +163,13 @@ public class CohenTC {
         JavaPairRDD<Tuple2<Long, Long>, List<Tuple2<Long, Long>>> syntheticEdges = filteredVertexDegree.groupByKey()
             .flatMapToPair(e -> {
                 List<Tuple2<Tuple2<Long, Long>, List<Tuple2<Long, Long>>>> list = new ArrayList<>();
-                Long key = e._1;
+                Long keyVertex = e._1;
 
                 // First, add all edges to a list.
-                Iterator<VertexDegree[]> iter = e._2.iterator();
+                Iterator<VertexDegree[]> it = e._2.iterator();
                 List<VertexDegree[]> edges = new ArrayList<>();
-                while (iter.hasNext())
-                    edges.add(iter.next());
+                while (it.hasNext())
+                    edges.add(it.next());
 
                 // If size of the "list" variable exceed from the maximum JVM memory, a JavaHeapSpace error will be thrown, causes the
                 // program to be crashed.
@@ -161,26 +177,33 @@ public class CohenTC {
                     for (int j = i + 1; j < edges.size(); j++) {
                         // Select two edges.
                         List<Tuple2<Long, Long>> simpleEdges = new ArrayList<>(2);
-                        VertexDegree vd1_1 = edges.get(i)[0];
-                        VertexDegree vd1_2 = edges.get(i)[1];
-                        VertexDegree vd2_1 = edges.get(j)[0];
-                        VertexDegree vd2_2 = edges.get(j)[1];
+                        VertexDegree edge1_vd1 = edges.get(i)[0];
+                        VertexDegree edge1_vd2 = edges.get(i)[1];
+                        VertexDegree edge2_vd1 = edges.get(j)[0];
+                        VertexDegree edge2_vd2 = edges.get(j)[1];
 
-                        simpleEdges.add(new Tuple2<>(vd1_1.vertex, vd1_2.vertex));
-                        simpleEdges.add(new Tuple2<>(vd2_1.vertex, vd2_2.vertex));
+                        if (edge1_vd1.vertex < edge1_vd2.vertex)
+                            simpleEdges.add(new Tuple2<>(edge1_vd1.vertex, edge1_vd2.vertex));
+                        else
+                            simpleEdges.add(new Tuple2<>(edge1_vd2.vertex, edge1_vd1.vertex));
+
+                        if (edge2_vd1.vertex < edge2_vd2.vertex)
+                            simpleEdges.add(new Tuple2<>(edge2_vd1.vertex, edge2_vd2.vertex));
+                        else
+                            simpleEdges.add(new Tuple2<>(edge2_vd2.vertex, edge2_vd1.vertex));
 
                         // Find uncommon vertices of the selected two edges in the previous instructions.
                         VertexDegree vd1;
                         VertexDegree vd2;
-                        if (vd1_1.vertex != key)
-                            vd1 = vd1_1;
+                        if (edge1_vd1.vertex != keyVertex)
+                            vd1 = edge1_vd1;
                         else
-                            vd1 = vd1_2;
+                            vd1 = edge1_vd2;
 
-                        if (vd2_1.vertex != key)
-                            vd2 = vd2_1;
+                        if (edge2_vd1.vertex != keyVertex)
+                            vd2 = edge2_vd1;
                         else
-                            vd2 = vd2_2;
+                            vd2 = edge2_vd2;
 
                         Tuple2<Long, Long> syntheticEdge;
                         if (vd1.degree < vd2.degree)
@@ -196,23 +219,10 @@ public class CohenTC {
                         list.add(new Tuple2<>(syntheticEdge, simpleEdges));
                     }
                 return list.iterator();
-            }).filter(t -> t != null).repartition(partition);
-
-        syntheticEdges.persist(StorageLevel.DISK_ONLY());
-
-        // Extract every two connected edges.
-        JavaPairRDD<Tuple2<Long, Long>, Tuple2<Long, Long>> connectedEdges = edgeVertex2Degree
-            .mapToPair(e -> {
-                if (e._2[0] > e._2[1])
-                    return new Tuple2<>(new Tuple2<>(e._1._2, e._1._1), e._1);
-                else if (e._2[0] == e._2[1]) {
-                    if (e._1._1 > e._1._2)
-                        return new Tuple2<>(new Tuple2<>(e._1._2, e._1._1), e._1);
-                    else
-                        return new Tuple2<>(e._1, e._1);
-                }
-                return new Tuple2<>(e._1, e._1);
             });
+
+//        syntheticEdges.persist(StorageLevel.DISK_ONLY());
+
 
         // Find triangles
         return syntheticEdges.cogroup(connectedEdges, partition).flatMap(m -> {
