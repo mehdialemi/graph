@@ -25,7 +25,11 @@ public class GraphStat {
         if (args.length > 0)
             inputPath = args[0];
 
-        String outputPath = new File(inputPath).getParent() + "/dist/" + new File(inputPath).getName();
+        String dataset = new File(inputPath).getName();
+        int index = inputPath.indexOf(dataset);
+        String parentOutput = inputPath.substring(0, index);
+
+        String outputPath = parentOutput + "/dist/" + dataset;
         int partition = 2;
         if (args.length > 1)
             partition = Integer.parseInt(args[1]);
