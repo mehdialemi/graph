@@ -15,7 +15,7 @@ if [ -z ${GRAPH_INPUT+X} ]; then
     GRAPH_INPUT="$input"
 fi
 
-if [ -z ${PARTITIONS+X} ]; then
+if [ ! -z ${PARTITIONS+X} ]; then
     p=$PARTITIONS
 else
     p=400

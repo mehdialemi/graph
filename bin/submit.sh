@@ -7,7 +7,7 @@ fi
 jar_path="$PWD/bin/graph-processing.jar"
 master="malemi-2"
 
-if [ -z ${TOTAL_CORES+X} ]; then
+if [ ! -z ${TOTAL_CORES+X} ]; then
     total_cores=$TOTAL_CORES
 else
     total_cores=100
