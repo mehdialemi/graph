@@ -49,7 +49,7 @@ public class GraphStat {
             }
 
             return new Tuple2<>(neighborSet.size(), 1);
-        }).reduceByKey((a , b) -> a + b).sortByKey();
+        }).reduceByKey((a , b) -> a + b, 1).sortByKey();
 
         FileUtils.deleteDirectory(new File(outputPath));
         degrees.saveAsTextFile(outputPath);
