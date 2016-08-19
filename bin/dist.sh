@@ -2,13 +2,13 @@
 
 export PARTITIONS=100
 export GRAPH_INPUT="liveJournal"
-bin/run_experiments_CC.sh
+bin/run_experiments_CC.sh Dist
 
 export GRAPH_INPUT="cit-Patents"
-bin/run_experiments_CC.sh
+bin/run_experiments_CC.sh Dist
 
 export GRAPH_INPUT="soc-LiveJournal"
-bin/run_experiments_CC.sh
+bin/run_experiments_CC.sh Dist
 
 export PARTITIONS=500
 export GRAPH_INPUT="orkut"
