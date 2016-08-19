@@ -6,7 +6,13 @@ fi
 
 jar_path="$PWD/bin/graph-processing.jar"
 master="malemi-2"
-total_cores=110
+
+if [ -z ${TOTAL_CORES+X} ]; then
+    total_cores=$TOTAL_CORES
+else
+    total_cores=100
+fi
+
 persistOnDisk="false"
 repartition="true"
 userSort="true"
@@ -40,6 +46,8 @@ case $task in
 	"TC_Cohen") main_class="graph.clusteringco.CohenTC"
 	;;
 	"TC_Pregel") main_class="graph.clusteringco.PregelTC"
+	;;
+	"Dist") main_class="graph.stat.GraphStat"
 	;;
 	*)	echo "please determine your task in the argument
 	[GCC_Hob|GCC_Deg|LCC_Deg|TC_Deg|GCC_Id|LCC_Id|GCC_GraphX|LCC_GraphX|TC_GraphX|GCC_NodeIter|TC_NodeIter"
