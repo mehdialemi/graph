@@ -101,6 +101,10 @@ public class FonlHobGCC {
                     Arrays.sort(forward);
                     output.add(new Tuple2<>(t._2[index], forward));
                 }
+
+                if (output.size() == 0)
+                    return Collections.emptyIterator();
+
                 return output.iterator();
             });
 
@@ -164,7 +168,6 @@ public class FonlHobGCC {
                 }
             }
         }
-
         return sum;
     }
 }

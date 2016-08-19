@@ -3,7 +3,6 @@ package graph.clusteringco
 import graph.{GraphUtils, OutUtils}
 import org.apache.spark.graphx.GraphLoader
 import org.apache.spark.graphx.lib.TriangleCount
-import org.apache.spark.storage.StorageLevel
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
@@ -12,7 +11,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 object GraphX_LCC {
 
     def main(args: Array[String]) {
-        var inputPath = "input.txt"
+        var inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt"
         if (args != null && args.length > 0)
             inputPath = args(0);
 

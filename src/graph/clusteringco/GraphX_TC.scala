@@ -3,7 +3,6 @@ package graph.clusteringco
 import graph.{GraphUtils, OutUtils}
 import org.apache.spark.graphx.GraphLoader
 import org.apache.spark.graphx.lib.TriangleCount
-import org.apache.spark.storage.StorageLevel
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
@@ -11,7 +10,7 @@ import org.apache.spark.{SparkConf, SparkContext}
   */
 object GraphX_TC {
     def main(args: Array[String]) {
-        var inputPath = "input.txt"
+        var inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt"
         if (args != null && args.length > 0)
             inputPath = args(0);
 
@@ -28,8 +27,8 @@ object GraphX_TC {
         val graph = GraphLoader.edgeListFile(sc, inputPath, numEdgePartitions=partition)
 
         val triangleGraph = TriangleCount.run(graph)
-        val triangle3 = triangleGraph.vertices.reduce((v1,v2) => (0L , v1._2 + v2._2))
-        val totalTriangles = triangle3._2.toInt / 3;
+        val triangle3 = triangleGraph.vertices.map(v => v._2.toLong).reduce((a , b) => a + b)
+        val totalTriangles = triangle3 / 3
 
         OutUtils.printOutputTC(totalTriangles)
         sc.stop()

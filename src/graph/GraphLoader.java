@@ -20,18 +20,23 @@ public class GraphLoader {
         JavaPairRDD<Long, Long> edges = input.flatMapToPair(new PairFlatMapFunction<String, Long, Long>() {
             @Override
             public Iterator<Tuple2<Long, Long>> call(String line) throws Exception {
-                List<Tuple2<Long, Long>> list = new ArrayList<>();
                 if (line.startsWith("#"))
-                    return list.iterator();
+                    return Collections.emptyIterator();
+
                 String[] s = line.split("\\s+");
-                try {
-                    long e1 = Long.parseLong(s[0]);
-                    long e2 = Long.parseLong(s[1]);
-                    list.add(new Tuple2<>(e1, e2));
-                    list.add(new Tuple2<>(e2, e1));
-                } catch (Throwable e) {
-                    System.out.println("Could not parse line " + line);
-                }
+                if (s == null || s.length != 2)
+                    return Collections.emptyIterator();
+
+
+                long e1 = Long.parseLong(s[0]);
+                long e2 = Long.parseLong(s[1]);
+
+                if (e1 == e2)
+                    return Collections.emptyIterator();
+
+                List<Tuple2<Long, Long>> list = new ArrayList<>();
+                list.add(new Tuple2<>(e1, e2));
+                list.add(new Tuple2<>(e2, e1));
                 return list.iterator();
             }
         });
@@ -43,12 +48,20 @@ public class GraphLoader {
 
             @Override
             public Iterator<Tuple2<Integer, Integer>> call(String line) throws Exception {
-                List<Tuple2<Integer, Integer>> list = new ArrayList<>();
                 if (line.startsWith("#"))
-                    return list.iterator();
+                    return Collections.emptyIterator();
                 String[] s = line.split("\\s+");
+
+                if (s == null || s.length != 2)
+                    return Collections.emptyIterator();
+
                 int e1 = Integer.parseInt(s[0]);
                 int e2 = Integer.parseInt(s[1]);
+
+                if (e1 == e2)
+                    return Collections.emptyIterator();
+
+                List<Tuple2<Integer, Integer>> list = new ArrayList<>();
                 list.add(new Tuple2<>(e1, e2));
                 list.add(new Tuple2<>(e2, e1));
                 return list.iterator();
@@ -71,7 +84,7 @@ public class GraphLoader {
             long v2 = Long.parseLong(e[1]);
 
             if (v1 == v2)
-                throw new NullPointerException("Self loop detected for vertex " + v1);
+                return Collections.emptyIterator(); // self loop
 
             if (v1 < v2)
                 list.add(new Tuple2<>(v1, v2));

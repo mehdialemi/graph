@@ -19,7 +19,6 @@ object PregelTC {
 
     case class NeighborMessage(list: ListBuffer[OneNeighborMsg])
 
-
     def main(args: Array[String]): Unit = {
         var inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt"
         if (args != null && args.length > 0)

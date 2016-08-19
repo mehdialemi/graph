@@ -10,6 +10,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import scala.Tuple2;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -48,7 +49,8 @@ public class FonlIdLCC {
             List<Tuple2<Integer, GraphUtils.CandidateState>> output = new ArrayList<>();
             int[] higherIds = new int[tuple._2.length - 1];
             if (higherIds.length < 2)
-                return output.iterator();
+                return Collections.emptyIterator();
+
             System.arraycopy(tuple._2, 1, higherIds, 0, higherIds.length);
 
             GraphUtils.CandidateState candidateState = new GraphUtils.CandidateState(tuple._1, higherIds);
@@ -67,6 +69,10 @@ public class FonlIdLCC {
                 }
                 output.add(new Tuple2<>(tuple._2[index], candidateState));
             }
+
+            if (output.size() == 0)
+                return Collections.emptyIterator();
+
             return output.iterator();
         });
 
@@ -75,12 +81,13 @@ public class FonlIdLCC {
                 Iterator<int[]> higherIdsIter = t._2._2.iterator();
                 List<Tuple2<Integer, Integer>> output = new ArrayList<>();
                 if (!higherIdsIter.hasNext())
-                    return output.iterator();
+                    return Collections.emptyIterator();
+
                 int[] higherIds = higherIdsIter.next();
 
                 Iterator<GraphUtils.CandidateState> candidateIter = t._2._1.iterator();
                 if (!candidateIter.hasNext())
-                    return output.iterator();
+                    return Collections.emptyIterator();
 
                 int sum = 0;
                 do {
@@ -95,6 +102,10 @@ public class FonlIdLCC {
                 if (sum > 0) {
                     output.add(new Tuple2<>(t._1, sum));
                 }
+
+                if (output.size() == 0)
+                    return Collections.emptyIterator();
+
                 return output.iterator();
             }).reduceByKey((a, b) -> a + b);
 
