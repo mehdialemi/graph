@@ -110,7 +110,7 @@ public class CohenTC {
                     throw new NullPointerException("Vertex2 degree for edge " + edge + " is null!!!");
 
                 if (vd1 == vd2)
-                    throw new Exception("Self loop detected for edge " + edge);
+                    throw new NullPointerException("Self loop detected for edge " + edge);
 
                 // If this VertexDegree is related to first vertex of the edge
                 // then add degree to the first index else add it to the second one.

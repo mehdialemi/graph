@@ -69,7 +69,7 @@ public class GraphLoader {
             long v2 = Long.parseLong(e[1]);
 
             if (v1 == v2)
-                throw new Exception("Self loop detected for vertex " + v1);
+                throw new NullPointerException("Self loop detected for vertex " + v1);
 
             if (v1 < v2)
                 list.add(new Tuple2<>(v1, v2));
