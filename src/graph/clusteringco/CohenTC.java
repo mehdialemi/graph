@@ -182,7 +182,7 @@ public class CohenTC {
                         else
                             vd2 = vd2_2;
 
-                        Tuple2<Long, Long> syntheticEdge;
+                        Tuple2<Long, Long> syntheticEdge;-
                         if (vd1.degree < vd2.degree)
                             syntheticEdge = new Tuple2<>(vd1.vertex, vd2.vertex);
                         else if (vd1.degree == vd2.degree) {
@@ -196,7 +196,7 @@ public class CohenTC {
                         list.add(new Tuple2<>(syntheticEdge, simpleEdges));
                     }
                 return list.iterator();
-            }).repartition(partition);
+            }).filter(t -> t != null).repartition(partition);
 
         syntheticEdges.persist(StorageLevel.DISK_ONLY());
 
@@ -215,7 +215,7 @@ public class CohenTC {
             });
 
         // Find triangles
-        return syntheticEdges.cogroup(connectedEdges).flatMap(m -> {
+        return syntheticEdges.cogroup(connectedEdges, partition).flatMap(m -> {
             Tuple2<Long, Long> e1;
             Tuple2<Long, Long> e2;
             Tuple2<Long, Long> e3;

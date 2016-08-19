@@ -8,7 +8,8 @@
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/graph-processing.jar" afterPath="$PROJECT_DIR$/bin/graph-processing.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/stat/GraphStat.java" afterPath="$PROJECT_DIR$/src/graph/stat/GraphStat.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/clusteringco/CohenTC.java" afterPath="$PROJECT_DIR$/src/graph/clusteringco/CohenTC.java" />
     </list>
     <ignored path="graph-processing.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -30,7 +31,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="GraphStat.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="GraphStat.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/graph/stat/GraphStat.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="243">
@@ -112,21 +113,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FonlDegGCC.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/FonlDegGCC.java">
+      <file leaf-file-name="CohenTC.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/CohenTC.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="386">
-              <caret line="40" column="69" selection-start-line="40" selection-start-column="8" selection-end-line="40" selection-end-column="69" />
+            <state relative-caret-position="98">
+              <caret line="184" column="58" selection-start-line="184" selection-start-column="58" selection-end-line="184" selection-end-column="58" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CohenTC.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/CohenTC.java">
+      <file leaf-file-name="GraphLoader.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/graph/GraphLoader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="214" column="15" selection-start-line="214" selection-start-column="15" selection-end-line="214" selection-end-column="15" />
+            <state relative-caret-position="311">
+              <caret line="61" column="69" selection-start-line="61" selection-start-column="23" selection-end-line="61" selection-end-column="69" />
               <folding />
             </state>
           </provider>
@@ -186,8 +187,6 @@
         <option value="$PROJECT_DIR$/src/graph/ktruss/old/KTruss2.java" />
         <option value="$PROJECT_DIR$/src/graph/ktruss/old/TriangleListGenerator.java" />
         <option value="$PROJECT_DIR$/src/graph/GraphUtils.java" />
-        <option value="$PROJECT_DIR$/src/graph/GraphLoader.java" />
-        <option value="$PROJECT_DIR$/src/graph/clusteringco/CohenTC.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/FonlHobGCC.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/NodeIteratorPlusGCC_Spark.java" />
         <option value="$PROJECT_DIR$/src/graph/clusteringco/NodeIteratorPlusTC_Spark.java" />
@@ -206,6 +205,8 @@
         <option value="$PROJECT_DIR$/bin/run_experiments_CC.sh" />
         <option value="$PROJECT_DIR$/bin/submit.sh" />
         <option value="$PROJECT_DIR$/src/graph/stat/GraphStat.java" />
+        <option value="$PROJECT_DIR$/src/graph/GraphLoader.java" />
+        <option value="$PROJECT_DIR$/src/graph/clusteringco/CohenTC.java" />
       </list>
     </option>
   </component>
@@ -435,27 +436,7 @@
       <recent name="$PROJECT_DIR$/src/graph/statistics" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.GraphStat">
-    <configuration default="false" name="FonlHobGCC" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
-        <pattern>
-          <option name="PATTERN" value="graph.clusteringco.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="MAIN_CLASS_NAME" value="graph.clusteringco.FonlHobGCC" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="graph-processing" />
-      <envs />
-      <method />
-    </configuration>
+  <component name="RunManager" selected="Application.CohenTC">
     <configuration default="false" name="FonlIdGCC" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
@@ -524,6 +505,26 @@
         </pattern>
       </extension>
       <option name="MAIN_CLASS_NAME" value="graph.stat.GraphStat" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="graph-processing" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="false" name="CohenTC" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
+        <pattern>
+          <option name="PATTERN" value="graph.clusteringco.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="MAIN_CLASS_NAME" value="graph.clusteringco.CohenTC" />
       <option name="VM_PARAMETERS" />
       <option name="PROGRAM_PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -827,19 +828,19 @@
       <method />
     </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="Application.FonlHobGCC" />
-      <item index="1" class="java.lang.String" itemvalue="Application.FonlIdGCC" />
-      <item index="2" class="java.lang.String" itemvalue="Application.FonlIdLCC" />
-      <item index="3" class="java.lang.String" itemvalue="Application.FonlIdTC" />
-      <item index="4" class="java.lang.String" itemvalue="Application.GraphStat" />
+      <item index="0" class="java.lang.String" itemvalue="Application.FonlIdGCC" />
+      <item index="1" class="java.lang.String" itemvalue="Application.FonlIdLCC" />
+      <item index="2" class="java.lang.String" itemvalue="Application.FonlIdTC" />
+      <item index="3" class="java.lang.String" itemvalue="Application.GraphStat" />
+      <item index="4" class="java.lang.String" itemvalue="Application.CohenTC" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Application.GraphStat" />
-        <item index="1" class="java.lang.String" itemvalue="Application.FonlIdTC" />
-        <item index="2" class="java.lang.String" itemvalue="Application.FonlIdLCC" />
-        <item index="3" class="java.lang.String" itemvalue="Application.FonlIdGCC" />
-        <item index="4" class="java.lang.String" itemvalue="Application.FonlHobGCC" />
+        <item index="0" class="java.lang.String" itemvalue="Application.CohenTC" />
+        <item index="1" class="java.lang.String" itemvalue="Application.GraphStat" />
+        <item index="2" class="java.lang.String" itemvalue="Application.FonlIdTC" />
+        <item index="3" class="java.lang.String" itemvalue="Application.FonlIdLCC" />
+        <item index="4" class="java.lang.String" itemvalue="Application.FonlIdGCC" />
       </list>
     </recent_temporary>
   </component>
@@ -1109,13 +1110,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/graph/GraphLoader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="182">
-          <caret line="58" column="64" selection-start-line="58" selection-start-column="46" selection-end-line="58" selection-end-column="64" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/NodeIteratorPlusGCC_Spark.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-660">
@@ -1277,14 +1271,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/CohenTC.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="214" column="15" selection-start-line="214" selection-start-column="15" selection-end-line="214" selection-end-column="15" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/bin/dist.sh">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="210">
@@ -1324,6 +1310,22 @@
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/graph/GraphLoader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="311">
+          <caret line="61" column="69" selection-start-line="61" selection-start-column="23" selection-end-line="61" selection-end-column="69" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/graph/clusteringco/CohenTC.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="98">
+          <caret line="184" column="58" selection-start-line="184" selection-start-column="58" selection-end-line="184" selection-end-column="58" />
+          <folding />
         </state>
       </provider>
     </entry>
