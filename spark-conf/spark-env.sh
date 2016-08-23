@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -31,8 +30,9 @@
 # - SPARK_LOCAL_IP, to set the IP address Spark binds to on this node
 # - SPARK_PUBLIC_DNS, to set the public DNS name of the driver program
 # - SPARK_CLASSPATH, default classpath entries to appen
-SPARK_LOCAL_DIRS="/mnt/ssd1/spark-data,/mnt/ssd2/spark-data,/mnt/ssd3/spark-data"
 # - SPARK_LOCAL_DIRS, storage directories to use on this node for shuffle and RDD data
+#SPARK_LOCAL_DIRS="/mnt/ssd1/spark-data,/mnt/ssd2/spark-data,/mnt/ssd3/spark-data,/mnt/sdb,/mnt/sdc,/mnt/sdd"
+SPARK_LOCAL_DIRS="/mnt/ssd1/spark-data,/mnt/ssd2/spark-data,/mnt/ssd3/spark-data"
 # - MESOS_NATIVE_JAVA_LIBRARY, to point to your libmesos.so if you use Mesos
 
 # Options read in YARN client mode
@@ -65,6 +65,7 @@ SPARK_WORKER_INSTANCES=1
 SPARK_WORKER_DIR="/mnt/ssd1/spark-data,/mnt/ssd2/spark-data,/mnt/ssd3/spark-data"
 # - SPARK_WORKER_OPTS, to set config properties only for the worker (e.g. "-Dx=y")
 # - SPARK_DAEMON_MEMORY, to allocate to the master, worker and history server themselves (default: 1g).
+SPARK_HISTORY_OPTS="-Dspark.history.provider=org.apache.spark.deploy.history.FsHistoryProvider -Dspark.history.fs.logDirectory=hdfs://malemi-2/history -Dspark.history.retainedApplications=300"
 # - SPARK_HISTORY_OPTS, to set config properties only for the history server (e.g. "-Dx=y")
 # - SPARK_SHUFFLE_OPTS, to set config properties only for the external shuffle service (e.g. "-Dx=y")
 # - SPARK_DAEMON_JAVA_OPTS, to set config properties for all daemons (e.g. "-Dx=y")
