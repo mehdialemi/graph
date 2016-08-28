@@ -22,8 +22,8 @@ import java.util.List;
 public class RebuildTriangles {
 
     public static void main(String[] args) {
-//        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
-        String inputPath = "/home/mehdi/graph-data/cit-Patents.txt";
+        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
+//        String inputPath = "/home/mehdi/graph-data/cit-Patents.txt";
         String outputPath = "/home/mehdi/graph-data/output-mapreduce";
         if (args.length > 0)
             inputPath = args[0];
@@ -52,7 +52,6 @@ public class RebuildTriangles {
 
         int iteration = 0;
         while (true) {
-            long t1 = System.currentTimeMillis();
             log("iteration: " + ++iteration);
 
             JavaPairRDD<KEdge, Integer> edgeCounts = triangles.flatMapToPair(t -> {
@@ -62,11 +61,9 @@ public class RebuildTriangles {
                 list.add(new Tuple2<>(new KEdge(t._2(), t._3(), t._1()), 1));
                 return list.iterator();
             }).reduceByKey((a, b) -> a + b);
-            edgeCounts.repartition(partition);
             long t2 = System.currentTimeMillis();
 
             JavaPairRDD<KEdge, Integer> invalidEdges = edgeCounts.filter(ec -> ec._2 < support);
-            invalidEdges.repartition(partition);
             long invalidEdgeCount = invalidEdges.count();
             long t3 = System.currentTimeMillis();
             logDuration("Invalid Edge Count: " + invalidEdgeCount, t3 - t2);
@@ -74,7 +71,8 @@ public class RebuildTriangles {
             if (invalidEdgeCount == 0)
                 break;
 
-            JavaRDD<Tuple3<Long, Long, Long>> invalidTriangles = invalidEdges.distinct().map(t -> t._1.createTuple3());
+            JavaRDD<Tuple3<Long, Long, Long>> invalidTriangles = invalidEdges.repartition(partition)
+                .distinct().map(t -> t._1.createTuple3());
 
             JavaRDD<Tuple3<Long, Long, Long>> newTriangles = triangles.subtract(invalidTriangles).repartition
                 (partition).cache();

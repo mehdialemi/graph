@@ -5,7 +5,7 @@ import java.io.File
 import org.apache.spark.graphx._
 import org.apache.spark.{SparkConf, SparkContext}
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ListBuffer, Map}
 
 /**
   * Find ktruss subgraph using pregel like procedure.
@@ -25,9 +25,10 @@ object KTrussPregel {
         config.setAppName("ktruss-pregel")
         config.setMaster("local[2]")
         val sc = SparkContext.getOrCreate(config)
-        val k = 5
+        val k = 4
         val support = k - 2
 
+        val start = System.currentTimeMillis()
         // Load int graph which is as a list of edges
         val inputGraph = GraphLoader.edgeListFile(sc, inputPath)
 
@@ -42,12 +43,12 @@ object KTrussPregel {
         // Find new edges with correct direction. A direction from a lower degree node to a higher degree node.
         val newEdges = graphVD.triplets.map { et =>
             if (et.srcAttr.get <= et.dstAttr.get)
-                Edge(et.srcId, et.dstId, true)
+                Edge(et.srcId, et.dstId, 0)
             else
-                Edge(et.dstId, et.srcId, true)
+                Edge(et.dstId, et.srcId, 0)
         }
 
-        val empty = sc.makeRDD(Array[(Long, Boolean)]())
+        val empty = sc.makeRDD(Array[(Long, Integer)]())
 
         // Create graph with edge direction from lower degree to higher degree node and edge attribute.
         var graph = Graph(empty, newEdges)
@@ -56,12 +57,13 @@ object KTrussPregel {
         var stop = false
         while (!stop) {
             graph.persist()
+            val oldEdgeCount = graph.edges.count()
             // =======================================================
             // phase 1: Send message about completing the third edges.
             // =======================================================
 
             // Find outlink neighbors ids
-            val neighborIds = graph.collectNeighborIds(EdgeDirection.Out)
+            val neighborIds = graph.collectNeighborIds(EdgeDirection.Either)
 
             // Update each nodes with its outlink neighbors' id.
             val graphWithOutlinks = graph.outerJoinVertices(neighborIds)((vid, _, nId) => nId.getOrElse(Array[Long]()))
@@ -69,7 +71,7 @@ object KTrussPregel {
             // Send neighborIds of a node to all other its neighbors.
             // Send neighborIds of a node to all other its neighbors.
             val message = graphWithOutlinks.aggregateMessages(
-                (ctx: EdgeContext[Array[Long], Boolean, List[(Long, Array[Long])]]) => {
+                (ctx: EdgeContext[Array[Long], Int, List[(Long, Array[Long])]]) => {
                     val msg = List((ctx.srcId, ctx.srcAttr))
                     ctx.sendToDst(msg)
                 }, (msg1: List[(Long, Array[Long])], msg2: List[(Long, Array[Long])]) => msg1 ::: msg2)
@@ -82,43 +84,32 @@ object KTrussPregel {
             // If there was any common neighbors then it report back telling the sender the completing nodes to make
             // a triangle through it.
             val triangleMsg = graphWithOutlinks.vertices.join(message).flatMap{ case (vid, (n, msg)) =>
-                msg.map(ids => (ids._1, n.intersect(ids._2).union(Array[Long](vid)))).filter(_._2.length > 1)
+                msg.map(ids => (ids._1, vid -> n.intersect(ids._2).length)).filter(t => t._2._2 > 0)
             }.groupByKey()
 
             // In this step tgraph have information about the common neighbors per neighbor as the follow:
             // (neighborId, array of common neighbors with neighborId)
-            val tgraph = graphWithOutlinks.outerJoinVertices(triangleMsg)((vid, n, msg) => msg)
+            val edgeCount = graphWithOutlinks.outerJoinVertices(triangleMsg)((vid, n, msg) => {
+                val m = Map[Long, Int]()
+                msg.getOrElse(Map[Long, Int]()).map(t => m.put(t._1, t._2 + m.getOrElse(t._1, 0)))
+                m
+            })
 
+            val edgeUpdated = edgeCount.mapTriplets(t => t.srcAttr.getOrElse(t.dstId, 0)).subgraph(e => e.attr >=
+              support, (vid, v) => true)
+            graph = edgeUpdated.mapVertices((vId, v) => 0)
             // =======================================================
             // phase 3: Collate messages for each edge
             // =======================================================
-
-            // here there is a graph which nodes on it contains valid edges
-            val validEdgeGraph = tgraph.mapVertices((vid, nMsgs) => nMsgs.getOrElse(Iterable[Array[Long]]()).flatten
-              .map((vid, _)).groupBy(identity).mapValues(_.size).filter(_._2 >= support)
-            )
-
-            // activeEdgeMsg determine nodes and edges to be held to the next step.
-            val activeEdgeMsg = validEdgeGraph.aggregateMessages(
-                (ctx: EdgeContext[Map[(Long, Long), Int], Boolean,Boolean]) => {
-                if (ctx.srcAttr.contains((ctx.srcId, ctx.dstId)))
-                    ctx.sendToDst(true)
-                ctx.sendToSrc(true)
-            }, (a: Boolean, b: Boolean) => true)
-
-            // this is a graph which boolean values in the nodes and edges indicate valid and invalid ones.
-            val egraph = tgraph.outerJoinVertices(activeEdgeMsg)((vid, value, v) => v.getOrElse(false))
-
-            val oldEdgeCount = graph.edges.count()
-            graph = egraph.subgraph(e => e.srcAttr && e.dstAttr, (vid, v) => v)
             val newEdgeCount = graph.edges.count()
+
+            println("KTRUSS New Edge Count: " + newEdgeCount)
 
             if (newEdgeCount == 0 || newEdgeCount == oldEdgeCount)
                 stop = true
         }
 
-        new File(outputPath).delete()
-        println("Remaining graph edge count: " + graph.edges.count())
-        graph.edges.saveAsTextFile(outputPath)
+        println("KTRUSS final graph edge count: " + graph.edges.count() + ", duration: " + (System.currentTimeMillis
+        () - start) / 1000)
     }
 }

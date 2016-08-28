@@ -7,9 +7,9 @@ run_command() {
 
 #input="com-friendster.ungraph.txt"
 #input="com-amazon.ungraph.txt"
-input="friendster"
+#input="friendster"
 #input="orkut"
-#input="soc-LiveJournal"
+input="soc-LiveJournal"
 #input="twitter"
 if [ -z ${GRAPH_INPUT+X} ]; then
     GRAPH_INPUT="$input"
@@ -40,7 +40,7 @@ for task in "${TASKS[@]}"; do
     SECONDS=0
     d=`date +%s`
     echo "`LANG=de_DE date` Running Task=$task, Input=$GRAPH_INPUT, Partitions=$p, Log=$logDir/$d.log"
-    run_command "bin/submit.sh $task $GRAPH_INPUT $p $1"  $logDir/"$d.log"
+    run_command "bin/submit.sh $task $GRAPH_INPUT $p $2"  $logDir/"$d.log"
     echo "`LANG=de_DE date` Task=$task, Input=$GRAPH_INPUT, Partitions=$p, Duration=$SECONDS, Log=$logDir/$d.log" >> logs/results.txt
     sleep 3
 done
