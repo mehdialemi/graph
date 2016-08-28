@@ -2,6 +2,7 @@ package graph.ktruss
 
 import java.io.File
 
+import graph.GraphUtils
 import org.apache.spark.graphx._
 import org.apache.spark.{SparkConf, SparkContext}
 
@@ -19,14 +20,25 @@ object KTrussPregel {
 
 
     def main(args: Array[String]): Unit = {
-        val inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt"
-        val outputPath = "/home/mehdi/graph-data/output-pregel"
-        val config = new SparkConf()
-        config.setAppName("ktruss-pregel")
-        config.setMaster("local[2]")
-        val sc = SparkContext.getOrCreate(config)
-        val k = 4
-        val support = k - 2
+        var inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt"
+        if (args != null && args.length > 0)
+            inputPath = args(0);
+
+        var partition = 2
+        if (args != null && args.length > 1)
+            partition = args(1).toInt;
+
+        var k = 4
+        if (args.length > 2)
+            k = args(2).toInt
+        val support: Int = k - 2
+
+        val conf = new SparkConf()
+        if (args == null || args.length == 0)
+            conf.setMaster("local[2]")
+        GraphUtils.setAppName(conf, "KTruss-Pregel-" + k, partition, inputPath);
+
+        val sc = SparkContext.getOrCreate(conf)
 
         val start = System.currentTimeMillis()
         // Load int graph which is as a list of edges
