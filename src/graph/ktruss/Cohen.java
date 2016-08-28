@@ -2,20 +2,17 @@ package graph.ktruss;
 
 import graph.GraphUtils;
 import graph.clusteringco.CohenTC;
-import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.PairFlatMapFunction;
-import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Cohen {
     public static void main(String[] args) throws FileNotFoundException {
@@ -27,13 +24,16 @@ public class Cohen {
         if (args.length > 1)
             partition = Integer.parseInt(args[1]);
 
+        int k = 4; // k-truss
+        if (args.length > 0)
+            k = Integer.parseInt(args[0]);
+        final int support = k - 2;
+
         SparkConf conf = new SparkConf();
         if (args.length == 0)
             conf.setMaster("local[2]");
+        GraphUtils.setAppName(conf, "KTruss-Cohen-" + k, partition, inputPath);
 
-        final int support = 2;
-
-        GraphUtils.setAppName(conf, "Cohen-TC", partition, inputPath);
         conf.registerKryoClasses(new Class[]{GraphUtils.class, GraphUtils.VertexDegree.class, long[].class,
             Map.class, HashMap.class});
         JavaSparkContext sc = new JavaSparkContext(conf);
@@ -84,10 +84,9 @@ public class Cohen {
             if (reduction)
                 break;
 
+            edgesToExplore.unpersist();
             // Select only the edge part as output.
             currentEdges = newEdges.filter(t -> t._2).map(t -> t._1);
-            long edges = currentEdges.map(t-> 1).reduce((a, b) -> a + b);
-            System.out.println("Edges: " + edges);
         }
 
         System.out.println("Edges: " + currentEdges.distinct().count());

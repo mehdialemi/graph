@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-bin/run_experiments.sh KT_EVL
+bin/run_experiments.sh KT_EVL 5

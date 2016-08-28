@@ -7,7 +7,6 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 import scala.Tuple3;
 
@@ -26,35 +25,35 @@ public class RebuildTriangles {
 //        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
         String inputPath = "/home/mehdi/graph-data/cit-Patents.txt";
         String outputPath = "/home/mehdi/graph-data/output-mapreduce";
-        int k = 4; // k-truss
+        if (args.length > 0)
+            inputPath = args[0];
 
+        int partition = 2;
+        if (args.length > 1)
+            partition = Integer.parseInt(args[1]);
+
+        int k = 4; // k-truss
         if (args.length > 0)
             k = Integer.parseInt(args[0]);
         final int support = k - 2;
 
-        if (args.length > 1)
-            inputPath = args[1];
-
         SparkConf conf = new SparkConf();
-        conf.setAppName("KTruss MapReduce");
-        conf.setMaster("local[2]");
-        conf.registerKryoClasses(new Class[]{GraphUtils.VertexDegree.class, long[].class});
+        if (args.length == 0)
+            conf.setMaster("local[2]");
+        GraphUtils.setAppName(conf, "KTruss-RebuildTriangles-" + k, partition, inputPath);
+        conf.registerKryoClasses(new Class[]{GraphUtils.VertexDegree.class, long[].class, List.class});
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         long start = System.currentTimeMillis();
-        int partition = 20;
 
-        JavaRDD<Tuple3<Long, Long, Long>> triangles = listTriangles(sc, inputPath, partition);
-        long triangleDuration = System.currentTimeMillis() - start;
-        triangles.repartition(partition);
-        logDuration("Triangles: " + triangles.count(), triangleDuration);
+        JavaRDD<Tuple3<Long, Long, Long>> triangles = listTriangles(sc, inputPath, partition)
+            .repartition(partition).cache();
 
         int iteration = 0;
         while (true) {
             long t1 = System.currentTimeMillis();
             log("iteration: " + ++iteration);
-            triangles.persist(StorageLevel.MEMORY_AND_DISK());
 
             JavaPairRDD<KEdge, Integer> edgeCounts = triangles.flatMapToPair(t -> {
                 List<Tuple2<KEdge, Integer>> list = new ArrayList<>(3);
@@ -64,9 +63,7 @@ public class RebuildTriangles {
                 return list.iterator();
             }).reduceByKey((a, b) -> a + b);
             edgeCounts.repartition(partition);
-            long edgeCount = edgeCounts.count();
             long t2 = System.currentTimeMillis();
-            logDuration("EdgeCount: " + edgeCount, (t2 - t1));
 
             JavaPairRDD<KEdge, Integer> invalidEdges = edgeCounts.filter(ec -> ec._2 < support);
             invalidEdges.repartition(partition);
@@ -79,19 +76,8 @@ public class RebuildTriangles {
 
             JavaRDD<Tuple3<Long, Long, Long>> invalidTriangles = invalidEdges.distinct().map(t -> t._1.createTuple3());
 
-//            JavaRDD<Tuple3<Long, Long, Long>> invalidTriangles = invalidEdges.map(t -> t._1.createTuple3()).distinct();
-            invalidTriangles.repartition(partition);
-            long invalidTriangleCount = invalidTriangles.count();
-            long t4 = System.currentTimeMillis();
-            logDuration("Invalid Triangle Count: " + invalidTriangleCount, t4 - t3);
-
-            JavaRDD<Tuple3<Long, Long, Long>> newTriangles = triangles.subtract(invalidTriangles);
-            newTriangles.repartition(partition);
-            long newTrianglesCount = newTriangles.count();
-
-            long t5 = System.currentTimeMillis();
-            logDuration("newTriangle: " + newTrianglesCount, t5 - t4);
-
+            JavaRDD<Tuple3<Long, Long, Long>> newTriangles = triangles.subtract(invalidTriangles).repartition
+                (partition).cache();
             triangles.unpersist();
             triangles = newTriangles;
         }

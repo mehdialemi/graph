@@ -8,7 +8,10 @@ import org.apache.spark.api.java.JavaSparkContext;
 import scala.Tuple2;
 import scala.Tuple3;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by mehdi on 8/22/16.
@@ -19,30 +22,29 @@ public class EdgeVertexList {
 //        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
         String inputPath = "/home/mehdi/graph-data/cit-Patents.txt";
         String outputPath = "/home/mehdi/graph-data/output-mapreduce";
-        int k = 4; // k-truss
+        if (args.length > 0)
+            inputPath = args[0];
 
+        int partition = 2;
+        if (args.length > 1)
+            partition = Integer.parseInt(args[1]);
+
+        int k = 4; // k-truss
         if (args.length > 0)
             k = Integer.parseInt(args[0]);
         final int support = k - 2;
 
-        if (args.length > 1)
-            inputPath = args[1];
-
         SparkConf conf = new SparkConf();
-        conf.setAppName("KTruss MapReduce");
-        conf.setMaster("local[2]");
-        conf.registerKryoClasses(new Class[]{GraphUtils.VertexDegree.class, long[].class});
+        if (args.length == 0)
+            conf.setMaster("local[2]");
+        GraphUtils.setAppName(conf, "KTruss-EdgeVertexList-" + k, partition, inputPath);
+        conf.registerKryoClasses(new Class[]{GraphUtils.VertexDegree.class, long[].class, List.class});
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         long start = System.currentTimeMillis();
-        int partition = 20;
 
         JavaRDD<Tuple3<Long, Long, Long>> allTriangles = RebuildTriangles.listTriangles(sc, inputPath, partition);
-        ;
-        long allTrianglesCount = allTriangles.count();
-        long triangleDuration = System.currentTimeMillis() - start;
-        logDuration("Triangles: " + allTrianglesCount, triangleDuration);
 
         long t1 = System.currentTimeMillis();
         JavaPairRDD<Tuple2<Long, Long>, List<Long>> edgeNodes = allTriangles.flatMapToPair(t -> {
@@ -58,19 +60,15 @@ public class EdgeVertexList {
             List<Long> list = new ArrayList<>();
             t.forEach(node -> list.add(node));
             return list;
-        });
+        }).repartition(partition).cache();
 
-        long edgeNodesCount = edgeNodes.count();
-        long t2 = System.currentTimeMillis();
-        logDuration("Extracting edge nodes, count: " + edgeNodesCount, (t2 - t1));
         int iteration = 0;
         while (true) {
-            edgeNodes.repartition(partition).cache();
             log("iteration: " + ++iteration);
 
             long t3 = System.currentTimeMillis();
-            JavaPairRDD<Tuple2<Long, Long>, List<Long>> invalidEdges = edgeNodes.filter(en -> en._2.size() < support
-                && en._2.size() > 0);
+            JavaPairRDD<Tuple2<Long, Long>, List<Long>> invalidEdges =
+                edgeNodes.filter(en -> en._2.size() < support&& en._2.size() > 0);
 
             long invalidEdgesCount = invalidEdges.count();
             if (invalidEdges.count() == 0)
@@ -115,12 +113,10 @@ public class EdgeVertexList {
                     }
 
                     return Collections.singleton(new Tuple2<>(t._1,  nodes)).iterator();
-                });
+                }).repartition(partition).cache();
 
             edgeNodes.unpersist();
             edgeNodes = newEdgeNodes;
-            long t5 = System.currentTimeMillis();
-            logDuration("last updated edge nodes: " + edgeNodes.count(), (t5 - t4));
         }
 
         long duration = System.currentTimeMillis() - start;
