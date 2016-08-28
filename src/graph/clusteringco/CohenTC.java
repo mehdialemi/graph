@@ -25,7 +25,7 @@ public class CohenTC {
         if (args.length > 0)
             inputPath = args[0];
 
-        int partition = 2;
+        int partition = 20;
         if (args.length > 1)
             partition = Integer.parseInt(args[1]);
 
@@ -141,7 +141,7 @@ public class CohenTC {
                 return new Tuple2<>(e._1, e._1);
             });
 
-        connectedEdges.cache();
+        connectedEdges.persist(StorageLevel.MEMORY_AND_DISK());
 
         // Filter out vertices with higher degree.
         JavaPairRDD<Long, VertexDegree[]> filteredVertexDegree = edgeVertex2Degree
@@ -244,12 +244,12 @@ public class CohenTC {
             if (!oneEdgeIter.hasNext())
                 return Collections.emptyIterator();
 
-            e1 = m._1;
+            e1 = m._1._1 < m._1._2 ? m._1 : new Tuple2<>(m._1._2, m._1._1);
             Iterator<List<Tuple2<Long, Long>>> twoEdgesIter = m._2._1.iterator();
             while (twoEdgesIter.hasNext()) {
                 List<Tuple2<Long, Long>> edges = twoEdgesIter.next();
-                e2 = edges.get(0);
-                e3 = edges.get(1);
+                e2 = edges.get(0)._1 < edges.get(0)._2 ? edges.get(0) : new Tuple2<>(edges.get(0)._2, edges.get(0)._1);
+                e3 = edges.get(1)._1 < edges.get(1)._2 ? edges.get(1) : new Tuple2<>(edges.get(1)._2, edges.get(1)._1);
 
                 List<Tuple2<Long, Long>> triangleEdges = Arrays.asList(e1, e2, e3);
                 list.add(triangleEdges);

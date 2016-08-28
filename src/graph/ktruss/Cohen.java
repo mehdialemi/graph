@@ -17,13 +17,13 @@ import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.*;
 
-public class CohenKTruss {
+public class Cohen {
     public static void main(String[] args) throws FileNotFoundException {
         String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
         if (args.length > 0)
             inputPath = args[0];
 
-        int partition = 2;
+        int partition = 20;
         if (args.length > 1)
             partition = Integer.parseInt(args[1]);
 
@@ -53,45 +53,45 @@ public class CohenKTruss {
             return null; // no self loop is accepted
         }).filter(t -> t != null);
 
+        int iteration = 0;
         while (true) {
-            JavaRDD<List<Tuple2<Long, Long>>> triangles = CohenTC.listTriangles(currentEdges, partition);
+            JavaRDD<Tuple2<Long, Long>> edgesToExplore = currentEdges.repartition(partition).cache();
+            System.out.println("iteration: " + ++iteration);
+            JavaRDD<List<Tuple2<Long, Long>>> triangles = CohenTC.listTriangles(edgesToExplore, partition);
 
             // Extract triangles' edges
-            JavaPairRDD<Tuple2<Long, Long>, Integer> triangleEdges = triangles
-                .flatMapToPair(new PairFlatMapFunction<List<Tuple2<Long, Long>>, Tuple2<Long, Long>, Integer>() {
-                    @Override
-                    public Iterator<Tuple2<Tuple2<Long, Long>, Integer>> call(List<Tuple2<Long, Long>> t) throws
-                        Exception {
-                        List<Tuple2<Tuple2<Long, Long>, Integer>> edges = new ArrayList<>(3);
-                        edges.add(new Tuple2<>(t.get(0), 1));
-                        edges.add(new Tuple2<>(t.get(1), 1));
-                        edges.add(new Tuple2<>(t.get(2), 1));
-                        return edges.iterator();
-                    }
+            JavaPairRDD<Tuple2<Long, Long>, Integer> triangleEdges = triangles.flatMapToPair(t -> {
+                    List<Tuple2<Tuple2<Long, Long>, Integer>> edges = new ArrayList<>(3);
+                    edges.add(new Tuple2<>(t.get(0), 1));
+                    edges.add(new Tuple2<>(t.get(1), 1));
+                    edges.add(new Tuple2<>(t.get(2), 1));
+                    return edges.iterator();
                 });
 
             JavaPairRDD<Tuple2<Long, Long>, Integer> edgeCount = triangleEdges.reduceByKey((a, b) -> a + b);
+//            long oldEdgeCount = edgeCount.count();
 
-            JavaRDD<Tuple2<Long, Long>> newEdges = edgeCount.filter(t -> {
+            JavaPairRDD<Tuple2<Long, Long>, Boolean> newEdges = edgeCount.mapToPair(t -> {
                 // If triangle count for the current edge is higher than the specified support, then include that edge,
                 // otherwise exclude the current edge.
                 if (t._2 >= support)
-                    return true;
-                return false;
-            }).map(e -> e._1); // Select only the edge part as output.
+                    return new Tuple2<>(t._1, true);
+                return new Tuple2<>(t._1, false);
+            });
 
-            long newEdgeCount = newEdges.count();
-            long oldEdgeCount = edgeCount.count();
-
-            // If no edge was filtered, then we all done and currentEdges represent k-truss subgraphs.
-            if (newEdgeCount == oldEdgeCount) {
+            boolean reduction = newEdges.map(t -> t._2).reduce((a, b) -> a && b);
+            System.out.println("Reduction: " + reduction);
+            if (reduction)
                 break;
-            }
 
-            currentEdges.unpersist();
-            currentEdges = newEdges;
-            currentEdges.persist(StorageLevel.MEMORY_AND_DISK());
+            // Select only the edge part as output.
+            currentEdges = newEdges.filter(t -> t._2).map(t -> t._1);
+            long edges = currentEdges.map(t-> 1).reduce((a, b) -> a + b);
+            System.out.println("Edges: " + edges);
         }
+
+        System.out.println("Edges: " + currentEdges.distinct().count());
+        sc.close();
     }
 
 }

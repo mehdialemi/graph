@@ -1,13 +1,12 @@
 package graph.ktruss;
 
 import graph.GraphUtils;
+import graph.clusteringco.FonlDegTC;
 import graph.clusteringco.FonlUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.PairFlatMapFunction;
 import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 import scala.Tuple3;
@@ -21,11 +20,11 @@ import java.util.List;
 /**
  *
  */
-public class KTrussSparkJava {
+public class RebuildTriangles {
 
     public static void main(String[] args) {
-        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
-//        String inputPath = "input.txt";
+//        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
+        String inputPath = "/home/mehdi/graph-data/cit-Patents.txt";
         String outputPath = "/home/mehdi/graph-data/output-mapreduce";
         int k = 4; // k-truss
 
@@ -43,15 +42,19 @@ public class KTrussSparkJava {
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
         JavaSparkContext sc = new JavaSparkContext(conf);
 
-        int partition = 2;
+        long start = System.currentTimeMillis();
+        int partition = 20;
+
         JavaRDD<Tuple3<Long, Long, Long>> triangles = listTriangles(sc, inputPath, partition);
+        long triangleDuration = System.currentTimeMillis() - start;
+        triangles.repartition(partition);
+        logDuration("Triangles: " + triangles.count(), triangleDuration);
 
         int iteration = 0;
         while (true) {
-            System.out.println("iteration: " + ++iteration);
-            triangles.persist(StorageLevel.MEMORY_ONLY());
-            long triangleCount = triangles.count();
-            System.out.println("Triangle Count: " + triangleCount);
+            long t1 = System.currentTimeMillis();
+            log("iteration: " + ++iteration);
+            triangles.persist(StorageLevel.MEMORY_AND_DISK());
 
             JavaPairRDD<KEdge, Integer> edgeCounts = triangles.flatMapToPair(t -> {
                 List<Tuple2<KEdge, Integer>> list = new ArrayList<>(3);
@@ -60,18 +63,34 @@ public class KTrussSparkJava {
                 list.add(new Tuple2<>(new KEdge(t._2(), t._3(), t._1()), 1));
                 return list.iterator();
             }).reduceByKey((a, b) -> a + b);
+            edgeCounts.repartition(partition);
+            long edgeCount = edgeCounts.count();
+            long t2 = System.currentTimeMillis();
+            logDuration("EdgeCount: " + edgeCount, (t2 - t1));
 
             JavaPairRDD<KEdge, Integer> invalidEdges = edgeCounts.filter(ec -> ec._2 < support);
+            invalidEdges.repartition(partition);
             long invalidEdgeCount = invalidEdges.count();
-            System.out.println("Invalid Edge Count: " + invalidEdgeCount);
+            long t3 = System.currentTimeMillis();
+            logDuration("Invalid Edge Count: " + invalidEdgeCount, t3 - t2);
 
             if (invalidEdgeCount == 0)
                 break;
 
-            JavaRDD<Tuple3<Long, Long, Long>> invalidTriangles = invalidEdges.map(t -> t._1.createTuple3()).distinct();
-            System.out.println("Invalid Triangle Count: " + invalidTriangles.count());
+            JavaRDD<Tuple3<Long, Long, Long>> invalidTriangles = invalidEdges.distinct().map(t -> t._1.createTuple3());
+
+//            JavaRDD<Tuple3<Long, Long, Long>> invalidTriangles = invalidEdges.map(t -> t._1.createTuple3()).distinct();
+            invalidTriangles.repartition(partition);
+            long invalidTriangleCount = invalidTriangles.count();
+            long t4 = System.currentTimeMillis();
+            logDuration("Invalid Triangle Count: " + invalidTriangleCount, t4 - t3);
 
             JavaRDD<Tuple3<Long, Long, Long>> newTriangles = triangles.subtract(invalidTriangles);
+            newTriangles.repartition(partition);
+            long newTrianglesCount = newTriangles.count();
+
+            long t5 = System.currentTimeMillis();
+            logDuration("newTriangle: " + newTrianglesCount, t5 - t4);
 
             triangles.unpersist();
             triangles = newTriangles;
@@ -85,7 +104,8 @@ public class KTrussSparkJava {
             return list.iterator();
         }).distinct();
 
-        System.out.println("Remaining graph edge count: " + edges.count());
+        long duration = System.currentTimeMillis() - start;
+        logDuration("Remaining graph edge count: " + edges.count(), duration);
         sc.close();
     }
 
@@ -118,23 +138,6 @@ public class KTrussSparkJava {
         }
     }
 
-    public static JavaPairRDD<Long, long[]> createCandidates(JavaPairRDD<Long, long[]> fonl) {
-        return fonl.filter(t -> t._2.length > 2)
-            .flatMapToPair((PairFlatMapFunction<Tuple2<Long, long[]>, Long, long[]>) t -> {
-                int size = t._2.length - 1;
-                List<Tuple2<Long, long[]>> output = new ArrayList<>(size);
-                for (int index = 1; index < size; index++) {
-                    int len = size - index;
-                    long[] forward = new long[len + 1];
-                    forward[0] = t._1; // First vertex in the triangle
-                    System.arraycopy(t._2, index + 1, forward, 1, len);
-                    Arrays.sort(forward, 1, forward.length); // sort to comfort with fonl
-                    output.add(new Tuple2<>(t._2[index], forward));
-                }
-                return output.iterator();
-            });
-    }
-
     public static JavaRDD<Tuple3<Long, Long, Long>> listTriangles(JavaSparkContext sc, String inputPath,
                                                                   int partition) {
         JavaPairRDD<Long, long[]> fonl = FonlUtils.loadFonl(sc, inputPath, partition);
@@ -143,9 +146,8 @@ public class KTrussSparkJava {
         // for example a vertex with high number of higherIds (high deg) would be allocated besides vertex with
         // low number of higherIds (high deg)
 
-        JavaPairRDD<Long, long[]> candidates = createCandidates(fonl);
-        return candidates.cogroup(fonl, partition)
-            .flatMap((FlatMapFunction<Tuple2<Long, Tuple2<Iterable<long[]>, Iterable<long[]>>>, Tuple3<Long, Long, Long>>) t -> {
+        JavaPairRDD<Long, long[]> candidates = FonlDegTC.generateCandidates(fonl, true);
+        return candidates.cogroup(fonl, partition).flatMap(t -> {
                 List<Tuple3<Long, Long, Long>> triangles = new ArrayList<>();
                 Iterator<long[]> iterator = t._2._2.iterator();
                 if (!iterator.hasNext())
@@ -170,4 +172,11 @@ public class KTrussSparkJava {
             });
     }
 
+    static void log(String text) {
+        System.out.println("KTRUSS: " + text);
+    }
+
+    static void logDuration(String text, long millis) {
+        log(text + ", duration " + millis / 1000 + " sec");
+    }
 }

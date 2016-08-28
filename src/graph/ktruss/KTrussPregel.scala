@@ -67,27 +67,22 @@ object KTrussPregel {
             val graphWithOutlinks = graph.outerJoinVertices(neighborIds)((vid, _, nId) => nId.getOrElse(Array[Long]()))
 
             // Send neighborIds of a node to all other its neighbors.
+            // Send neighborIds of a node to all other its neighbors.
             val message = graphWithOutlinks.aggregateMessages(
-                (ctx: EdgeContext[Array[Long], Boolean,NeighborMessage]) => {
-                val msg = new ListBuffer[OneNeighborMsg]()
-                msg += OneNeighborMsg(ctx.srcId, ctx.srcAttr)
-                ctx.sendToDst(NeighborMessage(msg))
-            }, (msg1: NeighborMessage, msg2: NeighborMessage) => {
-                msg1.list ++= msg2.list
-                msg1
-            })
+                (ctx: EdgeContext[Array[Long], Boolean, List[(Long, Array[Long])]]) => {
+                    val msg = List((ctx.srcId, ctx.srcAttr))
+                    ctx.sendToDst(msg)
+                }, (msg1: List[(Long, Array[Long])], msg2: List[(Long, Array[Long])]) => msg1 ::: msg2)
 
             // =======================================================
             // phase 2: Find triangles
             // =======================================================
-            // At first each node receive messages from its neighbor telling their neighbors' id.
+            // At first each node receives messages from its neighbor telling their neighbors' id.
             // Then check that if receiving neighborIds have a common with its neighbors.
             // If there was any common neighbors then it report back telling the sender the completing nodes to make
             // a triangle through it.
             val triangleMsg = graphWithOutlinks.vertices.join(message).flatMap{ case (vid, (n, msg)) =>
-                val map1 = msg.list.map(ids => (ids.vId, n.intersect(ids.neighbors))).filter(_._2.length > 0)
-                val map2 = map1.map(vid_ids => (vid_ids._1, Array[Long](vid)))
-                map1.union(map2)
+                msg.map(ids => (ids._1, n.intersect(ids._2).union(Array[Long](vid)))).filter(_._2.length > 1)
             }.groupByKey()
 
             // In this step tgraph have information about the common neighbors per neighbor as the follow:

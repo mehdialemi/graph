@@ -198,7 +198,7 @@ public class GraphUtils implements Serializable {
     }
 
     public static Tuple3<Long, Long, Long> createSorted(long u, long v, long w) {
-        long first = u, second = v, third = w;
+        long first, second, third;
         if (u < v) {
             if (v < w) {
                 first = u;

@@ -46,21 +46,7 @@ public class FonlDegLCC {
         // Partition based on degree. To balance workload, it is better to have a partitioning mechanism that
         // for example a vertex with high number of higherIds (high deg) would be allocated besides vertex with
         // low number of higherIds (high deg)
-        JavaPairRDD<Long, long[]> candidates = fonl
-            .filter(t -> t._2.length > 2)
-            .flatMapToPair(t -> {
-                int size = t._2.length - 1;
-                List<Tuple2<Long, long[]>> output = new ArrayList<>(size);
-                for (int index = 1; index < size; index++) {
-                    int len = size - index;
-                    long[] forward = new long[len + 1];
-                    forward[0] = t._1; // First vertex in the triangle
-                    System.arraycopy(t._2, index + 1, forward, 1, len);
-                    Arrays.sort(forward, 1, forward.length); // sort to comfort with fonl
-                    output.add(new Tuple2<>(t._2[index], forward));
-                }
-                return output.iterator();
-            });
+        JavaPairRDD<Long, long[]> candidates = FonlDegTC.generateCandidates(fonl, true);
 
         JavaPairRDD<Long, Integer> localTriangleCount = candidates.cogroup(fonl, partition)
             .flatMapToPair(t -> {
