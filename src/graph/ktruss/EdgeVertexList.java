@@ -30,8 +30,8 @@ public class EdgeVertexList {
             partition = Integer.parseInt(args[1]);
 
         int k = 4; // k-truss
-        if (args.length > 0)
-            k = Integer.parseInt(args[0]);
+        if (args.length > 2)
+            k = Integer.parseInt(args[2]);
         final int support = k - 2;
 
         SparkConf conf = new SparkConf();

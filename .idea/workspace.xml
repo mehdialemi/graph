@@ -8,8 +8,6 @@
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/graph-processing.jar" afterPath="$PROJECT_DIR$/bin/graph-processing.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ktruss/run_edge_nodes.sh" afterPath="$PROJECT_DIR$/bin/ktruss/run_edge_nodes.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ktruss/run_rebuild_triangles.sh" afterPath="$PROJECT_DIR$/bin/ktruss/run_rebuild_triangles.sh" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/ktruss/Cohen.java" afterPath="$PROJECT_DIR$/src/graph/ktruss/Cohen.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/ktruss/EdgeVertexList.java" afterPath="$PROJECT_DIR$/src/graph/ktruss/EdgeVertexList.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/graph/ktruss/RebuildTriangles.java" afterPath="$PROJECT_DIR$/src/graph/ktruss/RebuildTriangles.java" />
@@ -57,8 +55,8 @@
       <file leaf-file-name="Cohen.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/graph/ktruss/Cohen.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="36" column="49" selection-start-line="36" selection-start-column="49" selection-end-line="36" selection-end-column="49" />
+            <state relative-caret-position="225">
+              <caret line="27" column="27" selection-start-line="27" selection-start-column="27" selection-end-line="27" selection-end-column="27" />
               <folding />
             </state>
           </provider>
@@ -77,8 +75,8 @@
       <file leaf-file-name="EdgeVertexList.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/graph/ktruss/EdgeVertexList.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="329">
-              <caret line="40" column="100" selection-start-line="40" selection-start-column="100" selection-end-line="40" selection-end-column="100" />
+            <state relative-caret-position="209">
+              <caret line="32" column="27" selection-start-line="32" selection-start-column="27" selection-end-line="32" selection-end-column="27" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -89,8 +87,8 @@
       <file leaf-file-name="RebuildTriangles.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/graph/ktruss/RebuildTriangles.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="314">
-              <caret line="40" column="8" selection-start-line="40" selection-start-column="8" selection-end-line="42" selection-end-column="90" />
+            <state relative-caret-position="239">
+              <caret line="35" column="27" selection-start-line="35" selection-start-column="27" selection-end-line="35" selection-end-column="27" />
               <folding />
             </state>
           </provider>
@@ -208,8 +206,8 @@
         <option value="$PROJECT_DIR$/bin/ktruss/run_edge_nodes.sh" />
         <option value="$PROJECT_DIR$/bin/ktruss/run_rebuild_triangles.sh" />
         <option value="$PROJECT_DIR$/src/graph/ktruss/RebuildTriangles.java" />
-        <option value="$PROJECT_DIR$/src/graph/ktruss/EdgeVertexList.java" />
         <option value="$PROJECT_DIR$/src/graph/ktruss/Cohen.java" />
+        <option value="$PROJECT_DIR$/src/graph/ktruss/EdgeVertexList.java" />
       </list>
     </option>
   </component>
@@ -1398,24 +1396,24 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/graph/ktruss/RebuildTriangles.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="314">
-          <caret line="40" column="8" selection-start-line="40" selection-start-column="8" selection-end-line="42" selection-end-column="90" />
+        <state relative-caret-position="239">
+          <caret line="35" column="27" selection-start-line="35" selection-start-column="27" selection-end-line="35" selection-end-column="27" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/graph/ktruss/Cohen.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="36" column="49" selection-start-line="36" selection-start-column="49" selection-end-line="36" selection-end-column="49" />
+        <state relative-caret-position="225">
+          <caret line="27" column="27" selection-start-line="27" selection-start-column="27" selection-end-line="27" selection-end-column="27" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/graph/ktruss/EdgeVertexList.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="329">
-          <caret line="40" column="100" selection-start-line="40" selection-start-column="100" selection-end-line="40" selection-end-column="100" />
+        <state relative-caret-position="209">
+          <caret line="32" column="27" selection-start-line="32" selection-start-column="27" selection-end-line="32" selection-end-column="27" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
