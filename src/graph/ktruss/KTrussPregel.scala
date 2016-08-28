@@ -42,7 +42,7 @@ object KTrussPregel {
 
         val start = System.currentTimeMillis()
         // Load int graph which is as a list of edges
-        val inputGraph = GraphLoader.edgeListFile(sc, inputPath)
+        val inputGraph = GraphLoader.edgeListFile(sc, inputPath, numEdgePartitions = partition)
 
         // Change direction from lower degree node to a higher node
         // First find degree of each node
