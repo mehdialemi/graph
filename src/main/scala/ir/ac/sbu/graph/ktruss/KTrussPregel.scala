@@ -1,6 +1,7 @@
 package ir.ac.sbu.graph.ktruss
 
 import ir.ac.sbu.graph.GraphUtils
+import org.apache.spark.graphx._
 import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.mutable.{ListBuffer, Map}

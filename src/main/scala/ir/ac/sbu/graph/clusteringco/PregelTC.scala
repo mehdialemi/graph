@@ -1,7 +1,5 @@
 package ir.ac.sbu.graph.clusteringco
 
-import java.io.File
-
 import ir.ac.sbu.graph.{GraphUtils, OutUtils}
 import org.apache.spark.graphx._
 import org.apache.spark.storage.StorageLevel

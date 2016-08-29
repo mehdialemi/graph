@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.subgraph.search
+package ir.ac.sbu.graph.search
 
 import org.apache.spark.graphx.{EdgeContext, GraphLoader}
 import org.apache.spark.{SparkConf, SparkContext}

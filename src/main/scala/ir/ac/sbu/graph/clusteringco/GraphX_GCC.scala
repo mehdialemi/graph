@@ -1,7 +1,7 @@
 package ir.ac.sbu.graph.clusteringco
 
 import ir.ac.sbu.graph.{GraphUtils, OutUtils}
-import org.apache.spark.graphx.GraphLoader
+import org.apache.spark.graphx._
 import org.apache.spark.graphx.lib.TriangleCount
 import org.apache.spark.{SparkConf, SparkContext}
 
