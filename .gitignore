@@ -8,3 +8,4 @@ logs/*
 /target/classes.timestamp
 /target/classes/
 /.idea/
+/target/subgraph-mining-1.0-jar-with-dependencies.jar

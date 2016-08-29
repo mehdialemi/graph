@@ -4,7 +4,7 @@ if [ -z ${SPARK_HOME+X} ]; then
     SPARK_HOME="/home/$USER/spark-2"
 fi
 
-jar_path="$PWD/target/subgraph-mining-1.0.jar"
+jar_path="$PWD/target/subgraph-mining-1.0-jar-with-dependencies.jar"
 master="malemi-2"
 
 if [ ! -z ${TOTAL_CORES+X} ]; then
