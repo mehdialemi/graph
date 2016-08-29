@@ -4,10 +4,10 @@
 (Synthetic) SNAP
 (Synthetic) Graph500
 (Real) http://law.di.unimi.it/datasets.php  (twitter is available here)
-(Real) Web graph => http://webdatacommons.org/hyperlinkgraph/
+(Real) Web ir.ac.sbu.graph => http://webdatacommons.org/hyperlinkgraph/
 (Real) Yahoo Web Graph => https://webscope.sandbox.yahoo.com/catalog.php?datatype=g
 (Synthetic) GraphGen => http://www.cse.ust.hk/graphgen/
-(Reference) https://sites.google.com/site/xiaomengsite/research/resources/graph-dataset
+(Reference) https://sites.google.com/site/xiaomengsite/research/resources/ir.ac.sbu.graph-dataset
 (Synthetic) http://graphstream-project.org/doc/Generators/Overview-of-generators/
 (Synthetic) https://github.com/facebookarchive/linkbench
 (Ready) http://atlarge.ewi.tudelft.nl/graphalytics/

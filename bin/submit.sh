@@ -4,7 +4,7 @@ if [ -z ${SPARK_HOME+X} ]; then
     SPARK_HOME="/home/$USER/spark-2"
 fi
 
-jar_path="$PWD/bin/graph-processing.jar"
+jar_path="$PWD/target/subgraph-mining-1.0.jar"
 master="malemi-2"
 
 if [ ! -z ${TOTAL_CORES+X} ]; then
@@ -19,43 +19,43 @@ userSort="true"
 
 task=$1
 case $task in
-    "GCC_Hob")  main_class="graph.clusteringco.FonlHobGCC"
+    "GCC_Hob")  main_class="ir.ac.sbu.graph.clusteringco.FonlHobGCC"
     ;;
-	"GCC_Deg") 	main_class="graph.clusteringco.FonlDegGCC"
+	"GCC_Deg") 	main_class="ir.ac.sbu.graph.clusteringco.FonlDegGCC"
 	;;
-	"LCC_Deg")	main_class="graph.clusteringco.FonlDegLCC"
+	"LCC_Deg")	main_class="ir.ac.sbu.graph.clusteringco.FonlDegLCC"
 	;;
-	"TC_Deg")   main_class="graph.clusteringco.FonlDegTC"
+	"TC_Deg")   main_class="ir.ac.sbu.graph.clusteringco.FonlDegTC"
 	;;
-	"GCC_Id")  main_class="graph.clusteringco.FonlIdGCC"
+	"GCC_Id")  main_class="ir.ac.sbu.graph.clusteringco.FonlIdGCC"
 	;;
-	"LCC_Id")  main_class="graph.clusteringco.FonlIdLCC"
+	"LCC_Id")  main_class="ir.ac.sbu.graph.clusteringco.FonlIdLCC"
 	;;
-	"TC_Id")    main_class="graph.clusteringco.FonlIdTC"
+	"TC_Id")    main_class="ir.ac.sbu.graph.clusteringco.FonlIdTC"
 	;;
-	"GCC_GraphX") main_class="graph.clusteringco.GraphX_GCC"
+	"GCC_GraphX") main_class="ir.ac.sbu.graph.clusteringco.GraphX_GCC"
 	;;
-	"LCC_GraphX") main_class="graph.clusteringco.GraphX_LCC"
+	"LCC_GraphX") main_class="ir.ac.sbu.graph.clusteringco.GraphX_LCC"
 	;;
-	"TC_GraphX") main_class="graph.clusteringco.GraphX_TC"
+	"TC_GraphX") main_class="ir.ac.sbu.graph.clusteringco.GraphX_TC"
 	;;
-	"GCC_NodeIter") main_class="graph.clusteringco.NodeIteratorPlusGCC_Spark"
+	"GCC_NodeIter") main_class="ir.ac.sbu.graph.clusteringco.NodeIteratorPlusGCC_Spark"
 	;;
-	"TC_NodeIter")  main_class="graph.clusteringco.NodeIteratorPlusTC_Spark"
+	"TC_NodeIter")  main_class="ir.ac.sbu.graph.clusteringco.NodeIteratorPlusTC_Spark"
 	;;
-	"TC_Cohen") main_class="graph.clusteringco.CohenTC"
+	"TC_Cohen") main_class="ir.ac.sbu.graph.clusteringco.CohenTC"
 	;;
-	"TC_Pregel") main_class="graph.clusteringco.PregelTC"
+	"TC_Pregel") main_class="ir.ac.sbu.graph.clusteringco.PregelTC"
 	;;
-	"Dist") main_class="graph.stat.GraphStat"
+	"Dist") main_class="ir.ac.sbu.graph.stat.GraphStat"
 	;;
-	"KT_RT") main_class="graph.ktruss.RebuildTriangles"
+	"KT_RT") main_class="ir.ac.sbu.graph.ktruss.RebuildTriangles"
 	;;
-	"KT_EVL") main_class="graph.ktruss.EdgeVertexList"
+	"KT_EVL") main_class="ir.ac.sbu.graph.ktruss.EdgeVertexList"
 	;;
-	"KT_Cohen") main_class="graph.ktruss.Cohen"
+	"KT_Cohen") main_class="ir.ac.sbu.graph.ktruss.Cohen"
 	;;
-	"KT_Pregel") main_class="graph.ktruss.KTrussPregel"
+	"KT_Pregel") main_class="ir.ac.sbu.graph.ktruss.KTrussPregel"
 	;;
 	*)	echo "please determine your task in the argument
 	[GCC_Hob|GCC_Deg|LCC_Deg|TC_Deg|GCC_Id|LCC_Id|GCC_GraphX|LCC_GraphX|TC_GraphX|GCC_NodeIter|TC_NodeIter"
@@ -66,7 +66,7 @@ dataset="$HOME/$2"
 p="$3"
 
 if [ "$master" != "localhost" ]; then
-	dataset="hdfs://$master/graph-data/$2"
+	dataset="hdfs://$master/ir.ac.sbu.graph-data/$2"
 fi
 
 cd $SPARK_HOME

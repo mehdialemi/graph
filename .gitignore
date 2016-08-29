@@ -1,6 +1,10 @@
 out
-target/
 logs/*
-.idea/workspace.xml
-.idea/*
-
+/target/generated-sources/
+/target/surefire/
+/target/archive-tmp/
+/target/maven-archiver/
+/target/test-classes/
+/target/classes.timestamp
+/target/classes/
+/.idea/
