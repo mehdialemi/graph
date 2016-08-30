@@ -10,6 +10,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.Function;
 import scala.Tuple2;
 
 import java.io.File;
@@ -21,13 +22,13 @@ import java.util.HashSet;
  */
 public class GraphStatRedis {
 
-    static RedisAsyncCommands<String, String> connection;
+//    static RedisAsyncCommands<String, String> connection;
 
     public static void main(String[] args) throws IOException {
 
-        RedisClient redisClient = RedisClient.create(RedisURI.create("redis://localhost:6379/0"));
-        connection = redisClient.connect().async();
-        connection.set("1", "0");
+//        RedisClient redisClient = RedisClient.create(RedisURI.create("redis://localhost:6379/0"));
+//        connection = redisClient.connect().async();
+//        connection.set("1", "0");
 
         String inputPath = "/home/mehdi/ir.ac.sbu.graph-data/com-amazon.ungraph.txt";
         if (args.length > 0)
@@ -54,9 +55,19 @@ public class GraphStatRedis {
 
         JavaPairRDD<Long, Long> edges = GraphLoader.loadEdges(input);
 
-        edges.filter(t -> {
-            connection.incr(t._1().toString());
-            return false;
+        edges.filter(new Function<Tuple2<Long, Long>, Boolean>() {
+            RedisAsyncCommands<String, String> connection;
+
+            {
+                RedisClient redisClient = RedisClient.create(RedisURI.create("redis://localhost:6379/0"));
+                connection = redisClient.connect().async();
+            }
+
+            @Override
+            public Boolean call(Tuple2<Long, Long> t) throws Exception {
+                connection.incr(t._1().toString());
+                return false;
+            }
         }).count();
 
         sc.close();
