@@ -16,7 +16,7 @@ class RedisRDD(rdds: RDD[(Long, Long)], redisEndpoint: RedisEndpoint) extends RD
                 var redis = redisEndpoint.connect()
                 redis.incr(x._1.toString)
                 redis.close()
-                
+
                 redis = redisEndpoint.connect()
                 redis.incr(x._2.toString)
                 redis.close()

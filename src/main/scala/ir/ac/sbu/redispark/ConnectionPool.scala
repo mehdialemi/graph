@@ -10,13 +10,11 @@ import scala.collection.JavaConversions._
 
 object ConnectionPool {
 
-    @transient private lazy val pools: ConcurrentHashMap[RedisEndpoint, ShardedJedisPool] =
-        new ConcurrentHashMap[RedisEndpoint, ShardedJedisPool]()
+    @transient private val pools: ConcurrentHashMap[RedisEndpoint, JedisPool] =
+        new ConcurrentHashMap[RedisEndpoint, JedisPool]()
 
-    def connect(re: RedisEndpoint): ShardedJedis = {
+    def connect(re: RedisEndpoint): Jedis = {
         val pool = pools.getOrElseUpdate(re, {
-            val shardInfo = List(new JedisShardInfo(re.host, re.port))
-
             val poolConfig: JedisPoolConfig = new JedisPoolConfig();
             poolConfig.setMaxTotal(1000)
             poolConfig.setMaxIdle(1)
@@ -26,11 +24,11 @@ object ConnectionPool {
             poolConfig.setMinEvictableIdleTimeMillis(60000)
             poolConfig.setTimeBetweenEvictionRunsMillis(3000)
             poolConfig.setNumTestsPerEvictionRun(3)
-            new ShardedJedisPool(poolConfig, shardInfo)
+            new JedisPool(poolConfig, re.host, re.port, 60000)
         }
         )
         var sleepTime: Int = 4
-        var conn: ShardedJedis = null
+        var conn: Jedis = null
         while (conn == null) {
             try {
                 conn = pool.getResource
