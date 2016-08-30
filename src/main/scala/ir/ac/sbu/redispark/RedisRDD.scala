@@ -10,9 +10,9 @@ import redis.clients.jedis.Jedis
   */
 class RedisRDD(rdds: RDD[(Long, Long)], redisEndpoint: RedisEndpoint) extends RDD[(Long, Long)] (rdds)  {
 
+    val jedis = new Jedis(redisEndpoint.host, redisEndpoint.port)
     @DeveloperApi
     override def compute(split: Partition, context: TaskContext): Iterator[(Long, Long)] = {
-        val jedis = new Jedis(redisEndpoint.host, redisEndpoint.port)
         rdds.iterator(split, context).foreach{
             x => {
                 jedis.incr(x._1.toString)
@@ -20,7 +20,6 @@ class RedisRDD(rdds: RDD[(Long, Long)], redisEndpoint: RedisEndpoint) extends RD
                 jedis.incr(x._2.toString)
             }
         }
-        jedis.close()
         Iterator()
     }
 
