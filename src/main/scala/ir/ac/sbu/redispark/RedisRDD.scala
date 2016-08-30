@@ -24,5 +24,5 @@ class RedisRDD(rdd: RDD[(Long, Long)], redisEndpoint: RedisEndpoint) extends RDD
         y
     }
 
-    override protected def getPartitions: Array[Partition] = rdd.partitions
+    override protected def getPartitions: Array[Partition] = firstParent[(Long, Long)].partitions
 }
