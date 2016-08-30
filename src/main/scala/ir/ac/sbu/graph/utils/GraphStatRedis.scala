@@ -22,6 +22,8 @@ object GraphStatRedis {
         if (args == null || args.length == 0)
             conf.setMaster("local[2]")
 
+        conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+        
         GraphUtils.setAppName(conf, "Graph-Stat-By-Redis", partition, inputPath);
         conf.set("redis.host", "malemi-2").set("redis.port", "6379")
 
