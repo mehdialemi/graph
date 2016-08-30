@@ -20,7 +20,7 @@ class RedisRDD(rdds: RDD[(Long, Long)], redisEndpoint: RedisEndpoint) extends RD
             pipline.incr(x._1.toString)
             pipline.incr(x._2.toString)
         })
-        
+
         pipline.close()
         Iterator()
     }
