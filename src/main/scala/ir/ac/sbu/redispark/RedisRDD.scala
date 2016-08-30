@@ -9,10 +9,9 @@ import org.apache.spark.rdd.RDD
   */
 class RedisRDD(rdds: RDD[(Long, Long)], redisEndpoint: RedisEndpoint) extends RDD[(Long, Long)] (rdds)  {
 
-    val redis = redisEndpoint.connect()
-
     @DeveloperApi
     override def compute(split: Partition, context: TaskContext): Iterator[(Long, Long)] = {
+        val redis = redisEndpoint.connect()
         rdds.iterator(split, context).foreach{
             x => {
                 redis.incr(x._1.toString)
