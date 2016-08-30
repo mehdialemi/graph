@@ -3,7 +3,6 @@ package ir.ac.sbu.redispark
 import java.net.URI
 
 import org.apache.spark.SparkConf
-import redis.clients.jedis.Jedis
 
 /**
   * RedisEndpoint represents a redis connection endpoint info: host, port, auth password
@@ -43,15 +42,5 @@ case class RedisEndpoint(host: String = "127.0.0.1", port: Int = 6379)
       */
     def this(uri: String) {
         this(URI.create(uri))
-    }
-
-    /**
-      * Connect tries to open a connection to the redis endpoint,
-      * optionally authenticating and selecting a db
-      *
-      * @return a new Jedis instance
-      */
-    def connect() = {
-        ConnectionPool.connect(this)
     }
 }

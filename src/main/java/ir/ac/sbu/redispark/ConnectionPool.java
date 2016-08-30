@@ -9,10 +9,8 @@ import redis.clients.jedis.JedisPoolConfig;
  */
 public class ConnectionPool {
 
-    private static JedisPool instance;
-
-    private static synchronized JedisPool getInstance(RedisEndpoint re) {
-        if (instance == null) {
+    private JedisPool jedisPool;
+    public ConnectionPool(RedisEndpoint re) {
             JedisPoolConfig poolConfig = new JedisPoolConfig();
             poolConfig.setMaxTotal(1000);
             poolConfig.setMaxIdle(1);
@@ -22,12 +20,10 @@ public class ConnectionPool {
             poolConfig.setMinEvictableIdleTimeMillis(60000);
             poolConfig.setTimeBetweenEvictionRunsMillis(3000);
             poolConfig.setNumTestsPerEvictionRun(3);
-            instance = new JedisPool(poolConfig, re.host(), re.port(), 60000);
-        }
-        return instance;
+            jedisPool = new JedisPool(poolConfig, re.host(), re.port(), 60000);
     }
 
-    public static Jedis connect(RedisEndpoint re) {
-        return getInstance(re).getResource();
+    public Jedis getJedis() {
+        return jedisPool.getResource();
     }
 }

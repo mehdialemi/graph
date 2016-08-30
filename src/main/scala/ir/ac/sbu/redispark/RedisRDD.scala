@@ -11,15 +11,17 @@ class RedisRDD(rdds: RDD[(Long, Long)], redisEndpoint: RedisEndpoint) extends RD
 
     @DeveloperApi
     override def compute(split: Partition, context: TaskContext): Iterator[(Long, Long)] = {
+        val pool = new ConnectionPool(redisEndpoint);
+
         rdds.iterator(split, context).foreach{
             x => {
-                var redis = redisEndpoint.connect()
-                redis.incr(x._1.toString)
-                redis.close()
+                var jedis = pool.getJedis();
+                jedis.incr(x._1.toString)
+                jedis.close()
 
-                redis = redisEndpoint.connect()
-                redis.incr(x._2.toString)
-                redis.close()
+                jedis = pool.getJedis();
+                jedis.incr(x._2.toString)
+                jedis.close()
             }
         }
         Iterator()
