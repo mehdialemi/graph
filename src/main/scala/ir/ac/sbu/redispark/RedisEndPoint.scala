@@ -2,7 +2,6 @@ package ir.ac.sbu.redispark
 
 import java.net.URI
 
-import com.redis.RedisClient
 import org.apache.spark.SparkConf
 import redis.RedisClient
 
@@ -54,7 +53,7 @@ case class RedisEndpoint(host: String = "127.0.0.1", port: Int = 6379)
       * @return a new Jedis instance
       */
     def connect() = {
-        new RedisClient(host, port)
+        ConnectionPool.connect(this)
     }
 
 
