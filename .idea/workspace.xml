@@ -7,8 +7,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/redispark/ConnectionPool.scala" afterPath="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/redispark/ConnectionPool.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/subgraph-mining-1.0.jar" afterPath="$PROJECT_DIR$/target/subgraph-mining-1.0.jar" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/redispark/RedisRDD.scala" afterPath="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/redispark/RedisRDD.scala" />
     </list>
     <ignored path="graph-processing.iws" />
@@ -45,8 +44,8 @@
       <file leaf-file-name="RedisRDD.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/ir/ac/sbu/redispark/RedisRDD.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="20" column="16" selection-start-line="20" selection-start-column="16" selection-end-line="20" selection-end-column="16" />
+            <state relative-caret-position="270">
+              <caret line="18" column="29" selection-start-line="18" selection-start-column="29" selection-end-line="18" selection-end-column="29" />
               <folding>
                 <element signature="e#29#77#0" expanded="true" />
               </folding>
@@ -1550,8 +1549,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/ir/ac/sbu/redispark/RedisRDD.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="20" column="16" selection-start-line="20" selection-start-column="16" selection-end-line="20" selection-end-column="16" />
+        <state relative-caret-position="270">
+          <caret line="18" column="29" selection-start-line="18" selection-start-column="29" selection-end-line="18" selection-end-column="29" />
           <folding>
             <element signature="e#29#77#0" expanded="true" />
           </folding>

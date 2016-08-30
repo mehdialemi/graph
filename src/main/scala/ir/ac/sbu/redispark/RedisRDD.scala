@@ -16,6 +16,7 @@ class RedisRDD(rdds: RDD[(Long, Long)], redisEndpoint: RedisEndpoint) extends RD
                 val redis = redisEndpoint.connect()
                 redis.incr(x._1.toString)
                 redis.incr(x._2.toString)
+                redis.close()
             }
         }
         Iterator()
