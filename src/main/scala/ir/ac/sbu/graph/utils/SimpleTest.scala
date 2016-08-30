@@ -5,7 +5,7 @@ import ir.ac.sbu.redispark.RedisEndpoint
 /**
   * Created by mehdi on 8/30/16.
   */
-class SimpleTest {
+object SimpleTest {
 
     def main(args: Array[String]) {
         val endPoint = new RedisEndpoint("127.0.0.1", 6379)
