@@ -10,7 +10,7 @@ import redis.clients.jedis.Jedis
   */
 class RedisRDD(rdds: RDD[(Long, Long)], redisEndpoint: RedisEndpoint) extends RDD[(Long, Long)] (rdds)  {
 
-    object xxx {
+    @volatile object xxx {
         val jedis = new Jedis(redisEndpoint.host, redisEndpoint.port)
     }
 
