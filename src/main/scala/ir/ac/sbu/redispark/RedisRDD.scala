@@ -24,6 +24,7 @@ class RedisRDD(rdds: RDD[(Long, Long)], redisEndpoint: RedisEndpoint) extends RD
                 jedis.close()
             }
         }
+        pool.close()
         Iterator()
     }
 

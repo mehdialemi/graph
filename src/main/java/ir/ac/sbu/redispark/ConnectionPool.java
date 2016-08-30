@@ -28,4 +28,8 @@ public class ConnectionPool implements Serializable {
     public Jedis getJedis() {
         return jedisPool.getResource();
     }
+
+    public void close() {
+        jedisPool.close();
+    }
 }
