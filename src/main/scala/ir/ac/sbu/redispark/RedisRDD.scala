@@ -15,13 +15,13 @@ class RedisRDD(rdd: RDD[(Long, Long)], redisEndpoint: RedisEndpoint) extends RDD
         val jedis = new Jedis(redisEndpoint.host, redisEndpoint.port, 60000)
         val pipline = jedis.pipelined()
 
-        rdd.iterator(split, context).map(x => {
+        val y = rdd.iterator(split, context).map(x => {
             pipline.incr(x._1.toString)
             pipline.incr(x._2.toString)
+            x
         })
-
         pipline.close()
-        Iterator()
+        y
     }
 
     override protected def getPartitions: Array[Partition] = rdd.partitions
