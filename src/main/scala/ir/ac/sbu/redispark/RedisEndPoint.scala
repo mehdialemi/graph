@@ -53,6 +53,4 @@ case class RedisEndpoint(host: String = "127.0.0.1", port: Int = 6379)
     def connect() = {
         ConnectionPool.connect(this)
     }
-
-
 }
