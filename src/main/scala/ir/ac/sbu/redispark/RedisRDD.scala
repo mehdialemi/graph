@@ -12,15 +12,15 @@ class RedisRDD(rdd: RDD[(Long, Long)], redisEndpoint: RedisEndpoint) extends RDD
 
     @DeveloperApi
     override def compute(split: Partition, context: TaskContext): Iterator[(Long, Long)] = {
-        val jedis = new Jedis(redisEndpoint.host, redisEndpoint.port, 60000)
-        val pipline = jedis.pipelined()
 
         val y = rdd.iterator(split, context).map(x => {
+            val jedis = new Jedis(redisEndpoint.host, redisEndpoint.port, 60000)
+            val pipline = jedis.pipelined()
             pipline.incr(x._1.toString)
             pipline.incr(x._2.toString)
+            pipline.close()
             x
         })
-        pipline.close()
         y
     }
 
