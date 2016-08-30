@@ -1,7 +1,7 @@
 package ir.ac.sbu.graph.utils
 
 import ir.ac.sbu.graph.GraphUtils
-import ir.ac.sbu.redispark.{RedisConfig, RedisContext, RedisEndpoint}
+import ir.ac.sbu.redispark.{RedisContext, RedisEndpoint}
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
@@ -29,8 +29,7 @@ object GraphStatRedis {
           .filter(t => !t.startsWith("#")).map(t => t.split("\\s+"))
           .map(t => t(0).toLong -> t(1).toLong)
         val rc = new RedisContext(sc)
-        val redisConfig = new RedisConfig(new RedisEndpoint("127.0.0.1", 6379))
-        rc.incr(edges)(redisConfig)
+        rc.incr(edges)(new RedisEndpoint("127.0.0.1", 6379))
         sc.stop()
     }
 
