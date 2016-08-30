@@ -47,6 +47,7 @@ public class GraphStatRedis {
         SparkConf conf = new SparkConf();
         if (args.length == 0)
             conf.setMaster("local[2]");
+        conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
         conf.registerKryoClasses(new Class[]{RedisAsyncCommandsImpl.class});
 
         GraphUtils.setAppName(conf, "Dist", partition, inputPath);
