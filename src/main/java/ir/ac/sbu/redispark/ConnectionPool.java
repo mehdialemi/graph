@@ -5,14 +5,14 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.io.Serializable;
-
 /**
  *
  */
-public class ConnectionPool implements Serializable{
+public class ConnectionPool implements Serializable {
 
     private JedisPool jedisPool;
-    public ConnectionPool(RedisEndpoint re) {
+
+    public ConnectionPool(String host, int port) {
             JedisPoolConfig poolConfig = new JedisPoolConfig();
             poolConfig.setMaxTotal(1000);
             poolConfig.setMaxIdle(1);
@@ -22,7 +22,7 @@ public class ConnectionPool implements Serializable{
             poolConfig.setMinEvictableIdleTimeMillis(60000);
             poolConfig.setTimeBetweenEvictionRunsMillis(3000);
             poolConfig.setNumTestsPerEvictionRun(3);
-            jedisPool = new JedisPool(poolConfig, re.host(), re.port(), 60000);
+            jedisPool = new JedisPool(poolConfig, host, port, 60000);
     }
 
     public Jedis getJedis() {

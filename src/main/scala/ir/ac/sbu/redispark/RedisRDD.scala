@@ -11,7 +11,7 @@ class RedisRDD(rdds: RDD[(Long, Long)], redisEndpoint: RedisEndpoint) extends RD
 
     @DeveloperApi
     override def compute(split: Partition, context: TaskContext): Iterator[(Long, Long)] = {
-        val pool = new ConnectionPool(redisEndpoint);
+        val pool = new ConnectionPool(redisEndpoint.host, redisEndpoint.port);
 
         rdds.iterator(split, context).foreach{
             x => {
