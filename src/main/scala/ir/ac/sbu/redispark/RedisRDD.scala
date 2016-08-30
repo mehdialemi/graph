@@ -13,8 +13,11 @@ class RedisRDD(rdds: RDD[(Long, Long)], redisEndpoint: RedisEndpoint) extends RD
     override def compute(split: Partition, context: TaskContext): Iterator[(Long, Long)] = {
         rdds.iterator(split, context).foreach{
             x => {
-                val redis = redisEndpoint.connect()
+                var redis = redisEndpoint.connect()
                 redis.incr(x._1.toString)
+                redis.close()
+                
+                redis = redisEndpoint.connect()
                 redis.incr(x._2.toString)
                 redis.close()
             }

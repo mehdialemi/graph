@@ -18,7 +18,7 @@ object ConnectionPool {
             val shardInfo = List(new JedisShardInfo(re.host, re.port))
 
             val poolConfig: JedisPoolConfig = new JedisPoolConfig();
-            poolConfig.setMaxTotal(10)
+            poolConfig.setMaxTotal(1000)
             poolConfig.setMaxIdle(1)
             poolConfig.setTestOnBorrow(true)
             poolConfig.setTestOnReturn(true)
