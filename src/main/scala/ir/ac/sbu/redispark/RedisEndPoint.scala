@@ -4,6 +4,7 @@ import java.net.URI
 
 import com.redis.RedisClient
 import org.apache.spark.SparkConf
+import redis.RedisClient
 
 
 /**
