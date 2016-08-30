@@ -27,6 +27,7 @@ public class GraphStatRedis {
 
         RedisClient redisClient = RedisClient.create(RedisURI.create("redis://localhost:6379/0"));
         connection = redisClient.connect().async();
+        connection.set("1", "0");
 
         String inputPath = "/home/mehdi/ir.ac.sbu.graph-data/com-amazon.ungraph.txt";
         if (args.length > 0)
