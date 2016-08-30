@@ -29,8 +29,8 @@ object GraphStatRedis {
           .filter(t => !t.startsWith("#")).map(t => t.split("\\s+"))
           .map(t => t(0).toLong -> t(1).toLong)
         val rc = new RedisContext(sc)
-        rc.incr(edges)(new RedisEndpoint("malemi-2", 6379)).count()
-
+        val c = rc.incr(edges)(new RedisEndpoint("malemi-2", 6379)).count()
+        println(c)
         sc.stop()
     }
 
