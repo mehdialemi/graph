@@ -49,7 +49,7 @@ case $task in
 	;;
 	"Dist") main_class="ir.ac.sbu.graph.stat.GraphStat"
 	;;
-	"Dist_Redis") main_class="ir.ac.sbu.graph.stat.GraphStatRedis"
+	"Dist_Redis") main_class="ir.ac.sbu.graph.utils.GraphStatRedis"
 	;;
 	"KT_RT") main_class="ir.ac.sbu.graph.ktruss.RebuildTriangles"
 	;;
