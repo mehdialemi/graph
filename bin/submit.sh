@@ -68,7 +68,7 @@ dataset="$HOME/$2"
 p="$3"
 
 if [ "$master" != "localhost" ]; then
-	dataset="hdfs://$master/ir.ac.sbu.graph-data/$2"
+	dataset="hdfs://$master/graph-data/$2"
 fi
 
 cd $SPARK_HOME
