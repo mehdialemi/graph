@@ -1,5 +1,6 @@
 package ir.ac.sbu.graph.stat;
 
+import com.lambdaworks.redis.RedisAsyncCommandsImpl;
 import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.RedisURI;
 import com.lambdaworks.redis.api.async.RedisAsyncCommands;
@@ -46,11 +47,11 @@ public class GraphStatRedis {
         SparkConf conf = new SparkConf();
         if (args.length == 0)
             conf.setMaster("local[2]");
+        conf.registerKryoClasses(new Class[]{RedisAsyncCommandsImpl.class});
 
         GraphUtils.setAppName(conf, "Dist", partition, inputPath);
 
         JavaSparkContext sc = new JavaSparkContext(conf);
-
         JavaRDD<String> input = sc.textFile(inputPath, partition);
 
         JavaPairRDD<Long, Long> edges = GraphLoader.loadEdges(input);
