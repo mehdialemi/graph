@@ -24,7 +24,7 @@ object ConnectionPool {
             poolConfig.setTestOnReturn(true)
             poolConfig.setTestWhileIdle(true)
             poolConfig.setMinEvictableIdleTimeMillis(60000)
-            poolConfig.setTimeBetweenEvictionRunsMillis(30000)
+            poolConfig.setTimeBetweenEvictionRunsMillis(3000)
             poolConfig.setNumTestsPerEvictionRun(3)
             new ShardedJedisPool(poolConfig, shardInfo)
         }
