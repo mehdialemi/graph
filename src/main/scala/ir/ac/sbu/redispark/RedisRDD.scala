@@ -10,22 +10,18 @@ import redis.clients.jedis.Jedis
   */
 class RedisRDD(rdds: RDD[(Long, Long)], redisEndpoint: RedisEndpoint) extends RDD[(Long, Long)] (rdds)  {
 
-    def connect() = new Jedis(redisEndpoint.host, redisEndpoint.port, 60000)
 
     @DeveloperApi
     override def compute(split: Partition, context: TaskContext): Iterator[(Long, Long)] = {
-        var jedis = connect()
-        var pipline = jedis.pipelined()
-        rdds.iterator(split, context).foreach{
-            x => {
-                if (!jedis.getClient.isConnected) {
-                    jedis = connect()
-                    pipline = jedis.pipelined()
-                }
-                pipline.incr(x._1.toString)
-                pipline.incr(x._2.toString)
-            }
-        }
+        val jedis = new Jedis(redisEndpoint.host, redisEndpoint.port, 60000)
+        val pipline = jedis.pipelined()
+
+        firstParent[(Long, Long)].iterator(split, context).map(x => {
+            pipline.incr(x._1.toString)
+            pipline.incr(x._2.toString)
+        })
+        
+        pipline.close()
         Iterator()
     }
 
