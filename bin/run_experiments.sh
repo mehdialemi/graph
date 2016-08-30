@@ -2,7 +2,8 @@
 
 run_command() {
 
-    nohup $1 > $2 2>&1
+   # nohup $1 > $2 2>&1
+   $1
 }
 
 #input="com-friendster.ungraph.txt"
