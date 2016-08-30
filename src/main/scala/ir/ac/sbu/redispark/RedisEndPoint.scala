@@ -11,7 +11,7 @@ import org.apache.spark.SparkConf
   * @param host the redis host or ip
   * @param port the redis port
   */
-case class RedisEndpoint(host: String = "127.0.0.1", port: Int = 6379)
+case class RedisEndpoint(host: String = "malemi-2", port: Int = 6379)
   extends Serializable {
 
     /**

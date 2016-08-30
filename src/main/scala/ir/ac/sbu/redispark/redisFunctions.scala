@@ -1,7 +1,5 @@
 package ir.ac.sbu.redispark
 
-import akka.actor.ActorSystem
-import com.typesafe.config.ConfigFactory
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
