@@ -11,9 +11,7 @@
     <bookmark url="jar://$MAVEN_REPOSITORY$/org/apache/spark/spark-core_2.11/2.0.0/spark-core_2.11-2.0.0-sources.jar!/org/apache/spark/rdd/RDD.scala" line="282" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/redispark/RedisRDD.scala" afterPath="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/redispark/RedisRDD.scala" />
-    </list>
+    <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="" />
     <ignored path="graph-processing.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="$PROJECT_DIR$/out/" />
