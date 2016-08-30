@@ -2,5 +2,5 @@
 
 git checkout -- target/subgraph-mining-1.0.jar
 git pull --rebase origin master
-mvn install
+mvn clean install
 cp -r ./* ../../subgraph-mining/
