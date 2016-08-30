@@ -13,8 +13,8 @@ import org.apache.spark.rdd.RDD
 class RedisContext(@transient val sc: SparkContext) extends Serializable {
 
     def incr(kvs: RDD[(Long, Long)])
-            (implicit redisEndpoint: RedisEndpoint = new RedisEndpoint(sc.getConf)): JavaRedisRDD = {
-        new JavaRedisRDD(sc, redisEndpoint.host, redisEndpoint.port, kvs.dependencies)
+            (implicit redisEndpoint: RedisEndpoint = new RedisEndpoint(sc.getConf)): RDD[(Long, Long)] = {
+        new RedisRDD(kvs, redisEndpoint)
     }
 }
 

@@ -22,14 +22,14 @@ object GraphStatRedis {
         if (args == null || args.length == 0)
             conf.setMaster("local[2]")
         GraphUtils.setAppName(conf, "Graph-Stat-By-Redis", partition, inputPath);
-        conf.set("redis.host", "127.0.0.1").set("redis.port", "6379")
+        conf.set("redis.host", "malemi-2").set("redis.port", "6379")
 
         val sc = SparkContext.getOrCreate(conf)
         val edges = sc.textFile(inputPath, partition)
           .filter(t => !t.startsWith("#")).map(t => t.split("\\s+"))
           .map(t => t(0).toLong -> t(1).toLong)
         val rc = new RedisContext(sc)
-        rc.incr(edges)(new RedisEndpoint("127.0.0.1", 6379)).count()
+        rc.incr(edges)(new RedisEndpoint("malemi-2", 6379)).count()
 
         sc.stop()
     }
