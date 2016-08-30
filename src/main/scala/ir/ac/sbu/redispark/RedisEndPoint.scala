@@ -2,8 +2,8 @@ package ir.ac.sbu.redispark
 
 import java.net.URI
 
+import com.redis.RedisClient
 import org.apache.spark.SparkConf
-import redis.RedisClient
 
 
 /**
@@ -53,8 +53,7 @@ case class RedisEndpoint(host: String = "127.0.0.1", port: Int = 6379)
       * @return a new Jedis instance
       */
     def connect() = {
-        implicit val akkaSystem = akka.actor.ActorSystem()
-        RedisClient.apply(host, port)
+        new RedisClient(host, port)
     }
 
 
