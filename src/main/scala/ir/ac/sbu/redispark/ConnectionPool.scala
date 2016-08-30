@@ -17,7 +17,7 @@ object ConnectionPool {
         val poolConfig: JedisPoolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(250)
         poolConfig.setMaxIdle(32)
-        poolConfig.setTestOnBorrow(false)
+        poolConfig.setTestOnBorrow(true)
         poolConfig.setTestOnReturn(false)
         poolConfig.setTestWhileIdle(false)
         poolConfig.setMinEvictableIdleTimeMillis(60000)
