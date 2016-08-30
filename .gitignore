@@ -2,3 +2,4 @@ out
 logs/*
 /.idea/
 /target/
+/target/subgraph-mining-1.0.jar
