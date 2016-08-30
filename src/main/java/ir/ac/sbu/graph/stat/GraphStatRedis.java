@@ -21,10 +21,12 @@ import java.util.HashSet;
  */
 public class GraphStatRedis {
 
+    static RedisAsyncCommands<String, String> connection;
+
     public static void main(String[] args) throws IOException {
 
         RedisClient redisClient = RedisClient.create(RedisURI.create("redis://localhost:6379/0"));
-        final RedisAsyncCommands<String, String> connection = redisClient.connect().async();
+        connection = redisClient.connect().async();
 
         String inputPath = "/home/mehdi/ir.ac.sbu.graph-data/com-amazon.ungraph.txt";
         if (args.length > 0)
