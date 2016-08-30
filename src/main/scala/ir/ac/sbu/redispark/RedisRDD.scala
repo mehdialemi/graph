@@ -15,10 +15,9 @@ class RedisRDD(rdd: RDD[(Long, Long)], redisEndpoint: RedisEndpoint) extends RDD
 
         val y = rdd.iterator(split, context).map(x => {
             val jedis = new Jedis(redisEndpoint.host, redisEndpoint.port, 60000)
-            val pipline = jedis.pipelined()
-            pipline.incr(x._1.toString)
-            pipline.incr(x._2.toString)
-            pipline.close()
+            jedis.incr(x._1.toString)
+            jedis.incr(x._2.toString)
+            jedis.close()
             x
         })
         y
