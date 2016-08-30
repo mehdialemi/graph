@@ -3,8 +3,6 @@ package ir.ac.sbu.redispark
 import java.net.URI
 
 import org.apache.spark.SparkConf
-import redis.RedisClient
-
 
 /**
   * RedisEndpoint represents a redis connection endpoint info: host, port, auth password
