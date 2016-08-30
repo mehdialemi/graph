@@ -13,7 +13,7 @@ class RedisRDD(rdds: RDD[(Long, Long)], redisEndpoint: RedisEndpoint) extends RD
     object xxx {
         val jedis = new Jedis(redisEndpoint.host, redisEndpoint.port)
     }
-    
+
     @DeveloperApi
     override def compute(split: Partition, context: TaskContext): Iterator[(Long, Long)] = {
         rdds.iterator(split, context).foreach{
