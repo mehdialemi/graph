@@ -23,7 +23,7 @@ object GraphStatRedis {
         if (args == null || args.length == 0)
             conf.setMaster("local[2]")
 
-        val jedis = new Jedis("malemi-2", 6379, 60000)
+        val jedis = new Jedis("malemi-2", 6379, 60000, true)
         val pipline = jedis.pipelined()
 
         GraphUtils.setAppName(conf, "Graph-Stat-By-Redis", partition, inputPath);
@@ -34,10 +34,10 @@ object GraphStatRedis {
           .filter(t => !t.startsWith("#")).map(t => t.split("\\s+"))
           .map(t => t(0).toLong -> t(1).toLong)
 
-        val count = edges.filter(t => {
+        val count = edges.map(t => {
             pipline.incr(t._1.toString)
             pipline.incr(t._2.toString)
-            false
+            t._1
         }).count()
 
         println(count)
