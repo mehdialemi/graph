@@ -14,14 +14,7 @@ class RedisContext(@transient val sc: SparkContext) extends Serializable {
 
     def incr(kvs: RDD[(Long, Long)])
             (implicit redisEndpoint: RedisEndpoint = new RedisEndpoint(sc.getConf)): Unit = {
-        val redis = redisEndpoint.connect()
-
-        kvs.foreachPartition((partition: Iterator[(Long, Long)]) => partition.foreach {
-            x => {
-                redis.incr(x._1.toString)
-                redis.incr(x._2.toString)
-            }
-        })
+        new RedisRDD(kvs, redisEndpoint)
     }
 }
 
