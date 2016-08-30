@@ -4,10 +4,12 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
+import java.io.Serializable;
+
 /**
- * Created by mehdi on 8/30/16.
+ *
  */
-public class ConnectionPool {
+public class ConnectionPool implements Serializable{
 
     private JedisPool jedisPool;
     public ConnectionPool(RedisEndpoint re) {
