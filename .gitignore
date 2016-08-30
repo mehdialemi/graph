@@ -1,5 +1,6 @@
 out
 logs/*
+.idea/workspace.xml
 /.idea/
 target/subgraph-mining-1.0.jar
 /target/
