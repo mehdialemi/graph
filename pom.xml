@@ -39,7 +39,7 @@
         <dependency>
             <groupId>com.github.etaty</groupId>
             <artifactId>rediscala_2.11</artifactId>
-            <version>1.5.0</version>
+            <version>LATEST</version>
         </dependency>
         <dependency>
             <groupId>redis.clients</groupId>
