@@ -2,5 +2,12 @@ out
 logs/*
 .idea/workspace.xml
 /.idea/
-target/subgraph-mining-1.0.jar
-/target/
+/target/generated-sources/
+/target/surefire/
+/target/archive-tmp/
+/target/maven-archiver/
+/target/test-classes/
+/target/classes.timestamp
+/target/subgraph-mining-1.0.jar
+/target/classes/
+/target/subgraph-mining-1.0-jar-with-dependencies.jar

@@ -3,6 +3,7 @@ package ir.ac.sbu.graph.utils
 import ir.ac.sbu.graph.GraphUtils
 import ir.ac.sbu.redispark.{RedisContext, RedisEndpoint}
 import org.apache.spark.{SparkConf, SparkContext}
+import redis.clients.jedis.Jedis
 
 /**
   * Created by mehdi on 8/30/16.
@@ -30,12 +31,18 @@ object GraphStatRedis {
         val sc = SparkContext.getOrCreate(conf)
         val edges = sc.textFile(inputPath, partition)
           .filter(t => !t.startsWith("#")).map(t => t.split("\\s+"))
-          .map(t => t(0).toLong -> t(1).toLong)
+          .map(t => t(0).toLong -> t(1).toLong).mapPartitions(eha => {
+            val jedis = new Jedis("malemi-2", 6379, 60000)
+            val map = eha.map(e => {
+                jedis.incr(e._1.toString)
+                jedis.incr(e._2.toString)
+            })
+            jedis.close()
+            map
+        })
 
-        val rc = new RedisContext(sc)
-
-        val c = rc.incr(edges)(new RedisEndpoint("malemi-2", 6379)).count()
-        println(c)
+        val count = edges.count()
+        println(count)
         sc.stop()
     }
 
