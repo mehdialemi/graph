@@ -1,35 +1,18 @@
-#   -----------------------------------------------------
-#               My Spark Default Configuration
-#   -----------------------------------------------------
+This repository relates to my thesis in phD of computer engineering. Subject of my thesis is "A model for subgraph mining in big graphs".
+The solutions in this repository is going to be expanded to include all topics in the domain of subgraph mining such as
+	1- Clustering coefficient
+	2- Community detection
+	3- Subgraph search
+	...
 
-spark.master                     spark://localhost:7077
-#spark.dynamicAllocation.enabled         true
-#spark.shuffle.service.enabled   true
-spark.driver.memory              1g
-spark.executor.memory            1g
-spark.memory.fraction            0.75
-spark.memory.storageFraction     0.5
-spark.eventLog.enabled           true
-spark.eventLog.dir               /home/mehdi/spark-event-log
-spark.local.dir                 /tmp
-spark.serializer                org.apache.spark.serializer.KryoSerializer
-spark.akka.frameSize            128
-spark.shuffle.compress          true
-spark.shuffle.file.buffer       32k
+To process big graph, most of the active frameworks in big data processing are investigated and currently among them Spark and Redis have been chosen.
 
-#spark.shuffle.io.numConnectionsPerPeer Increase this conf if you have more than one disk per machine
-spark.shuffle.io.numConnectionsPerPeer  1
+Now the following problem have been solved by this framework:
+	1- Triangle Counting
+	2- Triangle Listing
+	3- Global clustering coefficient
+	4- Local clustering coefficient
+	5- Ktruss detection
 
-spark.io.compression.codec              lz4
-#spark.kryo.registrationRequired                true
-spark.rdd.compress              false
-spark.kryoserializer.buffer     64m
-spark.executor.extraJavaOptions -XX:+UseParallelGC -XX:+UseParallelOldGC -XX:ParallelGCThreads=3 -XX:MaxGCPauseMillis=100 -XX:+UseCompressedOops -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xmn200m
+If you had any questions, please contact me through mehdi.alemi.se@gmail.com
 
-# Add -XX:+UseCompressedOops to GC options if you have less than 32G Ram per worker
-# By considering GC log:
-#   - OldGen is close to full => lower spark.memory.storageFraction
-#   - full GC => There isn't enough memory for executing of tasks.
-#   - Too many minor collection => Increase eden (-Xmn=...). For example if you have 4 tasks each read a block of HDFS
-#     (with 64M) then your eden size should be at least 4 * 3 * 64. Here, 3 stands for size of block after
-#     decompressing.
