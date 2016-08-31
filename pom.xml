@@ -87,6 +87,7 @@
                 </executions>
                 <configuration>
                     <sourceDir>src/main/java</sourceDir>
+                    <sourceDir>src/main/scala</sourceDir>
                 </configuration>
             </plugin>
             <plugin>
