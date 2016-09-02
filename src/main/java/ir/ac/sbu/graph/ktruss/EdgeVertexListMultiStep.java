@@ -28,7 +28,7 @@ public class EdgeVertexListMultiStep {
         int k = 4; // k-truss
         if (args.length > 2)
             k = Integer.parseInt(args[2]);
-        final int minSupport = k - 2;
+        final int minSup = k - 2;
 
         SparkConf conf = new SparkConf();
         if (args.length == 0)
@@ -60,16 +60,16 @@ public class EdgeVertexListMultiStep {
         int iteration = 0;
         boolean stop = false;
 
-        int currSteps = minSupport + 1;
+        int currSteps = minSup;
         float diffTimeRatio = 0.2f;
         int lastMaxSup = 0;
         int prevSteps = currSteps;
         while (!stop) {
             // if we currStep is higher prevSteps then lastMaxSup was good so use it again.
-            final int maxSup = currSteps > prevSteps ? lastMaxSup : minSupport + currSteps - 1;
+            final int maxSup = currSteps > prevSteps ? lastMaxSup : minSup + Math.min(currSteps, minSup);
             lastMaxSup = maxSup;
             prevSteps = currSteps;
-            log("iteration: " + ++iteration);
+            log("iteration: " + ++iteration + ", maxSup: " + maxSup + ", minSup: " + minSup);
 //            log("total edges: " + edgeNodes.count());
 
             JavaPairRDD<Tuple2<Long, Long>, List<Long>> partialEdgeNodes = edgeNodes.filter(e -> e._2.size() < maxSup).cache();
@@ -85,12 +85,11 @@ public class EdgeVertexListMultiStep {
             long prevDuration = 0;
             long diffThreshold = 0;
             while (!stop) {
-                currSteps ++;
-                JavaPairRDD<Tuple2<Long, Long>, List<Long>> invalidEdges = partialEdgeNodes.filter(en -> en._2.size() < minSupport);
+                JavaPairRDD<Tuple2<Long, Long>, List<Long>> invalidEdges = partialEdgeNodes.filter(en -> en._2.size() < minSup);
                 long invalidEdgeCount = invalidEdges.count();
                 log("invalid edge count: " + invalidEdgeCount);
                 if (invalidEdgeCount == 0) {
-                    if (currSteps == 1)
+                    if (currSteps == 0)
                         stop = true;
                     break;
                 } else {
@@ -99,10 +98,10 @@ public class EdgeVertexListMultiStep {
 
                 long stepDuration = (t2 - t1);
                 logDuration("step: " + currSteps, stepDuration);
-                if (currSteps == 1) {
+                if (currSteps == 0) {
                     diffThreshold = (long) (stepDuration * diffTimeRatio);
                     log("step: " + currSteps + ", diff-threshold: " + diffThreshold / 1000 + " sec");
-                } else if (currSteps > 2 && (stepDuration > diffThreshold && (stepDuration - prevDuration < diffThreshold))) {
+                } else if (currSteps > 1 && (stepDuration > diffThreshold && (stepDuration - prevDuration < diffThreshold))) {
                     break;
                 }
                 prevDuration = stepDuration;
@@ -142,7 +141,7 @@ public class EdgeVertexListMultiStep {
 
                         List<Long> nodes = it.next();
 
-                        if (nodes.size() < minSupport)
+                        if (nodes.size() < minSup)
                             return Collections.emptyIterator();
 
                         for (Long n : t._2._2) {
@@ -190,6 +189,7 @@ public class EdgeVertexListMultiStep {
 
             edgeNodes.unpersist();
             edgeNodes = nextEdgeNodes;
+            currSteps ++;
         }
 
         long duration = System.currentTimeMillis() - start;
