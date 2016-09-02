@@ -70,7 +70,7 @@ public class EdgeVertexListMultiStep {
                 .cache();
 
             log("partial edges: " + partialEdgeNodes.count());
-            
+
             JavaPairRDD<Tuple2<Long, Long>, List<Long>> toRemoveEdges = sc.emptyRDD()
                 .mapToPair(t -> new Tuple2<>(new Tuple2<>(0L, 0L), new ArrayList<Long>(1)));
 

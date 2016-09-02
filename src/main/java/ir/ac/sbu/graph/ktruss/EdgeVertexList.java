@@ -10,9 +10,6 @@ import scala.Tuple3;
 
 import java.util.*;
 
-/**
- * Created by mehdi on 8/22/16.
- */
 public class EdgeVertexList {
 
     public static void main(String[] args) {
@@ -60,17 +57,16 @@ public class EdgeVertexList {
         int iteration = 0;
         boolean stop = false;
         log("Total Edges at first: " + edgeNodes.count());
-        while (!stop) {
+        do {
             log("iteration: " + ++iteration);
 
             log("edgeNodes: " + edgeNodes.count());
 
-            long t3 = System.currentTimeMillis();
             JavaPairRDD<Tuple2<Long, Long>, List<Long>> invalidEdges =
                 edgeNodes.filter(en -> en._2.size() < support);
 
             long invalidEdgesCount = invalidEdges.count();
-            if (invalidEdges.count() == 0) {
+            if (invalidEdgesCount == 0) {
                 stop = true;
                 break;
             }
@@ -120,7 +116,7 @@ public class EdgeVertexList {
 
             edgeNodes.unpersist();
             edgeNodes = newEdgeNodes;
-        }
+        } while (!stop);
 
         long duration = System.currentTimeMillis() - start;
         JavaRDD<Tuple2<Long, Long>> edges = edgeNodes.map(t -> t._1);
