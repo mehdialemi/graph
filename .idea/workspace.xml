@@ -13,7 +13,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/EdgeVertexListMultiStep.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/EdgeVertexListMultiStep.java" />
     </list>
     <ignored path="graph-processing.iws" />
@@ -60,12 +59,12 @@
       <file leaf-file-name="EdgeVertexListMultiStep.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/EdgeVertexListMultiStep.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="69" column="28" selection-start-line="69" selection-start-column="28" selection-end-line="69" selection-end-column="28" />
+            <state relative-caret-position="105">
+              <caret line="62" column="38" selection-start-line="62" selection-start-column="38" selection-end-line="62" selection-end-column="38" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#8784#8785#0" expanded="true" />
-                <element signature="e#8857#8858#0" expanded="true" />
+                <element signature="e#8747#8748#0" expanded="true" />
+                <element signature="e#8820#8821#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -1360,12 +1359,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/EdgeVertexListMultiStep.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="69" column="28" selection-start-line="69" selection-start-column="28" selection-end-line="69" selection-end-column="28" />
+        <state relative-caret-position="105">
+          <caret line="62" column="38" selection-start-line="62" selection-start-column="38" selection-end-line="62" selection-end-column="38" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#8784#8785#0" expanded="true" />
-            <element signature="e#8857#8858#0" expanded="true" />
+            <element signature="e#8747#8748#0" expanded="true" />
+            <element signature="e#8820#8821#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -60,37 +60,36 @@ public class EdgeVertexListMultiStep {
         int iteration = 0;
         boolean stop = false;
 
-        int step = minSupport + 1;
+        int currStep = minSupport + 1;
         float diffTimeRatio = 0.2f;
-        int lastMaxSupport = minSupport * 2;
-        int lastStep = step;
+        int lastMaxSup = 0;
+        int prevSteps = currStep;
         while (!stop) {
-            final int maxSupport = minSupport + (step > lastStep ? lastMaxSupport : step - 1);
-            lastMaxSupport = maxSupport;
-            lastStep = step;
+            final int maxSup = currStep > prevSteps ? lastMaxSup : minSupport + currStep - 1;
+            lastMaxSup = maxSup;
+            prevSteps = currStep;
             log("iteration: " + ++iteration);
 //            log("total edges: " + edgeNodes.count());
 
-            long t1 = System.currentTimeMillis();
-            JavaPairRDD<Tuple2<Long, Long>, List<Long>> partialEdgeNodes = edgeNodes.filter(e -> e._2.size() < maxSupport).cache();
+            JavaPairRDD<Tuple2<Long, Long>, List<Long>> partialEdgeNodes = edgeNodes.filter(e -> e._2.size() < maxSup).cache();
 
 //            log("partial edges: " + partialEdgeNodes.count());
 
             JavaPairRDD<Tuple2<Long, Long>, List<Long>> toRemoveEdges = sc.emptyRDD()
                 .mapToPair(t -> new Tuple2<>(new Tuple2<>(0L, 0L), new ArrayList<Long>(1)));
 
-            step = 0;
-            t1 = System.currentTimeMillis();
+            currStep = 0;
+            long t1 = System.currentTimeMillis();
             long t2;
             long prevDuration = 0;
             long diffThreshold = 0;
             while (!stop) {
-                step ++;
+                currStep ++;
                 JavaPairRDD<Tuple2<Long, Long>, List<Long>> invalidEdges = partialEdgeNodes.filter(en -> en._2.size() < minSupport);
                 long invalidEdgeCount = invalidEdges.count();
                 log("Invalid edge count: " + invalidEdgeCount);
                 if (invalidEdgeCount == 0) {
-                    if (step == 1)
+                    if (currStep == 1)
                         stop = true;
                     break;
                 } else {
@@ -98,11 +97,11 @@ public class EdgeVertexListMultiStep {
                 }
 
                 long stepDuration = (t2 - t1);
-                logDuration("Step: " + step, stepDuration);
-                if (step == 1) {
+                logDuration("Step: " + currStep, stepDuration);
+                if (currStep == 1) {
                     diffThreshold = (long) (stepDuration * diffTimeRatio);
-                    logDuration("Step: " + step + ", Diff Threshold: ", diffThreshold);
-                } else if (step > 2 && (stepDuration > diffThreshold && (stepDuration - prevDuration < diffThreshold))) {
+                    logDuration("Step: " + currStep + ", Diff Threshold: ", diffThreshold);
+                } else if (currStep > 2 && (stepDuration > diffThreshold && (stepDuration - prevDuration < diffThreshold))) {
                     break;
                 }
                 prevDuration = stepDuration;
@@ -166,7 +165,7 @@ public class EdgeVertexListMultiStep {
             }
 
             JavaPairRDD<Tuple2<Long, Long>, List<Long>> nextEdgeNodes =
-                edgeNodes.filter(t -> t._2.size() >= maxSupport).cogroup(toRemoveEdges).flatMapToPair(t -> {
+                edgeNodes.filter(t -> t._2.size() >= maxSup).cogroup(toRemoveEdges).flatMapToPair(t -> {
                 Iterator<List<Long>> it = t._2._1.iterator();
                 if (!it.hasNext())
                     return Collections.emptyIterator();
