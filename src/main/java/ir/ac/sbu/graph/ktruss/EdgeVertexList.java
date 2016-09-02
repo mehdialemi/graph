@@ -56,11 +56,10 @@ public class EdgeVertexList {
 
         int iteration = 0;
         boolean stop = false;
-        log("Total Edges at first: " + edgeNodes.count());
         do {
             log("iteration: " + ++iteration);
 
-            log("edgeNodes: " + edgeNodes.count());
+//            log("edgeNodes: " + edgeNodes.count());
 
             JavaPairRDD<Tuple2<Long, Long>, List<Long>> invalidEdges =
                 edgeNodes.filter(en -> en._2.size() < support);
@@ -70,8 +69,6 @@ public class EdgeVertexList {
                 stop = true;
                 break;
             }
-
-            long t4 = System.currentTimeMillis();
 
             JavaPairRDD<Tuple2<Long, Long>, Long> edgeInvalidNodes = invalidEdges
                 .flatMapToPair(e -> {
