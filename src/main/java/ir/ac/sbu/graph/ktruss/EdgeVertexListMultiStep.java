@@ -60,14 +60,15 @@ public class EdgeVertexListMultiStep {
         int iteration = 0;
         boolean stop = false;
 
-        int currStep = minSupport + 1;
+        int currSteps = minSupport + 1;
         float diffTimeRatio = 0.2f;
         int lastMaxSup = 0;
-        int prevSteps = currStep;
+        int prevSteps = currSteps;
         while (!stop) {
-            final int maxSup = currStep > prevSteps ? lastMaxSup : minSupport + currStep - 1;
+            // if we currStep is higher prevSteps then lastMaxSup was good so use it again.
+            final int maxSup = currSteps > prevSteps ? lastMaxSup : minSupport + currSteps - 1;
             lastMaxSup = maxSup;
-            prevSteps = currStep;
+            prevSteps = currSteps;
             log("iteration: " + ++iteration);
 //            log("total edges: " + edgeNodes.count());
 
@@ -78,18 +79,18 @@ public class EdgeVertexListMultiStep {
             JavaPairRDD<Tuple2<Long, Long>, List<Long>> toRemoveEdges = sc.emptyRDD()
                 .mapToPair(t -> new Tuple2<>(new Tuple2<>(0L, 0L), new ArrayList<Long>(1)));
 
-            currStep = 0;
+            currSteps = 0;
             long t1 = System.currentTimeMillis();
             long t2;
             long prevDuration = 0;
             long diffThreshold = 0;
             while (!stop) {
-                currStep ++;
+                currSteps ++;
                 JavaPairRDD<Tuple2<Long, Long>, List<Long>> invalidEdges = partialEdgeNodes.filter(en -> en._2.size() < minSupport);
                 long invalidEdgeCount = invalidEdges.count();
                 log("invalid edge count: " + invalidEdgeCount);
                 if (invalidEdgeCount == 0) {
-                    if (currStep == 1)
+                    if (currSteps == 1)
                         stop = true;
                     break;
                 } else {
@@ -97,11 +98,11 @@ public class EdgeVertexListMultiStep {
                 }
 
                 long stepDuration = (t2 - t1);
-                logDuration("step: " + currStep, stepDuration);
-                if (currStep == 1) {
+                logDuration("step: " + currSteps, stepDuration);
+                if (currSteps == 1) {
                     diffThreshold = (long) (stepDuration * diffTimeRatio);
-                    log("step: " + currStep + ", diff-threshold: " + diffThreshold / 1000 + " sec");
-                } else if (currStep > 2 && (stepDuration > diffThreshold && (stepDuration - prevDuration < diffThreshold))) {
+                    log("step: " + currSteps + ", diff-threshold: " + diffThreshold / 1000 + " sec");
+                } else if (currSteps > 2 && (stepDuration > diffThreshold && (stepDuration - prevDuration < diffThreshold))) {
                     break;
                 }
                 prevDuration = stepDuration;
