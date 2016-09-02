@@ -87,7 +87,7 @@ public class EdgeVertexListMultiStep {
                 currStep ++;
                 JavaPairRDD<Tuple2<Long, Long>, List<Long>> invalidEdges = partialEdgeNodes.filter(en -> en._2.size() < minSupport);
                 long invalidEdgeCount = invalidEdges.count();
-                log("Invalid edge count: " + invalidEdgeCount);
+                log("invalid edge count: " + invalidEdgeCount);
                 if (invalidEdgeCount == 0) {
                     if (currStep == 1)
                         stop = true;
@@ -97,10 +97,10 @@ public class EdgeVertexListMultiStep {
                 }
 
                 long stepDuration = (t2 - t1);
-                logDuration("Step: " + currStep, stepDuration);
+                logDuration("step: " + currStep, stepDuration);
                 if (currStep == 1) {
                     diffThreshold = (long) (stepDuration * diffTimeRatio);
-                    logDuration("Step: " + currStep + ", Diff Threshold: ", diffThreshold);
+                    log("step: " + currStep + ", diff-threshold: " + diffThreshold / 1000 + " sec");
                 } else if (currStep > 2 && (stepDuration > diffThreshold && (stepDuration - prevDuration < diffThreshold))) {
                     break;
                 }
@@ -204,6 +204,6 @@ public class EdgeVertexListMultiStep {
     }
 
     static void logDuration(String text, long millis) {
-        log(text + ", duration " + millis / 1000 + " sec");
+        log(text + " (" + millis / 1000 + " sec)");
     }
 }
