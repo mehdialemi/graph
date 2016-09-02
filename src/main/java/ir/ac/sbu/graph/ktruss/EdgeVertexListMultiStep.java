@@ -60,6 +60,7 @@ public class EdgeVertexListMultiStep {
         int iteration = 0;
         boolean stop = false;
 
+        JavaPairRDD<Tuple2<Long, Long>, List<Long>> empty = sc.emptyRDD().mapToPair(t -> new Tuple2<>(new Tuple2<>(0L, 0L), new ArrayList<Long>(1)));
         int currSteps = minSup;
         float diffTimeRatio = 0.2f;
         int lastMaxSup = 0;
@@ -73,11 +74,9 @@ public class EdgeVertexListMultiStep {
 //            log("total edges: " + edgeNodes.count());
 
             JavaPairRDD<Tuple2<Long, Long>, List<Long>> partialEdgeNodes = edgeNodes.filter(e -> e._2.size() < maxSup).cache();
-
 //            log("partial edges: " + partialEdgeNodes.count());
 
-            JavaPairRDD<Tuple2<Long, Long>, List<Long>> toRemoveEdges = sc.emptyRDD()
-                .mapToPair(t -> new Tuple2<>(new Tuple2<>(0L, 0L), new ArrayList<Long>(1)));
+            JavaPairRDD<Tuple2<Long, Long>, List<Long>> toRemoveEdges = empty;
 
             currSteps = 0;
             long t1 = System.currentTimeMillis();
@@ -162,6 +161,7 @@ public class EdgeVertexListMultiStep {
                     newEdgeNodes.filter(t -> t._2._1).mapValues(t -> t._2).cache();
                 partialEdgeNodes.unpersist();
                 partialEdgeNodes = nextEdgeNodes;
+                currSteps ++;
             }
 
             JavaPairRDD<Tuple2<Long, Long>, List<Long>> nextEdgeNodes =
@@ -189,7 +189,6 @@ public class EdgeVertexListMultiStep {
 
             edgeNodes.unpersist();
             edgeNodes = nextEdgeNodes;
-            currSteps ++;
         }
 
         long duration = System.currentTimeMillis() - start;
