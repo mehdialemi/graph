@@ -72,10 +72,9 @@ public class EdgeVertexListMultiStep {
                 .mapToPair(t -> new Tuple2<>(new Tuple2<>(0L, 0L), new ArrayList<Long>(1)));
 
             int step = 0;
-//            long lastEdgeInvalidCount = Integer.MAX_VALUE;
             while (!stop) {
                 log("Step => " + ++step);
-                if (step > maxFirst)
+                if (step > iteration)
                     break;
 
                 JavaPairRDD<Tuple2<Long, Long>, List<Long>> invalidEdges =
@@ -87,10 +86,6 @@ public class EdgeVertexListMultiStep {
                         stop = true;
                     break;
                 }
-
-//                if (lastEdgeInvalidCount - invalidEdgeCount < 100)
-//                    break;
-//                lastEdgeInvalidCount = invalidEdgeCount;
 
                 JavaPairRDD<Tuple2<Long, Long>, Long> edgeInvalidNodes = invalidEdges
                     .flatMapToPair(e -> {

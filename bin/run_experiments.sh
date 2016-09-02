@@ -1,7 +1,6 @@
 #!/bin/bash
 
 run_command() {
-
     nohup $1 > $2 2>&1
 }
 
