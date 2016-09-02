@@ -1,5 +1,6 @@
 This repository relates to my thesis in phD of computer engineering. Subject of my thesis is "A model for subgraph mining in big graphs".
-The solutions in this repository is going to be expanded to include all topics in the domain of subgraph mining such as
+The solutions in this repository are going to be expanded to include all topics in the domain of sub-graph mining
+such as
 	1- Clustering coefficient
 	2- Community detection
 	3- Subgraph search
