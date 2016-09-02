@@ -60,11 +60,10 @@ public class EdgeVertexListMultiStep {
         int iteration = 0;
         boolean stop = false;
 
-        int step = support;
-        long threshold = 1000;
-        float timeRatio = 0.8f;
+        int step = support + 1;
+        float diffTimeRatio = 0.2f;
         while (!stop) {
-            final int max = support + step;
+            final int max = support + step - 1;
             log("iteration: " + ++iteration);
 //            log("total edges: " + edgeNodes.count());
 
@@ -81,15 +80,11 @@ public class EdgeVertexListMultiStep {
             t1 = System.currentTimeMillis();
             long t2;
             long prevDuration = 0;
-            long staticThreshold = 10000;
+            long diffThreshold = 0;
             while (!stop) {
-                log("Step => " + ++step);
-
-                JavaPairRDD<Tuple2<Long, Long>, List<Long>> invalidEdges =
-                    partialEdgeNodes.filter(en -> en._2.size() < support);
-
+                step ++;
+                JavaPairRDD<Tuple2<Long, Long>, List<Long>> invalidEdges = partialEdgeNodes.filter(en -> en._2.size() < support);
                 long invalidEdgeCount = invalidEdges.count();
-
                 log("Invalid edge count: " + invalidEdgeCount);
                 if (invalidEdgeCount == 0) {
                     if (step == 1)
@@ -99,15 +94,14 @@ public class EdgeVertexListMultiStep {
                     t2 = System.currentTimeMillis();
                 }
 
-                long localDuration = (t2 - t1);
-                logDuration("duration in step " + step, localDuration);
+                long stepDuration = (t2 - t1);
+                logDuration("Step: " + step, stepDuration);
                 if (step == 1) {
-                    threshold = (long) (localDuration * timeRatio);
-                    logDuration("Threshold is ", threshold);
-                } else if (step > 2 && (localDuration > threshold || (localDuration - prevDuration < staticThreshold))) {
+                    diffThreshold = (long) (stepDuration * diffTimeRatio);
+                } else if (step > 2 && (stepDuration - prevDuration < diffThreshold)) {
                     break;
                 }
-                prevDuration = localDuration;
+                prevDuration = stepDuration;
                 t1 = t2;
 
                 JavaPairRDD<Tuple2<Long, Long>, Long> edgeInvalidNodes = invalidEdges
