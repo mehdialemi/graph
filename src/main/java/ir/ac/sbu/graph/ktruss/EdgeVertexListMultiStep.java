@@ -62,12 +62,15 @@ public class EdgeVertexListMultiStep {
 
         int maxFirst = 4;
         while (!stop) {
-            final int max = support + Math.max(maxFirst - iteration, 1);
+            final int max = support + Math.max(maxFirst - iteration, 2);
             log("iteration: " + ++iteration);
+            log("total edges: " + edgeNodes.count());
 
             JavaPairRDD<Tuple2<Long, Long>, List<Long>> partialEdgeNodes = edgeNodes.filter(e -> e._2.size() < max)
                 .cache();
 
+            log("partial edges: " + partialEdgeNodes.count());
+            
             JavaPairRDD<Tuple2<Long, Long>, List<Long>> toRemoveEdges = sc.emptyRDD()
                 .mapToPair(t -> new Tuple2<>(new Tuple2<>(0L, 0L), new ArrayList<Long>(1)));
 

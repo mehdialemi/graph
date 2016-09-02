@@ -8,10 +8,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import scala.Tuple2;
 import scala.Tuple3;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by mehdi on 8/22/16.
@@ -79,7 +76,6 @@ public class EdgeVertexList {
             }
 
             long t4 = System.currentTimeMillis();
-            logDuration("Finding invalid edges: " + invalidEdgesCount, (t4 - t3));
 
             JavaPairRDD<Tuple2<Long, Long>, Long> edgeInvalidNodes = invalidEdges
                 .flatMapToPair(e -> {
@@ -134,7 +130,7 @@ public class EdgeVertexList {
     }
 
     static void log(String text) {
-        System.out.println("KTRUSS: " + text);
+        System.out.println("KTRUSS [" + new Date() + "] " + text);
     }
 
     static void logDuration(String text, long millis) {
