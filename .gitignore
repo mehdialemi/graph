@@ -3,7 +3,4 @@ logs/*
 .idea/workspace.xml
 /.idea/
 .idea/
-/target/
-target/
-target/subgraph-mining-1.0.jar
-target/subgraph-mining-1.0-jar-with-dependencies.jar
+target
