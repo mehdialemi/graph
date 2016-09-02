@@ -98,7 +98,8 @@ public class EdgeVertexListMultiStep {
                 logDuration("Step: " + step, stepDuration);
                 if (step == 1) {
                     diffThreshold = (long) (stepDuration * diffTimeRatio);
-                } else if (step > 2 && (stepDuration - prevDuration < diffThreshold)) {
+                    logDuration("Step: " + step, diffThreshold);
+                } else if (step > 2 && (stepDuration > diffThreshold && (stepDuration - prevDuration < diffThreshold))) {
                     break;
                 }
                 prevDuration = stepDuration;
