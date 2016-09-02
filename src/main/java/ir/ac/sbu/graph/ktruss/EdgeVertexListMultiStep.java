@@ -28,7 +28,7 @@ public class EdgeVertexListMultiStep {
         int k = 4; // k-truss
         if (args.length > 2)
             k = Integer.parseInt(args[2]);
-        final int support = k - 2;
+        final int minSupport = k - 2;
 
         SparkConf conf = new SparkConf();
         if (args.length == 0)
@@ -60,16 +60,19 @@ public class EdgeVertexListMultiStep {
         int iteration = 0;
         boolean stop = false;
 
-        int step = support + 1;
+        int step = minSupport + 1;
         float diffTimeRatio = 0.2f;
+        int lastMaxSupport = minSupport * 2;
+        int lastStep = step;
         while (!stop) {
-            final int max = support + Math.max(step, support * 2) - 1;
+            final int maxSupport = minSupport + (step > lastStep ? lastMaxSupport : step - 1);
+            lastMaxSupport = maxSupport;
+            lastStep = step;
             log("iteration: " + ++iteration);
 //            log("total edges: " + edgeNodes.count());
 
             long t1 = System.currentTimeMillis();
-            JavaPairRDD<Tuple2<Long, Long>, List<Long>> partialEdgeNodes = edgeNodes.filter(e -> e._2.size() < max)
-                .cache();
+            JavaPairRDD<Tuple2<Long, Long>, List<Long>> partialEdgeNodes = edgeNodes.filter(e -> e._2.size() < maxSupport).cache();
 
 //            log("partial edges: " + partialEdgeNodes.count());
 
@@ -83,7 +86,7 @@ public class EdgeVertexListMultiStep {
             long diffThreshold = 0;
             while (!stop) {
                 step ++;
-                JavaPairRDD<Tuple2<Long, Long>, List<Long>> invalidEdges = partialEdgeNodes.filter(en -> en._2.size() < support);
+                JavaPairRDD<Tuple2<Long, Long>, List<Long>> invalidEdges = partialEdgeNodes.filter(en -> en._2.size() < minSupport);
                 long invalidEdgeCount = invalidEdges.count();
                 log("Invalid edge count: " + invalidEdgeCount);
                 if (invalidEdgeCount == 0) {
@@ -139,7 +142,7 @@ public class EdgeVertexListMultiStep {
 
                         List<Long> nodes = it.next();
 
-                        if (nodes.size() < support)
+                        if (nodes.size() < minSupport)
                             return Collections.emptyIterator();
 
                         for (Long n : t._2._2) {
@@ -163,7 +166,7 @@ public class EdgeVertexListMultiStep {
             }
 
             JavaPairRDD<Tuple2<Long, Long>, List<Long>> nextEdgeNodes =
-                edgeNodes.filter(t -> t._2.size() >= max).cogroup(toRemoveEdges).flatMapToPair(t -> {
+                edgeNodes.filter(t -> t._2.size() >= maxSupport).cogroup(toRemoveEdges).flatMapToPair(t -> {
                 Iterator<List<Long>> it = t._2._1.iterator();
                 if (!it.hasNext())
                     return Collections.emptyIterator();
