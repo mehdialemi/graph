@@ -63,7 +63,7 @@ public class EdgeVertexListMultiStep {
         int step = support + 1;
         float diffTimeRatio = 0.2f;
         while (!stop) {
-            final int max = support + step - 1;
+            final int max = support + Math.max(step, support * 2) - 1;
             log("iteration: " + ++iteration);
 //            log("total edges: " + edgeNodes.count());
 
