@@ -36,11 +36,6 @@
     </properties>
 
     <dependencies>
-        <!--<dependency>-->
-            <!--<groupId>com.github.etaty</groupId>-->
-            <!--<artifactId>rediscala_2.11</artifactId>-->
-            <!--<version>1.5.0</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
@@ -57,13 +52,11 @@
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-graphx_${scala.version}</artifactId>
             <version>${spark.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_${scala.version}</artifactId>
             <version>${spark.version}</version>
-            <scope>provided</scope>
         </dependency>
         <!--<dependency>-->
             <!--<groupId>biz.paluch.redis</groupId>-->

@@ -55,6 +55,8 @@ case $task in
 	;;
 	"KT_EVL") main_class="ir.ac.sbu.graph.ktruss.EdgeVertexList"
 	;;
+	"KT_EVL_IT") main_class="ir.ac.sbu.graph.ktruss.EdgeVertexListMultiStep"
+	;;
 	"KT_Cohen") main_class="ir.ac.sbu.graph.ktruss.Cohen"
 	;;
 	"KT_Pregel") main_class="ir.ac.sbu.graph.ktruss.KTrussPregel"

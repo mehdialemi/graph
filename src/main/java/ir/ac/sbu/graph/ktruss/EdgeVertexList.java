@@ -19,13 +19,12 @@ import java.util.List;
 public class EdgeVertexList {
 
     public static void main(String[] args) {
-        String inputPath = "/home/mehdi/ir.ac.sbu.graph-data/com-amazon.ungraph.txt";
-//        String inputPath = "/home/mehdi/ir.ac.sbu.graph-data/cit-Patents.txt";
-        String outputPath = "/home/mehdi/ir.ac.sbu.graph-data/output-mapreduce";
+        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
+//        String inputPath = "/home/mehdi/graph-data/cit-Patents.txt";
         if (args.length > 0)
             inputPath = args[0];
 
-        int partition = 2;
+        int partition = 10;
         if (args.length > 1)
             partition = Integer.parseInt(args[1]);
 
@@ -46,7 +45,6 @@ public class EdgeVertexList {
 
         JavaRDD<Tuple3<Long, Long, Long>> allTriangles = RebuildTriangles.listTriangles(sc, inputPath, partition);
 
-        long t1 = System.currentTimeMillis();
         JavaPairRDD<Tuple2<Long, Long>, List<Long>> edgeNodes = allTriangles.flatMapToPair(t -> {
             List<Tuple2<Tuple2<Long, Long>, Long>> list = new ArrayList<>(3);
             Tuple2<Long, Long> e1 = t._1() < t._2() ? new Tuple2<>(t._1(), t._2()) : new Tuple2<>(t._2(), t._1());
@@ -64,12 +62,15 @@ public class EdgeVertexList {
 
         int iteration = 0;
         boolean stop = false;
+        log("Total Edges at first: " + edgeNodes.count());
         while (!stop) {
             log("iteration: " + ++iteration);
 
+            log("edgeNodes: " + edgeNodes.count());
+
             long t3 = System.currentTimeMillis();
             JavaPairRDD<Tuple2<Long, Long>, List<Long>> invalidEdges =
-                edgeNodes.filter(en -> en._2.size() < support&& en._2.size() > 0);
+                edgeNodes.filter(en -> en._2.size() < support);
 
             long invalidEdgesCount = invalidEdges.count();
             if (invalidEdges.count() == 0) {
@@ -115,6 +116,9 @@ public class EdgeVertexList {
                         nodes.remove(n);
                     }
 
+                    if (nodes.size() == 0)
+                        return Collections.emptyIterator();
+
                     return Collections.singleton(new Tuple2<>(t._1,  nodes)).iterator();
                 }).repartition(partition).cache();
 
@@ -125,7 +129,7 @@ public class EdgeVertexList {
         long duration = System.currentTimeMillis() - start;
         JavaRDD<Tuple2<Long, Long>> edges = edgeNodes.map(t -> t._1);
         long edgeCount = edges.count();
-        logDuration("Remaining ir.ac.sbu.graph edge count: " + edgeCount, duration);
+        logDuration("KTruss Edge Count: " + edgeCount, duration);
         sc.close();
     }
 
