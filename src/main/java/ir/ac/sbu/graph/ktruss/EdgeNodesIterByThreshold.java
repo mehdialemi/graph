@@ -185,7 +185,7 @@ public class EdgeNodesIterByThreshold {
                     if (it.hasNext())
                         return it.next();
                     return t._1.iterator().next();
-                }).cache();
+                }).repartition(partition).cache();
 
             edgeNodes.unpersist();
             edgeNodes = nextEdgeNodes;
