@@ -13,7 +13,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/EdgeNodesIterByConstant.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/EdgeNodesIterByConstant.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/EdgeNodesIterByThreshold.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/EdgeNodesIterByThreshold.java" />
     </list>
     <ignored path="graph-processing.iws" />
@@ -50,14 +49,14 @@
       <file leaf-file-name="EdgeNodesIterByThreshold.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/EdgeNodesIterByThreshold.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="104" column="24" selection-start-line="104" selection-start-column="24" selection-end-line="104" selection-end-column="24" />
+            <state relative-caret-position="135">
+              <caret line="66" column="111" selection-start-line="66" selection-start-column="111" selection-end-line="66" selection-end-column="111" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#9100#9101#0" expanded="true" />
-                <element signature="e#9173#9174#0" expanded="true" />
-                <element signature="e#9230#9231#0" expanded="true" />
-                <element signature="e#9288#9289#0" expanded="true" />
+                <element signature="e#9105#9106#0" expanded="true" />
+                <element signature="e#9178#9179#0" expanded="true" />
+                <element signature="e#9235#9236#0" expanded="true" />
+                <element signature="e#9293#9294#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -1397,14 +1396,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/EdgeNodesIterByThreshold.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="104" column="24" selection-start-line="104" selection-start-column="24" selection-end-line="104" selection-end-column="24" />
+        <state relative-caret-position="135">
+          <caret line="66" column="111" selection-start-line="66" selection-start-column="111" selection-end-line="66" selection-end-column="111" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#9100#9101#0" expanded="true" />
-            <element signature="e#9173#9174#0" expanded="true" />
-            <element signature="e#9230#9231#0" expanded="true" />
-            <element signature="e#9288#9289#0" expanded="true" />
+            <element signature="e#9105#9106#0" expanded="true" />
+            <element signature="e#9178#9179#0" expanded="true" />
+            <element signature="e#9235#9236#0" expanded="true" />
+            <element signature="e#9293#9294#0" expanded="true" />
           </folding>
         </state>
       </provider>
