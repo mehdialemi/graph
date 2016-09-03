@@ -55,9 +55,9 @@ case $task in
 	;;
 	"KT_EVL") main_class="ir.ac.sbu.graph.ktruss.EdgeVertexList"
 	;;
-	"KT_EVL_ITER") main_class="ir.ac.sbu.graph.ktruss.EdgeVertexListIter"
+	"KT_EVL_ITER") main_class="ir.ac.sbu.graph.ktruss.EdgeNodesIterByThreshold"
 	;;
-	"KT_EVL_ITER2") main_class="ir.ac.sbu.graph.ktruss.EdgeVertexListIter2"
+	"KT_EVL_ITER2") main_class="ir.ac.sbu.graph.ktruss.EdgeNodesIterByConstant"
 	;;
 	"KT_Cohen") main_class="ir.ac.sbu.graph.ktruss.Cohen"
 	;;
