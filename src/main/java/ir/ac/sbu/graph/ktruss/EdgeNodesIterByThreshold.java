@@ -66,7 +66,7 @@ public class EdgeNodesIterByThreshold {
         int prevStepCount = currStepCount;
         while (!stop) {
             // if we currStep is higher prevStepCount then lastMaxSup was good so use it again.
-            final int maxSup = minSup + currStepCount > prevStepCount ? lastMaxSup : Math.max(currStepCount, minSup);
+            final int maxSup = minSup + (currStepCount > prevStepCount ? lastMaxSup : Math.max(currStepCount, minSup));
             lastMaxSup = maxSup;
             prevStepCount = currStepCount;
             log("iteration: " + ++iteration + ", maxSup: " + maxSup + ", minSup: " + minSup);
