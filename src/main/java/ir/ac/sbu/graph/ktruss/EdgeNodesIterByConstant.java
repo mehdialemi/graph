@@ -27,6 +27,10 @@ public class EdgeNodesIterByConstant {
             k = Integer.parseInt(args[2]);
         final int minSup = k - 2;
 
+        int constant = 1;
+        if (args.length > 3)
+            constant = Integer.parseInt(args[3]);
+
         SparkConf conf = new SparkConf();
         if (args.length == 0)
             conf.setMaster("local[2]");
@@ -59,7 +63,7 @@ public class EdgeNodesIterByConstant {
 
         JavaPairRDD<Tuple2<Long, Long>, List<Long>> empty = sc.emptyRDD().mapToPair(t -> new Tuple2<>(new Tuple2<>(0L, 0L), new ArrayList<Long>(1)));
         while (!stop) {
-            final int maxSup = minSup + 2;
+            final int maxSup = minSup + constant;
             log("iteration: " + ++iteration + ", maxSup: " + maxSup + ", minSup: " + minSup);
 
             JavaPairRDD<Tuple2<Long, Long>, List<Long>> partialEdgeNodes = edgeNodes.filter(e -> e._2.size() < maxSup).cache();

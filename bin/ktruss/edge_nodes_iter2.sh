@@ -3,4 +3,4 @@
 export GRAPH_INPUT="soc-LiveJournal"
 export PARTITIONS=150
 
-bin/run_experiments.sh KT_EVL_ITER2 5
+bin/run_experiments.sh KT_EVL_ITER2 5 1
