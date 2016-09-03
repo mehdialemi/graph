@@ -61,15 +61,15 @@ public class EdgeVertexListMultiStep {
         boolean stop = false;
 
         JavaPairRDD<Tuple2<Long, Long>, List<Long>> empty = sc.emptyRDD().mapToPair(t -> new Tuple2<>(new Tuple2<>(0L, 0L), new ArrayList<Long>(1)));
-        int currSteps = minSup;
+        int currStepCount = minSup;
         float diffTimeRatio = 0.2f;
         int lastMaxSup = 0;
-        int prevSteps = currSteps;
+        int prevSteps = currStepCount;
         while (!stop) {
             // if we currStep is higher prevSteps then lastMaxSup was good so use it again.
-            final int maxSup = currSteps > prevSteps ? lastMaxSup : minSup + Math.min(currSteps, minSup);
+            final int maxSup = currStepCount > prevSteps ? lastMaxSup : minSup + Math.min(currStepCount, minSup);
             lastMaxSup = maxSup;
-            prevSteps = currSteps;
+            prevSteps = currStepCount;
             log("iteration: " + ++iteration + ", maxSup: " + maxSup + ", minSup: " + minSup);
 //            log("total edges: " + edgeNodes.count());
 
@@ -78,17 +78,18 @@ public class EdgeVertexListMultiStep {
 
             JavaPairRDD<Tuple2<Long, Long>, List<Long>> toRemoveEdges = empty;
 
-            currSteps = 0;
+            currStepCount = 0;
             long t1 = System.currentTimeMillis();
             long t2;
             long prevDuration = 0;
             long diffThreshold = 0;
+            long invalidEdgeCount = 0;
             while (!stop) {
                 JavaPairRDD<Tuple2<Long, Long>, List<Long>> invalidEdges = partialEdgeNodes.filter(en -> en._2.size() < minSup);
-                long invalidEdgeCount = invalidEdges.count();
+                invalidEdgeCount = invalidEdges.count();
                 log("invalid edge count: " + invalidEdgeCount);
                 if (invalidEdgeCount == 0) {
-                    if (currSteps == 0)
+                    if (currStepCount == 0)
                         stop = true;
                     break;
                 } else {
@@ -96,11 +97,11 @@ public class EdgeVertexListMultiStep {
                 }
 
                 long stepDuration = (t2 - t1);
-                logDuration("step: " + currSteps, stepDuration);
-                if (currSteps == 0) {
+                logDuration("step: " + currStepCount, stepDuration);
+                if (currStepCount == 0) {
                     diffThreshold = (long) (stepDuration * diffTimeRatio);
-                    log("step: " + currSteps + ", diff-threshold: " + diffThreshold / 1000 + " sec");
-                } else if (currSteps > 1 && (stepDuration > diffThreshold && (stepDuration - prevDuration < diffThreshold))) {
+                    log("step: " + currStepCount + ", diff-threshold: " + diffThreshold / 1000 + " sec");
+                } else if (currStepCount > 1 && (stepDuration > diffThreshold && (stepDuration - prevDuration < diffThreshold))) {
                     break;
                 }
                 prevDuration = stepDuration;
@@ -161,31 +162,47 @@ public class EdgeVertexListMultiStep {
                     newEdgeNodes.filter(t -> t._2._1).mapValues(t -> t._2).cache();
                 partialEdgeNodes.unpersist();
                 partialEdgeNodes = nextEdgeNodes;
-                currSteps ++;
+                currStepCount ++;
             }
 
-            JavaPairRDD<Tuple2<Long, Long>, List<Long>> nextEdgeNodes =
-                edgeNodes.filter(t -> t._2.size() >= maxSup).cogroup(toRemoveEdges).flatMapToPair(t -> {
-                Iterator<List<Long>> it = t._2._1.iterator();
-                if (!it.hasNext())
-                    return Collections.emptyIterator();
+            if (currStepCount > 0 && toRemoveEdges.count() == 0) {
+                stop = true;
+            }
 
-                List<Long> nodes = it.next();
+            JavaPairRDD<Tuple2<Long, Long>, List<Long>> nextEdgeNodes;
+            if (toRemoveEdges.count() == 0) {
+                if (invalidEdgeCount == 0)
+                    stop = true;
+                nextEdgeNodes = edgeNodes.filter(t -> t._2.size() >= maxSup).cogroup(partialEdgeNodes, partition).mapValues(t -> {
+                        Iterator<List<Long>> it = t._2.iterator();
+                        if (it.hasNext())
+                            return it.next();
+                        return t._1.iterator().next();
+                    }).cache();
+            } else {
+                nextEdgeNodes = edgeNodes.filter(t -> t._2.size() >= maxSup).cogroup(toRemoveEdges).flatMapToPair(t -> {
+                        Iterator<List<Long>> it = t._2._1.iterator();
+                        if (!it.hasNext())
+                            return Collections.emptyIterator();
 
-                for (List<Long> n : t._2._2) {
-                    nodes.removeAll(n);
-                }
+                        List<Long> nodes = it.next();
 
-                if (nodes.size() == 0)
-                    return Collections.emptyIterator();
+                        for (List<Long> n : t._2._2) {
+                            nodes.removeAll(n);
+                        }
 
-                return Collections.singleton(new Tuple2<>(t._1, nodes)).iterator();
-            }).cogroup(partialEdgeNodes, partition).mapValues(t -> {
-                    Iterator<List<Long>> it = t._2.iterator();
-                    if (it.hasNext())
-                        return it.next();
-                    return t._1.iterator().next();
-                }).cache();
+                        if (nodes.size() == 0)
+                            return Collections.emptyIterator();
+
+                        return Collections.singleton(new Tuple2<>(t._1, nodes)).iterator();
+                    }).cogroup(partialEdgeNodes, partition).mapValues(t -> {
+                        Iterator<List<Long>> it = t._2.iterator();
+                        if (it.hasNext())
+                            return it.next();
+                        return t._1.iterator().next();
+                    }).cache();
+            }
+
 
             edgeNodes.unpersist();
             edgeNodes = nextEdgeNodes;
