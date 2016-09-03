@@ -39,22 +39,7 @@ public class EdgeNodesIterByThreshold {
 
         long start = System.currentTimeMillis();
 
-        JavaRDD<Tuple3<Long, Long, Long>> allTriangles = RebuildTriangles.listTriangles(sc, inputPath, partition);
-
-        JavaPairRDD<Tuple2<Long, Long>, List<Long>> edgeNodes = allTriangles.flatMapToPair(t -> {
-            List<Tuple2<Tuple2<Long, Long>, Long>> list = new ArrayList<>(3);
-            Tuple2<Long, Long> e1 = t._1() < t._2() ? new Tuple2<>(t._1(), t._2()) : new Tuple2<>(t._2(), t._1());
-            Tuple2<Long, Long> e2 = t._1() < t._3() ? new Tuple2<>(t._1(), t._3()) : new Tuple2<>(t._3(), t._1());
-            Tuple2<Long, Long> e3 = t._2() < t._3() ? new Tuple2<>(t._2(), t._3()) : new Tuple2<>(t._3(), t._2());
-            list.add(new Tuple2<>(e1, t._3()));
-            list.add(new Tuple2<>(e2, t._2()));
-            list.add(new Tuple2<>(e3, t._1()));
-            return list.iterator();
-        }).groupByKey().mapValues(t -> {
-            List<Long> list = new ArrayList<>();
-            t.forEach(node -> list.add(node));
-            return list;
-        }).repartition(partition).cache();
+        JavaPairRDD<Tuple2<Long, Long>, List<Long>> edgeNodes = RebuildTriangles.listEdgeNodes(sc, inputPath, partition);
 
         int iteration = 0;
         boolean stop = false;

@@ -11,10 +11,7 @@ import scala.Tuple2;
 import scala.Tuple3;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  *
@@ -48,7 +45,7 @@ public class RebuildTriangles {
         long start = System.currentTimeMillis();
 
         JavaRDD<Tuple3<Long, Long, Long>> triangles = listTriangles(sc, inputPath, partition)
-            .repartition(partition).cache();
+                .repartition(partition).cache();
 
         int iteration = 0;
         boolean stop = false;
@@ -75,10 +72,10 @@ public class RebuildTriangles {
             }
 
             JavaRDD<Tuple3<Long, Long, Long>> invalidTriangles = invalidEdges.repartition(partition)
-                .distinct().map(t -> t._1.createTuple3());
+                    .distinct().map(t -> t._1.createTuple3());
 
             JavaRDD<Tuple3<Long, Long, Long>> newTriangles = triangles.subtract(invalidTriangles).repartition
-                (partition).cache();
+                    (partition).cache();
             triangles.unpersist();
             triangles = newTriangles;
         }
@@ -135,28 +132,70 @@ public class RebuildTriangles {
 
         JavaPairRDD<Long, long[]> candidates = FonlDegTC.generateCandidates(fonl, true);
         return candidates.cogroup(fonl, partition).flatMap(t -> {
-                List<Tuple3<Long, Long, Long>> triangles = new ArrayList<>();
-                Iterator<long[]> iterator = t._2._2.iterator();
-                if (!iterator.hasNext())
-                    return triangles.iterator();
-
-                long[] hDegs = iterator.next();
-
-                iterator = t._2._1.iterator();
-                if (!iterator.hasNext())
-                    return triangles.iterator();
-
-                Arrays.sort(hDegs, 1, hDegs.length);
-
-                do {
-                    long[] forward = iterator.next();
-                    List<Long> common = GraphUtils.sortedIntersection(hDegs, forward, 1, 1);
-                    for (long v : common)
-                        triangles.add(GraphUtils.createSorted(forward[0], t._1, v));
-                } while (iterator.hasNext());
-
+            List<Tuple3<Long, Long, Long>> triangles = new ArrayList<>();
+            Iterator<long[]> iterator = t._2._2.iterator();
+            if (!iterator.hasNext())
                 return triangles.iterator();
-            });
+
+            long[] hDegs = iterator.next();
+
+            iterator = t._2._1.iterator();
+            if (!iterator.hasNext())
+                return triangles.iterator();
+
+            Arrays.sort(hDegs, 1, hDegs.length);
+
+            do {
+                long[] forward = iterator.next();
+                List<Long> common = GraphUtils.sortedIntersection(hDegs, forward, 1, 1);
+                for (long v : common)
+                    triangles.add(GraphUtils.createSorted(forward[0], t._1, v));
+            } while (iterator.hasNext());
+
+            return triangles.iterator();
+        });
+    }
+
+    public static JavaPairRDD<Tuple2<Long, Long>, List<Long>> listEdgeNodes(JavaSparkContext sc, String inputPath,
+                                                                            int partition) {
+        JavaPairRDD<Long, long[]> fonl = FonlUtils.loadFonl(sc, inputPath, partition);
+
+        // Partition based on degree. To balance workload, it is better to have a partitioning mechanism that
+        // for example a vertex with high number of higherIds (high deg) would be allocated besides vertex with
+        // low number of higherIds (high deg)
+
+        JavaPairRDD<Long, long[]> candidates = FonlDegTC.generateCandidates(fonl, true);
+        return candidates.cogroup(fonl, partition).flatMapToPair(t -> {
+            Iterator<long[]> iterator = t._2._2.iterator();
+            if (!iterator.hasNext())
+                return Collections.emptyIterator();
+
+            long[] hDegs = iterator.next();
+
+            iterator = t._2._1.iterator();
+            if (!iterator.hasNext())
+                return Collections.emptyIterator();
+
+            Arrays.sort(hDegs, 1, hDegs.length);
+
+            List<Tuple2<Tuple2<Long, Long>, Long>> list = new ArrayList<>();
+            do {
+                long[] forward = iterator.next();
+                List<Long> common = GraphUtils.sortedIntersection(hDegs, forward, 1, 1);
+                for (long v : common) {
+                    Tuple3<Long, Long, Long> sorted = GraphUtils.createSorted(forward[0], t._1, v);
+                    list.add(new Tuple2<>(new Tuple2<>(sorted._1(), sorted._2()), sorted._3()));
+                    list.add(new Tuple2<>(new Tuple2<>(sorted._1(), sorted._3()), sorted._2()));
+                    list.add(new Tuple2<>(new Tuple2<>(sorted._2(), sorted._3()), sorted._1()));
+                }
+            } while (iterator.hasNext());
+
+            return list.iterator();
+        }).groupByKey().mapValues(t -> {
+            List<Long> list = new ArrayList<>();
+            t.forEach(node -> list.add(node));
+            return list;
+        });
     }
 
     static void log(String text) {
