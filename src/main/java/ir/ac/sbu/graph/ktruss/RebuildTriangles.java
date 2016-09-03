@@ -7,6 +7,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 import scala.Tuple3;
 
@@ -195,7 +196,7 @@ public class RebuildTriangles {
             List<Long> list = new ArrayList<>();
             t.forEach(node -> list.add(node));
             return list;
-        });
+        }).repartition(partition).persist(StorageLevel.MEMORY_AND_DISK());
     }
 
     static void log(String text) {
