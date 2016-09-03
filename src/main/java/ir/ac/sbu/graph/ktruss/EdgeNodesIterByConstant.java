@@ -137,43 +137,32 @@ public class EdgeNodesIterByConstant {
                     newEdgeNodes.filter(t -> t._2._1).mapValues(t -> t._2).cache();
                 partialEdgeNodes.unpersist();
                 partialEdgeNodes = nextEdgeNodes;
-                currStepCount ++;
+                currStepCount++;
             }
 
-            JavaPairRDD<Tuple2<Long, Long>, List<Long>> nextEdgeNodes;
-            long toRemoveEdgesCount = toRemoveEdges.count();
-            log("to remove edges count: " + toRemoveEdgesCount);
-            if (toRemoveEdgesCount == 0) {
-                stop = true;
-                nextEdgeNodes = edgeNodes.filter(t -> t._2.size() >= maxSup).cogroup(partialEdgeNodes, partition).mapValues(t -> {
-                        Iterator<List<Long>> it = t._2.iterator();
-                        if (it.hasNext())
-                            return it.next();
-                        return t._1.iterator().next();
-                    }).cache();
-            } else {
-                nextEdgeNodes = edgeNodes.filter(t -> t._2.size() >= maxSup).cogroup(toRemoveEdges).flatMapToPair(t -> {
-                        Iterator<List<Long>> it = t._2._1.iterator();
-                        if (!it.hasNext())
-                            return Collections.emptyIterator();
+            JavaPairRDD<Tuple2<Long, Long>, List<Long>> nextEdgeNodes = edgeNodes
+                .filter(t -> t._2.size() >= maxSup)
+                .cogroup(toRemoveEdges).flatMapToPair(t -> {
+                    Iterator<List<Long>> it = t._2._1.iterator();
+                    if (!it.hasNext())
+                        return Collections.emptyIterator();
 
-                        List<Long> nodes = it.next();
+                    List<Long> nodes = it.next();
 
-                        for (List<Long> n : t._2._2) {
-                            nodes.removeAll(n);
-                        }
+                    for (List<Long> n : t._2._2) {
+                        nodes.removeAll(n);
+                    }
 
-                        if (nodes.size() == 0)
-                            return Collections.emptyIterator();
+                    if (nodes.size() == 0)
+                        return Collections.emptyIterator();
 
-                        return Collections.singleton(new Tuple2<>(t._1, nodes)).iterator();
-                    }).cogroup(partialEdgeNodes, partition).mapValues(t -> {
-                        Iterator<List<Long>> it = t._2.iterator();
-                        if (it.hasNext())
-                            return it.next();
-                        return t._1.iterator().next();
-                    }).cache();
-            }
+                    return Collections.singleton(new Tuple2<>(t._1, nodes)).iterator();
+                }).cogroup(partialEdgeNodes, partition).mapValues(t -> {
+                    Iterator<List<Long>> it = t._2.iterator();
+                    if (it.hasNext())
+                        return it.next();
+                    return t._1.iterator().next();
+                }).cache();
 
             edgeNodes.unpersist();
             edgeNodes = nextEdgeNodes;
