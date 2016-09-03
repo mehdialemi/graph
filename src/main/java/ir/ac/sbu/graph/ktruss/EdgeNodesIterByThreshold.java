@@ -100,7 +100,7 @@ public class EdgeNodesIterByThreshold {
                 if (currStepCount == 0) {
                     diffThreshold = (long) (currDuration * diffTimeRatio) + MIN_PLUS_DIFF_THRESHOLD;
                     log("step: " + currStepCount + ", diff-threshold: " + diffThreshold / 1000 + " sec");
-                } else if (currDuration > diffThreshold && (currDuration - prevDuration < diffThreshold)) {
+                } else if (currStepCount > 1 && currDuration > diffThreshold && (currDuration - prevDuration < diffThreshold)) {
                     break;
                 }
                 prevDuration = currDuration;
