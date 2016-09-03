@@ -66,7 +66,7 @@ public class EdgeNodesIterByThreshold {
         int prevStepCount = currStepCount;
         while (!stop) {
             // if we currStep is higher prevStepCount then lastMaxSup was good so use it again.
-            final int maxSup = currStepCount > prevStepCount ? lastMaxSup : minSup + Math.min(currStepCount, minSup);
+            final int maxSup = minSup + currStepCount > prevStepCount ? lastMaxSup : Math.max(currStepCount, minSup);
             lastMaxSup = maxSup;
             prevStepCount = currStepCount;
             log("iteration: " + ++iteration + ", maxSup: " + maxSup + ", minSup: " + minSup);
@@ -163,6 +163,9 @@ public class EdgeNodesIterByThreshold {
                 partialEdgeNodes = nextEdgeNodes;
                 currStepCount++;
             }
+
+            if (stop)
+                break;
 
             JavaPairRDD<Tuple2<Long, Long>, List<Long>> nextEdgeNodes = edgeNodes
                 .filter(t -> t._2.size() >= maxSup)
