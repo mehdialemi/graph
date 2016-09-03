@@ -68,6 +68,7 @@ public class EdgeNodesIterByThreshold {
             long prevDuration = 0;
             long diffThreshold = 0;
             long invalidEdgeCount;
+            float sumDurations = 0;
             while (!stop) {
                 JavaPairRDD<Tuple2<Long, Long>, List<Long>> invalidEdges = partialEdgeNodes.filter(en -> en._2.size() < minSup);
                 invalidEdgeCount = invalidEdges.count();
@@ -81,12 +82,18 @@ public class EdgeNodesIterByThreshold {
                 }
 
                 long currDuration = (t2 - t1);
+
                 logDuration("step: " + currStepCount, currDuration);
                 if (currStepCount == 0) {
                     diffThreshold = (long) (currDuration * diffTimeRatio) + MIN_PLUS_DIFF_THRESHOLD;
                     log("step: " + currStepCount + ", diff-threshold: " + diffThreshold / 1000 + " sec");
-                } else if (currStepCount > 1 && currDuration > diffThreshold && (currDuration - prevDuration < diffThreshold)) {
-                    break;
+                } else {
+                    sumDurations += currDuration;
+                    float avgDuration = sumDurations / (float) currStepCount;
+                    float ratioDuration = (currDuration - prevDuration) / (float) prevDuration;
+                    if (currStepCount > 1 && (currDuration > avgDuration)  &&  ratioDuration > diffTimeRatio) {
+                        break;
+                    }
                 }
                 prevDuration = currDuration;
                 t1 = t2;
