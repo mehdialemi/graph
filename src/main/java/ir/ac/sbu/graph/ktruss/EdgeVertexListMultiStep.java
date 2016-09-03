@@ -96,15 +96,15 @@ public class EdgeVertexListMultiStep {
                     t2 = System.currentTimeMillis();
                 }
 
-                long stepDuration = (t2 - t1);
-                logDuration("step: " + currStepCount, stepDuration);
+                long currDuration = (t2 - t1);
+                logDuration("step: " + currStepCount, currDuration);
                 if (currStepCount == 0) {
-                    diffThreshold = (long) (stepDuration * diffTimeRatio);
+                    diffThreshold = (long) (currDuration * diffTimeRatio) + 1000;
                     log("step: " + currStepCount + ", diff-threshold: " + diffThreshold / 1000 + " sec");
-                } else if (currStepCount > 1 && (stepDuration > diffThreshold && (stepDuration - prevDuration < diffThreshold))) {
+                } else if (currStepCount > 1 && (currDuration > diffThreshold && (currDuration - prevDuration < diffThreshold))) {
                     break;
                 }
-                prevDuration = stepDuration;
+                prevDuration = currDuration;
                 t1 = t2;
 
                 JavaPairRDD<Tuple2<Long, Long>, Long> edgeInvalidNodes = invalidEdges
@@ -165,12 +165,10 @@ public class EdgeVertexListMultiStep {
                 currStepCount ++;
             }
 
-            if (currStepCount > 0 && toRemoveEdges.count() == 0) {
-                stop = true;
-            }
-
             JavaPairRDD<Tuple2<Long, Long>, List<Long>> nextEdgeNodes;
-            if (toRemoveEdges.count() == 0) {
+            long toRemoveEdgesCount = toRemoveEdges.count();
+            log("to remove edges count: " + toRemoveEdgesCount);
+            if (toRemoveEdgesCount == 0) {
                 if (invalidEdgeCount == 0)
                     stop = true;
                 nextEdgeNodes = edgeNodes.filter(t -> t._2.size() >= maxSup).cogroup(partialEdgeNodes, partition).mapValues(t -> {
