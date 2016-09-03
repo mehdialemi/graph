@@ -12,6 +12,8 @@ import java.util.*;
 
 public class EdgeNodesIterByThreshold {
 
+    public static final int MIN_PLUS_DIFF_THRESHOLD = 3000;
+
     public static void main(String[] args) {
         String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
 //        String inputPath = "/home/mehdi/graph-data/cit-Patents.txt";
@@ -61,12 +63,12 @@ public class EdgeNodesIterByThreshold {
         int currStepCount = minSup;
         float diffTimeRatio = 0.2f;
         int lastMaxSup = 0;
-        int prevSteps = currStepCount;
+        int prevStepCount = currStepCount;
         while (!stop) {
-            // if we currStep is higher prevSteps then lastMaxSup was good so use it again.
-            final int maxSup = currStepCount > prevSteps ? lastMaxSup : minSup + Math.min(currStepCount, minSup);
+            // if we currStep is higher prevStepCount then lastMaxSup was good so use it again.
+            final int maxSup = currStepCount > prevStepCount ? lastMaxSup : minSup + Math.min(currStepCount, minSup);
             lastMaxSup = maxSup;
-            prevSteps = currStepCount;
+            prevStepCount = currStepCount;
             log("iteration: " + ++iteration + ", maxSup: " + maxSup + ", minSup: " + minSup);
 //            log("total edges: " + edgeNodes.count());
 
@@ -80,7 +82,7 @@ public class EdgeNodesIterByThreshold {
             long t2;
             long prevDuration = 0;
             long diffThreshold = 0;
-            long invalidEdgeCount = 0;
+            long invalidEdgeCount;
             while (!stop) {
                 JavaPairRDD<Tuple2<Long, Long>, List<Long>> invalidEdges = partialEdgeNodes.filter(en -> en._2.size() < minSup);
                 invalidEdgeCount = invalidEdges.count();
@@ -96,7 +98,7 @@ public class EdgeNodesIterByThreshold {
                 long currDuration = (t2 - t1);
                 logDuration("step: " + currStepCount, currDuration);
                 if (currStepCount == 0) {
-                    diffThreshold = (long) (currDuration * diffTimeRatio) + 1000;
+                    diffThreshold = (long) (currDuration * diffTimeRatio) + MIN_PLUS_DIFF_THRESHOLD;
                     log("step: " + currStepCount + ", diff-threshold: " + diffThreshold / 1000 + " sec");
                 } else if (currDuration > diffThreshold && (currDuration - prevDuration < diffThreshold)) {
                     break;
