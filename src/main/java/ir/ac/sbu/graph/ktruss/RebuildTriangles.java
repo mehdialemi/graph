@@ -193,6 +193,7 @@ public class RebuildTriangles {
                         vList.add(sorted._3());
                     else {
                         vList = new ArrayList<>();
+                        vList.add(sorted._3());
                         eMap.put(e, vList);
                     }
 
@@ -202,6 +203,7 @@ public class RebuildTriangles {
                         vList.add(sorted._2());
                     else {
                         vList = new ArrayList<>();
+                        vList.add(sorted._2());
                         eMap.put(e, vList);
                     }
 
@@ -211,6 +213,7 @@ public class RebuildTriangles {
                         vList.add(sorted._1());
                     else {
                         vList = new ArrayList<>();
+                        vList.add(sorted._1());
                         eMap.put(e, vList);
                     }
                 }
