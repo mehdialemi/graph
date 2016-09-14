@@ -189,21 +189,30 @@ public class RebuildTriangles {
                     Tuple3<Long, Long, Long> sorted = GraphUtils.createSorted(forward[0], t._1, v);
                     Tuple2<Long, Long> e = new Tuple2<>(sorted._1(), sorted._2());
                     List<Long> vList = eMap.get(e);
-                    if (vList == null)
+                    if (vList != null)
+                        vList.add(sorted._3());
+                    else {
                         vList = new ArrayList<>();
-                    vList.add(sorted._3());
+                        eMap.put(e, vList);
+                    }
 
                     e = new Tuple2<>(sorted._1(), sorted._3());
                     vList = eMap.get(e);
-                    if (vList == null)
+                    if (vList != null)
+                        vList.add(sorted._2());
+                    else {
                         vList = new ArrayList<>();
-                    vList.add(sorted._2());
+                        eMap.put(e, vList);
+                    }
 
                     e = new Tuple2<>(sorted._2(), sorted._3());
                     vList = eMap.get(e);
-                    if (vList == null)
+                    if (vList != null)
+                        vList.add(sorted._1());
+                    else {
                         vList = new ArrayList<>();
-                    vList.add(sorted._1());
+                        eMap.put(e, vList);
+                    }
                 }
             } while (iterator.hasNext());
 
