@@ -3,6 +3,7 @@ package ir.ac.sbu.graph.ktruss;
 import ir.ac.sbu.graph.GraphUtils;
 import ir.ac.sbu.graph.clusteringco.FonlDegTC;
 import ir.ac.sbu.graph.clusteringco.FonlUtils;
+
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -179,22 +180,40 @@ public class RebuildTriangles {
 
             Arrays.sort(hDegs, 1, hDegs.length);
 
-            List<Tuple2<Tuple2<Long, Long>, Long>> list = new ArrayList<>();
+            List<Tuple2<Tuple2<Long, Long>, Long[]>> list = new ArrayList<>();
+            Map<Tuple2<Long, Long>, List<Long>> eMap = new HashMap<>();
             do {
                 long[] forward = iterator.next();
                 List<Long> common = GraphUtils.sortedIntersection(hDegs, forward, 1, 1);
                 for (long v : common) {
                     Tuple3<Long, Long, Long> sorted = GraphUtils.createSorted(forward[0], t._1, v);
-                    list.add(new Tuple2<>(new Tuple2<>(sorted._1(), sorted._2()), sorted._3()));
-                    list.add(new Tuple2<>(new Tuple2<>(sorted._1(), sorted._3()), sorted._2()));
-                    list.add(new Tuple2<>(new Tuple2<>(sorted._2(), sorted._3()), sorted._1()));
+                    Tuple2<Long, Long> e = new Tuple2<>(sorted._1(), sorted._2());
+                    List<Long> vList = eMap.get(e);
+                    if (vList == null)
+                        vList = new ArrayList<>();
+                    vList.add(sorted._3());
+
+                    e = new Tuple2<>(sorted._1(), sorted._3());
+                    vList = eMap.get(e);
+                    if (vList == null)
+                        vList = new ArrayList<>();
+                    vList.add(sorted._2());
+
+                    e = new Tuple2<>(sorted._2(), sorted._3());
+                    vList = eMap.get(e);
+                    if (vList == null)
+                        vList = new ArrayList<>();
+                    vList.add(sorted._1());
                 }
             } while (iterator.hasNext());
 
+            for(Map.Entry<Tuple2<Long, Long>, List<Long>> e : eMap.entrySet()) {
+                list.add(new Tuple2<>(e.getKey(), e.getValue().toArray(new Long[0])));
+            }
             return list.iterator();
         }).groupByKey().mapValues(t -> {
             List<Long> list = new ArrayList<>();
-            t.forEach(node -> list.add(node));
+            t.forEach(node -> list.addAll(Arrays.asList(node)));
             return list;
         }).repartition(partition).persist(StorageLevel.MEMORY_AND_DISK());
     }

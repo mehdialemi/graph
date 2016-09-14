@@ -44,7 +44,7 @@ public class EdgeNodesIterByThreshold {
         int iteration = 0;
         boolean stop = false;
 
-        JavaPairRDD<Tuple2<Long, Long>, List<Long>> empty = sc.emptyRDD().mapToPair(t -> new Tuple2<>(new Tuple2<>(0L, 0L), new ArrayList<Long>(1)));
+        JavaPairRDD<Tuple2<Long, Long>, List<Long>> empty = sc.emptyRDD().mapToPair(t -> new Tuple2<>(new Tuple2<>(0L, 0L), new ArrayList<>(1)));
         int currStepCount = minSup;
         float diffTimeRatio = 0.2f;
         int lastMaxSup = 0;
