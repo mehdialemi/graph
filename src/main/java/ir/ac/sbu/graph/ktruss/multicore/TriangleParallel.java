@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
-import static ir.ac.sbu.graph.ktruss.multicore.Utils.createBuckets;
+import static ir.ac.sbu.graph.ktruss.multicore.MultiCoreUtils.createBuckets;
 
 /**
  * Find triangles.
@@ -63,9 +63,9 @@ public class TriangleParallel {
                 Edge e = edges[i];
                 float diff = (degArray[e.v2].get() - degArray[e.v1].get()) + (e.v2 - e.v1) / (float) (e.v2 + e.v1);
                 if (diff >= 0) {
-                    neighbors[e.v1].add(Utils.toLong(e.v2, i));
+                    neighbors[e.v1].add(MultiCoreUtils.toLong(e.v2, i));
                 } else {
-                    neighbors[e.v2].add(Utils.toLong(e.v1, i));
+                    neighbors[e.v2].add(MultiCoreUtils.toLong(e.v1, i));
                 }
             }
         });

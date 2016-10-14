@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static ir.ac.sbu.graph.ktruss.multicore.Utils.createBuckets;
+import static ir.ac.sbu.graph.ktruss.multicore.MultiCoreUtils.createBuckets;
 
 /**
  * Truss Decomposition based on Edge TriangleParallel list.
@@ -40,6 +40,10 @@ public class KTrussParallel {
         if (args.length > 2)
             threads = Integer.parseInt(args[2]);
 
+        int sequentialBucket = 100000;
+        if (args.length > 3)
+            sequentialBucket = Integer.parseInt(args[3]);
+
 
         FileInputStream inputStream = new FileInputStream(inputPath);
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -63,9 +67,11 @@ public class KTrussParallel {
         while (true) {
             System.out.println("iteration: " + ++iteration);
             sorted = sort(eTriangles, sorted, threads, minSup);
+            int seqBucketSize = Math.max(2, sorted._1 / sequentialBucket);
+            threads = threads > seqBucketSize ? seqBucketSize : threads;
 
             System.out.println("Valid edges: " + sorted._2.length);
-            List<Tuple2<Integer, Integer>> buckets = Utils.createBuckets(threads, sorted._1);
+            List<Tuple2<Integer, Integer>> buckets = MultiCoreUtils.createBuckets(threads, sorted._1);
             final int[] etIndex = sorted._2;
             HashSet<Integer> tInvalids = buckets.parallelStream().map(bucket -> {
                 HashSet<Integer> tInvalidLocal = new HashSet<>();

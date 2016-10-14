@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Utility class for multi-core programming
  */
-public class Utils {
+public class MultiCoreUtils {
 
     public static List<Tuple2<Integer, Integer>> createBuckets(int threads, int len) {
         List<Tuple2<Integer, Integer>> starts = new ArrayList<>(threads);
