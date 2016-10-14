@@ -84,13 +84,12 @@ public class TriangleParallel {
         System.out.println("Fill neighbors in " + (t7 - t6) + " ms");
 
         // construct eTriangles
-        Set<Integer>[] eTriangles = new Set[edges.length];
-        buckets = createBuckets(threads, edges);
-        buckets.parallelStream().forEach(bucket ->
-            IntStream.range(bucket._1, bucket._2).forEach(i ->
-                eTriangles[i] = Collections.synchronizedSet(new HashSet<>())));
+//        Set<Integer>[] eTriangles = new Set[edges.length];
+//        buckets = createBuckets(threads, edges);
+//        buckets.parallelStream().forEach(bucket ->
+//            IntStream.range(bucket._1, bucket._2).forEach(i ->
+//                eTriangles[i] = Collections.synchronizedSet(new HashSet<>())));
         long t8 = System.currentTimeMillis();
-        System.out.println("Construct eTriangles in " + (t8 - t7) + " ms");
 
         AtomicInteger triangleOffset = new AtomicInteger(0);
         long count = Arrays.stream(degArray).parallel().filter(d -> d.get() > 1).count();
@@ -98,58 +97,101 @@ public class TriangleParallel {
         buckets = createBuckets(threads, vertices, start);
         long t9 = System.currentTimeMillis();
         System.out.println("Ready to triangle in " + (t9 - t8) + " ms");
-        HashMap<Integer, int[]> trianglesMap = buckets.parallelStream().map(bucket -> {
-            HashMap<Integer, int[]> triangleIndexMap = new HashMap<>();
-            int localTriangleIndex = triangleOffset.getAndAdd(BUCKET_COUNT);
+        final Map<Integer, int[]> triangles = new HashMap<>();
+//        Tuple2<HashMap<Integer, int[]>, Map<Integer, Set<Integer>>> teMap =
+        Map<Integer, Set<Integer>> et = buckets.parallelStream().map(bucket -> {
+//            HashMap<Integer, int[]> triangleIndexMap = new HashMap<>();
+            int triangleIndex = triangleOffset.getAndAdd(BUCKET_COUNT);
+            Map<Integer, Set<Integer>> localET = new HashMap<>();
             for (int i = bucket._2 - 1; i >= bucket._1; i--) {
                 int u = vertices[i];   // get current vertex id as u
 
                 // construct a map of nodes to their edges for u
                 List<Long> uNeighbors = neighbors[u];
                 Map<Integer, Integer> unEdges = new HashMap<>(uNeighbors.size());
-                for (int ni = 0; ni < uNeighbors.size(); ni ++) {
+                for (int ni = 0; ni < uNeighbors.size(); ni++) {
                     long ve = uNeighbors.get(ni);
-                    int v = (int)(ve >> 32);
-                    int e = (int)ve;
+                    int v = (int) (ve >> 32);
+                    int e = (int) ve;
                     unEdges.put(v, e);
                 }
 
                 // iterate over neighbors of u using edge info
-                for (int j = 0; j < uNeighbors.size(); j ++) {
+                for (int j = 0; j < uNeighbors.size(); j++) {
                     long ve = uNeighbors.get(j);
-                    int v = (int)(ve >> 32);
-                    int uv = (int)ve;
+                    int v = (int) (ve >> 32);
+                    int uv = (int) ve;
 
                     // iterate over neighbors of v
                     List<Long> vNeighbors = neighbors[v];
-                    for (int k = 0; k < vNeighbors.size(); k ++) {
+                    for (int k = 0; k < vNeighbors.size(); k++) {
                         long we = vNeighbors.get(k);
-                        int w = (int)(we >> 32);
-                        int vw = (int)we;
+                        int w = (int) (we >> 32);
+                        int vw = (int) we;
 
                         Integer uw = unEdges.get(w);
                         if (uw != null) {
-                            eTriangles[vw].add(localTriangleIndex);
-                            eTriangles[uv].add(localTriangleIndex);
-                            eTriangles[uw].add(localTriangleIndex);
+                            Set<Integer> set = localET.get(vw);
+                            if (set == null) {
+                                set = new HashSet<>();
+                                localET.put(vw, set);
+                            }
+                            set.add(triangleIndex);
 
-                            triangleIndexMap.put(localTriangleIndex, new int[]{vw, uv, uw});
-                            localTriangleIndex++;
-                            if (localTriangleIndex % BUCKET_COUNT == 0)
-                                localTriangleIndex = triangleOffset.getAndAdd(BUCKET_COUNT);
+                            set = localET.get(uv);
+                            if (set == null) {
+                                set = new HashSet<>();
+                                localET.put(uv, set);
+                            }
+                            set.add(triangleIndex);
+
+                            set = localET.get(uw);
+                            if (set == null) {
+                                set = new HashSet<>();
+                                localET.put(uw, set);
+                            }
+                            set.add(triangleIndex);
+
+//                            triangleIndexMap.put(triangleIndex, new int[]{vw, uv, uw});
+                            triangles.put(triangleIndex, new int[]{vw, uv, uw});
+                            triangleIndex++;
+                            if (triangleIndex % BUCKET_COUNT == 0)
+                                triangleIndex = triangleOffset.getAndAdd(BUCKET_COUNT);
                         }
                     }
                 }
             }
-            return triangleIndexMap;
-        }).reduce((map1, map2) -> {
-            map1.putAll(map2);
-            return map1;
+//            return new Tuple2<>(triangleIndexMap, localET);
+            return localET;
+        }).reduce((m1, m2) -> {
+            m2.entrySet().parallelStream().forEach(entry -> {
+                Set<Integer> set = m1.get(entry.getKey());
+                if (set == null)
+                    m1.put(entry.getKey(), entry.getValue());
+                else
+                    set.addAll(entry.getValue());
+            });
+            return m1;
         }).orElse(new HashMap<>());
-
         long t10 = System.currentTimeMillis();
         System.out.println("Triangle finished in " + (t10 - t9) + " ms");
-        return new Tuple2<>(trianglesMap, eTriangles);
+        Set<Integer>[] eTriangles = new Set[edges.length];
+        et.entrySet().parallelStream().forEach(entry -> eTriangles[entry.getKey()] = entry.getValue());
+        long t11 = System.currentTimeMillis();
+        System.out.println("Construct and fill eTriangles in " + (t11 - t10) + " ms");
+//                .reduce((m1, m2) -> {
+//            m1._1.putAll(m2._1);
+//            m2._2.entrySet().parallelStream().forEach(entry -> {
+//                Set<Integer> set = m1._2.get(entry.getKey());
+//                if (set == null)
+//                    m1._2.put(entry.getKey(), entry.getValue());
+//                else
+//                    set.addAll(entry.getValue());
+//            });
+//            return m1;
+//        }).orElse(new Tuple2<>(new HashMap<>(), new HashMap<>()));
+
+        return new Tuple2<>(triangles, eTriangles);
     }
 
     public static int[] sort(AtomicInteger[] degArray, int threads) throws Exception {

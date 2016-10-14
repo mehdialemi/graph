@@ -158,9 +158,10 @@ public class KTrussParallel {
                 }
             } else {
                 for (int i = bucket._1; i < bucket._2; i++) {
-                    if (eTriangles[i] == null || eTriangles[i].isEmpty())
+                    Set<Integer> et = eTriangles[i];
+                    if (et == null || et.isEmpty())
                         continue;
-                    counts[eTriangles[i].size() - min].incrementAndGet();
+                    counts[et.size() - min].incrementAndGet();
                 }
             }
         });
@@ -174,7 +175,10 @@ public class KTrussParallel {
         int[] edges = new int[length];
         if (usePrev) {
             for(int i = prevEdges._1 ; i < prevEdges._2.length ; i ++) {
-                int sup = eTriangles[prevEdges._2[i]].size();
+                Set<Integer> et = eTriangles[prevEdges._2[i]];
+                if (et == null || et.isEmpty())
+                    continue;
+                int sup = et.size();
                 int index = counts[sup - min].getAndDecrement();
                 edges[index] = prevEdges._2[i];
                 if (sup < minSup)
@@ -182,9 +186,10 @@ public class KTrussParallel {
             }
         } else {
             for (int i = eTriangles.length - 1; i >= 0; i--) {
-                if (eTriangles[i] == null || eTriangles[i].isEmpty())
+                Set<Integer> et = eTriangles[i];
+                if (et == null || et.isEmpty())
                     continue;
-                int sup = eTriangles[i].size();
+                int sup = et.size();
                 int index = counts[sup - min].getAndDecrement();
                 edges[index] = i;
                 if (sup < minSup)
