@@ -38,13 +38,14 @@ public class KTrussSequential {
             .filter(e -> e.v1 != e.v2)
             .collect(Collectors.toList());
 
-        long t1 = System.currentTimeMillis();
         final Edge[] edges = list.toArray(new Edge[0]);
         System.out.println("Graph loaded, edges: " + edges.length);
+        long t1 = System.currentTimeMillis();
         Tuple2<List<int[]>, Set<Integer>[]> result = TriangleSequential.findEdgeTriangles(edges);
+        long triangleTime = System.currentTimeMillis() - t1;
         Set<Integer>[] eTriangles = result._2;
         List<int[]> triangles = result._1;
-        System.out.println("After triangle, #edgeTriangles: " + eTriangles.length);
+        System.out.println("Triangle time: " + triangleTime + " , count: " + eTriangles.length);
 
         int[] eSorted = null;
         int iteration = 0;

@@ -54,30 +54,30 @@ public class KTrussParallel {
             .filter(e -> e.v1 != e.v2)
             .collect(Collectors.toList());
 
-        long t1 = System.currentTimeMillis();
         final Edge[] edges = list.toArray(new Edge[0]);
         System.out.println("Graph loaded, edges: " + edges.length);
+        long t1 = System.currentTimeMillis();
         Tuple2<Map<Integer, int[]>, Set<Integer>[]> result = TriangleParallel.findEdgeTriangles(edges, threads);
         Set<Integer>[] eTriangles = result._2;
         Map<Integer, int[]> triangles = result._1;
-        System.out.println("After triangle, #edgeTriangles: " + eTriangles.length);
+        long triangleTime = System.currentTimeMillis() - t1;
+        System.out.println("Triangle time: " + triangleTime + " , count: " + eTriangles.length);
 
         Tuple2<Integer, int[]> sorted = null;
         int iteration = 0;
         while (true) {
             System.out.println("iteration: " + ++iteration);
             sorted = sort(eTriangles, sorted, threads, minSup);
-            int seqBucketSize = Math.max(2, sorted._1 / sequentialBucket);
-            threads = threads > seqBucketSize ? seqBucketSize : threads;
-
-            System.out.println("Valid edges: " + sorted._2.length);
+            System.out.println("Valid edges: " + sorted._2.length + ", to remove" + sorted._1);
             List<Tuple2<Integer, Integer>> buckets = MultiCoreUtils.createBuckets(threads, sorted._1);
             final int[] etIndex = sorted._2;
             HashSet<Integer> tInvalids = buckets.parallelStream().map(bucket -> {
                 HashSet<Integer> tInvalidLocal = new HashSet<>();
-                for (int i = bucket._1; i < bucket._2; i++)
+                for (int i = bucket._1; i < bucket._2; i++) {
                     for (int tIndex : eTriangles[etIndex[i]])
                         tInvalidLocal.add(tIndex);
+                    eTriangles[etIndex[i]] = null;
+                }
                 return tInvalidLocal;
             }).reduce((s1, s2) -> {
                 s1.addAll(s2);
