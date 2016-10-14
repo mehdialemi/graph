@@ -109,6 +109,8 @@ public class KTrussParallel {
             int len = 0;
             if (usePrev) {
                 for (int i = bucket._1 ; i < bucket._2; i ++) {
+                    if (eTriangles[prevEdges._2[i]] == null || eTriangles[prevEdges._2[i]].isEmpty())
+                        continue;
                     int num = eTriangles[prevEdges._2[i]].size();
                     if (num < min) {
                         min = num;
