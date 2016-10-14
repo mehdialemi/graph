@@ -11,15 +11,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Truss Decomposition based on Edge Triangle list.
+ * Truss Decomposition based on Edge TriangleParallel list.
  */
-public class TDET {
+public class KTrussSequential {
 
     public static final double MAX_CHECK_RATIO = 0.3;
 
     public static void main(String[] args) throws Exception {
-//        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
-        String inputPath = "/home/mehdi/graph-data/cit-Patents.txt";
+        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
+//        String inputPath = "/home/mehdi/graph-data/cit-Patents.txt";
 //        String inputPath = "/home/mehdi/graph-data/Email-EuAll.txt";
         if (args.length > 0)
             inputPath = args[0];
@@ -41,7 +41,7 @@ public class TDET {
         long t1 = System.currentTimeMillis();
         final Edge[] edges = list.toArray(new Edge[0]);
         System.out.println("Graph loaded, edges: " + edges.length);
-        Tuple2<List<int[]>, Set<Integer>[]> result = Triangle.findEdgeTriangles(edges);
+        Tuple2<List<int[]>, Set<Integer>[]> result = TriangleSequential.findEdgeTriangles(edges);
         Set<Integer>[] eTriangles = result._2;
         List<int[]> triangles = result._1;
         System.out.println("After triangle, #edgeTriangles: " + eTriangles.length);

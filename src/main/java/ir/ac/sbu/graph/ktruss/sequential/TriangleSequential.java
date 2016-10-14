@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * Find triangles.
  */
-public class Triangle {
+public class TriangleSequential {
 
     public static void main(String[] args) throws Exception {
         String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
@@ -118,7 +118,7 @@ public class Triangle {
     }
 
     public static Tuple2<List<int[]>, Set<Integer>[]> findEdgeTriangles(final Edge[] edges) throws Exception {
-        // find max vertex Id
+        // find max vertex Id in parallel
         int max = -1;
         for(Edge e : edges) {
             if (e.v1 > max)
@@ -128,7 +128,7 @@ public class Triangle {
         }
 
         int[] degArray = new int[max + 1];
-        // Construct degree array such that vertexId is the index of the array.
+        // Construct degree array such that vertexId is the index of the array in parallel
         for (Edge e : edges) {
             degArray[e.v1]++;
             degArray[e.v2]++;

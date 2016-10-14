@@ -15,7 +15,7 @@ import java.util.*;
 import static ir.ac.sbu.graph.GraphUtils.VertexDegree;
 
 /**
- * Cohen Triangle listing implementation on Apache Spark
+ * Cohen TriangleParallel listing implementation on Apache Spark
  */
 public class CohenTC {
     public static void main(String[] args) {
