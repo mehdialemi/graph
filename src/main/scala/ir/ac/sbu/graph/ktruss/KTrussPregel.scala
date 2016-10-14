@@ -63,7 +63,7 @@ object KTrussPregel {
         // Create ir.ac.sbu.graph with edge direction from lower degree to higher degree node and edge attribute.
         var graph = Graph(empty, newEdges)
 
-        // In a loop we find triangles and then remove edges lower than specified support
+        // In a loop we find triangles and then remove edges lower than specified sup
         var stop = false
         var iteration  = 0
         while (!stop) {

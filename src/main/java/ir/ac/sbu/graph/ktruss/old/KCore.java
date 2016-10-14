@@ -57,7 +57,7 @@ public class KCore implements Serializable {
 
             currentFdonl = currentFdonl.subtractByKey(expiredVertices);
 
-            // Join our current Fdonl with the subtract list to update Fdonl information
+            // Join our current Fdonl with the subtract list to updateSup Fdonl information
             currentFdonl.cogroup(subtractList)
                 .mapToPair(new PairFunction<Tuple2<Long, Tuple2<Iterable<FdValue>, Iterable<Iterable<Long>>>>, Long, FdValue>() {
                     @Override

@@ -44,12 +44,13 @@ public class EdgeVertexList {
         do {
             log("iteration: " + ++iteration);
 
-//            log("edgeNodes: " + edgeNodes.count());
+            log("edgeNodes: " + edgeNodes.count());
 
             JavaPairRDD<Tuple2<Long, Long>, List<Long>> invalidEdges =
                 edgeNodes.filter(en -> en._2.size() < support);
 
             long invalidEdgesCount = invalidEdges.count();
+            log("invalidEdgeCount: " + invalidEdgesCount);
             if (invalidEdgesCount == 0) {
                 stop = true;
                 break;

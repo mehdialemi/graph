@@ -42,7 +42,7 @@ public class Cohen {
         // Convert edges to the appropriate structure.
         JavaRDD<Tuple2<Long, Long>> currentEdges = input.map(line -> {
             if (line.startsWith("#"))
-                return null;
+                    return null;
             String[] e = line.split("\\s+");
             long v1 = Long.parseLong(e[0]);
             long v2 = Long.parseLong(e[1]);
@@ -72,7 +72,7 @@ public class Cohen {
 //            long oldEdgeCount = edgeCount.count();
 
             JavaPairRDD<Tuple2<Long, Long>, Boolean> newEdges = edgeCount.mapToPair(t -> {
-                // If triangle count for the current edge is higher than the specified support, then include that edge,
+                // If triangle count for the current edge is higher than the specified sup, then include that edge,
                 // otherwise exclude the current edge.
                 if (t._2 >= support)
                     return new Tuple2<>(t._1, true);
