@@ -119,6 +119,7 @@ public class TriangleSequential {
 
     public static Tuple2<List<int[]>, Set<Integer>[]> findEdgeTriangles(final Edge[] edges) throws Exception {
         // find max vertex Id in parallel
+        long t1 = System.currentTimeMillis();
         int max = -1;
         for(Edge e : edges) {
             if (e.v1 > max)
@@ -126,16 +127,25 @@ public class TriangleSequential {
             if (e.v2 > max)
                 max = e.v2;
         }
+        long t2 = System.currentTimeMillis();
+        System.out.println("Finding max in " + (t2 - t1) + " ms");
 
         int[] degArray = new int[max + 1];
+        long t3 = System.currentTimeMillis();
+        System.out.println("Construct degArray (AtomicInteger) in " + (t3 - t2) + " ms");
+
         // Construct degree array such that vertexId is the index of the array in parallel
         for (Edge e : edges) {
             degArray[e.v1]++;
             degArray[e.v2]++;
         }
+        long t4 = System.currentTimeMillis();
+        System.out.println("Fill degArray in " + (t4 - t3) + " ms");
 
         // Fill and sort vertices array.
         int[] vertices = sort(degArray);
+        long t5 = System.currentTimeMillis();
+        System.out.println("Sort degArray in " + (t5 - t4) + " ms");
 
         // Construct neighborhood
         List<Integer>[] neighbors = new List[vertices.length];
@@ -144,6 +154,8 @@ public class TriangleSequential {
         for(int i = 0; i < vertices.length; i ++) {
             neighbors[vertices[i]] = new ArrayList<>();
         }
+        long t6 = System.currentTimeMillis();
+        System.out.println("Construct neighbors in " + (t6 - t5) + " ms");
 
         // Fill neighbors array
         for(int i = 0 ; i < edges.length ; i ++) {
@@ -157,10 +169,17 @@ public class TriangleSequential {
                 neighbors[e.v2].add(i);
             }
         }
-        System.out.println("Neighbor list is created");
+        long t7 = System.currentTimeMillis();
+        System.out.println("Fill neighbors in " + (t7 - t6) + " ms");
 
         Set<Integer>[] eTriangles = new Set[edges.length];
+        long t8 = System.currentTimeMillis();
+        System.out.println("Construct eTriangles in " + (t8 - t7) + " ms");
+
         List<int[]> triangles = new ArrayList<>();
+
+        long t9 = System.currentTimeMillis();
+        System.out.println("Ready to triangle in " + (t9 - t8) + " ms");
         int triangleIndex = 0;
         for(int i = vertices.length - 1 ; i >= 0 ; i --) {
             int u = vertices[i]; // get current vertex id as u
@@ -204,7 +223,9 @@ public class TriangleSequential {
                 }
             }
         }
-
+        
+        long t10 = System.currentTimeMillis();
+        System.out.println("Triangle finished in " + (t10 - t9) + " ms");
         return new Tuple2<>(triangles, eTriangles);
     }
 

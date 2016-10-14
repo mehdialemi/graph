@@ -19,12 +19,15 @@ public class TriangleParallel {
 
     public static Tuple2<Map<Integer, int[]>, Set<Integer>[]> findEdgeTriangles(final Edge[] edges, int threads) throws Exception {
         // find max vertex Id in parallel
+        long t1 = System.currentTimeMillis();
         List<Tuple2<Integer, Integer>> buckets = createBuckets(threads, edges);
         int max = buckets.parallelStream()
             .map(bucket -> Arrays.stream(edges, bucket._1, bucket._2)
                     .map(e -> Math.max(e.v1, e.v2))
                     .reduce((v1, v2) -> Math.max(v1, v2)).orElse(-1))
             .reduce((m1, m2) -> Math.max(m1, m2)).orElse(-1).intValue();
+        long t2 = System.currentTimeMillis();
+        System.out.println("Finding max in " + (t2 - t1) + " ms");
 
         if (max == -1)
             throw new Exception("Problem in max finding");
@@ -34,6 +37,8 @@ public class TriangleParallel {
         buckets = createBuckets(threads, degArray);
         buckets.parallelStream().forEach(bucket ->
             IntStream.range(bucket._1, bucket._2).forEach(i -> degArray[i] = new AtomicInteger(0)));
+        long t3 = System.currentTimeMillis();
+        System.out.println("Construct degArray (AtomicInteger) in " + (t3 - t2) + " ms");
 
         // Construct degree array such that vertexId is the index of the array in parallel
         buckets = createBuckets(threads, edges);
@@ -43,9 +48,13 @@ public class TriangleParallel {
                     degArray[e.v2].incrementAndGet();
                 })
         );
+        long t4 = System.currentTimeMillis();
+        System.out.println("Fill degArray in " + (t4 - t3) + " ms");
 
         // Fill and sort vertices array.
         int[] vertices = sort(degArray, threads);
+        long t5 = System.currentTimeMillis();
+        System.out.println("Sort degArray in " + (t5 - t4) + " ms");
 
         // Construct neighborhood
         List<Long>[] neighbors = new List[vertices.length];
@@ -55,6 +64,8 @@ public class TriangleParallel {
                 neighbors[v] = Collections.synchronizedList(new ArrayList())
             )
         );
+        long t6 = System.currentTimeMillis();
+        System.out.println("Construct neighbors in " + (t6 - t5) + " ms");
 
         // Fill neighbors array
         buckets = createBuckets(threads, edges);
@@ -69,7 +80,8 @@ public class TriangleParallel {
                 }
             }
         });
-        System.out.println("Neighbor list is created");
+        long t7 = System.currentTimeMillis();
+        System.out.println("Fill neighbors in " + (t7 - t6) + " ms");
 
         // construct eTriangles
         Set<Integer>[] eTriangles = new Set[edges.length];
@@ -77,12 +89,15 @@ public class TriangleParallel {
         buckets.parallelStream().forEach(bucket ->
             IntStream.range(bucket._1, bucket._2).forEach(i ->
                 eTriangles[i] = Collections.synchronizedSet(new HashSet<>())));
+        long t8 = System.currentTimeMillis();
+        System.out.println("Construct eTriangles in " + (t8 - t7) + " ms");
 
         AtomicInteger triangleOffset = new AtomicInteger(0);
         long count = Arrays.stream(degArray).parallel().filter(d -> d.get() > 1).count();
         int start = (int) (vertices.length - count);
         buckets = createBuckets(threads, vertices, start);
-
+        long t9 = System.currentTimeMillis();
+        System.out.println("Ready to triangle in " + (t9 - t8) + " ms");
         HashMap<Integer, int[]> trianglesMap = buckets.parallelStream().map(bucket -> {
             HashMap<Integer, int[]> triangleIndexMap = new HashMap<>();
             int localTriangleIndex = triangleOffset.getAndAdd(BUCKET_COUNT);
@@ -132,6 +147,8 @@ public class TriangleParallel {
             return map1;
         }).orElse(new HashMap<>());
 
+        long t10 = System.currentTimeMillis();
+        System.out.println("Triangle finished in " + (t10 - t9) + " ms");
         return new Tuple2<>(trianglesMap, eTriangles);
     }
 

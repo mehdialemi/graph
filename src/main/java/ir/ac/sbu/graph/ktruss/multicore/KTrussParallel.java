@@ -150,8 +150,12 @@ public class KTrussParallel {
 
         buckets.parallelStream().forEach(bucket -> {
             if (usePrev) {
-                for (int i = bucket._1 ; i < bucket._2 ; i ++)
+                for (int i = bucket._1 ; i < bucket._2 ; i ++) {
+                    Set<Integer> et = eTriangles[prevEdges._2[i]];
+                    if (et == null || et.isEmpty())
+                        continue;
                     counts[eTriangles[prevEdges._2[i]].size() - min].incrementAndGet();
+                }
             } else {
                 for (int i = bucket._1; i < bucket._2; i++) {
                     if (eTriangles[i] == null || eTriangles[i].isEmpty())
