@@ -10,7 +10,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/KTrussParallel.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/KTrussParallel.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/bin/ktruss/subgraph-env.sh" afterPath="$PROJECT_DIR$/bin/subgraph-env.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ktruss/ktruss-parallel.sh" afterPath="$PROJECT_DIR$/bin/ktruss/ktruss-parallel.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ktruss/ktruss-sequential.sh" afterPath="$PROJECT_DIR$/bin/ktruss/ktruss-sequential.sh" />
     </list>
     <ignored path="graph-processing.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -43,21 +45,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="KTrussParallel.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="KTrussParallel.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/KTrussParallel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="111" column="100" selection-start-line="111" selection-start-column="100" selection-end-line="111" selection-end-column="100" />
+            <state relative-caret-position="210">
+              <caret line="118" column="21" selection-start-line="118" selection-start-column="21" selection-end-line="118" selection-end-column="21" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ktruss-parallel.sh" pinned="false" current-in-tab="false">
+      <file leaf-file-name="ktruss-parallel.sh" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/bin/ktruss/ktruss-parallel.sh">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="105">
-              <caret line="7" column="73" selection-start-line="7" selection-start-column="73" selection-end-line="7" selection-end-column="73" />
+              <caret line="7" column="109" selection-start-line="7" selection-start-column="109" selection-end-line="7" selection-end-column="109" />
               <folding />
             </state>
           </provider>
@@ -600,8 +602,18 @@
       <file leaf-file-name="ktruss-sequential.sh" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/bin/ktruss/ktruss-sequential.sh">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+            <state relative-caret-position="60">
+              <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="subgraph-env.sh" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/bin/subgraph-env.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="30">
+              <caret line="2" column="12" selection-start-line="2" selection-start-column="12" selection-end-line="2" selection-end-column="12" />
               <folding />
             </state>
           </provider>
@@ -625,77 +637,6 @@
                 <element signature="e#28584#28585#0" expanded="false" />
                 <element signature="e#29654#29655#0" expanded="false" />
                 <element signature="e#29697#29698#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Arrays.java" pinned="false" current-in-tab="false">
-        <entry file="jar:///usr/local/jvm/jdk1.8.0_92/src.zip!/java/util/Arrays.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="73665">
-              <caret line="5002" column="32" selection-start-line="5002" selection-start-column="32" selection-end-line="5002" selection-end-column="32" />
-              <folding>
-                <element signature="e#0#227755#0" expanded="false" />
-                <element signature="imports" expanded="false" />
-                <element signature="e#3370#3371#0" expanded="false" />
-                <element signature="e#3446#3447#0" expanded="false" />
-                <element signature="e#5027#5028#0" expanded="false" />
-                <element signature="e#5098#5099#0" expanded="false" />
-                <element signature="e#6903#6904#0" expanded="false" />
-                <element signature="e#6974#6975#0" expanded="false" />
-                <element signature="e#8781#8782#0" expanded="false" />
-                <element signature="e#8852#8853#0" expanded="false" />
-                <element signature="e#10659#10660#0" expanded="false" />
-                <element signature="e#10730#10731#0" expanded="false" />
-                <element signature="e#12536#12537#0" expanded="false" />
-                <element signature="e#12595#12596#0" expanded="false" />
-                <element signature="e#14928#14929#0" expanded="false" />
-                <element signature="e#14999#15000#0" expanded="false" />
-                <element signature="e#17889#17890#0" expanded="false" />
-                <element signature="e#17960#17961#0" expanded="false" />
-                <element signature="e#84738#84739#0" expanded="false" />
-                <element signature="e#84795#84796#0" expanded="false" />
-                <element signature="e#88329#88330#0" expanded="false" />
-                <element signature="e#88386#88387#0" expanded="false" />
-                <element signature="e#91921#91922#0" expanded="false" />
-                <element signature="e#91978#91979#0" expanded="false" />
-                <element signature="e#95523#95524#0" expanded="false" />
-                <element signature="e#95580#95581#0" expanded="false" />
-                <element signature="e#99118#99119#0" expanded="false" />
-                <element signature="e#99175#99176#0" expanded="false" />
-                <element signature="e#102793#102794#0" expanded="false" />
-                <element signature="e#102850#102851#0" expanded="false" />
-                <element signature="e#107069#107070#0" expanded="false" />
-                <element signature="e#107126#107127#0" expanded="false" />
-                <element signature="e#111724#111725#0" expanded="false" />
-                <element signature="e#111781#111782#0" expanded="false" />
-                <element signature="e#116612#116613#0" expanded="false" />
-                <element signature="e#116672#116673#0" expanded="false" />
-                <element signature="e#144806#144807#0" expanded="false" />
-                <element signature="e#144883#144884#0" expanded="false" />
-                <element signature="e#177013#177014#0" expanded="false" />
-                <element signature="e#177054#177055#0" expanded="false" />
-                <element signature="e#177353#177354#0" expanded="false" />
-                <element signature="e#177410#177411#0" expanded="false" />
-                <element signature="e#177457#177458#0" expanded="false" />
-                <element signature="e#177496#177497#0" expanded="false" />
-                <element signature="e#177551#177552#0" expanded="false" />
-                <element signature="e#177591#177592#0" expanded="false" />
-                <element signature="e#178082#178083#0" expanded="false" />
-                <element signature="e#178121#178122#0" expanded="false" />
-                <element signature="e#178785#178786#0" expanded="false" />
-                <element signature="e#178832#178833#0" expanded="false" />
-                <element signature="e#178897#178898#0" expanded="false" />
-                <element signature="e#178976#178977#0" expanded="false" />
-                <element signature="e#179525#179526#0" expanded="false" />
-                <element signature="e#179566#179567#0" expanded="false" />
-                <element signature="e#224394#224395#0" expanded="false" />
-                <element signature="e#224447#224448#0" expanded="false" />
-                <element signature="e#225606#225607#0" expanded="false" />
-                <element signature="e#225659#225660#0" expanded="false" />
-                <element signature="e#226830#226831#0" expanded="false" />
-                <element signature="e#226883#226884#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -725,7 +666,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/graph/utils/GraphStat.scala" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/RedisTest.java" />
         <option value="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/redispark/RedisConfig.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/redispark/RedisPartition.scala" />
@@ -770,12 +710,13 @@
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/sequential/Triangle.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/sequential/TriangleSequential.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/TriangleParallel.java" />
-        <option value="$PROJECT_DIR$/bin/ktruss/ktruss-sequential.sh" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/Utils.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/MultiCoreUtils.java" />
-        <option value="$PROJECT_DIR$/bin/ktruss/ktruss-parallel.sh" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/sequential/KTrussSequential.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/KTrussParallel.java" />
+        <option value="$PROJECT_DIR$/bin/ktruss/ktruss-sequential.sh" />
+        <option value="$PROJECT_DIR$/bin/subgraph-env.sh" />
+        <option value="$PROJECT_DIR$/bin/ktruss/ktruss-parallel.sh" />
       </list>
     </option>
   </component>
@@ -1249,15 +1190,15 @@
     <property name="prop_add_unversioned_files" value="true" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/bin/ktruss" />
-      <recent name="$PROJECT_DIR$/bin/utils" />
-      <recent name="$PROJECT_DIR$/bin/cc" />
-    </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="ir.ac.sbu.graph" />
       <recent name="ir.ac.sbu.graph.clusteringco" />
       <recent name="ir.ac.sbu.graph.ktruss" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/bin/ktruss" />
+      <recent name="$PROJECT_DIR$/src/graph/ktruss" />
+      <recent name="$PROJECT_DIR$/src/graph/statistics" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="ir.ac.sbu.graph.ktruss.multicore" />
@@ -1265,10 +1206,11 @@
       <recent name="ir.ac.sbu.redispark" />
       <recent name="graph.clusteringco" />
     </key>
-    <key name="CopyFile.RECENT_KEYS">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/bin" />
       <recent name="$PROJECT_DIR$/bin/ktruss" />
-      <recent name="$PROJECT_DIR$/src/graph/ktruss" />
-      <recent name="$PROJECT_DIR$/src/graph/statistics" />
+      <recent name="$PROJECT_DIR$/bin/utils" />
+      <recent name="$PROJECT_DIR$/bin/cc" />
     </key>
   </component>
   <component name="RunManager" selected="Application.KTrussParallel">
@@ -1874,6 +1816,11 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4695">
           <caret line="336" column="0" selection-start-line="336" selection-start-column="0" selection-end-line="336" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#33182#0" expanded="false" />
+            <element signature="e#33104#33105#0" expanded="false" />
+            <element signature="e#33178#33179#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1917,6 +1864,11 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4695">
           <caret line="336" column="0" selection-start-line="336" selection-start-column="0" selection-end-line="336" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#33182#0" expanded="false" />
+            <element signature="e#33104#33105#0" expanded="false" />
+            <element signature="e#33178#33179#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -2008,6 +1960,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2070">
           <caret line="164" column="12" selection-start-line="164" selection-start-column="12" selection-end-line="164" selection-end-column="12" />
+          <folding>
+            <element signature="e#0#53227#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -2087,13 +2043,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15">
           <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/bin/ktruss/subgraph-env.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="30" />
         </state>
       </provider>
     </entry>
@@ -2696,14 +2645,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/bin/ktruss/ktruss-sequential.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/MultiCoreUtils.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
@@ -2728,14 +2669,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/bin/ktruss/ktruss-parallel.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="73" selection-start-line="7" selection-start-column="73" selection-end-line="7" selection-end-column="73" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/sequential/KTrussSequential.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="566">
@@ -2746,8 +2679,32 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/KTrussParallel.java">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="118" column="21" selection-start-line="118" selection-start-column="21" selection-end-line="118" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bin/ktruss/ktruss-sequential.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bin/subgraph-env.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="12" selection-start-line="2" selection-start-column="12" selection-end-line="2" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bin/ktruss/ktruss-parallel.sh">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
-          <caret line="111" column="100" selection-start-line="111" selection-start-column="100" selection-end-line="111" selection-end-column="100" />
+          <caret line="7" column="109" selection-start-line="7" selection-start-column="109" selection-end-line="7" selection-end-column="109" />
           <folding />
         </state>
       </provider>
