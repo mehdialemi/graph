@@ -223,7 +223,7 @@ public class TriangleSequential {
                 }
             }
         }
-        
+
         long t10 = System.currentTimeMillis();
         System.out.println("Triangle finished in " + (t10 - t9) + " ms");
         return new Tuple2<>(triangles, eTriangles);

@@ -106,7 +106,7 @@ public class TriangleParallel {
 
                 // construct a map of nodes to their edges for u
                 List<Long> uNeighbors = neighbors[u];
-                Map<Integer, Integer> unEdges = new HashMap<>(uNeighbors.size() / 2);
+                Map<Integer, Integer> unEdges = new HashMap<>(uNeighbors.size());
                 for (int ni = 0; ni < uNeighbors.size(); ni ++) {
                     long ve = uNeighbors.get(ni);
                     int v = (int)(ve >> 32);
