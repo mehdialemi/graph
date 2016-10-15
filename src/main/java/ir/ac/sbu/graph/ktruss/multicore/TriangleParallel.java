@@ -100,14 +100,21 @@ public class TriangleParallel {
         int start = (int) (vertices.length - count);
         buckets = createBuckets(threads, vertices, start);
         long t9 = System.currentTimeMillis();
-        System.out.println("Ready to triangle in " + (t9 - t8) + " ms");
+        System.out.println("Ready to triangle in " + (t9 - t8) + " ms with " + buckets.size() + " buckets");
         final Map<Integer, int[]> triangles = new HashMap<>();
 //        Tuple2<HashMap<Integer, int[]>, Map<Integer, Set<Integer>>> teMap =
         Map<Integer, Set<Integer>> et = buckets.parallelStream().map(bucket -> {
 //            HashMap<Integer, int[]> triangleIndexMap = new HashMap<>();
             int triangleIndex = triangleOffset.getAndAdd(BUCKET_COUNT);
             Map<Integer, Set<Integer>> localET = new HashMap<>();
+            int progress = 0;
+            int step = (bucket._2 - bucket._1) / 10;
+            progress = step;
             for (int i = bucket._2 - 1; i >= bucket._1; i--) {
+                if (bucket._2 - i > progress) {
+                    System.out.println("bucket (" + bucket._1 + " , " + bucket._2 + ") progress = " + progress / step);
+                    progress += step;
+                }
                 int u = vertices[i];   // get current vertex id as u
 
                 // construct a map of nodes to their edges for u

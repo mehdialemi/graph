@@ -40,10 +40,7 @@ public class KTrussParallel {
         if (args.length > 2)
             threads = Integer.parseInt(args[2]);
 
-        int sequentialBucket = 100000;
-        if (args.length > 3)
-            sequentialBucket = Integer.parseInt(args[3]);
-
+        System.out.println("Start ktruss with k = " + k + ", threads = " + threads + ", input: " + inputPath);
 
         FileInputStream inputStream = new FileInputStream(inputPath);
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));

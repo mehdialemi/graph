@@ -25,9 +25,10 @@ public class KTrussSequential {
             inputPath = args[0];
 
         int k = 4; // k-truss
-        if (args.length > 2)
+        if (args.length > 1)
             k = Integer.parseInt(args[1]);
         int minSup = k - 2;
+        System.out.println("Start ktruss with k = " + k + ", input: " + inputPath);
 
         FileInputStream inputStream = new FileInputStream(inputPath);
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
