@@ -10,10 +10,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/KTrussParallel.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/KTrussParallel.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/TriangleParallel.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/TriangleParallel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/sequential/KTrussSequential.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/sequential/KTrussSequential.java" />
     </list>
     <ignored path="graph-processing.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -92,8 +89,8 @@
       <file leaf-file-name="TriangleParallel.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/TriangleParallel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="114" column="40" selection-start-line="114" selection-start-column="40" selection-end-line="114" selection-end-column="40" />
+            <state relative-caret-position="207">
+              <caret line="193" column="109" selection-start-line="193" selection-start-column="109" selection-end-line="193" selection-end-column="109" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -1716,8 +1713,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/TriangleParallel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="114" column="40" selection-start-line="114" selection-start-column="40" selection-end-line="114" selection-end-column="40" />
+        <state relative-caret-position="207">
+          <caret line="193" column="109" selection-start-line="193" selection-start-column="109" selection-end-line="193" selection-end-column="109" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

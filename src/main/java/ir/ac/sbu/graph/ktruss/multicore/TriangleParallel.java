@@ -6,6 +6,7 @@ import scala.Tuple2;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static ir.ac.sbu.graph.ktruss.multicore.MultiCoreUtils.createBuckets;
 
@@ -103,7 +104,7 @@ public class TriangleParallel {
         System.out.println("Ready to triangle in " + (t9 - t8) + " ms with " + buckets.size() + " buckets");
         final Map<Integer, int[]> triangles = new HashMap<>();
 //        Tuple2<HashMap<Integer, int[]>, Map<Integer, Set<Integer>>> teMap =
-        Map<Integer, Set<Integer>> et = buckets.parallelStream().map(bucket -> {
+        Stream<Map<Integer, Set<Integer>>> map = buckets.parallelStream().map(bucket -> {
 //            HashMap<Integer, int[]> triangleIndexMap = new HashMap<>();
             int triangleIndex = triangleOffset.getAndAdd(BUCKET_COUNT);
             Map<Integer, Set<Integer>> localET = new HashMap<>();
@@ -112,7 +113,7 @@ public class TriangleParallel {
             progress = step;
             for (int i = bucket._2 - 1; i >= bucket._1; i--) {
                 if (bucket._2 - i > progress) {
-                    System.out.println("bucket (" + bucket._1 + " , " + bucket._2 + ") progress = " + progress / step);
+                    System.out.println("bucket (" + bucket._1 + ") progress = " + progress / step * 10 + "%");
                     progress += step;
                 }
                 int u = vertices[i];   // get current vertex id as u
@@ -172,9 +173,14 @@ public class TriangleParallel {
                     }
                 }
             }
+            System.out.println("Bucket (" + bucket._1 + ") finished");
 //            return new Tuple2<>(triangleIndexMap, localET);
             return localET;
-        }).reduce((m1, m2) -> {
+        });
+        long tMap = System.currentTimeMillis();
+        System.out.println("Map is finished in " + (tMap - t9) + " ms");
+
+        Map<Integer, Set<Integer>> et = map.reduce((m1, m2) -> {
             m2.entrySet().parallelStream().forEach(entry -> {
                 Set<Integer> set = m1.get(entry.getKey());
                 if (set == null)
@@ -185,7 +191,7 @@ public class TriangleParallel {
             return m1;
         }).orElse(new HashMap<>());
         long t10 = System.currentTimeMillis();
-        System.out.println("Triangle finished in " + (t10 - t9) + " ms");
+        System.out.println("Triangle finished in " + (t10 - t9) + " ms, reducer time: " + (t10 - tMap) + " ms");
         Set<Integer>[] eTriangles = new Set[edges.length];
         et.entrySet().parallelStream().forEach(entry -> eTriangles[entry.getKey()] = entry.getValue());
         long t11 = System.currentTimeMillis();
