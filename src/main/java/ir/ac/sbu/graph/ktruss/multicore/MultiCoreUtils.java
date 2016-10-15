@@ -52,8 +52,4 @@ public class MultiCoreUtils {
         }
         return starts;
     }
-
-    public static long toLong(int a, int b) {
-        return (long)a << 32 | b & 0xFFFFFFFFL;
-    }
 }

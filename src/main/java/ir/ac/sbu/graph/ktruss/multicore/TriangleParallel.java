@@ -61,7 +61,7 @@ public class TriangleParallel {
         buckets = createBuckets(threads, vertices);
         buckets.parallelStream().forEach(bucket ->
             Arrays.stream(vertices, bucket._1, bucket._2).forEach(v ->
-                neighbors[v] = Collections.synchronizedList(new ArrayList())
+                neighbors[v] = new ArrayList()
             )
         );
         long t6 = System.currentTimeMillis();
@@ -74,9 +74,13 @@ public class TriangleParallel {
                 Edge e = edges[i];
                 float diff = (degArray[e.v2].get() - degArray[e.v1].get()) + (e.v2 - e.v1) / (float) (e.v2 + e.v1);
                 if (diff >= 0) {
-                    neighbors[e.v1].add(MultiCoreUtils.toLong(e.v2, i));
+                    synchronized (degArray[e.v1]) {
+                        neighbors[e.v1].add((long) e.v2 << 32 | i & 0xFFFFFFFFL);
+                    }
                 } else {
-                    neighbors[e.v2].add(MultiCoreUtils.toLong(e.v1, i));
+                    synchronized (degArray[e.v2]) {
+                        neighbors[e.v2].add((long) e.v1 << 32 | i & 0xFFFFFFFFL);
+                    }
                 }
             }
         });
