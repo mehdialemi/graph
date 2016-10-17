@@ -77,6 +77,8 @@ public class KTrussParallel {
             for(int i = 0 ; i < threads; i ++)
                 tInvalids[i] = new HashSet<>();
 
+            Arrays.sort(etIndex, 0, sorted._1);
+            
             IntStream.range(0, threads).parallel().forEach(index -> {
                 Tuple2<Integer, Integer> bucket = buckets.get(index);
                 for (int i = bucket._1; i < bucket._2; i++) {

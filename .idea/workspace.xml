@@ -7,12 +7,11 @@
   </component>
   <component name="BookmarkManager">
     <bookmark url="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/sequential/TriangleSequential.java" line="165" />
+    <bookmark url="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/sequential/KTrussSequential.java" line="58" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ktruss/ktruss-sequential.sh" afterPath="$PROJECT_DIR$/bin/ktruss/ktruss-sequential.sh" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/KTrussParallel.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/KTrussParallel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/sequential/KTrussSequential.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/sequential/KTrussSequential.java" />
     </list>
     <ignored path="graph-processing.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -35,21 +34,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="KTrussParallel.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="KTrussParallel.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/KTrussParallel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="566">
-              <caret line="108" column="96" selection-start-line="108" selection-start-column="96" selection-end-line="108" selection-end-column="96" />
+            <state relative-caret-position="210">
+              <caret line="80" column="12" selection-start-line="80" selection-start-column="12" selection-end-line="80" selection-end-column="12" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="KTrussSequential.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="KTrussSequential.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/sequential/KTrussSequential.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="506">
-              <caret line="89" column="12" selection-start-line="89" selection-start-column="12" selection-end-line="89" selection-end-column="12" />
+            <state relative-caret-position="240">
+              <caret line="67" column="27" selection-start-line="67" selection-start-column="27" selection-end-line="67" selection-end-column="27" />
               <folding />
             </state>
           </provider>
@@ -257,8 +256,8 @@
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/MultiCoreUtils.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/TriangleParallel.java" />
         <option value="$PROJECT_DIR$/bin/ktruss/ktruss-sequential.sh" />
-        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/KTrussParallel.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/sequential/KTrussSequential.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/KTrussParallel.java" />
       </list>
     </option>
   </component>
@@ -1748,18 +1747,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/KTrussParallel.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/sequential/KTrussSequential.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="566">
-          <caret line="108" column="96" selection-start-line="108" selection-start-column="96" selection-end-line="108" selection-end-column="96" />
+        <state relative-caret-position="240">
+          <caret line="67" column="27" selection-start-line="67" selection-start-column="27" selection-end-line="67" selection-end-column="27" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/sequential/KTrussSequential.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/KTrussParallel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="506">
-          <caret line="89" column="12" selection-start-line="89" selection-start-column="12" selection-end-line="89" selection-end-column="12" />
+        <state relative-caret-position="210">
+          <caret line="80" column="12" selection-start-line="80" selection-start-column="12" selection-end-line="80" selection-end-column="12" />
           <folding />
         </state>
       </provider>
