@@ -58,7 +58,7 @@ public class KTrussSequential {
             long t2_sort = System.currentTimeMillis();
             System.out.println("Valid edges: " + sorted.length + ", sort time: " + (t2_sort - t1_sort) + " ms");
             lastIndex = 0;
-            HashSet<Integer> tInvalids = new HashSet<>();
+//            HashSet<Integer> tInvalids = new HashSet<>();
             for (; lastIndex < sorted.length; lastIndex++) {
                 int eIndex = sorted[lastIndex];
                 Set<Integer> tSet = eTriangles[eIndex]; // triangle set
@@ -68,7 +68,7 @@ public class KTrussSequential {
                 for (int tIndex : tSet) {
 //                    tInvalids.add(tIndex);
                     for (int e : triangles.get(tIndex))
-                        if (eTriangles[e] != null)
+                        if (eTriangles[e] != null && e != eIndex)
                             eTriangles[e].remove(tIndex);
                 }
                 eTriangles[eIndex] = null;
