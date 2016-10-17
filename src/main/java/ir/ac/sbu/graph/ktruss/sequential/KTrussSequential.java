@@ -65,8 +65,12 @@ public class KTrussSequential {
                 int sup = tSet.size();
                 if (sup >= minSup)
                     break;
-                for (int tIndex : tSet)
-                    tInvalids.add(tIndex);
+                for (int tIndex : tSet) {
+//                    tInvalids.add(tIndex);
+                    for (int e : triangles.get(tIndex))
+                        if (eTriangles[e] != null)
+                            eTriangles[e].remove(tIndex);
+                }
                 eTriangles[eIndex] = null;
             }
 
@@ -75,16 +79,16 @@ public class KTrussSequential {
 
             long t2_findInvalids = System.currentTimeMillis();
             System.out.println("invalid time: " + (t2_findInvalids - t2_sort) + " ms");
+//
+//            for (int tIndex : tInvalids) {
+//                for (int e : triangles.get(tIndex)) {
+//                    if (eTriangles[e] != null)
+//                        eTriangles[e].remove(tIndex);
+//                }
+//            }
 
-            for (int tIndex : tInvalids) {
-                for (int e : triangles.get(tIndex)) {
-                    if (eTriangles[e] != null)
-                        eTriangles[e].remove(tIndex);
-                }
-            }
-
-            long t2_remove = System.currentTimeMillis();
-            System.out.println("remove invalid time: " + (t2_remove - t2_findInvalids) + " ms");
+//            long t2_remove = System.currentTimeMillis();
+//            System.out.println("remove invalid time: " + (t2_remove - t2_findInvalids) + " ms");
         }
 
         long duration = System.currentTimeMillis() - t1;
