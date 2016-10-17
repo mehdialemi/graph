@@ -9,7 +9,6 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -54,18 +53,16 @@ public class KTrussParallel {
         final Edge[] edges = list.toArray(new Edge[0]);
         System.out.println("Graph loaded, edges: " + edges.length);
         long t1 = System.currentTimeMillis();
-        Tuple2<Map<Integer, int[]>, Set<Integer>[]> result = TriangleParallel.findEdgeTriangles(edges, threads);
+        Tuple2<int[][], Set<Integer>[]> result = TriangleParallel.findEdgeTriangles(edges, threads);
         Set<Integer>[] eTriangles = result._2;
-        Map<Integer, int[]> triangles = result._1;
-        long triangleTime = System.currentTimeMillis() - t1;
-        System.out.println("Triangle time: " + triangleTime + " , count: " + eTriangles.length);
+        int[][] triangles = result._1;
 
         Tuple2<Integer, int[]> sorted = null;
         int iteration = 0;
         while (true) {
             System.out.println("iteration: " + ++iteration);
             sorted = sort(eTriangles, sorted, threads, minSup);
-            System.out.println("Valid edges: " + sorted._2.length + ", to remove" + sorted._1);
+            System.out.println("Valid edges: " + sorted._2.length + ", to remove: " + sorted._1);
             List<Tuple2<Integer, Integer>> buckets = MultiCoreUtils.createBuckets(threads, sorted._1);
             final int[] etIndex = sorted._2;
             HashSet<Integer> tInvalids = buckets.parallelStream().map(bucket -> {
@@ -82,7 +79,7 @@ public class KTrussParallel {
             }).orElse(new HashSet<>());
 
             tInvalids.parallelStream().forEach(tIndex -> {
-                for (int e : triangles.get(tIndex)) {
+                for (int e : triangles[tIndex]) {
                     if (eTriangles[e] != null)
                         eTriangles[e].remove(tIndex);
                 }
@@ -99,7 +96,7 @@ public class KTrussParallel {
         final boolean usePrev = prevEdges == null || prevEdges._2 == null ||
             (prevEdges != null && prevEdges._1 < prevEdges._2.length * MAX_CHECK_RATIO) ? false : true;
         List<Tuple2<Integer, Integer>> buckets =
-            usePrev ? createBuckets(threads, prevEdges._2, prevEdges._1) : createBuckets(threads, eTriangles);
+            usePrev ? createBuckets(threads, prevEdges._1, prevEdges._2.length) : createBuckets(threads, eTriangles.length);
         Tuple3<Integer, Integer, Integer> minMaxLen = buckets.parallelStream().map(bucket -> {
             int min = eTriangles.length;
             int max = 0;

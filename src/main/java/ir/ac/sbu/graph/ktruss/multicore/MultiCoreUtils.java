@@ -11,45 +11,25 @@ import java.util.List;
 public class MultiCoreUtils {
 
     public static List<Tuple2<Integer, Integer>> createBuckets(int threads, int len) {
+        return createBuckets(threads, 0, len);
+    }
+
+    public static List<Tuple2<Integer, Integer>> createBuckets(int threads, int offset, int len) {
         List<Tuple2<Integer, Integer>> starts = new ArrayList<>(threads);
-        int bucket = len / threads;
+        int bucketLen = (len - offset) / threads;
+        int startIndex = offset;
         for (int i = 0; i < threads; i++) {
-            int start = i * bucket;
             if (i == threads - 1)
-                starts.add(new Tuple2<>(start, len));
+                starts.add(new Tuple2<>(startIndex, len));
             else
-                starts.add(new Tuple2<>(start, start + bucket));
+                starts.add(new Tuple2<>(startIndex, startIndex + bucketLen));
+            startIndex += bucketLen;
         }
         return starts;
     }
 
-    public static <T> List<Tuple2<Integer, Integer>> createBuckets(int threads, T[] list) {
-        List<Tuple2<Integer, Integer>> starts = new ArrayList<>(threads);
-        int bucket = list.length / threads;
-        for (int i = 0; i < threads; i++) {
-            int start = i * bucket;
-            if (i == threads - 1)
-                starts.add(new Tuple2<>(start, list.length));
-            else
-                starts.add(new Tuple2<>(start, start + bucket));
-        }
-        return starts;
-    }
+    public static void printBuckets(List<Tuple2<Integer, Integer>> buckets) {
+        buckets.forEach(bucket -> System.err.println(bucket + ", len: " + (bucket._2 - bucket._1)));
 
-    public static List<Tuple2<Integer, Integer>> createBuckets(int threads, int[] list) {
-        return createBuckets(threads, list, 0);
-    }
-
-    public static List<Tuple2<Integer, Integer>> createBuckets(int threads, int[] list, int start) {
-        List<Tuple2<Integer, Integer>> starts = new ArrayList<>(threads);
-        int bucket = (list.length - start) / threads;
-        for (int i = 0; i < threads; i++) {
-            int s = i * bucket;
-            if (i == threads - 1)
-                starts.add(new Tuple2<>(s, list.length));
-            else
-                starts.add(new Tuple2<>(s, s + bucket));
-        }
-        return starts;
     }
 }
