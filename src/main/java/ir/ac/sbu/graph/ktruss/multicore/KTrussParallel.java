@@ -7,11 +7,13 @@ import scala.Tuple3;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static ir.ac.sbu.graph.ktruss.multicore.MultiCoreUtils.createBuckets;
 
@@ -54,38 +56,48 @@ public class KTrussParallel {
         System.out.println("Graph loaded, edges: " + edges.length);
         long t1 = System.currentTimeMillis();
         Tuple2<int[][], Set<Integer>[]> result = TriangleParallel.findEdgeTriangles(edges, threads);
+        long triangleTime = System.currentTimeMillis() - t1;
         Set<Integer>[] eTriangles = result._2;
         int[][] triangles = result._1;
+        System.out.println("Triangle time: " + triangleTime);
 
         Tuple2<Integer, int[]> sorted = null;
         int iteration = 0;
         while (true) {
             System.out.println("iteration: " + ++iteration);
+            long t1_sort = System.currentTimeMillis();
             sorted = sort(eTriangles, sorted, threads, minSup);
-            System.out.println("Valid edges: " + sorted._2.length + ", to remove: " + sorted._1);
+            long t2_sort = System.currentTimeMillis();
+            System.out.println("Valid edges: " + sorted._2.length + ", sort time: " + (t2_sort - t1_sort) + " ms");
             List<Tuple2<Integer, Integer>> buckets = MultiCoreUtils.createBuckets(threads, sorted._1);
-            final int[] etIndex = sorted._2;
-            HashSet<Integer> tInvalids = buckets.parallelStream().map(bucket -> {
-                HashSet<Integer> tInvalidLocal = new HashSet<>();
-                for (int i = bucket._1; i < bucket._2; i++) {
-                    for (int tIndex : eTriangles[etIndex[i]])
-                        tInvalidLocal.add(tIndex);
-                    eTriangles[etIndex[i]] = null;
-                }
-                return tInvalidLocal;
-            }).reduce((s1, s2) -> {
-                s1.addAll(s2);
-                return s1;
-            }).orElse(new HashSet<>());
-
-            tInvalids.parallelStream().forEach(tIndex -> {
-                for (int e : triangles[tIndex]) {
-                    if (eTriangles[e] != null)
-                        eTriangles[e].remove(tIndex);
-                }
-            });
             if (sorted._1 == 0)
                 break;
+            final int[] etIndex = sorted._2;
+            HashSet<Integer>[] tInvalids = new HashSet[threads];
+            for(int i = 0 ; i < threads; i ++)
+                tInvalids[i] = new HashSet<>();
+
+            IntStream.range(0, threads).parallel().forEach(index -> {
+                Tuple2<Integer, Integer> bucket = buckets.get(index);
+                for (int i = bucket._1; i < bucket._2; i++) {
+                    for (int tIndex : eTriangles[etIndex[i]])
+                        tInvalids[index].add(tIndex);
+                    eTriangles[etIndex[i]] = null;
+                }
+            });
+            long t2_findInvalids = System.currentTimeMillis();
+            System.out.println("invalid time: " + (t2_findInvalids - t2_sort) + " ms");
+
+            Arrays.stream(tInvalids).parallel().forEach(invalids -> {
+                for (int tIndex : invalids) {
+                    for (int e : triangles[tIndex]) {
+                        if (eTriangles[e] != null)
+                            eTriangles[e].remove(tIndex);
+                    }
+                }
+            });
+            long t2_remove = System.currentTimeMillis();
+            System.out.println("remove invalid time: " + (t2_remove - t2_findInvalids) + " ms");
         }
 
         long duration = System.currentTimeMillis() - t1;

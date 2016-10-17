@@ -46,30 +46,35 @@ public class KTrussSequential {
         long triangleTime = System.currentTimeMillis() - t1;
         Set<Integer>[] eTriangles = result._2;
         List<int[]> triangles = result._1;
-        System.out.println("Triangle time: " + triangleTime + " , count: " + eTriangles.length);
+        System.out.println("Triangle time: " + triangleTime);
 
-        int[] eSorted = null;
+        int[] sorted = null;
         int iteration = 0;
         int lastIndex = 0;
         while (true) {
             System.out.println("iteration: " + ++iteration);
-            eSorted = sort(eTriangles, eSorted, lastIndex);
-
+            long t1_sort = System.currentTimeMillis();
+            sorted = sort(eTriangles, sorted, lastIndex);
+            long t2_sort = System.currentTimeMillis();
+            System.out.println("Valid edges: " + sorted.length + ", sort time: " + (t2_sort - t1_sort) + " ms");
             lastIndex = 0;
-            System.out.println("Valid edges: " + eSorted.length);
             HashSet<Integer> tInvalids = new HashSet<>();
-            for (; lastIndex < eSorted.length; lastIndex++) {
-                int eIndex = eSorted[lastIndex];
+            for (; lastIndex < sorted.length; lastIndex++) {
+                int eIndex = sorted[lastIndex];
                 Set<Integer> tSet = eTriangles[eIndex]; // triangle set
                 int sup = tSet.size();
                 if (sup >= minSup)
                     break;
-
                 for (int tIndex : tSet)
                     tInvalids.add(tIndex);
-
                 eTriangles[eIndex] = null;
             }
+
+            if (lastIndex == 0)
+                break;
+
+            long t2_findInvalids = System.currentTimeMillis();
+            System.out.println("invalid time: " + (t2_findInvalids - t2_sort) + " ms");
 
             for (int tIndex : tInvalids) {
                 for (int e : triangles.get(tIndex)) {
@@ -78,13 +83,12 @@ public class KTrussSequential {
                 }
             }
 
-            System.out.println("remove: " + lastIndex);
-            if (lastIndex == 0)
-                break;
+            long t2_remove = System.currentTimeMillis();
+            System.out.println("remove invalid time: " + (t2_remove - t2_findInvalids) + " ms");
         }
 
         long duration = System.currentTimeMillis() - t1;
-        System.out.println("Number of edges is " + eSorted.length + ", in " + duration + " ms");
+        System.out.println("Number of edges is " + sorted.length + ", in " + duration + " ms");
     }
 
     public static int[] sort(Set<Integer>[] eTriangles, int[] eSorted, int eIndex) {
