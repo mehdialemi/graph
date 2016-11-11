@@ -15,15 +15,15 @@ public class TriangleParallelExecutor {
     public static final int BUCKET_LEN = 10000;
     public static final Tuple2<Integer, Integer> INVALID_TUPLE2 = new Tuple2<>(-1, -1);
 
-    public static Tuple2<int[][], Set<Integer>[]> findEdgeTriangles(final List<Edge> edges, final int threads, ForkJoinPool forkJoinPool) throws Exception {
-        ExecutorService executorService = Executors.newFixedThreadPool(threads);
+    public static Tuple2<int[][], Set<Integer>[]> findEdgeTriangles(final List<Edge> edges, final int threads, ForkJoinPool forkJoinPool)
+        throws Exception {
         // find max vertex Id in parallel
         long t1 = System.currentTimeMillis();
         final List<Tuple2<Integer, Integer>> edgeBuckets = createBuckets(threads, edges.size());
         int max = forkJoinPool.submit(() -> {
             return edgeBuckets.parallelStream().mapToInt(bucket -> {
                 int maxV = 0;
-                for(int i = bucket._1; i < bucket._2; i ++) {
+                for (int i = bucket._1; i < bucket._2; i++) {
                     int maxE = Math.max(edges.get(i).v1, edges.get(i).v2);
                     if (maxE > maxV)
                         maxV = maxE;
@@ -55,7 +55,7 @@ public class TriangleParallelExecutor {
         System.out.println("Fill degArray in " + (t4 - t3) + " ms");
 
         // Fill and sort vertices array.
-        final int[] vertices = TriangleParallel.sort(degArray, threads);
+        final int[] vertices = sort(degArray, threads);
         final int[] rvertices = new int[vertices.length];
         forkJoinPool.submit(() -> IntStream.range(0, threads).forEach(index -> {
             for (int i = index; i < vertices.length; i += threads)
@@ -200,5 +200,53 @@ public class TriangleParallelExecutor {
         long t10 = System.currentTimeMillis();
         System.out.println("Triangle finished in " + (t10 - t9));
         return new Tuple2<>(triangles, edgeTriangles);
+    }
+
+    public static int[] sort(AtomicInteger[] degArray, int threads, ForkJoinPool forkJoinPool) throws Exception {
+        List<Tuple2<Integer, Integer>> buckets = createBuckets(threads, degArray.length);
+        Tuple2<Integer, Integer> minMaxLen = forkJoinPool.submit(() ->
+            buckets.parallelStream().map(bucket -> {
+                int min = degArray[bucket._1].get();
+                int max = degArray[bucket._1].get();
+                for (int i = bucket._1 + 1; i < bucket._2; i++) {
+                    int deg = degArray[i].get();
+                    if (deg == 0)
+                        continue;
+                    if (deg < min) {
+                        min = deg;
+                    } else if (deg > max)
+                        max = deg;
+                }
+                return new Tuple2<>(min, max);
+            }).reduce((r1, r2) -> new Tuple2<>(Math.min(r1._1(), r2._1()), Math.max(r1._2(), r2._2())))
+                .orElse(INVALID_TUPLE2)
+        ).get();
+
+        if (minMaxLen == INVALID_TUPLE2)
+            throw new Exception("Invalid tuple");
+
+        int min = minMaxLen._1();
+        int max = minMaxLen._2();
+
+        // init the frequencies
+        AtomicInteger[] counts = new AtomicInteger[max - min + 1];
+        for (int i = 0; i < counts.length; i++)
+            counts[i] = new AtomicInteger(0);
+        forkJoinPool.submit(() -> buckets.parallelStream().forEach(bucket ->
+            IntStream.range(bucket._1, bucket._2).forEach(i ->
+                counts[degArray[i].get() - min].incrementAndGet()))
+        ).get();
+
+        counts[0].decrementAndGet();
+        for (int i = 1; i < counts.length; i++) {
+            counts[i].addAndGet(counts[i - 1].get());
+        }
+
+        int[] vertices = new int[degArray.length];
+        for (int i = vertices.length - 1; i >= 0; i--) {
+            int index = counts[degArray[i].get() - min].getAndDecrement();
+            vertices[index] = i;
+        }
+        return vertices;
     }
 }

@@ -56,11 +56,21 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="TriangleParallel.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/TriangleParallel.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="150">
+              <caret line="17" column="87" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="87" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="TriangleParallelExecutor.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/TriangleParallelExecutor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="205">
-              <caret line="31" column="70" selection-start-line="31" selection-start-column="70" selection-end-line="31" selection-end-column="70" />
+            <state relative-caret-position="300">
+              <caret line="221" column="0" selection-start-line="221" selection-start-column="0" selection-end-line="221" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -135,77 +145,6 @@
               <folding>
                 <element signature="e#0#15254#0" expanded="false" />
                 <element signature="imports" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Spliterators.java" pinned="false" current-in-tab="false">
-        <entry file="jar:///usr/local/jvm/jdk1.8.0_92/src.zip!/java/util/Spliterators.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5775">
-              <caret line="419" column="33" selection-start-line="419" selection-start-column="33" selection-end-line="419" selection-end-column="33" />
-              <folding>
-                <element signature="e#0#86512#0" expanded="false" />
-                <element signature="imports" expanded="false" />
-                <element signature="e#1248#1249#0" expanded="false" />
-                <element signature="e#1305#1306#0" expanded="false" />
-                <element signature="e#1785#1786#0" expanded="false" />
-                <element signature="e#1829#1830#0" expanded="false" />
-                <element signature="e#2312#2313#0" expanded="false" />
-                <element signature="e#2357#2358#0" expanded="false" />
-                <element signature="e#2849#2850#0" expanded="false" />
-                <element signature="e#2896#2897#0" expanded="false" />
-                <element signature="e#37509#37510#0" expanded="false" />
-                <element signature="e#37544#37545#0" expanded="false" />
-                <element signature="e#37727#37728#0" expanded="false" />
-                <element signature="e#37783#37784#0" expanded="false" />
-                <element signature="e#37821#37822#0" expanded="false" />
-                <element signature="e#37853#37854#0" expanded="false" />
-                <element signature="e#37893#37894#0" expanded="false" />
-                <element signature="e#37964#37965#0" expanded="false" />
-                <element signature="e#40118#40119#0" expanded="false" />
-                <element signature="e#40197#40198#0" expanded="false" />
-                <element signature="e#42311#42312#0" expanded="false" />
-                <element signature="e#42357#42358#0" expanded="false" />
-                <element signature="e#43504#43505#0" expanded="false" />
-                <element signature="e#43583#43584#0" expanded="false" />
-                <element signature="e#45582#45583#0" expanded="false" />
-                <element signature="e#45628#45629#0" expanded="false" />
-                <element signature="e#48872#48873#0" expanded="false" />
-                <element signature="e#48918#48919#0" expanded="false" />
-                <element signature="e#52185#52186#0" expanded="false" />
-                <element signature="e#52231#52232#0" expanded="false" />
-                <element signature="e#54984#54985#0" expanded="false" />
-                <element signature="e#55034#55035#0" expanded="false" />
-                <element signature="e#56964#56965#0" expanded="false" />
-                <element signature="e#56998#56999#0" expanded="false" />
-                <element signature="e#57233#57234#0" expanded="false" />
-                <element signature="e#57279#57280#0" expanded="false" />
-                <element signature="e#59923#59924#0" expanded="false" />
-                <element signature="e#59973#59974#0" expanded="false" />
-                <element signature="e#61162#61163#0" expanded="false" />
-                <element signature="e#61196#61197#0" expanded="false" />
-                <element signature="e#61431#61432#0" expanded="false" />
-                <element signature="e#61477#61478#0" expanded="false" />
-                <element signature="e#64133#64134#0" expanded="false" />
-                <element signature="e#64183#64184#0" expanded="false" />
-                <element signature="e#65378#65379#0" expanded="false" />
-                <element signature="e#65412#65413#0" expanded="false" />
-                <element signature="e#65647#65648#0" expanded="false" />
-                <element signature="e#65693#65694#0" expanded="false" />
-                <element signature="e#68373#68374#0" expanded="false" />
-                <element signature="e#68423#68424#0" expanded="false" />
-                <element signature="e#69630#69631#0" expanded="false" />
-                <element signature="e#69664#69665#0" expanded="false" />
-                <element signature="e#69899#69900#0" expanded="false" />
-                <element signature="e#69945#69946#0" expanded="false" />
-                <element signature="e#79228#79229#0" expanded="false" />
-                <element signature="e#79262#79263#0" expanded="false" />
-                <element signature="e#82681#82682#0" expanded="false" />
-                <element signature="e#82715#82716#0" expanded="false" />
-                <element signature="e#86163#86164#0" expanded="false" />
-                <element signature="e#86197#86198#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -1477,14 +1416,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/TriangleParallel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="945">
-          <caret line="63" column="0" selection-start-line="20" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/MultiCoreUtils.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
@@ -1706,10 +1637,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/TriangleParallel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="17" column="87" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="87" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/TriangleParallelExecutor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="205">
-          <caret line="31" column="70" selection-start-line="31" selection-start-column="70" selection-end-line="31" selection-end-column="70" />
+        <state relative-caret-position="300">
+          <caret line="221" column="0" selection-start-line="221" selection-start-column="0" selection-end-line="221" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
