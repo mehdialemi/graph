@@ -152,7 +152,6 @@ public class TriangleParallelExecutor {
                                     }
                                     list.add(triangleNum);
 
-
                                     localTriangles.put(triangleNum, new int[]{vw, uv, uw});
                                     triangleNum++;
                                     if (triangleNum % BUCKET_LEN == 0)

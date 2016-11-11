@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-heapSize="20g"
+heapSize="80g"
 newRatio=2
 maxPause=500
 export BASEDIR=$(dirname "$0")
