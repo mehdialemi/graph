@@ -20,10 +20,18 @@ public class TriangleParallelExecutor {
         // find max vertex Id in parallel
         long t1 = System.currentTimeMillis();
         final List<Tuple2<Integer, Integer>> edgeBuckets = createBuckets(threads, edges.size());
-        int max = forkJoinPool.submit(() ->
-            edges.parallelStream().map(edge -> Math.max(edge.v1, edge.v2))
-                .reduce((v1, v2) -> Math.max(v1, v2)).orElse(0))
-            .get();
+        int max = forkJoinPool.submit(() -> {
+            return edgeBuckets.parallelStream().mapToInt(bucket -> {
+                int maxV = 0;
+                for(int i = bucket._1; i < bucket._2; i ++) {
+                    int maxE = Math.max(edges.get(i).v1, edges.get(i).v2);
+                    if (maxE > maxV)
+                        maxV = maxE;
+                }
+                return maxV;
+            }).reduce((max1, max2) -> Math.max(max1, max2)).getAsInt();
+        }).get();
+
         long t2 = System.currentTimeMillis();
         System.out.println("Finding max in " + (t2 - t1) + " ms");
 
@@ -161,7 +169,6 @@ public class TriangleParallelExecutor {
                         }
                     }
                 }
-                System.out.println("Thread " + index + ", triangle offset: " + triangleOffset.get());
                 return new Tuple2<>(localTriangles, localEdgeTriangles);
             });
         }).get();
