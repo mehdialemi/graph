@@ -4,7 +4,7 @@ import ir.ac.sbu.graph.ktruss.sequential.Edge;
 import scala.Tuple2;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -46,9 +46,11 @@ public class TriangleParallelForkJoin {
         System.out.println("Construct degArray (AtomicInteger) in " + (t3 - t2) + " ms");
 
         // Construct degree array such that vertexId is the index of the array in parallel
-        forkJoinPool.submit(() -> edges.parallelStream().forEach(e -> {
-            degArray[e.v1].incrementAndGet();
-            degArray[e.v2].incrementAndGet();
+        forkJoinPool.submit(() -> edgeBuckets.parallelStream().forEach(bucket -> {
+            for(int i = bucket._1; i < bucket._2; i ++) {
+                degArray[edges.get(i).v1].incrementAndGet();
+                degArray[edges.get(i).v2].incrementAndGet();
+            }
         })).get();
 
         long t4 = System.currentTimeMillis();
