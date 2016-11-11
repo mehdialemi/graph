@@ -4,6 +4,7 @@ import ir.ac.sbu.graph.ktruss.sequential.Edge;
 import scala.Tuple2;
 
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -97,21 +98,17 @@ public class TriangleParallelExecutor {
         AtomicInteger triangleOffset = new AtomicInteger(0);
         final int offset = (int) Arrays.stream(degArray).parallel().filter(d -> d.get() < 2).count();
         final List<Tuple2<Integer, Integer>> bucketsIndex = createBuckets(threads, offset, vertices.length);
-        HashSet<Integer>[] validEdges = new HashSet[edges.length];
         long t9 = System.currentTimeMillis();
         System.out.println("Ready to triangle in " + (t9 - t8) + " ms with " + buckets.size() + " buckets");
 
-        List<Future<Tuple2<Map<Integer, int[]>, Map<Integer, Set<Integer>>[]>>> futures = new ArrayList<>();
-        final int maxBucketIndex = bucketsIndex.size() - 1;
+        List<Future<Tuple2<Map<Integer, int[]>, Map<Integer, List<Integer>>>>> futures = new ArrayList<>();
+        ArrayBlockingQueue<Integer> completedThreadsQueue = new ArrayBlockingQueue<>(threads);
         for (int th = 0; th < threads; th++) {
             final int index = th;
-            Future<Tuple2<Map<Integer, int[]>, Map<Integer, Set<Integer>>[]>> future = executorService.submit(() -> {
-                Map<Integer, int[]> triangles = new HashMap<>();
-                int bucketLen = bucketsIndex.get(0)._2 - bucketsIndex.get(0)._1;
+            Future<Tuple2<Map<Integer, int[]>, Map<Integer, List<Integer>>>> future = executorService.submit(() -> {
+                Map<Integer, List<Integer>> localValids = new HashMap<>();
+                Map<Integer, int[]> localTriangles = new HashMap<>();
                 int triangleIndex = triangleOffset.getAndAdd(BUCKET_COUNT);
-                Map<Integer, Set<Integer>>[] targetArray = new HashMap[threads];
-                for (int j = 0; j < threads; j++)
-                    targetArray[j] = new HashMap<>();
 
                 for (int b = 0; b < bucketsIndex.size(); b++) {
                     Tuple2<Integer, Integer> bucket = bucketsIndex.get(b);
@@ -119,7 +116,7 @@ public class TriangleParallelExecutor {
                         int u = vertices[i];   // get current vertex id as u
 
                         // construct a map of nodes to their edges for u
-                        List<Long> uNeighbors = neighbors[u];
+                        final List<Long> uNeighbors = neighbors[u];
                         Map<Integer, Integer> unEdges = new HashMap<>(uNeighbors.size());
                         for (int ni = 0; ni < uNeighbors.size(); ni++) {
                             long ve = uNeighbors.get(ni);
@@ -141,33 +138,30 @@ public class TriangleParallelExecutor {
                                 int w = (int) (we >> 32);
                                 int vw = (int) we;
 
-                                // TODO check unEdges.remove
                                 Integer uw = unEdges.get(w);
                                 if (uw != null) {
-                                    if (validEdges[uv] == null)
-                                        validEdges[uv] = new HashSet<>();
-                                    validEdges[uv].add(triangleIndex);
-
-                                    if (validEdges[uw] == null)
-                                        validEdges[uw] = new HashSet<>();
-                                    validEdges[uw].add(triangleIndex);
-
-                                    int vIndex = rvertices[v] - offset;
-                                    int target = (vIndex + offset - bucketsIndex.get(Math.min(maxBucketIndex, vIndex / bucketLen))._1) % threads;
-                                    if (target == index) {
-                                        if (validEdges[vw] == null)
-                                            validEdges[vw] = new HashSet<>();
-                                        validEdges[vw].add(triangleIndex);
-                                    } else {
-                                        Set<Integer> set = targetArray[target].get(vw);
-                                        if (set == null) {
-                                            set = new HashSet<>();
-                                            targetArray[target].put(vw, set);
-                                        }
-                                        set.add(triangleIndex);
+                                    List<Integer> list = localValids.get(uv);
+                                    if (list == null) {
+                                        list = new ArrayList<>();
+                                        localValids.put(uv, list);
                                     }
+                                    list.add(triangleIndex);
 
-                                    triangles.put(triangleIndex, new int[]{vw, uv, uw});
+                                    list = localValids.get(uw);
+                                    if (list == null) {
+                                        list = new ArrayList<>();
+                                        localValids.put(uw, list);
+                                    }
+                                    list.add(triangleIndex);
+
+                                    list = localValids.get(vw);
+                                    if (list == null) {
+                                        list = new ArrayList<>();
+                                        localValids.put(vw, list);
+                                    }
+                                    list.add(triangleIndex);
+
+                                    localTriangles.put(triangleIndex, new int[]{vw, uv, uw});
                                     triangleIndex++;
                                     if (triangleIndex % BUCKET_COUNT == 0)
                                         triangleIndex = triangleOffset.getAndAdd(BUCKET_COUNT);
@@ -176,43 +170,38 @@ public class TriangleParallelExecutor {
                         }
                     }
                 }
-                return new Tuple2(triangles, targetArray);
+                completedThreadsQueue.add(index);
+                return new Tuple2<>(localTriangles, localValids);
             });
             futures.add(future);
         }
 
-        List<Map<Integer, int[]>> trianglesMap = new ArrayList<>();
-        List<Map<Integer, Set<Integer>>[]> etMap = new ArrayList<>();
-        for(int i = 0 ; i < threads ; i ++) {
-            Tuple2<Map<Integer, int[]>, Map<Integer, Set<Integer>>[]> result = futures.get(0).get();
-            trianglesMap.add(result._1);
-            etMap.add(result._2);
-        }
+        final HashSet<Integer>[] validEdges = new HashSet[edges.length];
+        final int[][] triangleArray = new int[triangleOffset.addAndGet(BUCKET_COUNT)][];
+        List<Tuple2<Integer, Integer>> edgeBuckets = MultiCoreUtils.createBuckets(threads, edges.length);
 
-        // add remaining local found valid edges to the global valid edges
-        IntStream.range(0, threads).parallel().forEach(index -> {
-            for (int i = 0; i < threads; i++) {
-                for (Map.Entry<Integer, Set<Integer>> entry : etMap.get(i)[index].entrySet()) {
-                    if (validEdges[entry.getKey()] == null)
-                        validEdges[entry.getKey()] = new HashSet<>();
-                    validEdges[entry.getKey()].addAll(entry.getValue());
+        int counter = 0;
+        while (counter < threads) {
+            Integer completedThread = completedThreadsQueue.peek();
+            while (!futures.get(completedThread).isDone()) Thread.sleep(1);
+            final Tuple2<Map<Integer, int[]>, Map<Integer, List<Integer>>> result = futures.get(completedThread).get();
+            Set<Map.Entry<Integer, int[]>> triangles = result._1.entrySet();
+            Map<Integer, List<Integer>> localValids = result._2;
+            edgeBuckets.parallelStream().forEach(eBucket -> {
+                for (int edgeIndex = eBucket._1; edgeIndex < eBucket._2; edgeIndex++) {
+                    List<Integer> et = localValids.get(edgeIndex);
+                    if (et != null) {
+                        if (validEdges[edgeIndex] == null)
+                            validEdges[edgeIndex] = new HashSet<>();
+                        validEdges[edgeIndex].addAll(et);
+                    }
                 }
-            }
-        });
-
-        // construct triangle array
-        int tNum = triangleOffset.addAndGet(BUCKET_COUNT);
-        int[][] triangleArray = new int[tNum][];
-        IntStream.range(0, threads).parallel().forEach(index -> {
-            Map<Integer, int[]> localT = trianglesMap.get(index);
-            for (Map.Entry<Integer, int[]> entry : localT.entrySet()) {
-                triangleArray[entry.getKey()] = entry.getValue();
-            }
-        });
-
+            });
+            triangles.parallelStream().forEach(entry -> triangleArray[entry.getKey()] = entry.getValue());
+            counter ++;
+        }
         long t10 = System.currentTimeMillis();
         System.out.println("Triangle finished in " + (t10 - t9));
-
         return new Tuple2<>(triangleArray, validEdges);
     }
 }

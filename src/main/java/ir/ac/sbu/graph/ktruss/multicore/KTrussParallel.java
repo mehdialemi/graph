@@ -40,6 +40,7 @@ public class KTrussParallel {
         int threads = 4;
         if (args.length > 2)
             threads = Integer.parseInt(args[2]);
+        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "" + threads);
 
         System.out.println("Start ktruss with k = " + k + ", threads = " + threads + ", input: " + inputPath);
 
