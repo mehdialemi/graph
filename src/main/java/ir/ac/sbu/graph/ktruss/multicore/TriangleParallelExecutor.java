@@ -15,19 +15,15 @@ public class TriangleParallelExecutor {
     public static final int BUCKET_LEN = 10000;
     public static final Tuple2<Integer, Integer> INVALID_TUPLE2 = new Tuple2<>(-1, -1);
 
-    public static Tuple2<int[][], Set<Integer>[]> findEdgeTriangles(final Edge[] edges, final int threads, ForkJoinPool forkJoinPool) throws Exception {
+    public static Tuple2<int[][], Set<Integer>[]> findEdgeTriangles(final List<Edge> edges, final int threads, ForkJoinPool forkJoinPool) throws Exception {
         ExecutorService executorService = Executors.newFixedThreadPool(threads);
         // find max vertex Id in parallel
         long t1 = System.currentTimeMillis();
-        final List<Tuple2<Integer, Integer>> edgeBuckets = createBuckets(threads, edges.length);
-        int max = forkJoinPool.submit(() -> {
-            return edgeBuckets.parallelStream()
-                .map(bucket -> Arrays.stream(edges, bucket._1, bucket._2)
-                    .map(e -> Math.max(e.v1, e.v2))
-                    .reduce((v1, v2) -> Math.max(v1, v2)).orElse(-1))
-                .reduce((m1, m2) -> Math.max(m1, m2)).orElse(-1).intValue();
-
-        }).get();
+        final List<Tuple2<Integer, Integer>> edgeBuckets = createBuckets(threads, edges.size());
+        int max = forkJoinPool.submit(() ->
+            edges.parallelStream().map(edge -> Math.max(edge.v1, edge.v2))
+                .reduce((v1, v2) -> Math.max(v1, v2)).orElse(0))
+            .get();
         long t2 = System.currentTimeMillis();
         System.out.println("Finding max in " + (t2 - t1) + " ms");
 
@@ -42,7 +38,7 @@ public class TriangleParallelExecutor {
         System.out.println("Construct degArray (AtomicInteger) in " + (t3 - t2) + " ms");
 
         // Construct degree array such that vertexId is the index of the array in parallel
-        forkJoinPool.submit(() -> Arrays.stream(edges).parallel().forEach(e -> {
+        forkJoinPool.submit(() -> edges.parallelStream().forEach(e -> {
             degArray[e.v1].incrementAndGet();
             degArray[e.v2].incrementAndGet();
         })).get();
@@ -71,7 +67,7 @@ public class TriangleParallelExecutor {
         // Fill neighbors array
         forkJoinPool.submit(() -> edgeBuckets.parallelStream().forEach(bucket -> {
             for (int i = bucket._1; i < bucket._2; i++) {
-                Edge e = edges[i];
+                Edge e = edges.get(i);
                 if (rvertices[e.v2] >= rvertices[e.v1]) {
                     synchronized (degArray[e.v1]) {
                         neighbors[e.v1].add((long) e.v2 << 32 | i & 0xFFFFFFFFL);
@@ -171,7 +167,7 @@ public class TriangleParallelExecutor {
             });
         }).get();
 
-        final HashSet<Integer>[] edgeTriangles = new HashSet[edges.length];
+        final HashSet<Integer>[] edgeTriangles = new HashSet[edges.size()];
         final List<Map<Integer, int[]>> localTrianglesList = new ArrayList<>(threads);
         final AtomicInteger triangleCount = new AtomicInteger(0);
         forkJoinPool.submit(() -> {
@@ -187,7 +183,6 @@ public class TriangleParallelExecutor {
             });
         }).get();
 
-        
         System.out.println("triangle count: " + triangleCount.get());
         int[][] triangles = new int[triangleCount.get() + BUCKET_LEN * threads][];
         forkJoinPool.submit(() ->

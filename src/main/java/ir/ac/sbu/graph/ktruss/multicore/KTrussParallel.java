@@ -55,11 +55,10 @@ public class KTrussParallel {
             .filter(e -> e.v1 != e.v2)
             .collect(Collectors.toList());
 
-        final Edge[] edges = list.toArray(new Edge[0]);
-        System.out.println("Graph loaded, edges: " + edges.length);
+        System.out.println("Graph loaded, edges: " + list.size());
         long t1 = System.currentTimeMillis();
 //        Tuple2<int[][], Set<Integer>[]> result = TriangleParallel.findEdgeTriangles(edges, threads);
-        Tuple2<int[][], Set<Integer>[]> result = TriangleParallelExecutor.findEdgeTriangles(edges, threads, forkJoinPool);
+        Tuple2<int[][], Set<Integer>[]> result = TriangleParallelExecutor.findEdgeTriangles(list, threads, forkJoinPool);
         long triangleTime = System.currentTimeMillis() - t1;
         Set<Integer>[] eTriangles = result._2;
         int[][] triangles = result._1;
