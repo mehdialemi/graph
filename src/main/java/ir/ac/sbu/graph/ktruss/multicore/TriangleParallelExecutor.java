@@ -187,6 +187,7 @@ public class TriangleParallelExecutor {
             });
         }).get();
 
+        
         System.out.println("triangle count: " + triangleCount.get());
         int[][] triangles = new int[triangleCount.get() + BUCKET_LEN * threads][];
         forkJoinPool.submit(() ->
