@@ -55,7 +55,8 @@ public class KTrussParallel {
         final Edge[] edges = list.toArray(new Edge[0]);
         System.out.println("Graph loaded, edges: " + edges.length);
         long t1 = System.currentTimeMillis();
-        Tuple2<int[][], Set<Integer>[]> result = TriangleParallel.findEdgeTriangles(edges, threads);
+//        Tuple2<int[][], Set<Integer>[]> result = TriangleParallel.findEdgeTriangles(edges, threads);
+        Tuple2<int[][], Set<Integer>[]> result = TriangleParallelExecutor.findEdgeTriangles(edges, threads);
         long triangleTime = System.currentTimeMillis() - t1;
         Set<Integer>[] eTriangles = result._2;
         int[][] triangles = result._1;
@@ -82,29 +83,24 @@ public class KTrussParallel {
             IntStream.range(0, threads).parallel().forEach(index -> {
                 Tuple2<Integer, Integer> bucket = buckets.get(index);
                 for (int i = bucket._1; i < bucket._2; i++) {
-                    for (int tIndex : eTriangles[etIndex[i]]) {
-                        for (int e : triangles[tIndex]) {
-                            if (eTriangles[e] != null)
-                                eTriangles[e].remove(tIndex);
-                        }
-                    }
-//                        tInvalids[index].add(tIndex);
+                    for (int tIndex : eTriangles[etIndex[i]])
+                        tInvalids[index].add(tIndex);
                     eTriangles[etIndex[i]] = null;
                 }
             });
             long t2_findInvalids = System.currentTimeMillis();
             System.out.println("invalid time: " + (t2_findInvalids - t2_sort) + " ms");
 
-//            Arrays.stream(tInvalids).parallel().forEach(invalids -> {
-//                for (int tIndex : invalids) {
-//                    for (int e : triangles[tIndex]) {
-//                        if (eTriangles[e] != null)
-//                            eTriangles[e].remove(tIndex);
-//                    }
-//                }
-//            });
-//            long t2_remove = System.currentTimeMillis();
-//            System.out.println("remove invalid time: " + (t2_remove - t2_findInvalids) + " ms");
+            Arrays.stream(tInvalids).parallel().forEach(invalids -> {
+                for (int tIndex : invalids) {
+                    for (int e : triangles[tIndex]) {
+                        if (eTriangles[e] != null)
+                            eTriangles[e].remove(tIndex);
+                    }
+                }
+            });
+            long t2_remove = System.currentTimeMillis();
+            System.out.println("remove invalid time: " + (t2_remove - t2_findInvalids) + " ms");
         }
 
         long duration = System.currentTimeMillis() - t1;
