@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -40,7 +41,8 @@ public class KTrussParallel {
         int threads = 4;
         if (args.length > 2)
             threads = Integer.parseInt(args[2]);
-        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "" + threads);
+//        System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "" + threads);
+        ForkJoinPool forkJoinPool = new ForkJoinPool(threads);
 
         System.out.println("Start ktruss with k = " + k + ", threads = " + threads + ", input: " + inputPath);
 
@@ -57,7 +59,7 @@ public class KTrussParallel {
         System.out.println("Graph loaded, edges: " + edges.length);
         long t1 = System.currentTimeMillis();
 //        Tuple2<int[][], Set<Integer>[]> result = TriangleParallel.findEdgeTriangles(edges, threads);
-        Tuple2<int[][], Set<Integer>[]> result = TriangleParallelExecutor.findEdgeTriangles(edges, threads);
+        Tuple2<int[][], Set<Integer>[]> result = TriangleParallelExecutor.findEdgeTriangles(edges, threads, forkJoinPool);
         long triangleTime = System.currentTimeMillis() - t1;
         Set<Integer>[] eTriangles = result._2;
         int[][] triangles = result._1;
@@ -91,6 +93,7 @@ public class KTrussParallel {
             });
             long t2_findInvalids = System.currentTimeMillis();
             System.out.println("invalid time: " + (t2_findInvalids - t2_sort) + " ms");
+
 
             Arrays.stream(tInvalids).parallel().forEach(invalids -> {
                 for (int tIndex : invalids) {
