@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 import static ir.ac.sbu.graph.ktruss.multicore.MultiCoreUtils.createBuckets;
 
-public class TriangleParallelExecutor {
+public class TriangleParallelForkJoin {
     public static final int BUCKET_LEN = 10000;
     public static final Tuple2<Integer, Integer> INVALID_TUPLE2 = new Tuple2<>(-1, -1);
 
@@ -55,7 +55,7 @@ public class TriangleParallelExecutor {
         System.out.println("Fill degArray in " + (t4 - t3) + " ms");
 
         // Fill and sort vertices array.
-        final int[] vertices = sort(degArray, threads);
+        final int[] vertices = sort(degArray, threads, forkJoinPool);
         final int[] rvertices = new int[vertices.length];
         forkJoinPool.submit(() -> IntStream.range(0, threads).forEach(index -> {
             for (int i = index; i < vertices.length; i += threads)
