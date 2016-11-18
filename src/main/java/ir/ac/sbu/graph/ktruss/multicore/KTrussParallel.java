@@ -85,15 +85,17 @@ public class KTrussParallel {
             long t1 = System.currentTimeMillis();
             System.out.println("Iteration: " + ++iteration + " started, InvalidSize: " + invalids.size() + " EdgeSize: " + edgeMap.size());
 
-            final int batchSize = (int) Math.max(1000, ((invalids.size() * BATCH_RATIO) / threads) * threads ) ;
 
             final List<Map.Entry<Long, Set<Integer>>> nextInvalid = new ArrayList<>();
             final List<Map.Entry<Long, Set<Integer>>> currentInvalid = invalids;
-            // find edges that should be updated. Here we create a map from edge to vertices which should be removed
             final int invalidSize = currentInvalid.size();
+
+            final int batchSize = Math.max(1000, (int) (((invalidSize * BATCH_RATIO)) / threads) * threads);
+
             AtomicInteger batchSelector = new AtomicInteger(0);
             final AtomicInteger syncSizeSelector = new AtomicInteger(0);
             int syncIncrement = batchSize / threads;
+            // find edges that should be updated. Here we create a map from edge to vertices which should be removed
             forkJoinPool.submit(() ->
                 IntStream.range(0, threads).parallel().forEach(index -> {
                     int start = 0;
