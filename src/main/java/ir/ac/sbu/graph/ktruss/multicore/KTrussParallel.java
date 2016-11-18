@@ -69,8 +69,8 @@ public class KTrussParallel {
         long tr2 = System.currentTimeMillis();
         System.out.println("Graph loaded, edges: " + list.size() + ", load time: " + (tr2 - tr1) + " ms");
 
-//        ktrussArrayIndex(minSup, threads, forkJoinPool, list);
-        ktrussMap(minSup, threads, forkJoinPool, list);
+        ktrussArrayIndex(minSup, threads, forkJoinPool, list);
+//        ktrussMap(minSup, threads, forkJoinPool, list);
     }
 
     private static void ktrussMap(int minSup, int threads, ForkJoinPool forkJoinPool, List<Edge> edges) throws Exception {
