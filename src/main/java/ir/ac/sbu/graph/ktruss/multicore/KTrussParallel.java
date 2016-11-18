@@ -55,8 +55,8 @@ public class KTrussParallel {
         ByteArrayInputStream isr = new ByteArrayInputStream(buf);
         InputStreamReader ip = new InputStreamReader(isr);
         BufferedReader reader = new BufferedReader(ip);
-
         long tr = System.currentTimeMillis();
+
         Stream<Edge> lines = reader.lines().parallel().filter(line -> !line.startsWith("#"))
             .map(line -> line.split("\\s+"))
             .map(split -> new Edge(Integer.parseInt(split[0]), Integer.parseInt(split[1])))
@@ -92,7 +92,6 @@ public class KTrussParallel {
         while (invalids.size() > 0) {
             long t1 = System.currentTimeMillis();
             System.out.println("Iteration: " + ++iteration + " started, InvalidSize: " + invalids.size() + " EdgeSize: " + edgeMap.size());
-
 
             final List<Map.Entry<Long, Set<Integer>>> nextInvalid = new ArrayList<>();
             final List<Map.Entry<Long, Set<Integer>>> currentInvalid = invalids;
@@ -149,8 +148,10 @@ public class KTrussParallel {
                                             return;
 
                                         vertices.removeAll(entry.getValue());
-                                        if (vertices.size() < minSup)
-                                            nextInvalid.add(new AbstractMap.SimpleEntry(entry.getKey(), vertices));
+                                        if (vertices.size() < minSup) {
+                                            List<Integer> list = new ArrayList<>(vertices);
+                                            nextInvalid.add(new AbstractMap.SimpleEntry(entry.getKey(), list));
+                                        }
                                     });
                                 }
 
@@ -180,6 +181,7 @@ public class KTrussParallel {
                         }
                     }
                 })).get();
+
 
             invalids = nextInvalid;
             long t2 = System.currentTimeMillis();
