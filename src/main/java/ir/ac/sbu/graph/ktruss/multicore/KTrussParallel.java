@@ -7,10 +7,7 @@ import scala.Tuple3;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -25,6 +22,7 @@ public class KTrussParallel {
 
     public static final double MAX_CHECK_RATIO = 0.3;
     private static final Tuple3<Integer, Integer, Integer> INVALID_TUPLE3 = new Tuple3<>(-1, -1, -1);
+    public static final float BATCH_RATIO = 0.01f;
 
     public static void main(String[] args) throws Exception {
         String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
@@ -54,11 +52,134 @@ public class KTrussParallel {
             .map(split -> new Edge(Integer.parseInt(split[0]), Integer.parseInt(split[1])))
             .filter(e -> e.v1 != e.v2)
             .collect(Collectors.toList());
-
         System.out.println("Graph loaded, edges: " + list.size());
+
+//        ktrussArrayIndex(minSup, threads, forkJoinPool, list);
+        ktrussMap(minSup, threads, forkJoinPool, list);
+    }
+
+    private static void ktrussMap(int minSup, int threads, ForkJoinPool forkJoinPool, List<Edge> edges) throws Exception {
+        long tStart = System.currentTimeMillis();
+        Map<Long, Set<Integer>> edgeMap = TriangleParallelForkJoin.findEdgeVerticesMap(edges, threads, forkJoinPool, BATCH_RATIO);
+        long triangleTime = System.currentTimeMillis() - tStart;
+        System.out.println("triangle time: " + triangleTime);
+        int iteration = 0;
+
+        // find invalid edges (those have support lesser than min sum)
+        List<Map.Entry<Long, Set<Integer>>> invalids = forkJoinPool.submit(() ->
+            edgeMap.entrySet().parallelStream()
+                .filter(entry -> entry.getValue().size() < minSup)
+                .collect(Collectors.toList())
+        ).get();
+
+        final Object lock = new Object();
+        System.out.println("e size: " + edgeMap.size());
+        while (invalids.size() > 0) {
+            long t1 = System.currentTimeMillis();
+            System.out.println("Iteration: " + ++iteration + " started, InvalidSize: " + invalids.size() + " EdgeSize: " + edgeMap.size());
+
+            final int batchSize = (int) Math.max(1000, ((invalids.size() * BATCH_RATIO) / threads) * threads ) ;
+
+            final List<Map.Entry<Long, Set<Integer>>> nextInvalid = new ArrayList<>();
+            final List<Map.Entry<Long, Set<Integer>>> currentInvalid = invalids;
+            // find edges that should be updated. Here we create a map from edge to vertices which should be removed
+            final int invalidSize = currentInvalid.size();
+            AtomicInteger batchSelector = new AtomicInteger(0);
+            final AtomicInteger syncSizeSelector = new AtomicInteger(0);
+            int syncIncrement = batchSize / threads;
+            forkJoinPool.submit(() ->
+                IntStream.range(0, threads).parallel().forEach(index -> {
+                    int start = 0;
+                    syncSizeSelector.compareAndSet(batchSize, 0);
+                    int syncSize = syncSizeSelector.getAndAdd(syncIncrement) + batchSize;
+                    final Map<Long, List<Integer>> edgeInvalidVertices = new HashMap<>(batchSize * 3);
+                    final List<Long> keys = new ArrayList<>(batchSize * 2);
+                    while (start < invalidSize) {
+                        start = batchSelector.getAndAdd(batchSize);
+                        for (int i = start; i < start + batchSize && i < invalidSize; i++) {
+                            Map.Entry<Long, Set<Integer>> invalidEV = currentInvalid.get(i);
+                            long edge = invalidEV.getKey();
+                            keys.add(edge);
+                            int u = (int) (edge >> 32);
+                            int v = (int) edge;
+
+                            for (int w : invalidEV.getValue()) {
+                                long uw = u < w ? (long) u << 32 | w & 0xFFFFFFFFL : (long) w << 32 | u & 0xFFFFFFFFL; // construct edge uw
+                                long vw = v < w ? (long) v << 32 | w & 0xFFFFFFFFL : (long) w << 32 | v & 0xFFFFFFFFL; // construct edge vw
+                                List<Integer> vertices = edgeInvalidVertices.get(uw);
+                                if (vertices == null) {
+                                    vertices = new ArrayList<>();
+                                    edgeInvalidVertices.put(uw, vertices);
+                                }
+                                vertices.add(v);  // add vertex v to include in invalid edges of uw
+
+                                vertices = edgeInvalidVertices.get(vw);
+                                if (vertices == null) {
+                                    vertices = new ArrayList<>();
+                                    edgeInvalidVertices.put(vw, vertices);
+                                }
+                                vertices.add(u);  // add vertex u to include in invalid edges of vw
+                            }
+                            if (edgeInvalidVertices.size() > syncSize) {
+                                synchronized (lock) {
+                                    for (long key : keys) {
+                                        edgeMap.remove(key);
+                                    }
+
+                                    edgeInvalidVertices.entrySet().stream().forEach(entry -> {
+                                        Set<Integer> vertices = edgeMap.get(entry.getKey());
+                                        if (vertices == null || vertices.size() == 0)
+                                            return;
+
+                                        vertices.removeAll(entry.getValue());
+                                        if (vertices.size() < minSup)
+                                            nextInvalid.add(new AbstractMap.SimpleEntry(entry.getKey(), vertices));
+                                    });
+                                }
+
+                                edgeInvalidVertices.clear();
+                                keys.clear();
+                                syncSizeSelector.compareAndSet(batchSize, 0);
+                                syncSize = syncSizeSelector.getAndAdd(syncIncrement) + batchSize;
+                            }
+                        }
+                    }
+
+                    if (edgeInvalidVertices.size() > 0 || keys.size() > 0) {
+                        synchronized (lock) {
+                            for (long key : keys) {
+                                edgeMap.remove(key);
+                            }
+
+                            edgeInvalidVertices.entrySet().stream().forEach(entry -> {
+                                Set<Integer> vertices = edgeMap.get(entry.getKey());
+                                if (vertices == null || vertices.size() == 0)
+                                    return;
+
+                                vertices.removeAll(entry.getValue());
+                                if (vertices.size() < minSup)
+                                    nextInvalid.add(new AbstractMap.SimpleEntry(entry.getKey(), vertices));
+                            });
+                        }
+                    }
+                })).get();
+
+            invalids = nextInvalid;
+            long t2 = System.currentTimeMillis();
+            System.out.println("Iteration : " + iteration + " finished in " + (t2 - t1) + " ms");
+        }
+
+        long duration = System.currentTimeMillis() - tStart;
+        System.out.println("Number of edges is " + edgeMap.size() + ", in " + duration + " ms");
+    }
+
+    private static void update(int minSup, Map<Long, Set<Integer>> edgeMap, List<Map.Entry<Long, Set<Integer>>> nextInvalid, Map<Long, List<Integer>> edgeInvalidVertices, List<Long> keys) {
+
+    }
+
+    private static void ktrussArrayIndex(int minSup, int threads, ForkJoinPool forkJoinPool, List<Edge> list) throws Exception {
         long t1 = System.currentTimeMillis();
-//        Tuple2<int[][], Set<Integer>[]> result = TriangleParallel.findEdgeTriangles(edges, threads);
-        Tuple2<int[][], Set<Integer>[]> result = TriangleParallelForkJoin.findEdgeTriangles(list, threads, forkJoinPool);
+        Tuple2<int[][], Set<Integer>[]> result = TriangleParallelForkJoin.findEdgeTriangles(list, threads, forkJoinPool, BATCH_RATIO);
         long triangleTime = System.currentTimeMillis() - t1;
         Set<Integer>[] eTriangles = result._2;
         int[][] triangles = result._1;
@@ -77,7 +198,7 @@ public class KTrussParallel {
                 break;
             final int[] etIndex = sorted._2;
             HashSet<Integer>[] tInvalids = new HashSet[threads];
-            for(int i = 0 ; i < threads; i ++)
+            for (int i = 0; i < threads; i++)
                 tInvalids[i] = new HashSet<>();
 
             Arrays.sort(etIndex, 0, sorted._1);
@@ -105,7 +226,6 @@ public class KTrussParallel {
             long t2_remove = System.currentTimeMillis();
             System.out.println("remove invalid time: " + (t2_remove - t2_findInvalids) + " ms");
         }
-
         long duration = System.currentTimeMillis() - t1;
         System.out.println("Number of edges is " + sorted._2.length + ", in " + duration + " ms");
     }
@@ -120,7 +240,7 @@ public class KTrussParallel {
             int max = 0;
             int len = 0;
             if (usePrev) {
-                for (int i = bucket._1 ; i < bucket._2; i ++) {
+                for (int i = bucket._1; i < bucket._2; i++) {
                     if (eTriangles[prevEdges._2[i]] == null || eTriangles[prevEdges._2[i]].isEmpty())
                         continue;
                     int num = eTriangles[prevEdges._2[i]].size();
@@ -129,7 +249,7 @@ public class KTrussParallel {
                     } else if (num > max) {
                         max = num;
                     }
-                    len ++;
+                    len++;
                 }
             } else {
                 for (int i = bucket._1; i < bucket._2; i++) {
@@ -141,11 +261,11 @@ public class KTrussParallel {
                     } else if (num > max) {
                         max = num;
                     }
-                    len ++;
+                    len++;
                 }
             }
             return new Tuple3<>(min, max, len);
-        }).reduce((r1 , r2) -> new Tuple3<>(Math.min(r1._1(), r2._1()), Math.max(r1._2(), r2._2()), r1._3() + r2._3()))
+        }).reduce((r1, r2) -> new Tuple3<>(Math.min(r1._1(), r2._1()), Math.max(r1._2(), r2._2()), r1._3() + r2._3()))
             .orElse(INVALID_TUPLE3);
 
         if (minMaxLen == INVALID_TUPLE3)
@@ -157,12 +277,12 @@ public class KTrussParallel {
 
         // init the frequencies
         AtomicInteger[] counts = new AtomicInteger[max - min + 1];
-        for(int i = 0 ; i < counts.length ; i ++)
+        for (int i = 0; i < counts.length; i++)
             counts[i] = new AtomicInteger(0);
 
         buckets.parallelStream().forEach(bucket -> {
             if (usePrev) {
-                for (int i = bucket._1 ; i < bucket._2 ; i ++) {
+                for (int i = bucket._1; i < bucket._2; i++) {
                     Set<Integer> et = eTriangles[prevEdges._2[i]];
                     if (et == null || et.isEmpty())
                         continue;
@@ -186,7 +306,7 @@ public class KTrussParallel {
         int minSupIndex = 0;
         int[] edges = new int[length];
         if (usePrev) {
-            for(int i = prevEdges._1 ; i < prevEdges._2.length ; i ++) {
+            for (int i = prevEdges._1; i < prevEdges._2.length; i++) {
                 Set<Integer> et = eTriangles[prevEdges._2[i]];
                 if (et == null || et.isEmpty())
                     continue;
@@ -194,7 +314,7 @@ public class KTrussParallel {
                 int index = counts[sup - min].getAndDecrement();
                 edges[index] = prevEdges._2[i];
                 if (sup < minSup)
-                    minSupIndex ++;
+                    minSupIndex++;
             }
         } else {
             for (int i = eTriangles.length - 1; i >= 0; i--) {
@@ -205,7 +325,7 @@ public class KTrussParallel {
                 int index = counts[sup - min].getAndDecrement();
                 edges[index] = i;
                 if (sup < minSup)
-                    minSupIndex ++;
+                    minSupIndex++;
             }
         }
         return new Tuple2<>(minSupIndex, edges);
