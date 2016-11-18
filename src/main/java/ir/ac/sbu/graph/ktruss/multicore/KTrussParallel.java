@@ -5,8 +5,11 @@ import scala.Tuple2;
 import scala.Tuple3;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -45,8 +48,13 @@ public class KTrussParallel {
 
         System.out.println("Start ktruss with k = " + k + ", threads = " + threads + ", input: " + inputPath);
 
-        FileInputStream inputStream = new FileInputStream(inputPath);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        final FileChannel channel = new FileInputStream(inputPath).getChannel();
+        MappedByteBuffer mapBB = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+        byte[] buf = new byte[(int) channel.size()];
+        mapBB.get(buf);
+        ByteArrayInputStream isr = new ByteArrayInputStream(buf);
+        InputStreamReader ip = new InputStreamReader(isr);
+        BufferedReader reader = new BufferedReader(ip);
 
         long tr = System.currentTimeMillis();
         Stream<Edge> lines = reader.lines().parallel().filter(line -> !line.startsWith("#"))
