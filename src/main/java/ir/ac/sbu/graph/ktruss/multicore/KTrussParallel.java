@@ -12,6 +12,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static ir.ac.sbu.graph.ktruss.multicore.MultiCoreUtils.createBuckets;
 
@@ -47,15 +48,21 @@ public class KTrussParallel {
         FileInputStream inputStream = new FileInputStream(inputPath);
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 
-        List<Edge> list = reader.lines().parallel().filter(line -> !line.startsWith("#"))
+        long tr = System.currentTimeMillis();
+        Stream<Edge> lines = reader.lines().parallel().filter(line -> !line.startsWith("#"))
             .map(line -> line.split("\\s+"))
             .map(split -> new Edge(Integer.parseInt(split[0]), Integer.parseInt(split[1])))
-            .filter(e -> e.v1 != e.v2)
-            .collect(Collectors.toList());
-        System.out.println("Graph loaded, edges: " + list.size());
+            .filter(e -> e.v1 != e.v2);
+        long tr2 = System.currentTimeMillis();
+        System.out.println("Read lines in " + (tr2 - tr) + " ms");
+
+        List<Edge> edges = lines.collect(Collectors.toList());
+        long tr3 = System.currentTimeMillis();
+        System.out.println("Collect lines in " + (tr3 - tr2) + " ms");
+        System.out.println("Graph loaded, edges: " + edges.size());
 
 //        ktrussArrayIndex(minSup, threads, forkJoinPool, list);
-        ktrussMap(minSup, threads, forkJoinPool, list);
+        ktrussMap(minSup, threads, forkJoinPool, edges);
     }
 
     private static void ktrussMap(int minSup, int threads, ForkJoinPool forkJoinPool, List<Edge> edges) throws Exception {
