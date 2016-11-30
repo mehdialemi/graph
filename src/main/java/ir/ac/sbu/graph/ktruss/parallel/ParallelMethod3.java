@@ -89,11 +89,17 @@ public class ParallelMethod3 extends ParallelBase {
                 continue;
             int partition = random.nextInt(threads) + 1;
             p[i] = partition;
+            pSize[partition - 1] ++;
             for (int v : fonls[i]) {
                 if (fl[v] < 2 || p[v] != 0)
                     continue;
                 p[v] = partition;
+                pSize[partition - 1] ++;
             }
+        }
+
+        for (int i = 0; i < pSize.length; i++) {
+            System.out.println("Partition " + i + ", Size: " + pSize[i]);
         }
 
         final VertexCompare vertexCompare = new VertexCompare(d);
