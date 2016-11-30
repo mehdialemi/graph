@@ -158,7 +158,7 @@ ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0                  [vsysca
 
 VM Arguments:
 jvm_args: -XX:+UseParallelGC -Xmx80g -Xms80g -XX:NewRatio=2 -XX:MaxGCPauseMillis=500 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log 
-java_command: ir.ac.sbu.graph.ktruss.multicore.KTrussParallel /home/mehdi/graph-data/cit-Patents.txt 5 6
+java_command: ir.ac.sbu.graph.ktruss.parallel.KTrussParallel /home/mehdi/graph-data/cit-Patents.txt 5 6
 java_class_path (initial): /home/mehdi/IdeaProjects/graph-processing/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Launcher Type: SUN_STANDARD
 

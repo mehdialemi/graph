@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.ktruss.multicore;
+package ir.ac.sbu.graph;
 
 import scala.Tuple2;
 
@@ -26,10 +26,5 @@ public class MultiCoreUtils {
             startIndex += bucketLen;
         }
         return starts;
-    }
-
-    public static void printBuckets(List<Tuple2<Integer, Integer>> buckets) {
-        buckets.forEach(bucket -> System.err.println(bucket + ", len: " + (bucket._2 - bucket._1)));
-
     }
 }

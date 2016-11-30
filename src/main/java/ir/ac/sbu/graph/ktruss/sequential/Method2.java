@@ -19,6 +19,8 @@ public class Method2 extends SequentialBase {
     public void start() throws Exception {
         long tStart = System.currentTimeMillis();
         Map<Edge, Set<Integer>> edgeMap = findET(edges);
+        long tt = System.currentTimeMillis();
+        System.out.println("Triangle finding in " + (tt - tStart) + " ms");
 
         int iteration = 0;
         long tStartLoop = System.currentTimeMillis();
@@ -43,16 +45,16 @@ public class Method2 extends SequentialBase {
                     Edge e2 = new Edge(invalid.getKey().v2, vertex);
 
                     Set<Integer> vertices = edgeMap.get(e1);
-                    if (vertices != null)
+                    if (vertices != null) {
                         vertices.remove(invalid.getKey().v2);
-                    if (vertices.size() == 0)
                         edgeMap.remove(e1);
+                    }
 
                     vertices = edgeMap.get(e2);
-                    if (vertices != null)
+                    if (vertices != null) {
                         vertices.remove(invalid.getKey().v1);
-                    if (vertices.size() == 0)
                         edgeMap.remove(e2);
+                    }
                 }
             }
             long t3 = System.currentTimeMillis();
@@ -69,7 +71,7 @@ public class Method2 extends SequentialBase {
             "Count final edges time: " + (tOutput - tEndLoop));
     }
 
-    public static Map<Edge, Set<Integer>> findET(Edge[] edges) throws Exception {
+    public Map<Edge, Set<Integer>> findET(Edge[] edges) throws Exception {
         int[] degArray = new int[edges.length];
         // Construct degree array such that vertexId is the index of the array.
         for (Edge e : edges) {

@@ -1,7 +1,6 @@
-package ir.ac.sbu.graph.ktruss.multicore;
+package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
-import ir.ac.sbu.graph.ktruss.parallel.Utils;
 import scala.Tuple2;
 
 import java.util.*;
@@ -13,26 +12,121 @@ import java.util.stream.Stream;
 
 import static ir.ac.sbu.graph.MultiCoreUtils.createBuckets;
 
-public class TriangleParallelForkJoin {
+/**
+ *
+ */
+public class Method2 extends ParallelBase {
 
-    public static Map<Long, Set<Integer>> findEdgeVerticesArray(final List<Edge> edges, final int threads, ForkJoinPool forkJoinPool,
-                                                                float batchRatio)
+    private final ForkJoinPool forkJoinPool;
+
+    public Method2(Edge[] edges, int minSup, int threads) {
+        super(edges, minSup, threads);
+        forkJoinPool = new ForkJoinPool(threads);
+    }
+
+    @Override
+    public void start() throws Exception {
+        long tStart = System.currentTimeMillis();
+        Map<Long, Set<Integer>> edgeMap = findEdgeVerticesMap(edges, threads, forkJoinPool, BATCH_RATIO);
+        long triangleTime = System.currentTimeMillis() - tStart;
+        System.out.println("triangle time: " + triangleTime);
+        int iteration = 0;
+
+        while (true) {
+            long t1 = System.currentTimeMillis();
+            System.out.println("iteration: " + ++iteration);
+
+            System.out.println("e size: " + edgeMap.size());
+
+            // find invalid edges (those have support lesser than min sum)
+            final List<Map.Entry<Long, Set<Integer>>> invalids = forkJoinPool.submit(() ->
+                edgeMap.entrySet().parallelStream()
+                    .filter(entry -> entry.getValue().size() < minSup)
+                    .collect(Collectors.toList())
+            ).get();
+
+            if (invalids.size() == 0)
+                break;
+
+            long t2 = System.currentTimeMillis();
+            System.out.println("Invalid size: " + invalids.size() + ", duration: " + (t2 - t1) + " ms");
+            final Object lock = new Object();
+
+            // find edges that should be updated. Here we create a map from edge to vertices which should be removed
+            final int invalidSize = invalids.size();
+            AtomicInteger batchSelector = new AtomicInteger(0);
+            forkJoinPool.submit(() ->
+                IntStream.range(0, threads).parallel().forEach(index -> {
+                    int start = 0;
+                    while (start < invalidSize) {
+                        final Map<Long, List<Integer>> edgeInvalidVertices = new HashMap<>();
+                        start = batchSelector.getAndAdd(BATCH_SIZE);
+                        final List<Long> keys = new ArrayList<>();
+                        for (int i = start; i < start + BATCH_SIZE && i < invalidSize; i++) {
+                            Map.Entry<Long, Set<Integer>> invalidEV = invalids.get(i);
+                            long edge = invalidEV.getKey();
+                            keys.add(edge);
+                            int u = (int) (edge >> 32);
+                            int v = (int) edge;
+
+                            for (int w : invalidEV.getValue()) {
+                                long uw = u < w ? (long) u << 32 | w & 0xFFFFFFFFL : (long) w << 32 | u & 0xFFFFFFFFL; // construct edge uw
+                                long vw = v < w ? (long) v << 32 | w & 0xFFFFFFFFL : (long) w << 32 | v & 0xFFFFFFFFL; // construct edge vw
+                                List<Integer> vertices = edgeInvalidVertices.get(uw);
+                                if (vertices == null) {
+                                    vertices = new ArrayList<>();
+                                    edgeInvalidVertices.put(uw, vertices);
+                                }
+                                vertices.add(v);  // add vertex v to include in invalid edges of uw
+
+                                vertices = edgeInvalidVertices.get(vw);
+                                if (vertices == null) {
+                                    vertices = new ArrayList<>();
+                                    edgeInvalidVertices.put(vw, vertices);
+                                }
+                                vertices.add(u);  // add vertex u to include in invalid edges of vw
+                            }
+                        }
+
+                        synchronized (lock) {
+                            for (long key : keys) {
+                                edgeMap.remove(key);
+                            }
+                            edgeInvalidVertices.entrySet().stream().forEach(entry -> {
+                                Set<Integer> vertices = edgeMap.get(entry.getKey());
+                                if (vertices != null && vertices.size() > 0)
+                                    vertices.removeAll(entry.getValue());
+                            });
+                        }
+                    }
+                })).get();
+
+            long t3 = System.currentTimeMillis();
+            System.out.println("Find invalid vertices: " + (t3 - t2) + " ms");
+        }
+
+        long duration = System.currentTimeMillis() - tStart;
+        System.out.println("Number of edges is " + edgeMap.size() + ", in " + duration + " ms");
+    }
+
+    public static Map<Long, Set<Integer>> findEdgeVerticesMap(final Edge[] edges, final int threads, ForkJoinPool forkJoinPool,
+                                                              float batchRatio)
         throws Exception {
         long t1 = System.currentTimeMillis();
 
         // for each thread, create a map from vertex id to its degree
-        final List<Tuple2<Integer, Integer>> edgeBuckets = createBuckets(threads, edges.size());
+        final List<Tuple2<Integer, Integer>> edgeBuckets = createBuckets(threads, edges.length);
         Stream<Map<Integer, Integer>> vdResult = forkJoinPool.submit(() -> {
             return edgeBuckets.parallelStream().map(bucket -> {
                 Map<Integer, Integer> localVertexDegree = new HashMap<>();
                 for (int i = bucket._1; i < bucket._2; i++) {
-                    int v1 = edges.get(i).v1;
+                    int v1 = edges[i].v1;
                     Integer count = localVertexDegree.get(v1);
                     if (count == null)
                         count = 0;
                     localVertexDegree.put(v1, count + 1);
 
-                    int v2 = edges.get(i).v2;
+                    int v2 = edges[i].v2;
                     count = localVertexDegree.get(v2);
                     if (count == null)
                         count = 0;
@@ -65,7 +159,7 @@ public class TriangleParallelForkJoin {
         Stream<Map<Integer, List<Integer>>> localNeighborsMaps = forkJoinPool.submit(() -> edgeBuckets.parallelStream().map(bucket -> {
             Map<Integer, List<Integer>> localMap = new HashMap<>();
             for (int i = bucket._1; i < bucket._2; i++) {
-                Edge e = edges.get(i);
+                Edge e = edges[i];
                 int dv1 = vertexDegrees[e.v1];
                 int dv2 = vertexDegrees[e.v2];
                 if (dv1 < 2 || dv2 < 2)
@@ -196,169 +290,6 @@ public class TriangleParallelForkJoin {
         return eMap;
     }
 
-    public static Tuple2<long[][], Map<Long, List<Integer>>> findEdgeTrianglesMR(final List<Edge> edges, final int threads,
-                                                                                 ForkJoinPool forkJoinPool, float batchRatio)
-        throws Exception {
-        // find max vertex Id in parallel
-        long t1 = System.currentTimeMillis();
 
-        final List<Tuple2<Integer, Integer>> edgeBuckets = createBuckets(threads, edges.size());
-        final Map<Integer, Integer> vertexDegree = new HashMap<>();
-        Stream<Map<Integer, Integer>> vdResult = forkJoinPool.submit(() -> {
-            return edgeBuckets.parallelStream().map(bucket -> {
-                Map<Integer, Integer> localVertexDegree = new HashMap<>();
-                for (int i = bucket._1; i < bucket._2; i++) {
-                    Integer count = localVertexDegree.get(edges.get(i).v1);
-                    if (count == null)
-                        count = 0;
-                    localVertexDegree.put(edges.get(i).v1, ++count);
-
-                    count = localVertexDegree.get(edges.get(i).v2);
-                    if (count == null)
-                        count = 0;
-                    localVertexDegree.put(edges.get(i).v2, ++count);
-                }
-                return localVertexDegree;
-            });
-        }).get();
-
-        // aggregate vertex degrees
-        forkJoinPool.submit(() ->
-            vdResult.forEach(map -> map.entrySet().parallelStream().forEach(vd -> {
-                Integer num = vertexDegree.get(vd.getKey());
-                if (num == null)
-                    num = 0;
-                vertexDegree.put(vd.getKey(), num + vd.getValue());
-            }))).get();
-
-        final int batchSize = (int) (vertexDegree.size() * batchRatio);
-        long t2 = System.currentTimeMillis();
-        System.out.println("Calculating vertex degree in " + (t2 - t1) + " ms");
-
-        // Construct neighborhood
-
-        // Fill neighbors array
-        Stream<Map<Integer, List<Integer>>> localMaps = forkJoinPool.submit(() -> edgeBuckets.parallelStream().map(bucket -> {
-            Map<Integer, List<Integer>> localMap = new HashMap<>();
-            for (int i = bucket._1; i < bucket._2; i++) {
-                Edge e = edges.get(i);
-                Integer dv1 = vertexDegree.get(e.v1);
-                Integer dv2 = vertexDegree.get(e.v2);
-                if (dv1 < 2 || dv2 < 2)
-                    continue;
-
-                if (dv1 == dv2) {
-                    dv1 = e.v1;
-                    dv2 = e.v2;
-                }
-
-                if (dv1 < dv2) {
-                    List<Integer> list = localMap.get(e.v1);
-                    if (list == null) {
-                        list = new ArrayList<>();
-                        localMap.put(e.v1, list);
-                    }
-                    list.add(e.v2);
-                } else {
-                    List<Integer> list = localMap.get(e.v2);
-                    if (list == null) {
-                        list = new ArrayList<>();
-                        localMap.put(e.v2, list);
-                    }
-                    list.add(e.v1);
-                }
-            }
-            return localMap;
-        })).get();
-
-        final Map<Integer, Set<Integer>> filteredNeighbors = new HashMap<>();
-        forkJoinPool.submit(() -> localMaps.forEach(localMap -> {
-            localMap.entrySet().parallelStream().forEach(entry -> {
-                Set<Integer> list = filteredNeighbors.get(entry.getKey());
-                if (list == null) {
-                    list = new TreeSet<>();
-                    filteredNeighbors.put(entry.getKey(), list);
-                }
-                list.addAll(entry.getValue());
-            });
-        })).get();
-
-        long t3 = System.currentTimeMillis();
-        System.out.println("Fill neighbors in " + (t3 - t2) + " ms, ready to triangle in " + (t3 - t1) + " ms");
-
-        final AtomicInteger triangleOffset = new AtomicInteger(0);
-
-        final ThreadLocal<Integer> triangleNums = new ThreadLocal<>();
-        final Map<Long, Map<Long, List<Integer>>> localEdgeTriangles = new HashMap<>();
-        final Map<Long, Map<Integer, long[]>> allLocalTriangles = new HashMap<>();
-        forkJoinPool.submit(() -> filteredNeighbors.entrySet().parallelStream().forEach(uNeighbors -> {
-            long id = Thread.currentThread().getId();
-            int u = uNeighbors.getKey();
-            final Set<Integer> neighbors = uNeighbors.getValue();
-            uNeighbors.getValue().forEach(v -> {
-                Set<Integer> vNeighbors = filteredNeighbors.get(v);
-                Stream<Integer> wList = vNeighbors.stream().filter(vn -> neighbors.contains(vn));
-                wList.forEach(w -> {
-                        long uv = (long) u << 32 | v & 0xFFFFFFFFL;
-                        long vw = (long) v << 32 | w & 0xFFFFFFFFL;
-                        long uw = (long) u << 32 | w & 0xFFFFFFFFL;
-
-                        if (!localEdgeTriangles.containsKey(id)) {
-                            localEdgeTriangles.put(id, new HashMap<>());
-                        }
-
-                        if (!allLocalTriangles.containsKey(id)) {
-                            allLocalTriangles.put(id, new HashMap<>());
-                        }
-                        Integer triangleNum = triangleNums.get();
-
-                        if (triangleNum % batchSize == 0)
-                            triangleNum = triangleOffset.getAndAdd(batchSize);
-
-                        List<Integer> list = localEdgeTriangles.get(id).get(uv);
-                        if (list == null) {
-                            list = new ArrayList<>();
-                            localEdgeTriangles.get(id).put(uv, list);
-                        }
-                        list.add(triangleNum);
-
-                        list = localEdgeTriangles.get(id).get(uw);
-                        if (list == null) {
-                            list = new ArrayList<>();
-                            localEdgeTriangles.get(id).put(uw, list);
-                        }
-                        list.add(triangleNum);
-
-                        list = localEdgeTriangles.get(id).get(vw);
-                        if (list == null) {
-                            list = new ArrayList<>();
-                            localEdgeTriangles.get(id).put(vw, list);
-                        }
-                        list.add(triangleNum);
-
-                        allLocalTriangles.get(id).put(triangleNum, new long[]{vw, uv, uw});
-                        triangleNums.set(++triangleNum);
-                    }
-                );
-            });
-        })).get();
-
-        Map<Long, List<Integer>> edgeTriangles = new HashMap<>();
-        forkJoinPool.submit(() -> localEdgeTriangles.entrySet().forEach(entry -> entry.getValue().entrySet().parallelStream().forEach(et -> {
-            List<Integer> list = edgeTriangles.get(et.getKey());
-            if (list == null) {
-                list = new ArrayList<>();
-                edgeTriangles.put(et.getKey(), list);
-            }
-            list.addAll(et.getValue());
-        }))).get();
-
-        long[][] triangles = new long[triangleOffset.getAndAdd(batchSize) + batchSize * threads][];
-        forkJoinPool.submit(() -> allLocalTriangles.entrySet().forEach(entry -> entry.getValue().entrySet().parallelStream().forEach(triangle -> {
-            triangles[triangle.getKey()] = triangle.getValue();
-        }))).get();
-
-        return new Tuple2<>(triangles, edgeTriangles);
-    }
 
 }
