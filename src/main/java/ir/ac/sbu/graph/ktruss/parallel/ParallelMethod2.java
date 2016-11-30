@@ -142,7 +142,7 @@ public class ParallelMethod2 extends ParallelBase {
         final int vertexNum = vdLocalMaps.stream().map(v -> v.size()).reduce((a, b) -> b + a).get() + 1;
         final int batchSize = ((int) (vertexNum * batchRatio) / threads) * threads; // make batchSize as a multiplier of threads
 
-        // create an array to hold each vertex's degree. index of this array corresponds to vertex Id
+        // create an arrayList to hold each vertex's degree. index of this arrayList corresponds to vertex Id
         int[] vertexDegrees = new int[vertexNum];
 
         // Iterate over local vertex degree map (vdLocalMaps) and update vertexDegrees accordingly.
@@ -224,7 +224,7 @@ public class ParallelMethod2 extends ParallelBase {
                 while (start < vertexNum) {
                     start = batchSelector.getAndAdd(batchSize);
 
-                    // for each vertex u (index of the array is equal to its Id)
+                    // for each vertex u (index of the arrayList is equal to its Id)
                     for (int u = start; u < start + batchSize && u < vertexNum; u++) {
                         final Set<Integer> uNeighbors = fnl[u];   // get neighbors of u as uNeighbors
                         if (uNeighbors == null)

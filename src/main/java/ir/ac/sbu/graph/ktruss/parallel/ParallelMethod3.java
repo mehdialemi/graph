@@ -48,7 +48,7 @@ public class ParallelMethod3 extends ParallelBase {
             })).get().reduce((a, b) -> Math.max(a, b)).getAsInt();
 
 
-        // Construct degree array such that vertexId is the index of the array.
+        // Construct degree arrayList such that vertexId is the index of the arrayList.
         final int length = max + 1;
         int[] d = new int[length];  // vertex degree
         for (Edge e : edges) {
@@ -62,11 +62,11 @@ public class ParallelMethod3 extends ParallelBase {
         final int[][] fonls = new int[length][];
         final int[] fl = new int[length];  // Fonl Length
 
-        // Initialize neighbors array
+        // Initialize neighbors arrayList
         for (int i = 0; i < length; i++)
             fonls[i] = new int[Math.min(d[i], length - d[i])];
 
-        // Fill neighbors array
+        // Fill neighbors arrayList
         for (Edge e : edges) {
             int dv1 = d[e.v1];
             int dv2 = d[e.v2];
@@ -189,15 +189,16 @@ public class ParallelMethod3 extends ParallelBase {
         DataInputBuffer in1 = new DataInputBuffer();
         DataInputBuffer in2 = new DataInputBuffer();
 
-        int[][] eSups = new int[length][];
+
+        VertexEdge[] vertexEdges = new VertexEdge[length];
         for (int u = 0; u < fonlCN.length; u++) {
             if (fonlCN[u] == null)
                 continue;
 
             in1.reset(fonlCN[u], fonlCN[u].length);
             in2.reset(fonlVS[u], fonlVS[u].length);
-            if (eSups[u] == null)
-                eSups[u] = new int[fl[u]];
+            if (vertexEdges[u] == null)
+                vertexEdges[u] = new VertexEdge(fl[u]);
             while (true) {
                 if (in2.getPosition() >= fonlVS[u].length)
                     break;
@@ -207,15 +208,14 @@ public class ParallelMethod3 extends ParallelBase {
                     int len = WritableUtils.readVInt(in2);
                     int vIndex = WritableUtils.readVInt(in2);
                     int v = fonls[u][vIndex];
-                    eSups[u][vIndex]++;
                     for (int j = 0; j < len; j++) {
                         int uwIndex = WritableUtils.readVInt(in1);
-                        eSups[u][uwIndex]++;
+                        vertexEdges[u].add(uwIndex, v);
 
                         int vwIndex = WritableUtils.readVInt(in1);
-                        if (eSups[v] == null)
-                            eSups[v] = new int[fl[v]];
-                        eSups[v][vwIndex]++;
+                        if (vertexEdges[v] == null)
+                            vertexEdges[v] = new VertexEdge(fl[v]);
+                        vertexEdges[v].add(vwIndex, u);
                     }
 
                     tcCount += len;

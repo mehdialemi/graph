@@ -103,7 +103,7 @@ public class ParallelMethod1 extends ParallelBase {
         if (max == -1)
             throw new Exception("Problem in max finding");
 
-        // construct deg array
+        // construct deg arrayList
         AtomicInteger[] degArray = new AtomicInteger[max + 1];
         final int batchSize = (int) (degArray.length * batchRatio);
         forkJoinPool.submit(() -> IntStream.range(0, degArray.length).parallel().forEach(i -> degArray[i] = new AtomicInteger(0))).get();
@@ -111,7 +111,7 @@ public class ParallelMethod1 extends ParallelBase {
         long t3 = System.currentTimeMillis();
         System.out.println("Construct degArray (AtomicInteger) in " + (t3 - t2) + " ms");
 
-        // Construct degree array such that vertexId is the index of the array in parallel
+        // Construct degree arrayList such that vertexId is the index of the arrayList in parallel
         forkJoinPool.submit(() -> edgeBuckets.parallelStream().forEach(bucket -> {
             for (int i = bucket._1; i < bucket._2; i++) {
                 degArray[edges[i].v1].incrementAndGet();
@@ -122,7 +122,7 @@ public class ParallelMethod1 extends ParallelBase {
         long t4 = System.currentTimeMillis();
         System.out.println("Fill degArray in " + (t4 - t3) + " ms");
 
-        // Fill and quickSort vertices array.
+        // Fill and quickSort vertices arrayList.
         final int[] vertices = sort(degArray, threads, forkJoinPool);
         final int[] rvertices = new int[vertices.length];
         forkJoinPool.submit(() -> IntStream.range(0, threads).forEach(index -> {
@@ -140,7 +140,7 @@ public class ParallelMethod1 extends ParallelBase {
         long t6 = System.currentTimeMillis();
         System.out.println("Construct neighbors in " + (t6 - t5) + " ms");
 
-        // Fill neighbors array
+        // Fill neighbors arrayList
         forkJoinPool.submit(() -> edgeBuckets.parallelStream().forEach(bucket -> {
             for (int i = bucket._1; i < bucket._2; i++) {
                 Edge e = edges[i];
