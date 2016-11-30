@@ -2,6 +2,8 @@ package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Base class for all parallel methods to find ktruss
  */
@@ -13,6 +15,7 @@ public abstract class ParallelBase {
     protected final Edge[] edges;
     protected final int minSup;
     protected final int threads;
+    protected AtomicInteger batchSelector;
 
     public ParallelBase(Edge[] edges, int minSup, int threads) {
         this.edges = edges;
