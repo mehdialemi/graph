@@ -67,7 +67,7 @@ public class ParallelMethod3 extends ParallelBase {
         // Initialize neighbors arrayList
         for (int i = 0; i < length; i++) {
             fonls[i] = new int[Math.min(d[i], length - d[i])];
-            partition[i] = - 1;
+            partition[i] = -1;
         }
 
         // Fill neighbors arrayList
@@ -84,7 +84,7 @@ public class ParallelMethod3 extends ParallelBase {
                 fonls[e.v2][fl[e.v2]++] = e.v1;
         }
 
-        int[] pSize = new int[threads];
+        int[] pSizes = new int[threads];
         Random random = new Random();
         int[] pIndex = new int[length];
         for (int i = 0; i < fonls.length; i++) {
@@ -92,17 +92,17 @@ public class ParallelMethod3 extends ParallelBase {
                 continue;
             int p = random.nextInt(threads);
             partition[i] = p;
-            pIndex[i] = pSize[p] ++;
+            pIndex[i] = pSizes[p]++;
             for (int v : fonls[i]) {
                 if (fl[v] == 0 || partition[v] != 0)
                     continue;
                 partition[v] = p;
-                pIndex[v] = pSize[p] ++;
+                pIndex[v] = pSizes[p]++;
             }
         }
 
-        for (int i = 0; i < pSize.length; i++) {
-            System.out.println("Partition " + i + ", Size: " + pSize[i]);
+        for (int i = 0; i < pSizes.length; i++) {
+            System.out.println("Partition " + i + ", Size: " + pSizes[i]);
         }
 
         final VertexCompare vertexCompare = new VertexCompare(d);
@@ -121,7 +121,6 @@ public class ParallelMethod3 extends ParallelBase {
                     vertexCompare.quickSort(fonls[u], 0, fl[u] - 1);
                     if (maxFonlSize < fl[u])
                         maxFonlSize = fl[u];
-
                 }
             }
             return maxFonlSize;
@@ -133,16 +132,23 @@ public class ParallelMethod3 extends ParallelBase {
         final DataOutputBuffer[] fonlCN = new DataOutputBuffer[length];  // fonl common neighbors
         final DataOutputBuffer[] fonlVS = new DataOutputBuffer[length];  // fonl vertex size
         final DataOutputBuffer[] internalFU = new DataOutputBuffer[length];  // internal fonl update
-        final DataOutputBuffer[][] externalFU = new DataOutputBuffer[threads][];  // external fonl fonl update
-        for (int i = 0; i < externalFU.length; i++) {
-            externalFU[i] = new DataOutputBuffer[pSize[i]];
+        final DataOutputBuffer[][] externalFUs = new DataOutputBuffer[threads][];  // external fonl fonl update
+
+        int maxPartitionSize = 0;
+        for (int pSize : pSizes) {
+            if (pSize > maxPartitionSize)
+                maxPartitionSize = pSize;
+        }
+
+        for (int i = 0; i < externalFUs.length; i++) {
+            externalFUs[i] = new DataOutputBuffer[maxPartitionSize];
         }
 
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(p -> {
             int[] lens = new int[maxFSize];
             int[] vIndexes = new int[maxFSize];
-
+            DataOutputBuffer[] externalFU = externalFUs[p];
             try {
                 int len = fonls.length;
                 for (int u = 0; u < len; u++) {
@@ -172,10 +178,11 @@ public class ParallelMethod3 extends ParallelBase {
                                     WritableUtils.writeVInt(internalFU[v], vn);
                                     WritableUtils.writeVInt(internalFU[v], u);
                                 } else {
-                                    if (externalFU[partition[v]][pIndex[v]] == null)
-                                        externalFU[partition[v]][pIndex[v]] = new DataOutputBuffer();
-                                    WritableUtils.writeVInt(externalFU[partition[v]][pIndex[v]], vn);
-                                    WritableUtils.writeVInt(externalFU[partition[v]][pIndex[v]], u);
+                                    if (externalFU[pIndex[v]] == null)
+                                        externalFU[pIndex[v]] = new DataOutputBuffer();
+                                    WritableUtils.writeVInt(externalFU[pIndex[v]], v);
+                                    WritableUtils.writeVInt(externalFU[pIndex[v]], vn);
+                                    WritableUtils.writeVInt(externalFU[pIndex[v]], u);
                                 }
                                 idx++;
                                 f++;
@@ -209,9 +216,50 @@ public class ParallelMethod3 extends ParallelBase {
             }
         })).get();
 
-        long tEndTc = System.currentTimeMillis();
-        System.out.println("tc after fonl: " + (tEndTc - t3) + " ms");
-        System.out.println("tc duration: " + (tEndTc - tStart) + " ms");
+
+        long tTC = System.currentTimeMillis();
+        System.out.println("tc after fonl: " + (tTC - t3) + " ms");
+        System.out.println("tc duration: " + (tTC - tStart) + " ms");
+
+        // Add external to internal
+        for (int i = 0; i < externalFUs.length; i++) {
+            final DataOutputBuffer[] externalFU = externalFUs[i];
+            final int index = i;
+            batchSelector = new AtomicInteger(0);
+            final int pSize = externalFU.length;
+            IntStream.range(0, threads).forEach(x -> {
+                DataInputBuffer in = new DataInputBuffer();
+
+                while (true) {
+                    int start = batchSelector.getAndAdd(BATCH_SIZE);
+                    if (start >= pSize)
+                        break;
+                    int len = Math.min(pSize, start + BATCH_SIZE);
+                    for (int j = start; j < len; j++) {
+                        if (externalFU[j] == null)
+                            continue;
+
+                        try {
+                            in.reset(externalFU[j].getData(), externalFU[j].getLength());
+                            while (in.getPosition() != externalFU[j].getLength()) {
+                                int v = WritableUtils.readVInt(in);
+                                int vn = WritableUtils.readVInt(in);
+                                int u = WritableUtils.readVInt(in);
+                                if (internalFU[v] == null)
+                                    internalFU[v] = new DataOutputBuffer();
+                                WritableUtils.writeVInt(internalFU[v], vn);
+                                WritableUtils.writeVInt(internalFU[v], u);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+        }
+
+        long tExternal = System.currentTimeMillis();
+        System.out.println("Update internals in " + (tExternal - tTC) + " ms");
 
         int tcCount = 0;
         DataInputBuffer in1 = new DataInputBuffer();
@@ -250,7 +298,7 @@ public class ParallelMethod3 extends ParallelBase {
         }
 
         long tFinal = System.currentTimeMillis();
-        System.out.println("fill eSup in " + (tFinal - tEndTc) + " ms");
+        System.out.println("fill eSup in " + (tFinal - tTC) + " ms");
         System.out.println("tcCount: " + tcCount);
 
     }
