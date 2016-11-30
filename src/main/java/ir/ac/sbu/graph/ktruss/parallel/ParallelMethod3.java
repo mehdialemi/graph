@@ -221,6 +221,7 @@ public class ParallelMethod3 extends ParallelBase {
         System.out.println("tc after fonl: " + (tTC - t3) + " ms");
         System.out.println("tc duration: " + (tTC - tStart) + " ms");
 
+        final AtomicInteger updateCount = new AtomicInteger(0);
         // Add external to internal
         for (int i = 0; i < externalFUs.length; i++) {
             final DataOutputBuffer[] externalFU = externalFUs[i];
@@ -249,6 +250,7 @@ public class ParallelMethod3 extends ParallelBase {
                                     internalFU[v] = new DataOutputBuffer();
                                 WritableUtils.writeVInt(internalFU[v], vn);
                                 WritableUtils.writeVInt(internalFU[v], u);
+                                updateCount.incrementAndGet();
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -257,6 +259,8 @@ public class ParallelMethod3 extends ParallelBase {
                 }
             });
         }
+
+        System.out.println("update count: " + updateCount);
 
         long tExternal = System.currentTimeMillis();
         System.out.println("Update internals in " + (tExternal - tTC) + " ms");
@@ -271,8 +275,6 @@ public class ParallelMethod3 extends ParallelBase {
 
             in1.reset(fonlCN[u].getData(), fonlCN[u].getLength());
             in2.reset(fonlVS[u].getData(), fonlVS[u].getLength());
-//            if (vertexEdges[u] == null)
-//                vertexEdges[u] = new VertexEdge(fl[u]);
             while (true) {
                 if (in2.getPosition() >= fonlVS[u].getLength())
                     break;
