@@ -62,10 +62,13 @@ public class ParallelMethod3 extends ParallelBase {
         // Construct fonls and fonlCN
         final int[][] fonls = new int[length][];
         final int[] fl = new int[length];  // Fonl Length
+        final int[] partition = new int[length];
 
         // Initialize neighbors arrayList
-        for (int i = 0; i < length; i++)
+        for (int i = 0; i < length; i++) {
             fonls[i] = new int[Math.min(d[i], length - d[i])];
+            partition[i] = - 1;
+        }
 
         // Fill neighbors arrayList
         for (Edge e : edges) {
@@ -81,20 +84,20 @@ public class ParallelMethod3 extends ParallelBase {
                 fonls[e.v2][fl[e.v2]++] = e.v1;
         }
 
-        final int[] p = new int[length];
         int[] pSize = new int[threads];
         Random random = new Random();
+        int[] pIndex = new int[length];
         for (int i = 0; i < fonls.length; i++) {
-            if (fl[i] < 2 || p[i] != 0)
+            if (fl[i] == 0 || partition[i] != -1)
                 continue;
-            int partition = random.nextInt(threads) + 1;
-            p[i] = partition;
-            pSize[partition - 1] ++;
+            int p = random.nextInt(threads);
+            partition[i] = p;
+            pIndex[i] = pSize[p] ++;
             for (int v : fonls[i]) {
-                if (fl[v] < 2 || p[v] != 0)
+                if (fl[v] == 0 || partition[v] != 0)
                     continue;
-                p[v] = partition;
-                pSize[partition - 1] ++;
+                partition[v] = p;
+                pIndex[v] = pSize[p] ++;
             }
         }
 
@@ -104,7 +107,7 @@ public class ParallelMethod3 extends ParallelBase {
 
         final VertexCompare vertexCompare = new VertexCompare(d);
         batchSelector = new AtomicInteger(0);
-        final int maxFSize = forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().map(index -> {
+        final int maxFSize = forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().map(i -> {
             int maxFonlSize = 0;
             while (true) {
                 int start = batchSelector.getAndAdd(BATCH_SIZE);
@@ -129,16 +132,21 @@ public class ParallelMethod3 extends ParallelBase {
 
         final DataOutputBuffer[] fonlCN = new DataOutputBuffer[length];  // fonl common neighbors
         final DataOutputBuffer[] fonlVS = new DataOutputBuffer[length];  // fonl vertex size
+        final DataOutputBuffer[] internalFU = new DataOutputBuffer[length];  // internal fonl update
+        final DataOutputBuffer[][] externalFU = new DataOutputBuffer[threads][];  // external fonl fonl update
+        for (int i = 0; i < externalFU.length; i++) {
+            externalFU[i] = new DataOutputBuffer[pSize[i]];
+        }
 
         batchSelector = new AtomicInteger(0);
-        forkJoinPool.submit(() -> IntStream.range(1, threads + 1).parallel().forEach(partition -> {
+        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(p -> {
             int[] lens = new int[maxFSize];
             int[] vIndexes = new int[maxFSize];
 
             try {
                 int len = fonls.length;
                 for (int u = 0; u < len; u++) {
-                    if (fl[u] < 2 || p[u] != partition)
+                    if (fl[u] < 2 || partition[u] != p)
                         continue;
 
                     int jIndex = 0;
@@ -157,7 +165,18 @@ public class ParallelMethod3 extends ParallelBase {
                                 if (idx == 0)
                                     fonlCN[u] = new DataOutputBuffer(fl[u] * 2);
                                 WritableUtils.writeVInt(fonlCN[u], f);
-                                WritableUtils.writeVInt(fonlCN[u], vn);
+
+                                if (partition[v] == p) {
+                                    if (internalFU[v] == null)
+                                        internalFU[v] = new DataOutputBuffer();
+                                    WritableUtils.writeVInt(internalFU[v], vn);
+                                    WritableUtils.writeVInt(internalFU[v], u);
+                                } else {
+                                    if (externalFU[partition[v]][pIndex[v]] == null)
+                                        externalFU[partition[v]][pIndex[v]] = new DataOutputBuffer();
+                                    WritableUtils.writeVInt(externalFU[partition[v]][pIndex[v]], vn);
+                                    WritableUtils.writeVInt(externalFU[partition[v]][pIndex[v]], u);
+                                }
                                 idx++;
                                 f++;
                                 vn++;
