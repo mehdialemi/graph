@@ -127,23 +127,23 @@ public class ParallelMethod3 extends ParallelBase {
         long t3 = System.currentTimeMillis();
         System.out.println("Create fonl in " + (t3 - t2) + " ms");
 
-        final byte[][] fonlCN = new byte[length][];  // fonl common neighbors
-        final byte[][] fonlVS = new byte[length][];  // fonl vertex size
+        final DataOutputBuffer[] fonlCN = new DataOutputBuffer[length];  // fonl common neighbors
+        final DataOutputBuffer[] fonlVS = new DataOutputBuffer[length];  // fonl vertex size
 
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(1, threads + 1).parallel().forEach(partition -> {
             int[] lens = new int[maxFSize];
             int[] vIndexes = new int[maxFSize];
-            DataOutputBuffer out1 = new DataOutputBuffer();
-            DataOutputBuffer out2 = new DataOutputBuffer();
+//            DataOutputBuffer out1 = new DataOutputBuffer();
+//            DataOutputBuffer out2 = new DataOutputBuffer();
             try {
                 int len = fonls.length;
                 for (int u = 0; u < len; u++) {
                     if (fl[u] < 2 || p[u] != partition)
                         continue;
 
-                    out1.reset();
-                    out2.reset();
+//                    out1.reset();
+//                    out2.reset();
                     int jIndex = 0;
 
                     // Find triangle by checking connectivity of neighbors
@@ -157,8 +157,10 @@ public class ParallelMethod3 extends ParallelBase {
                         int f = j + 1, vn = 0;
                         while (f < fl[u] && vn < fl[v]) {
                             if (fonl[f] == vNeighbors[vn]) {
-                                WritableUtils.writeVInt(out1, f);
-                                WritableUtils.writeVInt(out1, vn);
+                                if (idx == 0)
+                                    fonlCN[u] = new DataOutputBuffer(fl[u] * 2);
+                                WritableUtils.writeVInt(fonlCN[u], f);
+                                WritableUtils.writeVInt(fonlCN[u], vn);
                                 idx++;
                                 f++;
                                 vn++;
@@ -178,19 +180,13 @@ public class ParallelMethod3 extends ParallelBase {
                     if (jIndex == 0)
                         continue;
 
-                    WritableUtils.writeVInt(out2, jIndex);
+                    fonlVS[u] = new DataOutputBuffer(jIndex * 2);
+
+                    WritableUtils.writeVInt(fonlVS[u], jIndex);
                     for (int j = 0; j < jIndex; j++) {
-                        WritableUtils.writeVInt(out2, lens[j]);
-                        WritableUtils.writeVInt(out2, vIndexes[j]);
+                        WritableUtils.writeVInt(fonlVS[u], lens[j]);
+                        WritableUtils.writeVInt(fonlVS[u], vIndexes[j]);
                     }
-
-                    byte[] bytes = new byte[out1.getLength()]; // encoded triangle
-                    System.arraycopy(out1.getData(), 0, bytes, 0, out1.getLength());
-                    fonlCN[u] = bytes;
-
-                    bytes = new byte[out2.getLength()];
-                    System.arraycopy(out2.getData(), 0, bytes, 0, out2.getLength());
-                    fonlVS[u] = bytes;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -204,33 +200,32 @@ public class ParallelMethod3 extends ParallelBase {
         DataInputBuffer in1 = new DataInputBuffer();
         DataInputBuffer in2 = new DataInputBuffer();
 
-        VertexEdge[] vertexEdges = new VertexEdge[length];
         for (int u = 0; u < fonlCN.length; u++) {
             if (fonlCN[u] == null)
                 continue;
 
-            in1.reset(fonlCN[u], fonlCN[u].length);
-            in2.reset(fonlVS[u], fonlVS[u].length);
-            if (vertexEdges[u] == null)
-                vertexEdges[u] = new VertexEdge(fl[u]);
+            in1.reset(fonlCN[u].getData(), fonlCN[u].getLength());
+            in2.reset(fonlVS[u].getData(), fonlVS[u].getLength());
+//            if (vertexEdges[u] == null)
+//                vertexEdges[u] = new VertexEdge(fl[u]);
             while (true) {
-                if (in2.getPosition() >= fonlVS[u].length)
+                if (in2.getPosition() >= fonlVS[u].getLength())
                     break;
 
                 int size = WritableUtils.readVInt(in2);
                 for (int i = 0; i < size; i++) {
                     int len = WritableUtils.readVInt(in2);
                     int vIndex = WritableUtils.readVInt(in2);
-                    int v = fonls[u][vIndex];
-                    for (int j = 0; j < len; j++) {
-                        int uwIndex = WritableUtils.readVInt(in1);
-                        vertexEdges[u].add(uwIndex, v);
-
-                        int vwIndex = WritableUtils.readVInt(in1);
-                        if (vertexEdges[v] == null)
-                            vertexEdges[v] = new VertexEdge(fl[v]);
-                        vertexEdges[v].add(vwIndex, u);
-                    }
+//                    int v = fonls[u][vIndex];
+//                    for (int j = 0; j < len; j++) {
+//                        int uwIndex = WritableUtils.readVInt(in1);
+//                        vertexEdges[u].add(uwIndex, v);
+//
+//                        int vwIndex = WritableUtils.readVInt(in1);
+//                        if (vertexEdges[v] == null)
+//                            vertexEdges[v] = new VertexEdge(fl[v]);
+//                        vertexEdges[v].add(vwIndex, u);
+//                    }
 
                     tcCount += len;
                 }
