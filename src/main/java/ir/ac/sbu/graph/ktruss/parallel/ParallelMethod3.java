@@ -33,7 +33,7 @@ public class ParallelMethod3 extends ParallelBase {
                     int start = batchSelector.getAndAdd(BATCH_SIZE);
                     if (start >= edges.length)
                         break;
-                    int end = start + BATCH_SIZE;
+                    int end = Math.min(edges.length, start + BATCH_SIZE);
                     for (int i = start; i < end; i++) {
                         if (edges[i].v1 > edges[i].v2) {
                             if (edges[i].v1 > localMax)
