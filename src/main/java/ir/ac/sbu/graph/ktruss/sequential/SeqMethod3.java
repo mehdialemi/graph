@@ -9,9 +9,9 @@ import org.apache.hadoop.io.WritableUtils;
 /**
  * Use VInt to store triangles
  */
-public class Method3 extends SequentialBase {
+public class SeqMethod3 extends SequentialBase {
 
-    public Method3(Edge[] edges, int minSup) {
+    public SeqMethod3(Edge[] edges, int minSup) {
         super(edges, minSup);
     }
 

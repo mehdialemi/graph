@@ -15,11 +15,11 @@ import static ir.ac.sbu.graph.MultiCoreUtils.createBuckets;
 /**
  *
  */
-public class Method1 extends ParallelBase {
+public class ParallelMethod1 extends ParallelBase {
     public static final Tuple2<Integer, Integer> INVALID_TUPLE2 = new Tuple2<>(-1, -1);
     private final ForkJoinPool forkJoinPool;
 
-    public Method1(Edge[] edges, int minSup, int threads) {
+    public ParallelMethod1(Edge[] edges, int minSup, int threads) {
         super(edges, minSup, threads);
         forkJoinPool = new ForkJoinPool(threads);
     }

@@ -8,9 +8,9 @@ import java.util.*;
 /**
  *
  */
-public class Method1 extends SequentialBase {
+public class SeqMethod1 extends SequentialBase {
 
-    public Method1(Edge[] edges, int minSup) {
+    public SeqMethod1(Edge[] edges, int minSup) {
         super(edges, minSup);
     }
 

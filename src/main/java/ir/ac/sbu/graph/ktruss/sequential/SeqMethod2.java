@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
  * Use edge map such that key is an {@link Edge} object and value is
  * its vertices in the existing triangles in front of edge
  */
-public class Method2 extends SequentialBase {
+public class SeqMethod2 extends SequentialBase {
 
-    public Method2(Edge[] edges, int minSup) {
+    public SeqMethod2(Edge[] edges, int minSup) {
         super(edges, minSup);
     }
 

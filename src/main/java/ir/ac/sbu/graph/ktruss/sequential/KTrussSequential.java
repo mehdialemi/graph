@@ -2,10 +2,6 @@ package ir.ac.sbu.graph.ktruss.sequential;
 
 import ir.ac.sbu.graph.Edge;
 import ir.ac.sbu.graph.GraphLoader;
-import scala.Tuple2;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * Truss Decomposition based on Edge TriangleParallel list.
@@ -35,11 +31,11 @@ public class KTrussSequential {
         long t1 = System.currentTimeMillis();
         SequentialBase sequentialMethod = null;
         switch (method) {
-            case 1: sequentialMethod = new Method1(edges, minSup);
+            case 1: sequentialMethod = new SeqMethod1(edges, minSup);
                 break;
-            case 2: sequentialMethod = new Method2(edges, minSup);
+            case 2: sequentialMethod = new SeqMethod2(edges, minSup);
                 break;
-            case 3: sequentialMethod = new Method3(edges, minSup);
+            case 3: sequentialMethod = new SeqMethod3(edges, minSup);
         }
 
         sequentialMethod.start();

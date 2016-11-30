@@ -5,7 +5,7 @@ package ir.ac.sbu.graph;
  */
 public class VertexCompare {
 
-    private int[] deg;
+    private final int[] deg;
 
     public VertexCompare(int[] deg) {
         this.deg = deg;

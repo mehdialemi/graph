@@ -2,16 +2,6 @@ package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
 import ir.ac.sbu.graph.GraphLoader;
-import scala.Tuple3;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.util.*;
-import java.util.concurrent.ForkJoinPool;
 
 import static ir.ac.sbu.graph.MultiCoreUtils.createBuckets;
 
@@ -36,7 +26,7 @@ public class KTrussParallel {
         if (args.length > 2)
             threads = Integer.parseInt(args[2]);
 
-        int method = 2;
+        int method = 3;
         if (args.length > 3)
             method = Integer.parseInt(args[3]);
 
@@ -45,10 +35,11 @@ public class KTrussParallel {
         long t1 = System.currentTimeMillis();
         ParallelBase parallelBase = null;
         switch (method) {
-            case 1: parallelBase = new Method1(edges, minSup, threads);
+            case 1: parallelBase = new ParallelMethod1(edges, minSup, threads);
                 break;
-            case 2: parallelBase = new Method2(edges, minSup, threads);
+            case 2: parallelBase = new ParallelMethod2(edges, minSup, threads);
                 break;
+            case 3: parallelBase = new ParallelMethod3(edges, minSup, threads);
         }
 
         System.out.println("Start ktruss with k = " + k + ", threads = " + threads + ", input: " + inputPath);
