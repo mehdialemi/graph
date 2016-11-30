@@ -18,9 +18,11 @@ import java.util.List;
  */
 public class GraphLoader {
 
-    public static Edge[] loadFromLocalFile(String input) throws IOException {
+    public static Edge[] loadFromLocalFile(String inputPath) throws IOException {
+        System.out.println("Loading " + inputPath);
+
         long tr1 = System.currentTimeMillis();
-        final FileChannel channel = new FileInputStream(input).getChannel();
+        final FileChannel channel = new FileInputStream(inputPath).getChannel();
         MappedByteBuffer mapBB = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
         byte[] buf = new byte[(int) channel.size()];
         mapBB.get(buf);

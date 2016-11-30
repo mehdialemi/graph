@@ -24,7 +24,7 @@ public class ParallelMethod3 extends ParallelBase {
 
     @Override
     public void start() throws Exception {
-        long t1 = System.currentTimeMillis();
+        long tStart = System.currentTimeMillis();
         batchSelector = new AtomicInteger(0);
         int max = forkJoinPool.submit(() ->
             IntStream.range(0, threads).map(index -> {
@@ -55,6 +55,8 @@ public class ParallelMethod3 extends ParallelBase {
             d[e.v1]++;
             d[e.v2]++;
         }
+        long t2 = System.currentTimeMillis();
+        System.out.println("Find degrees in " + (t2 - tStart) + " ms");
 
         // Construct fonls and fonlCN
         final int[][] fonls = new int[length][];
@@ -77,6 +79,8 @@ public class ParallelMethod3 extends ParallelBase {
             else
                 fonls[e.v2][fl[e.v2]++] = e.v1;
         }
+        long t3 = System.currentTimeMillis();
+        System.out.println("Create fonl in " + (t3 - t2) + " ms");
 
         final VertexCompare vertexCompare = new VertexCompare(d);
         batchSelector = new AtomicInteger(0);
@@ -177,8 +181,8 @@ public class ParallelMethod3 extends ParallelBase {
             }
         })).get();
 
-        long t2 = System.currentTimeMillis();
-        System.out.println("tc duration: " + (t2 - t1) + " ms");
+        long tEndTc = System.currentTimeMillis();
+        System.out.println("tc duration: " + (tEndTc - tStart) + " ms");
 
         int tcCount = 0;
         DataInputBuffer in1 = new DataInputBuffer();
@@ -218,8 +222,8 @@ public class ParallelMethod3 extends ParallelBase {
             }
         }
 
-        long t3 = System.currentTimeMillis();
-        System.out.println("fill eSup in " + (t3 - t2) + " ms");
+        long tFinal = System.currentTimeMillis();
+        System.out.println("fill eSup in " + (tFinal - tEndTc) + " ms");
         System.out.println("tcCount: " + tcCount);
 
     }
