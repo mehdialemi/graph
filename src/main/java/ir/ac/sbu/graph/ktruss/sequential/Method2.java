@@ -47,13 +47,15 @@ public class Method2 extends SequentialBase {
                     Set<Integer> vertices = edgeMap.get(e1);
                     if (vertices != null) {
                         vertices.remove(invalid.getKey().v2);
-                        edgeMap.remove(e1);
+                        if (vertices.size() == 0)
+                            edgeMap.remove(e1);
                     }
 
                     vertices = edgeMap.get(e2);
                     if (vertices != null) {
                         vertices.remove(invalid.getKey().v1);
-                        edgeMap.remove(e2);
+                        if (vertices.size() == 0)
+                            edgeMap.remove(e2);
                     }
                 }
             }
