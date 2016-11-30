@@ -5,6 +5,9 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import scala.Tuple2;
 
+import java.io.*;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -15,29 +18,51 @@ import java.util.List;
  */
 public class GraphLoader {
 
+    public static Edge[] loadFromLocalFile(String input) throws IOException {
+        long tr1 = System.currentTimeMillis();
+        final FileChannel channel = new FileInputStream(input).getChannel();
+        MappedByteBuffer mapBB = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+        byte[] buf = new byte[(int) channel.size()];
+        mapBB.get(buf);
+        ByteArrayInputStream isr = new ByteArrayInputStream(buf);
+        InputStreamReader ip = new InputStreamReader(isr);
+        BufferedReader reader = new BufferedReader(ip);
+        List<Edge> edgeList = new ArrayList<>(buf.length / 20);
+        while (true) {
+            String line = reader.readLine();
+            if (line == null)
+                break;
+            if (line.startsWith("#"))
+                continue;
+            String[] split = line.split("\\s+");
+            edgeList.add(new Edge(Integer.parseInt(split[0]), Integer.parseInt(split[1])));
+        }
+        long tr2 = System.currentTimeMillis();
+        System.out.println("Graph loaded, edges: " + edgeList.size() + ", load time: " + (tr2 - tr1) + " ms");
+
+        return edgeList.toArray(new Edge[0]);
+    }
+
     public static JavaPairRDD<Long, Long> loadEdges(JavaRDD<String> input) {
-        JavaPairRDD<Long, Long> edges = input.flatMapToPair(new PairFlatMapFunction<String, Long, Long>() {
-            @Override
-            public Iterator<Tuple2<Long, Long>> call(String line) throws Exception {
-                if (line.startsWith("#"))
-                    return Collections.emptyIterator();
+        JavaPairRDD<Long, Long> edges = input.flatMapToPair((PairFlatMapFunction<String, Long, Long>) line -> {
+            if (line.startsWith("#"))
+                return Collections.emptyIterator();
 
-                String[] s = line.split("\\s+");
-                if (s == null || s.length != 2)
-                    return Collections.emptyIterator();
+            String[] s = line.split("\\s+");
+            if (s == null || s.length != 2)
+                return Collections.emptyIterator();
 
 
-                long e1 = Long.parseLong(s[0]);
-                long e2 = Long.parseLong(s[1]);
+            long e1 = Long.parseLong(s[0]);
+            long e2 = Long.parseLong(s[1]);
 
-                if (e1 == e2)
-                    return Collections.emptyIterator();
+            if (e1 == e2)
+                return Collections.emptyIterator();
 
-                List<Tuple2<Long, Long>> list = new ArrayList<>();
-                list.add(new Tuple2<>(e1, e2));
-                list.add(new Tuple2<>(e2, e1));
-                return list.iterator();
-            }
+            List<Tuple2<Long, Long>> list = new ArrayList<>();
+            list.add(new Tuple2<>(e1, e2));
+            list.add(new Tuple2<>(e2, e1));
+            return list.iterator();
         });
         return edges;
     }

@@ -30,7 +30,7 @@ public class RadixSort {
 
         // Largest place for a 32-bit int is the 1 billion's place
         for(int place=1; place <= 1000000000; place *= 10){
-            // Use counting sort at each digit's place
+            // Use counting quickSort at each digit's place
             input = countingSort(input, place);
         }
 

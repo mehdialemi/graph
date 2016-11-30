@@ -9,7 +9,7 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
 /**
- * Calculate GCC with id based ordering. In this method we have no dealing with degree of nodes and to sort nodes in
+ * Calculate GCC with id based ordering. In this method we have no dealing with degree of nodes and to quickSort nodes in
  * the fonl just id of the nodes are taken into account.
  */
 public class FonlIdGCC {

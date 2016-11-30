@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.ktruss.sequential;
+package ir.ac.sbu.graph;
 
 /**
  * Edge encapsulation
@@ -10,8 +10,8 @@ public class Edge {
     public int sup;
 
     public Edge(int v1, int v2) {
-//        if (v1 > v2)
-//            v2 = (v1 + v2) - (v1 = v2);
+        if (v1 > v2)
+            v2 = (v1 + v2) - (v1 = v2);
         this.v1 = v1;
         this.v2 = v2;
     }

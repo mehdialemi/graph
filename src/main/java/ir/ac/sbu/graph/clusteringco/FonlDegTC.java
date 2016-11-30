@@ -115,7 +115,7 @@ public class FonlDegTC {
                     forward = new long[len + 1];
                     forward[0] = t._1; // First vertex in the triangle
                     System.arraycopy(t._2, index + 1, forward, 1, len);
-                    Arrays.sort(forward, 1, forward.length); // sort to comfort with fonl
+                    Arrays.sort(forward, 1, forward.length); // quickSort to comfort with fonl
                 } else {
                     forward = new long[len];
                     System.arraycopy(t._2, index + 1, forward, 0, len);

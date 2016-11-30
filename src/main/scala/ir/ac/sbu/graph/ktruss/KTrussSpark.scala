@@ -40,14 +40,14 @@ object KTrussSpark {
         val fsNeighbors = vdNeighbor
           .map(t => (t._1, t._2.filter(x => x._2 > t._2.size || (x._2 == t._2.size && x._1 > t._1)).map(_._1).toSet[Long])).cache
 
-        // Use sortWith(_._2 < _._2) before map when this sort means if in the subsequent steps there is a filtering based on it
+        // Use sortWith(_._2 < _._2) before map when this sortDegrees means if in the subsequent steps there is a filtering based on it
         // We can send degree along with vertex id to cut based on it
 
         // Step 2: find triangles
         // Send third completing edge to check
         val edgeMsg = fsNeighbors.flatMap { t =>
             val msg = mutable.Map[Long, (Long, Set[Long])]()
-            // we can add filtering based on sort and not send any more data
+            // we can add filtering based on sortDegrees and not send any more data
             t._2.foreach(e => msg += e -> (t._1, t._2))
             msg
         }

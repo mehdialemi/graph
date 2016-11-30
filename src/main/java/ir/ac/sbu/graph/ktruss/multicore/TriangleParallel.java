@@ -1,6 +1,6 @@
 package ir.ac.sbu.graph.ktruss.multicore;
 
-import ir.ac.sbu.graph.ktruss.sequential.Edge;
+import ir.ac.sbu.graph.Edge;
 import scala.Tuple2;
 
 import java.util.*;
@@ -51,7 +51,7 @@ public class TriangleParallel {
         long t4 = System.currentTimeMillis();
         System.out.println("Fill degArray in " + (t4 - t3) + " ms");
 
-        // Fill and sort vertices array.
+        // Fill and quickSort vertices array.
         int[] vertices = sort(degArray, threads);
         int[] rvertices = new int[vertices.length];
         IntStream.range(0, threads).forEach(index -> {

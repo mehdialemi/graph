@@ -89,7 +89,7 @@ public class Fdonl implements Serializable {
                         lowDegNeighborList.add(vd.vId);
                 }
 
-                // We only require sort neighbors with higher degree
+                // We only require quickSort neighbors with higher degree
                 Collections.sort(highDegvdNeighborList, new Comparator<VertexDegree>() {
 
                     @Override

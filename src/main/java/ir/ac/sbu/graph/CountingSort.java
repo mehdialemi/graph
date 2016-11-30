@@ -28,8 +28,8 @@ public class CountingSort {
     public static int[] sort(int[] array) {
 
         // array to be sorted in, this array is necessary
-        // when we sort object datatypes, if we don't,
-        // we can sort directly into the input array
+        // when we quickSort object datatypes, if we don't,
+        // we can quickSort directly into the input array
         int[] aux = new int[array.length];
 
         // find the smallest and the largest value

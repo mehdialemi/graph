@@ -1,6 +1,6 @@
 package ir.ac.sbu.graph.ktruss.multicore;
 
-import ir.ac.sbu.graph.ktruss.sequential.Edge;
+import ir.ac.sbu.graph.Edge;
 import scala.Tuple2;
 import scala.Tuple3;
 
@@ -172,7 +172,7 @@ public class KTrussParallel {
             long t1_sort = System.currentTimeMillis();
             sorted = sort(eTriangles, sorted, threads, minSup);
             long t2_sort = System.currentTimeMillis();
-            System.out.println("Valid edges: " + sorted._2.length + ", sort time: " + (t2_sort - t1_sort) + " ms");
+            System.out.println("Valid edges: " + sorted._2.length + ", quickSort time: " + (t2_sort - t1_sort) + " ms");
             List<Tuple2<Integer, Integer>> buckets = MultiCoreUtils.createBuckets(threads, sorted._1);
             if (sorted._1 == 0)
                 break;
