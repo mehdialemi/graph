@@ -6,6 +6,7 @@ import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.io.WritableUtils;
 
+import java.util.Random;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -80,6 +81,20 @@ public class ParallelMethod3 extends ParallelBase {
                 fonls[e.v2][fl[e.v2]++] = e.v1;
         }
 
+        final int[] p = new int[length];
+        int[] pSize = new int[threads];
+        Random random = new Random();
+        for (int i = 0; i < fonls.length; i++) {
+            if (fl[i] < 2 || p[i] != 0)
+                continue;
+            int partition = random.nextInt(threads) + 1;
+            p[i] = partition;
+            for (int v : fonls[i]) {
+                if (fl[v] < 2 || p[v] != 0)
+                    continue;
+                p[v] = partition;
+            }
+        }
 
         final VertexCompare vertexCompare = new VertexCompare(d);
         batchSelector = new AtomicInteger(0);
@@ -110,72 +125,66 @@ public class ParallelMethod3 extends ParallelBase {
         final byte[][] fonlVS = new byte[length][];  // fonl vertex size
 
         batchSelector = new AtomicInteger(0);
-        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(index -> {
+        forkJoinPool.submit(() -> IntStream.range(1, threads + 1).parallel().forEach(partition -> {
             int[] lens = new int[maxFSize];
             int[] vIndexes = new int[maxFSize];
             DataOutputBuffer out1 = new DataOutputBuffer();
             DataOutputBuffer out2 = new DataOutputBuffer();
             try {
-                while (true) {
-                    int start = batchSelector.getAndAdd(BATCH_SIZE);
-                    if (start >= length)
-                        break;
-                    int end = Math.min(length, BATCH_SIZE + start);
+                int len = fonls.length;
+                for (int u = 0; u < len; u++) {
+                    if (fl[u] < 2 || p[u] != partition)
+                        continue;
 
-                    for (int u = start; u < end; u++) {
-                        if (fl[u] < 2)
-                            continue;
+                    out1.reset();
+                    out2.reset();
+                    int jIndex = 0;
 
-                        out1.reset();
-                        out2.reset();
-                        int jIndex = 0;
+                    // Find triangle by checking connectivity of neighbors
+                    for (int j = 0; j < fl[u]; j++) {
+                        int[] fonl = fonls[u];
+                        int v = fonl[j];
+                        int[] vNeighbors = fonls[v];
 
-                        // Find triangle by checking connectivity of neighbors
-                        for (int j = 0; j < fl[u]; j++) {
-                            int[] fonl = fonls[u];
-                            int v = fonl[j];
-                            int[] vNeighbors = fonls[v];
-
-                            int idx = 0;
-                            // intersection on u neighbors and v neighbors
-                            int f = j + 1, vn = 0;
-                            while (f < fl[u] && vn < fl[v]) {
-                                if (fonl[f] == vNeighbors[vn]) {
-                                    WritableUtils.writeVInt(out1, f);
-                                    WritableUtils.writeVInt(out1, vn);
-                                    idx++;
-                                    f++;
-                                    vn++;
-                                } else if (vertexCompare.compare(fonl[f], vNeighbors[vn]) == -1)
-                                    f++;
-                                else
-                                    vn++;
-                            }
-
-                            if (idx == 0)
-                                continue;
-
-                            vIndexes[jIndex] = j;
-                            lens[jIndex++] = idx;
+                        int idx = 0;
+                        // intersection on u neighbors and v neighbors
+                        int f = j + 1, vn = 0;
+                        while (f < fl[u] && vn < fl[v]) {
+                            if (fonl[f] == vNeighbors[vn]) {
+                                WritableUtils.writeVInt(out1, f);
+                                WritableUtils.writeVInt(out1, vn);
+                                idx++;
+                                f++;
+                                vn++;
+                            } else if (vertexCompare.compare(fonl[f], vNeighbors[vn]) == -1)
+                                f++;
+                            else
+                                vn++;
                         }
 
-                        if (jIndex == 0)
+                        if (idx == 0)
                             continue;
 
-                        WritableUtils.writeVInt(out2, jIndex);
-                        for (int j = 0; j < jIndex; j++) {
-                            WritableUtils.writeVInt(out2, lens[j]);
-                            WritableUtils.writeVInt(out2, vIndexes[j]);
-                        }
-
-                        byte[] bytes = new byte[out1.getLength()]; // encoded triangle
-                        System.arraycopy(out1.getData(), 0, bytes, 0, out1.getLength());
-                        fonlCN[u] = bytes;
-
-                        bytes = new byte[out2.getLength()];
-                        System.arraycopy(out2.getData(), 0, bytes, 0, out2.getLength());
-                        fonlVS[u] = bytes;
+                        vIndexes[jIndex] = j;
+                        lens[jIndex++] = idx;
                     }
+
+                    if (jIndex == 0)
+                        continue;
+
+                    WritableUtils.writeVInt(out2, jIndex);
+                    for (int j = 0; j < jIndex; j++) {
+                        WritableUtils.writeVInt(out2, lens[j]);
+                        WritableUtils.writeVInt(out2, vIndexes[j]);
+                    }
+
+                    byte[] bytes = new byte[out1.getLength()]; // encoded triangle
+                    System.arraycopy(out1.getData(), 0, bytes, 0, out1.getLength());
+                    fonlCN[u] = bytes;
+
+                    bytes = new byte[out2.getLength()];
+                    System.arraycopy(out2.getData(), 0, bytes, 0, out2.getLength());
+                    fonlVS[u] = bytes;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -188,7 +197,6 @@ public class ParallelMethod3 extends ParallelBase {
         int tcCount = 0;
         DataInputBuffer in1 = new DataInputBuffer();
         DataInputBuffer in2 = new DataInputBuffer();
-
 
         VertexEdge[] vertexEdges = new VertexEdge[length];
         for (int u = 0; u < fonlCN.length; u++) {
