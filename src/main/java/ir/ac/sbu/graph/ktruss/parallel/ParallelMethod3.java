@@ -79,8 +79,7 @@ public class ParallelMethod3 extends ParallelBase {
             else
                 fonls[e.v2][fl[e.v2]++] = e.v1;
         }
-        long t3 = System.currentTimeMillis();
-        System.out.println("Create fonl in " + (t3 - t2) + " ms");
+
 
         final VertexCompare vertexCompare = new VertexCompare(d);
         batchSelector = new AtomicInteger(0);
@@ -104,6 +103,8 @@ public class ParallelMethod3 extends ParallelBase {
             return maxFonlSize;
         })).get().reduce((a, b) -> Integer.max(a, b)).getAsInt();
 
+        long t3 = System.currentTimeMillis();
+        System.out.println("Create fonl in " + (t3 - t2) + " ms");
 
         final byte[][] fonlCN = new byte[length][];  // fonl common neighbors
         final byte[][] fonlVS = new byte[length][];  // fonl vertex size
