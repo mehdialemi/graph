@@ -134,16 +134,13 @@ public class ParallelMethod3 extends ParallelBase {
         forkJoinPool.submit(() -> IntStream.range(1, threads + 1).parallel().forEach(partition -> {
             int[] lens = new int[maxFSize];
             int[] vIndexes = new int[maxFSize];
-//            DataOutputBuffer out1 = new DataOutputBuffer();
-//            DataOutputBuffer out2 = new DataOutputBuffer();
+
             try {
                 int len = fonls.length;
                 for (int u = 0; u < len; u++) {
                     if (fl[u] < 2 || p[u] != partition)
                         continue;
 
-//                    out1.reset();
-//                    out2.reset();
                     int jIndex = 0;
 
                     // Find triangle by checking connectivity of neighbors
@@ -194,6 +191,7 @@ public class ParallelMethod3 extends ParallelBase {
         })).get();
 
         long tEndTc = System.currentTimeMillis();
+        System.out.println("tc after fonl: " + (tEndTc - t3) + " ms");
         System.out.println("tc duration: " + (tEndTc - tStart) + " ms");
 
         int tcCount = 0;
