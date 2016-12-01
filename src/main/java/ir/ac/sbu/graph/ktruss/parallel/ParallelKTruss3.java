@@ -7,7 +7,6 @@ import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.io.WritableUtils;
 
-import java.text.DecimalFormat;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -135,7 +134,6 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
 
         final DataOutputBuffer[] fonlCN = new DataOutputBuffer[length];  // fonl common neighbors
         final DataOutputBuffer[] fonlVS = new DataOutputBuffer[length];  // fonl vertex size
-        final DataOutputBuffer[] internalFU = new DataOutputBuffer[length];  // internal fonl update
         final DataOutputBuffer[][] externalFUs = new DataOutputBuffer[threads][];  // external fonl fonl update
 
         int maxPartitionSize = 0;
@@ -176,18 +174,12 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
                                     fonlCN[u] = new DataOutputBuffer(fl[u] * 2);
                                 WritableUtils.writeVInt(fonlCN[u], f);
 
-                                if (partition[v] == p) {
-                                    if (internalFU[v] == null)
-                                        internalFU[v] = new DataOutputBuffer(fl[v] * 2);
-                                    WritableUtils.writeVInt(internalFU[v], vn);
-                                    WritableUtils.writeVInt(internalFU[v], u);
-                                } else {
-                                    if (externalFU[pIndex[v]] == null)
-                                        externalFU[pIndex[v]] = new DataOutputBuffer(fl[v] * 2);
-                                    WritableUtils.writeVInt(externalFU[pIndex[v]], v);
-                                    WritableUtils.writeVInt(externalFU[pIndex[v]], vn);
-                                    WritableUtils.writeVInt(externalFU[pIndex[v]], u);
-                                }
+                                if (externalFU[pIndex[v]] == null)
+                                    externalFU[pIndex[v]] = new DataOutputBuffer( (d[v] - fl[v]) * (4 + 4 + fl[v] / 8 + 1));
+
+                                WritableUtils.writeVInt(externalFU[pIndex[v]], v);
+                                WritableUtils.writeVInt(externalFU[pIndex[v]], vn);
+                                WritableUtils.writeVInt(externalFU[pIndex[v]], u);
                                 idx++;
                                 f++;
                                 vn++;
@@ -224,77 +216,6 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
         long tTC = System.currentTimeMillis();
         System.out.println("tc after fonl: " + (tTC - t3) + " ms");
         System.out.println("tc duration: " + (tTC - tStart) + " ms");
-
-        final AtomicInteger updateCount = new AtomicInteger(0);
-        // Add external to internal
-        for (int i = 0; i < externalFUs.length; i++) {
-            final DataOutputBuffer[] externalFU = externalFUs[i];
-            final int index = i;
-            batchSelector = new AtomicInteger(0);
-            final int pSize = externalFU.length;
-            IntStream.range(0, threads).forEach(x -> {
-                DataInputBuffer in = new DataInputBuffer();
-
-                while (true) {
-                    int start = batchSelector.getAndAdd(BATCH_SIZE);
-                    if (start >= pSize)
-                        break;
-                    int len = Math.min(pSize, start + BATCH_SIZE);
-                    for (int j = start; j < len; j++) {
-                        if (externalFU[j] == null)
-                            continue;
-
-                        try {
-                            in.reset(externalFU[j].getData(), externalFU[j].getLength());
-                            while (in.getPosition() != externalFU[j].getLength()) {
-                                int v = WritableUtils.readVInt(in);
-                                int vn = WritableUtils.readVInt(in);
-                                int u = WritableUtils.readVInt(in);
-                                if (internalFU[v] == null)
-                                    internalFU[v] = new DataOutputBuffer(fl[v] * 2);
-                                WritableUtils.writeVInt(internalFU[v], vn);
-                                WritableUtils.writeVInt(internalFU[v], u);
-                                updateCount.incrementAndGet();
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            });
-        }
-
-        int sumNeighborSize = 0;
-        int maxNeighborSize = 0;
-        int countNS = 0;
-
-        for (int i = 0; i < internalFU.length; i++) {
-            DataOutputBuffer internal = internalFU[i];
-            if (internal == null)
-                continue;
-            int neighborSize = internal.getLength() / 5;
-            if (neighborSize > maxNeighborSize)
-                maxNeighborSize = neighborSize;
-            sumNeighborSize += neighborSize;
-            countNS ++;
-        }
-
-        double avgNeighborSize = sumNeighborSize / (float) countNS;
-        double sumVarNS = 0.0;
-        for (int i = 0; i < internalFU.length; i++) {
-            DataOutputBuffer internal = internalFU[i];
-            if (internal == null)
-                continue;
-            int neighborSize = internal.getLength() / 5;
-            sumVarNS += Math.sqrt(Math.pow(neighborSize - avgNeighborSize, 2));
-        }
-        double varNS = sumVarNS / countNS;
-        DecimalFormat df = new DecimalFormat("#.00");
-        System.out.println("update count: " + updateCount + ", maxNS = " + maxNeighborSize + ", " +
-            "avgNS = " + df.format(avgNeighborSize) + ", varNS = " + df.format(varNS));
-
-        long tExternal = System.currentTimeMillis();
-        System.out.println("Update internals in " + (tExternal - tTC) + " ms");
 
         int tcCount = 0;
         DataInputBuffer in1 = new DataInputBuffer();
