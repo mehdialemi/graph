@@ -212,7 +212,6 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
             }
         })).get();
 
-
         long tTC = System.currentTimeMillis();
         System.out.println("tc after fonl: " + (tTC - t3) + " ms");
         System.out.println("tc duration: " + (tTC - tStart) + " ms");
