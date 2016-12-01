@@ -24,6 +24,9 @@ public class PartitioningUtils {
             vs[i] = new int[fonls.length];
         }
 
+        int[] outVone = new int[partitionNum];
+        int[] outVmore = new int[partitionNum];
+
         for (int u = 0; u < fonlNeighborL1.length; u++) {
             if (fonlNeighborL1[u] == null)
                 continue;
@@ -52,7 +55,9 @@ public class PartitioningUtils {
                         if (vs[partitions[u]][v] == 0) {
                             outV[partitions[u]]++;
                             vs[partitions[u]][v] = 1;
+                            outVone[partitions[u]] ++;
                         }
+                        outVmore[partitions[u]] ++;
                         outE[partitions[u]]++;
                     }
                 }
@@ -69,6 +74,7 @@ public class PartitioningUtils {
             System.out.println("partition " + i + " => sizeV: " + (inV[i] + outV[i]) +
                 " inV: " + inV[i] + ", outV: " + outV[i] + ", " +
                 "total inRatioV: " + df.format(inV[i] / (double)(inV[i] + outV[i])));
+            System.out.println("partition " + i + " => outVmore/outVone: " + df.format(outVmore[i] / (double) outVone[i]));
             totalIn += inE[i];
             totalOut += outE[i];
         }
