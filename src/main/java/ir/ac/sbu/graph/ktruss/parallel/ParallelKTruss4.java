@@ -1,12 +1,12 @@
 package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
-import ir.ac.sbu.graph.MultiCoreUtils;
 import ir.ac.sbu.graph.VertexCompare;
 import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.io.WritableUtils;
 
+import java.io.IOException;
 import java.util.BitSet;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,32 +28,39 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
     public void start() throws Exception {
         long tStart = System.currentTimeMillis();
         batchSelector = new AtomicInteger(0);
-        int maxVertexNum = forkJoinPool.submit(() ->
-            IntStream.range(0, threads).map(index -> {
-                int localMax = Integer.MIN_VALUE;
-                while (true) {
-                    int start = batchSelector.getAndAdd(BATCH_SIZE);
-                    if (start >= edges.length)
-                        break;
-                    int end = Math.min(edges.length, start + BATCH_SIZE);
-                    for (int i = start; i < end; i++) {
-                        if (edges[i].v1 > edges[i].v2) {
-                            if (edges[i].v1 > localMax)
-                                localMax = edges[i].v1;
-                        } else {
-                            if (edges[i].v2 > localMax)
-                                localMax = edges[i].v2;
-                        }
-                    }
-                }
-                return localMax;
-            })).get().reduce((a, b) -> Math.max(a, b)).getAsInt();
+        int maxVertexNum = 0;
+        for (Edge edge : edges) {
+            if (edge.v1 > maxVertexNum)
+                maxVertexNum = edge.v1;
+            if (edge.v2 > maxVertexNum)
+                maxVertexNum = edge.v2;
+        }
+//        int maxVertexNum = forkJoinPool.submit(() ->
+//            IntStream.range(0, threads).map(index -> {
+//                int localMax = Integer.MIN_VALUE;
+//                while (true) {
+//                    int start = batchSelector.getAndAdd(BATCH_SIZE);
+//                    if (start >= edges.vCount)
+//                        break;
+//                    int end = Math.min(edges.vCount, start + BATCH_SIZE);
+//                    for (int i = start; i < end; i++) {
+//                        if (edges[i].v1 > edges[i].v2) {
+//                            if (edges[i].v1 > localMax)
+//                                localMax = edges[i].v1;
+//                        } else {
+//                            if (edges[i].v2 > localMax)
+//                                localMax = edges[i].v2;
+//                        }
+//                    }
+//                }
+//                return localMax;
+//            })).get().reduce((a, b) -> Math.max(a, b)).getAsInt();
         long tMax = System.currentTimeMillis();
         System.out.println("find maxVertexNum in " + (tMax - tStart) + " ms");
 
         // Construct degree arrayList such that vertexId is the index of the arrayList.
-        final int length = maxVertexNum + 1;
-        int[] d = new int[length];  // vertex degree
+        final int vCount = maxVertexNum + 1;
+        int[] d = new int[vCount];  // vertex degree
         for (Edge e : edges) {
             d[e.v1]++;
             d[e.v2]++;
@@ -62,11 +69,11 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         System.out.println("Find degrees in " + (t2 - tStart) + " ms");
 
         // Construct fonls and fonlCN
-        final int[][] fonls = new int[length][];
-        final int[] fl = new int[length];  // Fonl Length
+        final int[][] fonls = new int[vCount][];
+        final int[] fl = new int[vCount];  // Fonl Length
 
-        for (int i = 0 ; i < length ; i ++)
-            fonls[i] = new int[Math.min(d[i], length - d[i])];
+        for (int i = 0 ; i < vCount ; i ++)
+            fonls[i] = new int[Math.min(d[i], vCount - d[i])];
 
         long tInitFonl = System.currentTimeMillis();
         System.out.println("Initialize fonl " + (tInitFonl - t2) + " ms");
@@ -91,9 +98,9 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             int maxFonlSize = 0;
             while (true) {
                 int start = batchSelector.getAndAdd(BATCH_SIZE);
-                if (start >= length)
+                if (start >= vCount)
                     break;
-                int end = Math.min(length, BATCH_SIZE + start);
+                int end = Math.min(vCount, BATCH_SIZE + start);
 
                 for (int u = start; u < end; u++) {
                     if (fl[u] < 2)
@@ -109,8 +116,8 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         long t3 = System.currentTimeMillis();
         System.out.println("Create fonl in " + (t3 - t2) + " ms");
 
-        byte[][] fonlNeighborL1 = new byte[length][];
-        byte[][] fonlNeighborL2 = new byte[length][];
+        byte[][] fonlNeighborL1 = new byte[vCount][];
+        byte[][] fonlNeighborL2 = new byte[vCount][];
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(i -> {
             int[] vIndexes = new int[maxFSize];
@@ -119,9 +126,9 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             DataOutputBuffer outNeighborL2 = new DataOutputBuffer(maxFSize);
             while (true) {
                 int start = batchSelector.getAndAdd(BATCH_SIZE);
-                if (start >= length)
+                if (start >= vCount)
                     break;
-                int end = Math.min(length, BATCH_SIZE + start);
+                int end = Math.min(vCount, BATCH_SIZE + start);
 
                 for (int u = start; u < end; u++) {
                     if (fl[u] < 2)
@@ -194,16 +201,12 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         // ================ Partition fonls ===================
 
         // initialize partitions to -1
-        int[] partitions = new int[length];
-        BitSet bitSet = new BitSet(length);
-        for (int i = 0; i < partitions.length; i++) {
-            partitions[i] = -1;
-        }
+        int[] partitions = new int[vCount];
+        int[] pSizes = new int[threads];
 
-        // create dominate set
-        for (int u = 0; u < fonls.length; u++) {
-
-        }
+        findBestPartition(vCount, fonls, fl, fonlNeighborL1, partitions, pSizes);
+        long tPartition = System.currentTimeMillis();
+        System.out.println("partition time: " + (tPartition - tTC) + " ms");
 
         int tcCount = 0;
         DataInputBuffer in1 = new DataInputBuffer();
@@ -243,5 +246,101 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         System.out.println("fill eSup in " + (tFinal - tTC) + " ms");
         System.out.println("tcCount: " + tcCount);
 
+    }
+
+    private void findBestPartition(int vCount, int[][] fonls, int[] fl, byte[][] fonlNeighborL1, int[] partitions, int[] pSizes) throws IOException {
+        BitSet bitSet = new BitSet(vCount);
+        for (int i = 0; i < partitions.length; i++) {
+            partitions[i] = -1;
+        }
+
+        // create dominate set
+        DataInputBuffer uIn = new DataInputBuffer();
+        int neighborhood = 5;
+        int currentPartition = 0;
+        int added = 0;
+        for (int u = 0; u < vCount; u++) {
+            if (fonlNeighborL1[u] == null || bitSet.get(u))
+                continue;
+            int p = currentPartition % threads;
+            added ++;
+            if (added % neighborhood == 0)
+                currentPartition ++;
+
+            partitions[u] = p;
+            pSizes[p] ++;
+            bitSet.set(u);
+            // set neighbors of u uIn the bitSet
+            uIn.reset(fonlNeighborL1[u], fonlNeighborL1[u].length);
+            while (true) {
+                if (uIn.getPosition() >= fonlNeighborL1[u].length)
+                    break;
+
+                int size = WritableUtils.readVInt(uIn);
+                for (int i = 0; i < size; i++) {
+                    WritableUtils.readVInt(uIn);  // skip len
+                    int vIndex = WritableUtils.readVInt(uIn);
+                    bitSet.set(fonls[u][vIndex]);
+                }
+            }
+        }
+
+        DataInputBuffer vIn = new DataInputBuffer();
+        int[] pScores = new int[threads];
+        for (int u = 0 ; u < vCount; u ++) {
+            if (fonlNeighborL1[u] == null || partitions[u] != -1)
+                continue;
+            // find appropriate findBestPartition
+            uIn.reset(fonlNeighborL1[u], fonlNeighborL1[u].length);
+            while (true) {
+                if (uIn.getPosition() >= fonlNeighborL1[u].length)
+                    break;
+
+                int size = WritableUtils.readVInt(uIn);
+                for (int i = 0; i < size; i++) {
+                    WritableUtils.readVInt(uIn);  // skip len
+                    int vIndex = WritableUtils.readVInt(uIn);
+                    int v = fonls[u][vIndex];
+                    if (fl[v] < 2 || partitions[v] != -1 || fonlNeighborL1[v] == null)
+                        continue;
+
+                    // find target findBestPartition for v
+                    int maxScore = 0;
+                    int targetPartition = 0;
+                    vIn.reset(fonlNeighborL1[v], fonlNeighborL1[v].length);
+                    for (int pIndex = 0; pIndex < pScores.length; pIndex++) {
+                        pScores[pIndex] = 0;
+                    }
+
+                    while (true) {
+                        if (vIn.getPosition() >= fonlNeighborL1[v].length)
+                            break;
+                        int vnSize = WritableUtils.readVInt(vIn);
+                        for (int j = 0 ; j < vnSize; j ++) {
+                            WritableUtils.readVInt(vIn);  // skip len
+                            int wIndex = WritableUtils.readVInt(vIn);
+                            int w = fonls[v][wIndex];
+                            if (fl[w] < 2 || partitions[w] == -1)
+                                continue;
+                            pScores[partitions[w]] ++;
+                            if (pScores[partitions[w]] > maxScore) {
+                                maxScore = pScores[partitions[w]];
+                                targetPartition = partitions[w];
+                            }
+                        }
+                    }
+                    // find target findBestPartition => the smallest size findBestPartition with maximum maxScore
+                    for (int pIndex = 0; pIndex < pScores.length; pIndex++) {
+                        if (pIndex == targetPartition)
+                            continue;
+                        if (pSizes[pIndex] < pSizes[targetPartition])
+                            targetPartition = pIndex;
+                    }
+
+                    partitions[v] = targetPartition;
+                    pSizes[targetPartition] ++;
+                }
+            }
+        }
     }
 }
