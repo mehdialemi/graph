@@ -1,6 +1,7 @@
 package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
+import ir.ac.sbu.graph.PartitioningUtils;
 import ir.ac.sbu.graph.VertexCompare;
 import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
@@ -72,7 +73,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         final int[][] fonls = new int[vCount][];
         final int[] fl = new int[vCount];  // Fonl Length
 
-        for (int i = 0 ; i < vCount ; i ++)
+        for (int i = 0; i < vCount; i++)
             fonls[i] = new int[Math.min(d[i], vCount - d[i])];
 
         long tInitFonl = System.currentTimeMillis();
@@ -126,13 +127,10 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         System.out.println("tc duration: " + (tTC - tStart) + " ms");
 
         // ================ Partition fonls ===================
-
-        // initialize partitions to -1
-        int[] partitions = new int[vCount];
         int[] pSizes = new int[threads];
-
-        findBestPartition(vCount, fonls, fl, fonlNeighborL1, partitions, pSizes);
+        int[] partitions = findPartition(threads, fonls, fl, fonlNeighborL1, pSizes);
         long tPartition = System.currentTimeMillis();
+        PartitioningUtils.printStatus(threads, partitions, fonls, fonlNeighborL1);
         System.out.println("partition time: " + (tPartition - tTC) + " ms");
 
         int tcCount = 0;
@@ -253,99 +251,87 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         })).get();
     }
 
-    private void findBestPartition(int vCount, int[][] fonls, int[] fl, byte[][] fonlNeighborL1, int[] partitions, int[] pSizes) throws IOException {
-        BitSet bitSet = new BitSet(vCount);
-        for (int i = 0; i < partitions.length; i++) {
-            partitions[i] = -1;
+    private int[] findPartition(int threads, int[][] fonls, int[] fl, byte[][] fonlNeighborL1, int[] pSizes) throws IOException {
+        int[] partitions = new int[fonls.length];
+        BitSet bitSet = new BitSet(fonls.length);
+        for (int u = 0; u < partitions.length; u++) {
+            partitions[u] = -1;
         }
 
         // create dominate set
-        DataInputBuffer uIn = new DataInputBuffer();
+        DataInputBuffer in = new DataInputBuffer();
         int neighborhood = 5;
         int currentPartition = 0;
         int added = 0;
-        for (int u = 0; u < vCount; u++) {
+        for (int u = 0; u < fonls.length; u++) {
             if (fonlNeighborL1[u] == null || bitSet.get(u))
                 continue;
             int p = currentPartition % threads;
-            added ++;
+            added++;
             if (added % neighborhood == 0)
-                currentPartition ++;
+                currentPartition++;
 
             partitions[u] = p;
-            pSizes[p] ++;
+            pSizes[p]++;
             bitSet.set(u);
-            // set neighbors of u uIn the bitSet
-            uIn.reset(fonlNeighborL1[u], fonlNeighborL1[u].length);
+            // set neighbors of u in the bitSet
+            in.reset(fonlNeighborL1[u], fonlNeighborL1[u].length);
             while (true) {
-                if (uIn.getPosition() >= fonlNeighborL1[u].length)
+                if (in.getPosition() >= fonlNeighborL1[u].length)
                     break;
 
-                int size = WritableUtils.readVInt(uIn);
+                int size = WritableUtils.readVInt(in);
                 for (int i = 0; i < size; i++) {
-                    WritableUtils.readVInt(uIn);  // skip len
-                    int vIndex = WritableUtils.readVInt(uIn);
+                    WritableUtils.readVInt(in);  // skip len
+                    int vIndex = WritableUtils.readVInt(in);
                     bitSet.set(fonls[u][vIndex]);
                 }
             }
         }
 
-        DataInputBuffer vIn = new DataInputBuffer();
         int[] pScores = new int[threads];
-        for (int u = 0 ; u < vCount; u ++) {
+        for (int u = 0; u < fonls.length; u++) {
             if (fonlNeighborL1[u] == null || partitions[u] != -1)
                 continue;
-            // find appropriate findBestPartition
-            uIn.reset(fonlNeighborL1[u], fonlNeighborL1[u].length);
+
+            // find appropriate findPartition
+            int maxScore = 0;
+            int targetPartition = 0;
+            in.reset(fonlNeighborL1[u], fonlNeighborL1[u].length);
+            for (int pIndex = 0; pIndex < pScores.length; pIndex++)
+                pScores[pIndex] = 0;
+
             while (true) {
-                if (uIn.getPosition() >= fonlNeighborL1[u].length)
+                if (in.getPosition() >= fonlNeighborL1[u].length)
                     break;
 
-                int size = WritableUtils.readVInt(uIn);
+                int size = WritableUtils.readVInt(in);
                 for (int i = 0; i < size; i++) {
-                    WritableUtils.readVInt(uIn);  // skip len
-                    int vIndex = WritableUtils.readVInt(uIn);
+                    WritableUtils.readVInt(in);  // skip len
+                    int vIndex = WritableUtils.readVInt(in);
                     int v = fonls[u][vIndex];
-                    if (fl[v] < 2 || partitions[v] != -1 || fonlNeighborL1[v] == null)
+                    if (partitions[v] == -1 || fonlNeighborL1[v] == null)
                         continue;
 
-                    // find target findBestPartition for v
-                    int maxScore = 0;
-                    int targetPartition = 0;
-                    vIn.reset(fonlNeighborL1[v], fonlNeighborL1[v].length);
-                    for (int pIndex = 0; pIndex < pScores.length; pIndex++) {
-                        pScores[pIndex] = 0;
+                    pScores[partitions[v]]++;
+                    if (pScores[partitions[v]] > maxScore) {
+                        maxScore = pScores[partitions[v]];
+                        targetPartition = partitions[v];
                     }
-
-                    while (true) {
-                        if (vIn.getPosition() >= fonlNeighborL1[v].length)
-                            break;
-                        int vnSize = WritableUtils.readVInt(vIn);
-                        for (int j = 0 ; j < vnSize; j ++) {
-                            WritableUtils.readVInt(vIn);  // skip len
-                            int wIndex = WritableUtils.readVInt(vIn);
-                            int w = fonls[v][wIndex];
-                            if (fl[w] < 2 || partitions[w] == -1)
-                                continue;
-                            pScores[partitions[w]] ++;
-                            if (pScores[partitions[w]] > maxScore) {
-                                maxScore = pScores[partitions[w]];
-                                targetPartition = partitions[w];
-                            }
-                        }
-                    }
-                    // find target findBestPartition => the smallest size findBestPartition with maximum maxScore
-                    for (int pIndex = 0; pIndex < pScores.length; pIndex++) {
-                        if (pIndex == targetPartition)
-                            continue;
-                        if (pSizes[pIndex] < pSizes[targetPartition])
-                            targetPartition = pIndex;
-                    }
-
-                    partitions[v] = targetPartition;
-                    pSizes[targetPartition] ++;
                 }
             }
+
+            // find target findPartition => the smallest size findPartition with maximum maxScore
+            for (int pIndex = 0; pIndex < pScores.length; pIndex++) {
+                if (pIndex == targetPartition)
+                    continue;
+                if (pSizes[pIndex] < pSizes[targetPartition])
+                    targetPartition = pIndex;
+            }
+
+            partitions[u] = targetPartition;
+            pSizes[targetPartition]++;
         }
+        return partitions;
     }
 }
