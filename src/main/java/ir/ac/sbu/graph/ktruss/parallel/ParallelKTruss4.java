@@ -63,16 +63,16 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         final int[][] fonls = new int[length][];
         final int[] fl = new int[length];  // Fonl Length
 
-        forkJoinPool.submit(() -> {
-        MultiCoreUtils.createBuckets(threads, length).parallelStream().forEach(bucket -> {
-            for (int i = bucket._1 ; i < bucket._2 ; i ++)
-                fonls[i] = new int[Math.min(d[i], length - d[i])];
-        });
-        }).get();
+//        forkJoinPool.submit(() -> {
+//            MultiCoreUtils.createBuckets(threads, length).parallelStream().forEach(bucket -> {
+//                for (int i = bucket._1; i < bucket._2; i++)
+//                    fonls[i] = new int[Math.min(d[i], length - d[i])];
+//            });
+//        }).get();
 
-//        for (int i = 0 ; i < length ; i ++)
-//            fonls[i] = new int[Math.min(d[i], length - d[i])];
-//        
+        for (int i = 0 ; i < length ; i ++)
+            fonls[i] = new int[Math.min(d[i], length - d[i])];
+
         long tInitFonl = System.currentTimeMillis();
         System.out.println("Initialize fonl " + (tInitFonl - t2) + " ms");
 
@@ -114,14 +114,14 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         long t3 = System.currentTimeMillis();
         System.out.println("Create fonl in " + (t3 - t2) + " ms");
 
-        byte[][] fonlNeighbor1Indices = new byte[length][];
-        byte[][] fonlNeighbor2Indices = new byte[length][];
+        byte[][] fonlNeighborL1 = new byte[length][];
+        byte[][] fonlNeighborL2 = new byte[length][];
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(i -> {
             int[] vIndexes = new int[maxFSize];
             int[] lens = new int[maxFSize];
-            DataOutputBuffer outNeighbor1 = new DataOutputBuffer(maxFSize);
-            DataOutputBuffer outNeighbor2 = new DataOutputBuffer(maxFSize);
+            DataOutputBuffer outNeighborL1 = new DataOutputBuffer(maxFSize);
+            DataOutputBuffer outNeighborL2 = new DataOutputBuffer(maxFSize);
             while (true) {
                 int start = batchSelector.getAndAdd(BATCH_SIZE);
                 if (start >= length)
@@ -146,9 +146,9 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                         while (f < fl[u] && vn < fl[v]) {
                             if (fonl[f] == vNeighbors[vn]) {
                                 if (idx == 0)
-                                    outNeighbor2.reset();
+                                    outNeighborL2.reset();
                                 try {
-                                    WritableUtils.writeVInt(outNeighbor2, f);
+                                    WritableUtils.writeVInt(outNeighborL2, f);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -172,43 +172,43 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                     if (jIndex == 0)
                         continue;
 
-                    outNeighbor1.reset();
+                    outNeighborL1.reset();
                     try {
-                        WritableUtils.writeVInt(outNeighbor1, jIndex);
+                        WritableUtils.writeVInt(outNeighborL1, jIndex);
                         for (int j = 0; j < jIndex; j++) {
-                            WritableUtils.writeVInt(outNeighbor1, lens[j]);
-                            WritableUtils.writeVInt(outNeighbor1, vIndexes[j]);
+                            WritableUtils.writeVInt(outNeighborL1, lens[j]);
+                            WritableUtils.writeVInt(outNeighborL1, vIndexes[j]);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
 
-                    fonlNeighbor1Indices[u] = new byte[outNeighbor1.getLength()];
-                    System.arraycopy(outNeighbor1.getData(), 0, fonlNeighbor1Indices[u], 0, outNeighbor1.getLength());
+                    fonlNeighborL1[u] = new byte[outNeighborL1.getLength()];
+                    System.arraycopy(outNeighborL1.getData(), 0, fonlNeighborL1[u], 0, outNeighborL1.getLength());
 
-                    fonlNeighbor2Indices[u] = new byte[outNeighbor2.getLength()];
-                    System.arraycopy(outNeighbor2.getData(), 0, fonlNeighbor2Indices[u], 0, outNeighbor2.getLength());
+                    fonlNeighborL2[u] = new byte[outNeighborL2.getLength()];
+                    System.arraycopy(outNeighborL2.getData(), 0, fonlNeighborL2[u], 0, outNeighborL2.getLength());
                 }
             }
         })).get();
-
 
         long tTC = System.currentTimeMillis();
         System.out.println("tc after fonl: " + (tTC - t3) + " ms");
         System.out.println("tc duration: " + (tTC - tStart) + " ms");
 
+
         int tcCount = 0;
         DataInputBuffer in1 = new DataInputBuffer();
         DataInputBuffer in2 = new DataInputBuffer();
 
-        for (int u = 0; u < fonlNeighbor1Indices.length; u++) {
-            if (fonlNeighbor1Indices[u] == null)
+        for (int u = 0; u < fonlNeighborL1.length; u++) {
+            if (fonlNeighborL1[u] == null)
                 continue;
 
-            in1.reset(fonlNeighbor1Indices[u], fonlNeighbor1Indices[u].length);
-            in2.reset(fonlNeighbor2Indices[u], fonlNeighbor2Indices[u].length);
+            in1.reset(fonlNeighborL1[u], fonlNeighborL1[u].length);
+            in2.reset(fonlNeighborL2[u], fonlNeighborL2[u].length);
             while (true) {
-                if (in1.getPosition() >= fonlNeighbor1Indices[u].length)
+                if (in1.getPosition() >= fonlNeighborL1[u].length)
                     break;
 
                 int size = WritableUtils.readVInt(in1);
