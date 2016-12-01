@@ -118,6 +118,64 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
         byte[][] fonlNeighborL1 = new byte[vCount][];
         byte[][] fonlNeighborL2 = new byte[vCount][];
+
+        findTriangles(vCount, fonls, fl, vertexCompare, maxFSize, fonlNeighborL1, fonlNeighborL2);
+
+        long tTC = System.currentTimeMillis();
+        System.out.println("tc after fonl: " + (tTC - t3) + " ms");
+        System.out.println("tc duration: " + (tTC - tStart) + " ms");
+
+        // ================ Partition fonls ===================
+
+        // initialize partitions to -1
+        int[] partitions = new int[vCount];
+        int[] pSizes = new int[threads];
+
+        findBestPartition(vCount, fonls, fl, fonlNeighborL1, partitions, pSizes);
+        long tPartition = System.currentTimeMillis();
+        System.out.println("partition time: " + (tPartition - tTC) + " ms");
+
+        int tcCount = 0;
+        DataInputBuffer in1 = new DataInputBuffer();
+        DataInputBuffer in2 = new DataInputBuffer();
+
+        for (int u = 0; u < fonlNeighborL1.length; u++) {
+            if (fonlNeighborL1[u] == null)
+                continue;
+
+            in1.reset(fonlNeighborL1[u], fonlNeighborL1[u].length);
+            in2.reset(fonlNeighborL2[u], fonlNeighborL2[u].length);
+            while (true) {
+                if (in1.getPosition() >= fonlNeighborL1[u].length)
+                    break;
+
+                int size = WritableUtils.readVInt(in1);
+                for (int i = 0; i < size; i++) {
+                    int len = WritableUtils.readVInt(in1);
+                    int vIndex = WritableUtils.readVInt(in1);
+//                    int v = fonls[u][vIndex];
+//                    for (int j = 0; j < len; j++) {
+//                        int uwIndex = WritableUtils.readVInt(in2);
+//                        vertexEdges[u].add(uwIndex, v);
+//
+//                        int vwIndex = WritableUtils.readVInt(in2);
+//                        if (vertexEdges[v] == null)
+//                            vertexEdges[v] = new VertexEdge(fl[v]);
+//                        vertexEdges[v].add(vwIndex, u);
+//                    }
+
+                    tcCount += len;
+                }
+            }
+        }
+
+        long tFinal = System.currentTimeMillis();
+        System.out.println("fill eSup in " + (tFinal - tTC) + " ms");
+        System.out.println("tcCount: " + tcCount);
+
+    }
+
+    private void findTriangles(int vCount, int[][] fonls, int[] fl, VertexCompare vertexCompare, int maxFSize, byte[][] fonlNeighborL1, byte[][] fonlNeighborL2) throws InterruptedException, java.util.concurrent.ExecutionException {
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(i -> {
             int[] vIndexes = new int[maxFSize];
@@ -193,59 +251,6 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 }
             }
         })).get();
-
-        long tTC = System.currentTimeMillis();
-        System.out.println("tc after fonl: " + (tTC - t3) + " ms");
-        System.out.println("tc duration: " + (tTC - tStart) + " ms");
-
-        // ================ Partition fonls ===================
-
-        // initialize partitions to -1
-        int[] partitions = new int[vCount];
-        int[] pSizes = new int[threads];
-
-        findBestPartition(vCount, fonls, fl, fonlNeighborL1, partitions, pSizes);
-        long tPartition = System.currentTimeMillis();
-        System.out.println("partition time: " + (tPartition - tTC) + " ms");
-
-        int tcCount = 0;
-        DataInputBuffer in1 = new DataInputBuffer();
-        DataInputBuffer in2 = new DataInputBuffer();
-
-        for (int u = 0; u < fonlNeighborL1.length; u++) {
-            if (fonlNeighborL1[u] == null)
-                continue;
-
-            in1.reset(fonlNeighborL1[u], fonlNeighborL1[u].length);
-            in2.reset(fonlNeighborL2[u], fonlNeighborL2[u].length);
-            while (true) {
-                if (in1.getPosition() >= fonlNeighborL1[u].length)
-                    break;
-
-                int size = WritableUtils.readVInt(in1);
-                for (int i = 0; i < size; i++) {
-                    int len = WritableUtils.readVInt(in1);
-                    int vIndex = WritableUtils.readVInt(in1);
-//                    int v = fonls[u][vIndex];
-//                    for (int j = 0; j < len; j++) {
-//                        int uwIndex = WritableUtils.readVInt(in2);
-//                        vertexEdges[u].add(uwIndex, v);
-//
-//                        int vwIndex = WritableUtils.readVInt(in2);
-//                        if (vertexEdges[v] == null)
-//                            vertexEdges[v] = new VertexEdge(fl[v]);
-//                        vertexEdges[v].add(vwIndex, u);
-//                    }
-
-                    tcCount += len;
-                }
-            }
-        }
-
-        long tFinal = System.currentTimeMillis();
-        System.out.println("fill eSup in " + (tFinal - tTC) + " ms");
-        System.out.println("tcCount: " + tcCount);
-
     }
 
     private void findBestPartition(int vCount, int[][] fonls, int[] fl, byte[][] fonlNeighborL1, int[] partitions, int[] pSizes) throws IOException {
