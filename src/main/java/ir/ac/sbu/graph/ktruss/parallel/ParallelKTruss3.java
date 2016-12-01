@@ -8,7 +8,6 @@ import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.io.WritableUtils;
 
 import java.text.DecimalFormat;
-import java.util.Random;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -16,11 +15,11 @@ import java.util.stream.IntStream;
 /**
  *
  */
-public class ParallelMethod3 extends ParallelBase {
+public class ParallelKTruss3 extends ParallelKTrussBase {
 
     private final ForkJoinPool forkJoinPool;
 
-    public ParallelMethod3(Edge[] edges, int minSup, int threads) {
+    public ParallelKTruss3(Edge[] edges, int minSup, int threads) {
         super(edges, minSup, threads);
         forkJoinPool = new ForkJoinPool(threads);
     }

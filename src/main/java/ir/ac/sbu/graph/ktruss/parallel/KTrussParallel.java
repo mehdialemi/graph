@@ -26,25 +26,27 @@ public class KTrussParallel {
         if (args.length > 2)
             threads = Integer.parseInt(args[2]);
 
-        int method = 3;
+        int method = 4;
         if (args.length > 3)
             method = Integer.parseInt(args[3]);
         Edge[] edges = GraphLoader.loadFromLocalFile(inputPath);
 
         long t1 = System.currentTimeMillis();
-        ParallelBase parallelBase = null;
+        ParallelKTrussBase parallelKTruss = null;
         switch (method) {
-            case 1: parallelBase = new ParallelMethod1(edges, minSup, threads);
+            case 1: parallelKTruss = new ParallelKTruss1(edges, minSup, threads);
                 break;
-            case 2: parallelBase = new ParallelMethod2(edges, minSup, threads);
+            case 2: parallelKTruss = new ParallelKTruss2(edges, minSup, threads);
                 break;
-            case 3: parallelBase = new ParallelMethod3(edges, minSup, threads);
+            case 3: parallelKTruss = new ParallelKTruss3(edges, minSup, threads);
+                break;
+            case 4: parallelKTruss = new ParallelKTruss4(edges, minSup, threads);
         }
 
         System.out.println("Start ktruss with k = " + k + ", threads = " + threads + ", " +
             "method = " + method + " input: " + inputPath);
 
-        parallelBase.start();
+        parallelKTruss.start();
         long t2 = System.currentTimeMillis();
 
         System.out.println("Duration: " + (t2- t1) + " ms");

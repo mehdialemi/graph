@@ -10,7 +10,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelMethod3.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelMethod3.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss4.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelBase.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTrussBase.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelMethod1.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss1.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelMethod2.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss2.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelMethod3.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss3.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/KTrussParallel.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/KTrussParallel.java" />
     </list>
     <ignored path="graph-processing.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -33,11 +39,55 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="ParallelMethod3.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelMethod3.java">
+      <file leaf-file-name="ParallelKTruss3.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss3.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="254" column="82" selection-start-line="254" selection-start-column="82" selection-end-line="254" selection-end-column="82" />
+            <state relative-caret-position="285">
+              <caret line="70" column="5" selection-start-line="68" selection-start-column="5" selection-end-line="70" selection-end-column="5" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ParallelKTruss4.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss4.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="285">
+              <caret line="74" column="8" selection-start-line="74" selection-start-column="8" selection-end-line="74" selection-end-column="8" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="KTrussParallel.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/KTrussParallel.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="89">
+              <caret line="28" column="22" selection-start-line="28" selection-start-column="22" selection-end-line="28" selection-end-column="22" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ParallelKTruss1.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss1.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="69">
+              <caret line="17" column="37" selection-start-line="17" selection-start-column="37" selection-end-line="17" selection-end-column="37" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ParallelKTrussBase.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTrussBase.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="129">
+              <caret line="9" column="36" selection-start-line="9" selection-start-column="36" selection-end-line="9" selection-end-column="36" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -55,43 +105,29 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DataOutputByteBuffer.java" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/org/apache/hadoop/hadoop-common/2.2.0/hadoop-common-2.2.0-sources.jar!/org/apache/hadoop/io/DataOutputByteBuffer.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="435">
-              <caret line="50" column="0" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
-              <folding>
-                <element signature="n#!!doc" expanded="false" />
-                <element signature="imports" expanded="false" />
-                <element signature="e#1724#1725#0" expanded="false" />
-                <element signature="e#1759#1760#0" expanded="false" />
-                <element signature="e#2712#2713#0" expanded="false" />
-                <element signature="e#2739#2740#0" expanded="false" />
-                <element signature="e#3096#3097#0" expanded="false" />
-                <element signature="e#3114#3115#0" expanded="false" />
-                <element signature="e#3157#3158#0" expanded="false" />
-                <element signature="e#3184#3185#0" expanded="false" />
-                <element signature="e#3243#3244#0" expanded="false" />
-                <element signature="e#3283#3284#0" expanded="false" />
-                <element signature="e#3420#3421#0" expanded="false" />
-                <element signature="e#3454#3455#0" expanded="false" />
-                <element signature="e#3482#3483#0" expanded="false" />
-                <element signature="e#3518#3519#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="DataOutputBuffer.class" pinned="false" current-in-tab="false">
         <entry file="jar://$MAVEN_REPOSITORY$/org/apache/hadoop/hadoop-core/1.2.1/hadoop-core-1.2.1.jar!/org/apache/hadoop/io/DataOutputBuffer.class">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
-              <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+            <state relative-caret-position="151">
+              <caret line="39" column="23" selection-start-line="39" selection-start-column="23" selection-end-line="39" selection-end-column="23" />
               <folding>
                 <element signature="e#424#425#0" expanded="true" />
                 <element signature="e#475#476#0" expanded="true" />
                 <element signature="e#1470#1471#0" expanded="true" />
                 <element signature="e#1505#1506#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ByteArrayOutputStream.java" pinned="false" current-in-tab="false">
+        <entry file="jar:///usr/local/jvm/jdk1.8.0_92/src.zip!/java/io/ByteArrayOutputStream.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="129">
+              <caret line="177" column="29" selection-start-line="177" selection-start-column="29" selection-end-line="177" selection-end-column="29" />
+              <folding>
+                <element signature="e#5255#5256#0" expanded="true" />
+                <element signature="e#5280#5281#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -130,133 +166,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ByteArrayInputStream.java" pinned="false" current-in-tab="false">
-        <entry file="jar:///usr/local/jvm/jdk1.8.0_92/src.zip!/java/io/ByteArrayInputStream.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="43" column="6" selection-start-line="43" selection-start-column="6" selection-end-line="43" selection-end-column="6" />
-              <folding>
-                <element signature="e#0#9076#0" expanded="false" />
-                <element signature="e#4342#4343#0" expanded="false" />
-                <element signature="e#4405#4406#0" expanded="false" />
-                <element signature="e#7613#7614#0" expanded="false" />
-                <element signature="e#7647#7648#0" expanded="false" />
-                <element signature="e#7921#7922#0" expanded="false" />
-                <element signature="e#7948#7949#0" expanded="false" />
-                <element signature="e#8531#8532#0" expanded="false" />
-                <element signature="e#8557#8558#0" expanded="false" />
-                <element signature="e#8784#8785#0" expanded="false" />
-                <element signature="e#8810#8811#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="VertexEdge.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/VertexEdge.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Int2ObjectOpenHashMap.java" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/Int2ObjectOpenHashMap.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2430">
-              <caret line="227" column="15" selection-start-line="227" selection-start-column="15" selection-end-line="227" selection-end-column="15" />
-              <folding>
-                <element signature="e#0#31283#0" expanded="false" />
-                <element signature="imports" expanded="false" />
-                <element signature="e#4866#4867#0" expanded="false" />
-                <element signature="e#4908#4909#0" expanded="false" />
-                <element signature="e#5752#5753#0" expanded="false" />
-                <element signature="e#5787#5788#0" expanded="false" />
-                <element signature="e#6379#6380#0" expanded="false" />
-                <element signature="e#6414#6415#0" expanded="false" />
-                <element signature="e#7615#7616#0" expanded="false" />
-                <element signature="e#7653#7654#0" expanded="false" />
-                <element signature="e#7679#7680#0" expanded="false" />
-                <element signature="e#7726#7727#0" expanded="false" />
-                <element signature="e#14612#14613#0" expanded="false" />
-                <element signature="e#14630#14631#0" expanded="false" />
-                <element signature="e#14659#14660#0" expanded="false" />
-                <element signature="e#14682#14683#0" expanded="false" />
-                <element signature="e#15257#15258#0" expanded="false" />
-                <element signature="e#15273#15274#0" expanded="false" />
-                <element signature="e#15760#15761#0" expanded="false" />
-                <element signature="e#15787#15788#0" expanded="false" />
-                <element signature="e#15980#15981#0" expanded="false" />
-                <element signature="e#16025#16026#0" expanded="false" />
-                <element signature="e#16053#16054#0" expanded="false" />
-                <element signature="e#16079#16080#0" expanded="false" />
-                <element signature="e#16104#16105#0" expanded="false" />
-                <element signature="e#16134#16135#0" expanded="false" />
-                <element signature="e#16757#16758#0" expanded="false" />
-                <element signature="e#16805#16806#0" expanded="false" />
-                <element signature="e#17904#17905#0" expanded="false" />
-                <element signature="e#17926#17927#0" expanded="false" />
-                <element signature="e#20300#20301#0" expanded="false" />
-                <element signature="e#20349#20350#0" expanded="false" />
-                <element signature="e#20900#20901#0" expanded="false" />
-                <element signature="e#20935#20936#0" expanded="false" />
-                <element signature="e#21001#21002#0" expanded="false" />
-                <element signature="e#21040#21041#0" expanded="false" />
-                <element signature="e#23353#23354#0" expanded="false" />
-                <element signature="e#23373#23374#0" expanded="false" />
-                <element signature="e#23398#23399#0" expanded="false" />
-                <element signature="e#23441#23442#0" expanded="false" />
-                <element signature="e#23938#23939#0" expanded="false" />
-                <element signature="e#23954#23955#0" expanded="false" />
-                <element signature="e#23979#23980#0" expanded="false" />
-                <element signature="e#24011#24012#0" expanded="false" />
-                <element signature="e#24038#24039#0" expanded="false" />
-                <element signature="e#24089#24090#0" expanded="false" />
-                <element signature="e#24181#24182#0" expanded="false" />
-                <element signature="e#24214#24215#0" expanded="false" />
-                <element signature="e#24237#24238#0" expanded="false" />
-                <element signature="e#24257#24258#0" expanded="false" />
-                <element signature="e#24293#24294#0" expanded="false" />
-                <element signature="e#24323#24324#0" expanded="false" />
-                <element signature="e#24483#24484#0" expanded="false" />
-                <element signature="e#24526#24527#0" expanded="false" />
-                <element signature="e#25013#25014#0" expanded="false" />
-                <element signature="e#25029#25030#0" expanded="false" />
-                <element signature="e#25049#25050#0" expanded="false" />
-                <element signature="e#25083#25084#0" expanded="false" />
-                <element signature="e#25240#25241#0" expanded="false" />
-                <element signature="e#25279#25280#0" expanded="false" />
-                <element signature="e#25304#25305#0" expanded="false" />
-                <element signature="e#25328#25329#0" expanded="false" />
-                <element signature="e#25369#25370#0" expanded="false" />
-                <element signature="e#25405#25406#0" expanded="false" />
-                <element signature="e#25432#25433#0" expanded="false" />
-                <element signature="e#25479#25480#0" expanded="false" />
-                <element signature="e#25836#25837#0" expanded="false" />
-                <element signature="e#25854#25855#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MyDataOutput.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/MyDataOutput.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="27" column="29" selection-start-line="27" selection-start-column="29" selection-end-line="27" selection-end-column="29" />
-              <folding>
-                <element signature="imports" expanded="false" />
-                <element signature="e#373#374#0" expanded="false" />
-                <element signature="e#396#397#0" expanded="false" />
-                <element signature="e#715#716#0" expanded="false" />
-                <element signature="e#744#745#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
     </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
@@ -281,9 +190,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/sequential/TDET.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/sequential/Triangle.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/Utils.java" />
         <option value="$PROJECT_DIR$/bin/deploy.sh" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/TriangleParallel.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/multicore/MyCallable.java" />
@@ -324,14 +230,17 @@
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/sequential/SeqMethod2.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/VertexCompare.java" />
         <option value="$PROJECT_DIR$/bin/ktruss/ktruss-parallel.sh" />
-        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/KTrussParallel.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelBase.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/GraphLoader.java" />
         <option value="$PROJECT_DIR$/bin/subgraph-env.sh" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/VertexEdge.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ProbabilityRandom.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelMethod3.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelMethod4.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelBase.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTrussBase.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/KTrussParallel.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss4.java" />
       </list>
     </option>
   </component>
@@ -1239,7 +1148,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5682183" sideWeight="0.37829912" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17302053" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32744783" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33226323" sideWeight="0.6217009" order="2" side_tool="false" content_ui="tabs" x="0" y="72" width="1366" height="628" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33226323" sideWeight="0.6217009" order="2" side_tool="false" content_ui="tabs" x="0" y="72" width="1366" height="628" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32744783" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -1332,13 +1241,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$MAVEN_REPOSITORY$/com/clearspring/analytics/stream/2.7.0/stream-2.7.0-sources.jar!/com/clearspring/analytics/stream/membership/DataOutputBuffer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="32" column="49" selection-start-line="32" selection-start-column="49" selection-end-line="32" selection-end-column="49" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar:///usr/local/jvm/jdk1.8.0_92/src.zip!/java/io/FilterOutputStream.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="138">
@@ -1382,21 +1284,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar:///usr/local/jvm/jdk1.8.0_92/src.zip!/java/io/ByteArrayOutputStream.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="129">
-          <caret line="177" column="29" selection-start-line="177" selection-start-column="29" selection-end-line="177" selection-end-column="29" />
-          <folding>
-            <element signature="e#5255#5256#0" expanded="false" />
-            <element signature="e#5280#5281#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar:///usr/local/jvm/jdk1.8.0_92/src.zip!/java/util/List.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="129">
           <caret line="707" column="12" selection-start-line="707" selection-start-column="12" selection-end-line="707" selection-end-column="12" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1404,6 +1296,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
           <caret line="970" column="67" selection-start-line="970" selection-start-column="67" selection-end-line="970" selection-end-column="67" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1522,6 +1415,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="390">
           <caret line="29" column="0" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
+          <folding>
+            <element signature="e#268#269#0" expanded="false" />
+            <element signature="e#321#322#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1529,13 +1426,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
           <caret line="16" column="18" selection-start-line="16" selection-start-column="18" selection-end-line="16" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelMethod1.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="21" column="11" selection-start-line="21" selection-start-column="11" selection-end-line="21" selection-end-column="11" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1559,12 +1452,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelMethod2.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss2.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
           <caret line="67" column="43" selection-start-line="67" selection-start-column="43" selection-end-line="67" selection-end-column="43" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1594,28 +1487,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelBase.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="21" column="29" selection-start-line="21" selection-start-column="29" selection-end-line="21" selection-end-column="29" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/KTrussParallel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="164">
-          <caret line="31" column="47" selection-start-line="31" selection-start-column="47" selection-end-line="31" selection-end-column="47" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/GraphLoader.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="239">
           <caret line="70" column="0" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1808,10 +1684,29 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar:///usr/local/jvm/jdk1.8.0_92/src.zip!/java/io/DataOutputStream.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///usr/local/jvm/jdk1.8.0_92/src.zip!/java/io/ByteArrayOutputStream.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="129">
+          <caret line="177" column="29" selection-start-line="177" selection-start-column="29" selection-end-line="177" selection-end-column="29" />
+          <folding>
+            <element signature="e#5255#5256#0" expanded="true" />
+            <element signature="e#5280#5281#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/org/apache/hadoop/hadoop-core/1.2.1/hadoop-core-1.2.1.jar!/org/apache/hadoop/io/DataOutputBuffer.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+        <state relative-caret-position="151">
+          <caret line="39" column="23" selection-start-line="39" selection-start-column="23" selection-end-line="39" selection-end-column="23" />
           <folding>
             <element signature="e#424#425#0" expanded="true" />
             <element signature="e#475#476#0" expanded="true" />
@@ -1821,18 +1716,46 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar:///usr/local/jvm/jdk1.8.0_92/src.zip!/java/io/DataOutputStream.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTrussBase.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="129">
+          <caret line="9" column="36" selection-start-line="9" selection-start-column="36" selection-end-line="9" selection-end-column="36" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss1.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="69">
+          <caret line="17" column="37" selection-start-line="17" selection-start-column="37" selection-end-line="17" selection-end-column="37" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelMethod3.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/KTrussParallel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="254" column="82" selection-start-line="254" selection-start-column="82" selection-end-line="254" selection-end-column="82" />
+        <state relative-caret-position="89">
+          <caret line="28" column="22" selection-start-line="28" selection-start-column="22" selection-end-line="28" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss3.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="70" column="5" selection-start-line="68" selection-start-column="5" selection-end-line="70" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss4.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="74" column="8" selection-start-line="74" selection-start-column="8" selection-end-line="74" selection-end-column="8" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
