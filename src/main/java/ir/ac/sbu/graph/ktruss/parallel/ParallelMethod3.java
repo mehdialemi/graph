@@ -6,6 +6,7 @@ import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.io.WritableUtils;
 
+import java.text.DecimalFormat;
 import java.util.Random;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -260,7 +261,34 @@ public class ParallelMethod3 extends ParallelBase {
             });
         }
 
-        System.out.println("update count: " + updateCount);
+        int sumNeighborSize = 0;
+        int maxNeighborSize = 0;
+        int countNS = 0;
+
+        for (int i = 0; i < internalFU.length; i++) {
+            DataOutputBuffer internal = internalFU[i];
+            if (internal == null)
+                continue;
+            int neighborSize = internal.getLength() / 5;
+            if (neighborSize > maxNeighborSize)
+                maxNeighborSize = neighborSize;
+            sumNeighborSize += neighborSize;
+            countNS ++;
+        }
+
+        double avgNeighborSize = sumNeighborSize / (float) countNS;
+        double sumVarNS = 0.0;
+        for (int i = 0; i < internalFU.length; i++) {
+            DataOutputBuffer internal = internalFU[i];
+            if (internal == null)
+                continue;
+            int neighborSize = internal.getLength() / 5;
+            sumVarNS += Math.sqrt(Math.pow(neighborSize - avgNeighborSize, 2));
+        }
+        double varNS = sumVarNS / countNS;
+        DecimalFormat df = new DecimalFormat("#.00");
+        System.out.println("update count: " + updateCount + ", maxNS = " + maxNeighborSize + ", " +
+            "avgNS = " + df.format(avgNeighborSize) + ", varNS = " + df.format(varNS));
 
         long tExternal = System.currentTimeMillis();
         System.out.println("Update internals in " + (tExternal - tTC) + " ms");
