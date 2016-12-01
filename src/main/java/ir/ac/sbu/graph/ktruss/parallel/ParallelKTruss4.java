@@ -7,6 +7,7 @@ import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.io.WritableUtils;
 
+import java.util.BitSet;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -27,7 +28,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
     public void start() throws Exception {
         long tStart = System.currentTimeMillis();
         batchSelector = new AtomicInteger(0);
-        int max = forkJoinPool.submit(() ->
+        int maxVertexNum = forkJoinPool.submit(() ->
             IntStream.range(0, threads).map(index -> {
                 int localMax = Integer.MIN_VALUE;
                 while (true) {
@@ -47,10 +48,11 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 }
                 return localMax;
             })).get().reduce((a, b) -> Math.max(a, b)).getAsInt();
-
+        long tMax = System.currentTimeMillis();
+        System.out.println("find maxVertexNum in " + (tMax - tStart) + " ms");
 
         // Construct degree arrayList such that vertexId is the index of the arrayList.
-        final int length = max + 1;
+        final int length = maxVertexNum + 1;
         int[] d = new int[length];  // vertex degree
         for (Edge e : edges) {
             d[e.v1]++;
@@ -62,13 +64,6 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         // Construct fonls and fonlCN
         final int[][] fonls = new int[length][];
         final int[] fl = new int[length];  // Fonl Length
-
-//        forkJoinPool.submit(() -> {
-//            MultiCoreUtils.createBuckets(threads, length).parallelStream().forEach(bucket -> {
-//                for (int i = bucket._1; i < bucket._2; i++)
-//                    fonls[i] = new int[Math.min(d[i], length - d[i])];
-//            });
-//        }).get();
 
         for (int i = 0 ; i < length ; i ++)
             fonls[i] = new int[Math.min(d[i], length - d[i])];
@@ -196,6 +191,19 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         System.out.println("tc after fonl: " + (tTC - t3) + " ms");
         System.out.println("tc duration: " + (tTC - tStart) + " ms");
 
+        // ================ Partition fonls ===================
+
+        // initialize partitions to -1
+        int[] partitions = new int[length];
+        BitSet bitSet = new BitSet(length);
+        for (int i = 0; i < partitions.length; i++) {
+            partitions[i] = -1;
+        }
+
+        // create dominate set
+        for (int u = 0; u < fonls.length; u++) {
+
+        }
 
         int tcCount = 0;
         DataInputBuffer in1 = new DataInputBuffer();
