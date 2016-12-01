@@ -1,7 +1,6 @@
 package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
-import ir.ac.sbu.graph.ProbabilityRandom;
 import ir.ac.sbu.graph.VertexCompare;
 import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
@@ -50,8 +49,8 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
 
 
         // Construct degree arrayList such that vertexId is the index of the arrayList.
-        final int length = max + 1;
-        int[] d = new int[length];  // vertex degree
+        final int vCount = max + 1;
+        int[] d = new int[vCount];  // vertex degree
         for (Edge e : edges) {
             d[e.v1]++;
             d[e.v2]++;
@@ -60,13 +59,13 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
         System.out.println("Find degrees in " + (t2 - tStart) + " ms");
 
         // Construct fonls and fonlCN
-        final int[][] fonls = new int[length][];
-        final int[] fl = new int[length];  // Fonl Length
-        final int[] partition = new int[length];
+        final int[][] fonls = new int[vCount][];
+        final int[] fl = new int[vCount];  // Fonl Length
+        final int[] partition = new int[vCount];
 
         // Initialize neighbors arrayList
-        for (int i = 0; i < length; i++) {
-            fonls[i] = new int[Math.min(d[i], length - d[i])];
+        for (int i = 0; i < vCount; i++) {
+            fonls[i] = new int[Math.min(d[i], vCount - d[i])];
             partition[i] = -1;
         }
 
@@ -85,24 +84,37 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
         }
 
         int[] pSizes = new int[threads];
-        ProbabilityRandom pRandom = new ProbabilityRandom(threads, length);
-        int[] pIndex = new int[length];
-        for (int i = 0; i < fonls.length; i++) {
-            if (fl[i] == 0 || partition[i] != -1)
-                continue;
-            int p = pRandom.getNextRandom();
-
-            pRandom.increment(p);
-            partition[i] = p;
-            pIndex[i] = pSizes[p]++;
-            for (int v : fonls[i]) {
-                if (fl[v] == 0 || partition[v] != 0)
-                    continue;
-                partition[v] = p;
-                pIndex[v] = pSizes[p]++;
-                pRandom.increment(p);
+        int cp = 0;
+        int batchSize = BATCH_SIZE;
+        int rem = fonls.length - threads * batchSize * 2;
+        for(int u = 0 ; u < fonls.length; u ++) {
+            int p = cp % threads;
+            pSizes[p] ++;
+            partition[u] = p;
+            if ((u + 1) % batchSize == 0)
+                cp ++;
+            if (p == 0 && u > rem) {
+                batchSize = Math.max(batchSize/ 2, 10);
+                rem = fonls.length - threads * batchSize * 2;
             }
         }
+//        ProbabilityRandom pRandom = new ProbabilityRandom(threads, vCount);
+//        for (int i = 0; i < fonls.vCount; i++) {
+//            if (fl[i] == 0 || partition[i] != -1)
+//                continue;
+//            int p = pRandom.getNextRandom();
+//
+//            pRandom.increment(p);
+//            partition[i] = p;
+//            pIndex[i] = pSizes[p]++;
+//            for (int v : fonls[i]) {
+//                if (fl[v] == 0 || partition[v] != 0)
+//                    continue;
+//                partition[v] = p;
+//                pIndex[v] = pSizes[p]++;
+//                pRandom.increment(p);
+//            }
+//        }
 
         for (int i = 0; i < pSizes.length; i++) {
             System.out.println("Partition " + i + ", Size: " + pSizes[i]);
@@ -114,9 +126,9 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
             int maxFonlSize = 0;
             while (true) {
                 int start = batchSelector.getAndAdd(BATCH_SIZE);
-                if (start >= length)
+                if (start >= vCount)
                     break;
-                int end = Math.min(length, BATCH_SIZE + start);
+                int end = Math.min(vCount, BATCH_SIZE + start);
 
                 for (int u = start; u < end; u++) {
                     if (fl[u] < 2)
@@ -132,8 +144,8 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
         long t3 = System.currentTimeMillis();
         System.out.println("Create fonl in " + (t3 - t2) + " ms");
 
-        final DataOutputBuffer[] fonlCN = new DataOutputBuffer[length];  // fonl common neighbors
-        final DataOutputBuffer[] fonlVS = new DataOutputBuffer[length];  // fonl vertex size
+        final DataOutputBuffer[] fonlCN = new DataOutputBuffer[vCount];  // fonl common neighbors
+        final DataOutputBuffer[] fonlVS = new DataOutputBuffer[vCount];  // fonl vertex size
         final DataOutputBuffer[][] externalFUs = new DataOutputBuffer[threads][];  // external fonl fonl update
 
         int maxPartitionSize = 0;
@@ -143,7 +155,7 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
         }
 
         for (int i = 0; i < externalFUs.length; i++) {
-            externalFUs[i] = new DataOutputBuffer[maxPartitionSize];
+            externalFUs[i] = new DataOutputBuffer[vCount];
         }
 
         batchSelector = new AtomicInteger(0);
@@ -174,12 +186,11 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
                                     fonlCN[u] = new DataOutputBuffer(fl[u] * 2);
                                 WritableUtils.writeVInt(fonlCN[u], f);
 
-                                if (externalFU[pIndex[v]] == null)
-                                    externalFU[pIndex[v]] = new DataOutputBuffer( (d[v] - fl[v]) * (4 + 4 + fl[v] / 8 + 1));
+                                if (externalFU[v] == null)
+                                    externalFU[v] = new DataOutputBuffer((d[v] - fl[v]) * (4 + fl[v] / 8 + 1));
 
-                                WritableUtils.writeVInt(externalFU[pIndex[v]], v);
-                                WritableUtils.writeVInt(externalFU[pIndex[v]], vn);
-                                WritableUtils.writeVInt(externalFU[pIndex[v]], u);
+                                WritableUtils.writeVInt(externalFU[v], vn);
+                                WritableUtils.writeVInt(externalFU[v], u);
                                 idx++;
                                 f++;
                                 vn++;
