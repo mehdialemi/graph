@@ -13,8 +13,16 @@ public class PartitioningUtils {
 
     public static void printStatus(int partitionNum, int[] partitions, int[][] fonls, byte[][] fonlNeighborL1) throws IOException {
         DataInputBuffer in = new DataInputBuffer();
-        int[] inside = new int[partitionNum];
-        int[] outside = new int[partitionNum];
+        int[] inE = new int[partitionNum];
+        int[] outE = new int[partitionNum];
+
+        int[] inV = new int[partitionNum];
+        int[] outV = new int[partitionNum];
+
+        int[][] vs = new int[partitionNum][];
+        for (int i = 0; i < vs.length; i++) {
+            vs[i] = new int[fonls.length];
+        }
 
         for (int u = 0; u < fonlNeighborL1.length; u++) {
             if (fonlNeighborL1[u] == null)
@@ -30,10 +38,19 @@ public class PartitioningUtils {
                     int len = WritableUtils.readVInt(in);
                     int vIndex = WritableUtils.readVInt(in);
                     int v = fonls[u][vIndex];
-                    if (partitions[u] == partitions[v])
-                        inside[partitions[u]] ++;
-                    else
-                        outside[partitions[u]] ++;
+                    if (partitions[u] == partitions[v]) {
+                        inE[partitions[u]]++;
+                        if (vs[partitions[u]][v] == 0) {
+                            inV[partitions[u]]++;
+                            vs[partitions[u]][v] = 1;
+                        }
+                    } else {
+                        if (vs[partitions[u]][v] == 0) {
+                            outV[partitions[u]]++;
+                            vs[partitions[u]][v] = 1;
+                        }
+                        outE[partitions[u]]++;
+                    }
                 }
             }
         }
@@ -42,14 +59,17 @@ public class PartitioningUtils {
         int totalIn = 0;
         int totalOut = 0;
         for (int i = 0; i < partitionNum; i++) {
-            System.out.println("partition " + i + " => size: " + (inside[i] + outside[i]) +
-                " inside: " + inside[i] + ", outside: " + outside[i] + ", " +
-                "inRatio: " + df.format(inside[i] / (double)(inside[i] + outside[i])));
-            totalIn += inside[i];
-            totalOut += outside[i];
+            System.out.println("partition " + i + " => sizeE: " + (inE[i] + outE[i]) +
+                " inE: " + inE[i] + ", outE: " + outE[i] + ", " +
+                "inRatioE: " + df.format(inE[i] / (double)(inE[i] + outE[i])));
+            System.out.println("partition " + i + " => sizeV: " + (inV[i] + outV[i]) +
+                " inV: " + inV[i] + ", outV: " + outV[i] + ", " +
+                "total inRatioV: " + df.format(inV[i] / (double)(inV[i] + outV[i])));
+            totalIn += inE[i];
+            totalOut += outE[i];
         }
 
-        System.out.println("total inside: " + totalIn + ", total outside: " + totalOut + ", " +
+        System.out.println("total inE: " + totalIn + ", total outE: " + totalOut + ", " +
             "total ratio: " + df.format(totalIn / (double) (totalIn + totalOut)));
 
     }
