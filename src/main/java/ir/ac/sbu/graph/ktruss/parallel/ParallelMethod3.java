@@ -179,12 +179,12 @@ public class ParallelMethod3 extends ParallelBase {
 
                                 if (partition[v] == p) {
                                     if (internalFU[v] == null)
-                                        internalFU[v] = new DataOutputBuffer();
+                                        internalFU[v] = new DataOutputBuffer(fl[v] * 2);
                                     WritableUtils.writeVInt(internalFU[v], vn);
                                     WritableUtils.writeVInt(internalFU[v], u);
                                 } else {
                                     if (externalFU[pIndex[v]] == null)
-                                        externalFU[pIndex[v]] = new DataOutputBuffer();
+                                        externalFU[pIndex[v]] = new DataOutputBuffer(fl[v] * 2);
                                     WritableUtils.writeVInt(externalFU[pIndex[v]], v);
                                     WritableUtils.writeVInt(externalFU[pIndex[v]], vn);
                                     WritableUtils.writeVInt(externalFU[pIndex[v]], u);
@@ -252,7 +252,7 @@ public class ParallelMethod3 extends ParallelBase {
                                 int vn = WritableUtils.readVInt(in);
                                 int u = WritableUtils.readVInt(in);
                                 if (internalFU[v] == null)
-                                    internalFU[v] = new DataOutputBuffer();
+                                    internalFU[v] = new DataOutputBuffer(fl[v] * 2);
                                 WritableUtils.writeVInt(internalFU[v], vn);
                                 WritableUtils.writeVInt(internalFU[v], u);
                                 updateCount.incrementAndGet();
