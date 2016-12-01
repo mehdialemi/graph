@@ -1,6 +1,7 @@
 package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
+import ir.ac.sbu.graph.ProbabilityRandom;
 import ir.ac.sbu.graph.VertexCompare;
 import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
@@ -86,12 +87,14 @@ public class ParallelMethod3 extends ParallelBase {
         }
 
         int[] pSizes = new int[threads];
-        Random random = new Random();
+        ProbabilityRandom pRandom = new ProbabilityRandom(threads, length);
         int[] pIndex = new int[length];
         for (int i = 0; i < fonls.length; i++) {
             if (fl[i] == 0 || partition[i] != -1)
                 continue;
-            int p = random.nextInt(threads);
+            int p = pRandom.getNextRandom();
+
+            pRandom.increment(p);
             partition[i] = p;
             pIndex[i] = pSizes[p]++;
             for (int v : fonls[i]) {
@@ -99,6 +102,7 @@ public class ParallelMethod3 extends ParallelBase {
                     continue;
                 partition[v] = p;
                 pIndex[v] = pSizes[p]++;
+                pRandom.increment(p);
             }
         }
 
