@@ -44,6 +44,10 @@ public class PartitioningUtils {
                             inV[partitions[u]]++;
                             vs[partitions[u]][v] = 1;
                         }
+                        if (vs[partitions[u]][u] == 0) {
+                            inV[partitions[u]]++;
+                            vs[partitions[u]][u] = 1;
+                        }
                     } else {
                         if (vs[partitions[u]][v] == 0) {
                             outV[partitions[u]]++;
