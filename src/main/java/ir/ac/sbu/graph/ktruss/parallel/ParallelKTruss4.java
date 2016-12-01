@@ -63,16 +63,16 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         final int[][] fonls = new int[length][];
         final int[] fl = new int[length];  // Fonl Length
 
-//        forkJoinPool.submit(() -> {
-//        MultiCoreUtils.createBuckets(threads, length).parallelStream().forEach(bucket -> {
-//            for (int i = bucket._1 ; i < bucket._2 ; i ++)
-//                fonls[i] = new int[Math.min(d[i], length - d[i])];
-//        });
-//        }).get();
+        forkJoinPool.submit(() -> {
+        MultiCoreUtils.createBuckets(threads, length).parallelStream().forEach(bucket -> {
+            for (int i = bucket._1 ; i < bucket._2 ; i ++)
+                fonls[i] = new int[Math.min(d[i], length - d[i])];
+        });
+        }).get();
 
-        for (int i = 0 ; i < length ; i ++)
-            fonls[i] = new int[Math.min(d[i], length - d[i])];
-        
+//        for (int i = 0 ; i < length ; i ++)
+//            fonls[i] = new int[Math.min(d[i], length - d[i])];
+//        
         long tInitFonl = System.currentTimeMillis();
         System.out.println("Initialize fonl " + (tInitFonl - t2) + " ms");
 
