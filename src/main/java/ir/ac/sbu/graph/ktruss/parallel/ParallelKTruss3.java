@@ -87,14 +87,14 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
         int cp = 0;
         int batchSize = BATCH_SIZE;
         int rem = fonls.length - threads * batchSize * 2;
-        for(int u = 0 ; u < fonls.length; u ++) {
+        for (int u = 0; u < fonls.length; u++) {
             int p = cp % threads;
-            pSizes[p] ++;
+            pSizes[p]++;
             partition[u] = p;
             if ((u + 1) % batchSize == 0)
-                cp ++;
+                cp++;
             if (p == 0 && u > rem) {
-                batchSize = Math.max(batchSize/ 2, 10);
+                batchSize = Math.max(batchSize / 2, 10);
                 rem = fonls.length - threads * batchSize * 2;
             }
         }
@@ -144,9 +144,8 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
         long t3 = System.currentTimeMillis();
         System.out.println("Create fonl in " + (t3 - t2) + " ms");
 
-        final DataOutputBuffer[] fonlCN = new DataOutputBuffer[vCount];  // fonl common neighbors
-        final DataOutputBuffer[] fonlVS = new DataOutputBuffer[vCount];  // fonl vertex size
-        final DataOutputBuffer[][] externalFUs = new DataOutputBuffer[threads][];  // external fonl fonl update
+        final DataOutputBuffer[][] externalFUs = new DataOutputBuffer[threads][];  // external fonl update
+        final byte[][] internalFUs = new byte[vCount][];
 
         int maxPartitionSize = 0;
         for (int pSize : pSizes) {
@@ -160,16 +159,15 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
 
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(p -> {
-            int[] lens = new int[maxFSize];
-            int[] vIndexes = new int[maxFSize];
             DataOutputBuffer[] externalFU = externalFUs[p];
+            DataOutputBuffer out = new DataOutputBuffer(maxFSize * (maxFSize - 1) * 2 * (maxFSize / 128 + 1));
             try {
                 int len = fonls.length;
                 for (int u = 0; u < len; u++) {
                     if (fl[u] < 2 || partition[u] != p)
                         continue;
 
-                    int jIndex = 0;
+                    out.reset();
 
                     // Find triangle by checking connectivity of neighbors
                     for (int j = 0; j < fl[u]; j++) {
@@ -177,21 +175,18 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
                         int v = fonl[j];
                         int[] vNeighbors = fonls[v];
 
-                        int idx = 0;
                         // intersection on u neighbors and v neighbors
                         int f = j + 1, vn = 0;
                         while (f < fl[u] && vn < fl[v]) {
                             if (fonl[f] == vNeighbors[vn]) {
-                                if (idx == 0)
-                                    fonlCN[u] = new DataOutputBuffer(fl[u] * 2);
-                                WritableUtils.writeVInt(fonlCN[u], f);
+                                WritableUtils.writeVInt(out, j); // second vertex index from neighbor
+                                WritableUtils.writeVInt(out, f); // third vertex index from neighbor
 
                                 if (externalFU[v] == null)
-                                    externalFU[v] = new DataOutputBuffer((d[v] - fl[v]) * (4 + fl[v] / 8 + 1));
+                                    externalFU[v] = new DataOutputBuffer((d[v] - fl[v]) * (4 + fl[v] / 128 + 1));
 
-                                WritableUtils.writeVInt(externalFU[v], vn);
-                                WritableUtils.writeVInt(externalFU[v], u);
-                                idx++;
+                                WritableUtils.writeVInt(externalFU[v], vn); // second vertex index
+                                WritableUtils.writeVInt(externalFU[v], u); // thir vertex num
                                 f++;
                                 vn++;
                             } else if (vertexCompare.compare(fonl[f], vNeighbors[vn]) == -1)
@@ -199,24 +194,14 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
                             else
                                 vn++;
                         }
-
-                        if (idx == 0)
-                            continue;
-
-                        vIndexes[jIndex] = j;
-                        lens[jIndex++] = idx;
                     }
 
-                    if (jIndex == 0)
+                    if (out.getLength() == 0)
                         continue;
 
-                    fonlVS[u] = new DataOutputBuffer(jIndex * 2);
-
-                    WritableUtils.writeVInt(fonlVS[u], jIndex);
-                    for (int j = 0; j < jIndex; j++) {
-                        WritableUtils.writeVInt(fonlVS[u], lens[j]);
-                        WritableUtils.writeVInt(fonlVS[u], vIndexes[j]);
-                    }
+                    byte[] bytes = new byte[out.getLength()];
+                    System.arraycopy(out.getData(), 0, bytes, 0, bytes.length);
+                    internalFUs[u] = bytes;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -229,35 +214,19 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
 
         int tcCount = 0;
         DataInputBuffer in1 = new DataInputBuffer();
-        DataInputBuffer in2 = new DataInputBuffer();
 
-        for (int u = 0; u < fonlCN.length; u++) {
-            if (fonlCN[u] == null)
+        for (int u = 0; u < internalFUs.length; u++) {
+            if (internalFUs[u] == null)
                 continue;
 
-            in1.reset(fonlCN[u].getData(), fonlCN[u].getLength());
-            in2.reset(fonlVS[u].getData(), fonlVS[u].getLength());
+            in1.reset(internalFUs[u], internalFUs[u].length);
             while (true) {
-                if (in2.getPosition() >= fonlVS[u].getLength())
+                if (in1.getPosition() >= internalFUs[u].length)
                     break;
 
-                int size = WritableUtils.readVInt(in2);
-                for (int i = 0; i < size; i++) {
-                    int len = WritableUtils.readVInt(in2);
-                    int vIndex = WritableUtils.readVInt(in2);
-//                    int v = fonls[u][vIndex];
-//                    for (int j = 0; j < len; j++) {
-//                        int uwIndex = WritableUtils.readVInt(in1);
-//                        vertexEdges[u].add(uwIndex, v);
-//
-//                        int vwIndex = WritableUtils.readVInt(in1);
-//                        if (vertexEdges[v] == null)
-//                            vertexEdges[v] = new VertexEdge(fl[v]);
-//                        vertexEdges[v].add(vwIndex, u);
-//                    }
-
-                    tcCount += len;
-                }
+                WritableUtils.readVInt(in1);
+                WritableUtils.readVInt(in1);
+                tcCount++;
             }
         }
 
