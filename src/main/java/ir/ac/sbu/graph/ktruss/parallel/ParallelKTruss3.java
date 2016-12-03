@@ -2,10 +2,16 @@ package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
 import ir.ac.sbu.graph.VertexCompare;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.io.WritableUtils;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -211,6 +217,82 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
         long tTC = System.currentTimeMillis();
         System.out.println("tc after fonl: " + (tTC - t3) + " ms");
         System.out.println("tc duration: " + (tTC - tStart) + " ms");
+
+        // aggregate internal and external fonl updates
+        Int2ObjectOpenHashMap<List<byte[]>>[] maps = new Int2ObjectOpenHashMap[vCount];
+        batchSelector = new AtomicInteger(0);
+        IntStream.range(0, threads).parallel().forEach(i -> {
+            while (true) {
+                int start = batchSelector.getAndAdd(BATCH_SIZE);
+                if (start >= vCount)
+                    break;
+                int end = Math.min(vCount, start + BATCH_SIZE);
+                DataInputBuffer in = new DataInputBuffer();
+                for(int u = start ; u < end ;  u ++) {
+                    if (fl[u] == 0) {
+                        continue;
+                    }
+                    Int2ObjectOpenHashMap<List<byte[]>> map = new Int2ObjectOpenHashMap<>();
+                    if (internalFUs[u] != null) {
+                        in.reset(internalFUs[u], internalFUs[u].length);
+                        while (true) {
+                            if (in.getPosition() >= internalFUs[u].length)
+                                break;
+                            try {
+                                int index1 = WritableUtils.readVInt(in);
+                                int p1 = in.getPosition();
+                                int index2 = WritableUtils.readVInt(in);
+                                int p2 = in.getPosition();
+                                List<byte[]> list = map.get(index1);
+                                if (list == null) {
+                                    list = new ArrayList<>();
+                                    map.put(index1, list);
+                                }
+                                byte[] bytes = new byte[1 + p2 - p1];
+                                bytes[0] = 0;
+                                System.arraycopy(in.getData(), p1, bytes, 1, p2 - p1);
+                                list.add(bytes);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    for(int j = 0 ; j < threads; j ++) {
+                        if (externalFUs[j][u] == null)
+                            continue;
+                        in.reset(externalFUs[j][u].getData(), externalFUs[j][u].getLength());
+                        while (true) {
+                            if (in.getPosition() >= externalFUs[j][u].getLength())
+                                break;
+                            try {
+                                int index1 = WritableUtils.readVInt(in);
+                                int p1 = in.getPosition();
+                                int index2 = WritableUtils.readVInt(in);
+                                int p2 = in.getPosition();
+                                List<byte[]> list = map.get(index1);
+                                if (list == null) {
+                                    list = new ArrayList<>();
+                                    map.put(index1, list);
+                                }
+                                byte[] bytes = new byte[1 + p2 - p1];
+                                bytes[0] = 1;
+                                System.arraycopy(in.getData(), p1, bytes, 1, p2 - p1);
+                                list.add(bytes);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                    if (map.isEmpty())
+                        continue;
+
+                    maps[u] = map;
+                }
+            }
+        });
+        long tAgg = System.currentTimeMillis();
+        System.out.println("Aggregate time " + (tAgg - tTC) + " ms");
 
         int tcCount = 0;
         DataInputBuffer in1 = new DataInputBuffer();
