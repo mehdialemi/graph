@@ -241,17 +241,17 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
                                 int indexN2 = WritableUtils.readVInt(in);
                                 IntList list = map.get(indexN1);
                                 if (list == null) {
-                                    list = new IntArrayList();
-                                    map.put(indexN1, list);
+//                                    list = new IntArrayList();
+//                                    map.put(indexN1, list);
                                 }
-                                list.add(fonls[u][indexN2]);
+//                                list.add(fonls[u][indexN2]);
 
                                 list = map.get(indexN2);
                                 if (list == null) {
-                                    list = new IntArrayList();
-                                    map.put(indexN2, list);
+//                                    list = new IntArrayList();
+//                                    map.put(indexN2, list);
                                 }
-                                list.add(fonls[u][indexN2]);
+//                                list.add(fonls[u][indexN2]);
 
                             } catch (IOException e) {
                                 e.printStackTrace();
@@ -270,10 +270,10 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
                                 int w = WritableUtils.readVInt(in);
                                 IntList list = map.get(indexN);
                                 if (list == null) {
-                                    list = new IntArrayList();
-                                    map.put(indexN, list);
+//                                    list = new IntArrayList();
+//                                    map.put(indexN, list);
                                 }
-                                list.add(w);
+//                                list.add(w);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -287,7 +287,7 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
                 }
             }
         });
-        
+
         long tAgg = System.currentTimeMillis();
         System.out.println("Aggregate time " + (tAgg - tTC) + " ms");
 
