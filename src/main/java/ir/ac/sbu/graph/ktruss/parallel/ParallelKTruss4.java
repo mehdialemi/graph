@@ -183,6 +183,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                         int idx = 0;
                         // intersection on u neighbors and v neighbors
                         int f = vIndex + 1, vn = 1;
+                        
                         while (f < neighbors[u][0] + 1 && vn < neighbors[v][0] + 1) {
                             if (neighborsU[f] == vNeighbors[vn]) {
                                 if (idx == 0)
