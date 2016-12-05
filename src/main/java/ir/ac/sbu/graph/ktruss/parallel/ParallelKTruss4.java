@@ -1,13 +1,13 @@
 package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
-import ir.ac.sbu.graph.PartitioningUtils;
 import ir.ac.sbu.graph.VertexCompare;
 import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.io.WritableUtils;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,26 +36,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             if (edge.v2 > maxVertexNum)
                 maxVertexNum = edge.v2;
         }
-//        int maxVertexNum = forkJoinPool.submit(() ->
-//            IntStream.range(0, threads).map(index -> {
-//                int localMax = Integer.MIN_VALUE;
-//                while (true) {
-//                    int start = batchSelector.getAndAdd(BATCH_SIZE);
-//                    if (start >= edges.vCount)
-//                        break;
-//                    int end = Math.min(edges.vCount, start + BATCH_SIZE);
-//                    for (int i = start; i < end; i++) {
-//                        if (edges[i].v1 > edges[i].v2) {
-//                            if (edges[i].v1 > localMax)
-//                                localMax = edges[i].v1;
-//                        } else {
-//                            if (edges[i].v2 > localMax)
-//                                localMax = edges[i].v2;
-//                        }
-//                    }
-//                }
-//                return localMax;
-//            })).get().reduce((a, b) -> Math.max(a, b)).getAsInt();
+
         long tMax = System.currentTimeMillis();
         System.out.println("find maxVertexNum in " + (tMax - tStart) + " ms");
 
@@ -69,17 +50,11 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         long t2 = System.currentTimeMillis();
         System.out.println("Find degrees in " + (t2 - tStart) + " ms");
 
-        // Construct fonls and fonlCN
-        final int[][] fonls = new int[vCount][];
-        final int[] fl = new int[vCount];  // Fonl Length
+        final int[][] neighbors = new int[vCount][];
+        for(int i = 0  ; i < vCount; i ++)
+            neighbors[i] = new int[d[i] + 1];
 
-        for (int i = 0; i < vCount; i++)
-            fonls[i] = new int[Math.min(d[i], vCount - d[i])];
-
-        long tInitFonl = System.currentTimeMillis();
-        System.out.println("Initialize fonl " + (tInitFonl - t2) + " ms");
-
-        // Fill neighbors arrayList
+        int[] pos = new int[vCount];
         for (Edge e : edges) {
             int dv1 = d[e.v1];
             int dv2 = d[e.v2];
@@ -87,11 +62,17 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 dv1 = e.v1;
                 dv2 = e.v2;
             }
-            if (dv2 > dv1)
-                fonls[e.v1][fl[e.v1]++] = e.v2;
-            else
-                fonls[e.v2][fl[e.v2]++] = e.v1;
+            if (dv1 < dv2) {
+                neighbors[e.v1][++neighbors[e.v1][0]] = e.v2;
+                neighbors[e.v2][d[e.v2] - pos[e.v2] ++] = e.v1;
+
+            } else {
+                neighbors[e.v2][++neighbors[e.v2][0]] = e.v1;
+                neighbors[e.v1][d[e.v1] - pos[e.v1] ++] = e.v2;
+            }
         }
+        long tInitFonl = System.currentTimeMillis();
+        System.out.println("Initialize fonl " + (tInitFonl - t2) + " ms");
 
         final VertexCompare vertexCompare = new VertexCompare(d);
         batchSelector = new AtomicInteger(0);
@@ -104,34 +85,35 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 int end = Math.min(vCount, BATCH_SIZE + start);
 
                 for (int u = start; u < end; u++) {
-                    if (fl[u] < 2)
+                    if (neighbors[u][0] < 2)
                         continue;
-                    vertexCompare.quickSort(fonls[u], 0, fl[u] - 1);
-                    if (maxFonlSize < fl[u])
-                        maxFonlSize = fl[u];
+                    vertexCompare.quickSort(neighbors[u], 1, neighbors[u][0]);
+                    if (maxFonlSize < neighbors[u][0])
+                        maxFonlSize = neighbors[u][0];
+                    Arrays.sort(neighbors[u], neighbors[u][0] + 1, neighbors[u].length);
                 }
             }
             return maxFonlSize;
         })).get().reduce((a, b) -> Integer.max(a, b)).getAsInt();
 
         long t3 = System.currentTimeMillis();
-        System.out.println("Create fonl in " + (t3 - t2) + " ms");
+        System.out.println("Sort fonl in " + (t3 - t2) + " ms");
 
         byte[][] fonlNeighborL1 = new byte[vCount][];
         byte[][] fonlNeighborL2 = new byte[vCount][];
 
-        findTriangles(vCount, fonls, fl, vertexCompare, maxFSize, fonlNeighborL1, fonlNeighborL2);
+        findTriangles(vCount, neighbors, vertexCompare, maxFSize, fonlNeighborL1, fonlNeighborL2);
 
         long tTC = System.currentTimeMillis();
         System.out.println("tc after fonl: " + (tTC - t3) + " ms");
         System.out.println("tc duration: " + (tTC - tStart) + " ms");
 
         // ================ Partition fonls ===================
-        int[] pSizes = new int[threads];
-        int[] partitions = findPartition(threads, fonls, fl, fonlNeighborL1, pSizes);
-        long tPartition = System.currentTimeMillis();
-        PartitioningUtils.printStatus(threads, partitions, fonls, fonlNeighborL1);
-        System.out.println("partition time: " + (tPartition - tTC) + " ms");
+//        int[] pSizes = new int[threads];
+//        int[] partitions = findPartition(threads, fonls, fl, fonlNeighborL1, pSizes);
+//        long tPartition = System.currentTimeMillis();
+//        PartitioningUtils.printStatus(threads, partitions, fonls, fonlNeighborL1);
+//        System.out.println("partition time: " + (tPartition - tTC) + " ms");
 
         int tcCount = 0;
         DataInputBuffer in1 = new DataInputBuffer();
@@ -173,7 +155,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
     }
 
-    private void findTriangles(int vCount, int[][] fonls, int[] fl, VertexCompare vertexCompare, int maxFSize, byte[][] fonlNeighborL1, byte[][] fonlNeighborL2) throws InterruptedException, java.util.concurrent.ExecutionException {
+    private void findTriangles(int vCount, int[][] neighbors, VertexCompare vertexCompare, int maxFSize, byte[][] fonlNeighborL1, byte[][] fonlNeighborL2) throws InterruptedException, java.util.concurrent.ExecutionException {
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(i -> {
             int[] vIndexes = new int[maxFSize];
@@ -187,22 +169,22 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 int end = Math.min(vCount, BATCH_SIZE + start);
 
                 for (int u = start; u < end; u++) {
-                    if (fl[u] < 2)
+                    if (neighbors[u][0] < 2)
                         continue;
 
                     int jIndex = 0;
 
                     // Find triangle by checking connectivity of neighbors
-                    for (int j = 0; j < fl[u]; j++) {
-                        int[] fonl = fonls[u];
-                        int v = fonl[j];
-                        int[] vNeighbors = fonls[v];
+                    for (int vIndex = 1; vIndex < neighbors[u][0]; vIndex++) {
+                        int[] neighborsU = neighbors[u];
+                        int v = neighborsU[vIndex];
+                        int[] vNeighbors = neighbors[v];
 
                         int idx = 0;
                         // intersection on u neighbors and v neighbors
-                        int f = j + 1, vn = 0;
-                        while (f < fl[u] && vn < fl[v]) {
-                            if (fonl[f] == vNeighbors[vn]) {
+                        int f = vIndex + 1, vn = 1;
+                        while (f < neighbors[u][0] + 1 && vn < neighbors[v][0] + 1) {
+                            if (neighborsU[f] == vNeighbors[vn]) {
                                 if (idx == 0)
                                     outNeighborL2.reset();
                                 try {
@@ -214,7 +196,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                                 idx++;
                                 f++;
                                 vn++;
-                            } else if (vertexCompare.compare(fonl[f], vNeighbors[vn]) == -1)
+                            } else if (vertexCompare.compare(neighborsU[f], vNeighbors[vn]) == -1)
                                 f++;
                             else
                                 vn++;
@@ -223,7 +205,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                         if (idx == 0)
                             continue;
 
-                        vIndexes[jIndex] = j;
+                        vIndexes[jIndex] = vIndex;
                         lens[jIndex++] = idx;
                     }
 
