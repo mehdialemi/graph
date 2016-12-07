@@ -119,6 +119,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
 //        int tcCount = 0;
 
+        long tsCounts = System.currentTimeMillis();
         AtomicInteger[][] counts = new AtomicInteger[vCount][];
         for (int u = 0; u < fonlNeighborL1.length; u++) {
             if (neighbors[u][0] == 0)
@@ -127,6 +128,8 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             for(int i = 0 ; i < neighbors[u][0]; i ++)
                 counts[u][i] = new AtomicInteger(0);
         }
+        long teCounts = System.currentTimeMillis();
+        System.out.println("Construct counts in " + (teCounts - tsCounts) + " ms");
 
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> {
@@ -197,7 +200,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 //        }
 
         long tFinal = System.currentTimeMillis();
-        System.out.println("fill eSup in " + (tFinal - tTC) + " ms");
+        System.out.println("fill eSup in " + (tFinal - teCounts) + " ms");
 //        System.out.println("tcCount: " + tcCount);
 
     }
