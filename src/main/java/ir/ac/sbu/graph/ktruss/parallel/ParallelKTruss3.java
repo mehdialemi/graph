@@ -1,9 +1,9 @@
 package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
+import ir.ac.sbu.graph.PartitioningUtils;
 import ir.ac.sbu.graph.VertexCompare;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
@@ -65,12 +65,10 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
         // Construct fonls and fonlCN
         final int[][] fonls = new int[vCount][];
         final int[] fl = new int[vCount];  // Fonl Length
-        final int[] partition = new int[vCount];
 
         // Initialize neighbors arrayList
         for (int i = 0; i < vCount; i++) {
             fonls[i] = new int[Math.min(d[i], vCount - d[i])];
-            partition[i] = -1;
         }
 
         // Fill neighbors arrayList
@@ -87,42 +85,25 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
                 fonls[e.v2][fl[e.v2]++] = e.v1;
         }
 
-        int[] pSizes = new int[threads];
-        int cp = 0;
-        int batchSize = BATCH_SIZE;
-        int rem = fonls.length - threads * batchSize * 2;
-        for (int u = 0; u < fonls.length; u++) {
-            int p = cp % threads;
-            pSizes[p]++;
-            partition[u] = p;
-            if ((u + 1) % batchSize == 0)
-                cp++;
-            if (p == 0 && u > rem) {
-                batchSize = Math.max(batchSize / 2, 10);
-                rem = fonls.length - threads * batchSize * 2;
-            }
-        }
+        int[] partitions = PartitioningUtils.createPartitions(vCount, threads, BATCH_SIZE);
+
 //        ProbabilityRandom pRandom = new ProbabilityRandom(threads, vCount);
 //        for (int i = 0; i < fonls.vCount; i++) {
-//            if (fl[i] == 0 || partition[i] != -1)
+//            if (fl[i] == 0 || partitions[i] != -1)
 //                continue;
 //            int p = pRandom.getNextRandom();
 //
 //            pRandom.increment(p);
-//            partition[i] = p;
+//            partitions[i] = p;
 //            pIndex[i] = pSizes[p]++;
 //            for (int v : fonls[i]) {
-//                if (fl[v] == 0 || partition[v] != 0)
+//                if (fl[v] == 0 || partitions[v] != 0)
 //                    continue;
-//                partition[v] = p;
+//                partitions[v] = p;
 //                pIndex[v] = pSizes[p]++;
 //                pRandom.increment(p);
 //            }
 //        }
-
-        for (int i = 0; i < pSizes.length; i++) {
-            System.out.println("Partition " + i + ", Size: " + pSizes[i]);
-        }
 
         final VertexCompare vertexCompare = new VertexCompare(d);
         batchSelector = new AtomicInteger(0);
@@ -151,12 +132,6 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
         final DataOutputBuffer[][] externalFUs = new DataOutputBuffer[threads][];  // external fonl update
         final byte[][] internalFUs = new byte[vCount][];
 
-        int maxPartitionSize = 0;
-        for (int pSize : pSizes) {
-            if (pSize > maxPartitionSize)
-                maxPartitionSize = pSize;
-        }
-
         for (int i = 0; i < externalFUs.length; i++) {
             externalFUs[i] = new DataOutputBuffer[vCount];
         }
@@ -168,7 +143,7 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
             try {
                 int len = fonls.length;
                 for (int u = 0; u < len; u++) {
-                    if (fl[u] < 2 || partition[u] != p)
+                    if (fl[u] < 2 || partitions[u] != p)
                         continue;
 
                     out.reset();

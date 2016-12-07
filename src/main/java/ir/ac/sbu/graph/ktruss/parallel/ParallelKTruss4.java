@@ -118,8 +118,6 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 //        System.out.println("partition time: " + (tPartition - tTC) + " ms");
 
 //        int tcCount = 0;
-        DataInputBuffer in1 = new DataInputBuffer();
-        DataInputBuffer in2 = new DataInputBuffer();
 
         AtomicInteger[][] counts = new AtomicInteger[vCount][];
         for (int u = 0; u < fonlNeighborL1.length; u++) {
@@ -133,6 +131,9 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> {
             IntStream.range(0, threads).forEach(index -> {
+                DataInputBuffer in1 = new DataInputBuffer();
+                DataInputBuffer in2 = new DataInputBuffer();
+
                 try {
                     while (true) {
                         int start = batchSelector.getAndAdd(BATCH_SIZE);
