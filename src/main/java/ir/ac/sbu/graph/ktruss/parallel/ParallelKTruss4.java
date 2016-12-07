@@ -228,9 +228,9 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                     int lastIndex = 0;
                     out2.reset();
 
+                    int[] neighborsU = neighbors[u];
                     // Find triangle by checking connectivity of neighbors
-                    for (int vIndex = 1; vIndex < neighbors[u][0]; vIndex++) {
-                        int[] neighborsU = neighbors[u];
+                    for (int vIndex = 1; vIndex < neighborsU[0]; vIndex++) {
                         int v = neighborsU[vIndex];
                         int[] vNeighbors = neighbors[v];
 

@@ -85,12 +85,12 @@ public class PartitioningUtils {
     }
 
     public static int[] createPartitions(int vCount, int threads, int batchSize) {
-        int[] partition = new int[vCount];
+        int[] partitions = new int[vCount];
         int cp = 0;
         int rem = vCount - threads * batchSize * 2;
         for (int u = 0; u < vCount; u++) {
             int p = cp % threads;
-            partition[u] = p;
+            partitions[u] = p;
             if ((u + 1) % batchSize == 0)
                 cp++;
             if (p == 0 && u > rem) {
@@ -98,6 +98,6 @@ public class PartitioningUtils {
                 rem = vCount - threads * batchSize * 2;
             }
         }
-        return partition;
+        return partitions;
     }
 }

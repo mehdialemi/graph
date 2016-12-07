@@ -10,8 +10,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/KTrussParallel.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/KTrussParallel.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/PartitioningUtils.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/PartitioningUtils.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss4.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss4.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss5.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss5.java" />
     </list>
     <ignored path="graph-processing.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -56,11 +58,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ParallelKTruss4.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ParallelKTruss4.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss4.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="269">
-              <caret line="202" column="63" selection-start-line="202" selection-start-column="63" selection-end-line="202" selection-end-column="63" />
+            <state relative-caret-position="225">
+              <caret line="89" column="33" selection-start-line="89" selection-start-column="33" selection-end-line="89" selection-end-column="33" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -68,11 +70,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ParallelKTruss5.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="ParallelKTruss5.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss5.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="190" column="0" selection-start-line="190" selection-start-column="0" selection-end-line="190" selection-end-column="0" />
+            <state relative-caret-position="239">
+              <caret line="177" column="45" selection-start-line="177" selection-start-column="45" selection-end-line="177" selection-end-column="45" />
               <folding />
             </state>
           </provider>
@@ -167,8 +169,8 @@
       <file leaf-file-name="PartitioningUtils.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/PartitioningUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="75" column="24" selection-start-line="75" selection-start-column="24" selection-end-line="75" selection-end-column="24" />
+            <state relative-caret-position="129">
+              <caret line="86" column="24" selection-start-line="86" selection-start-column="24" selection-end-line="86" selection-end-column="24" />
               <folding />
             </state>
           </provider>
@@ -278,11 +280,11 @@
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelMethod4.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelBase.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTrussBase.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/PartitioningUtils.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss3.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss5.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/PartitioningUtils.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/KTrussParallel.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss4.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss5.java" />
       </list>
     </option>
   </component>
@@ -1670,14 +1672,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/PartitioningUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="75" column="24" selection-start-line="75" selection-start-column="24" selection-end-line="75" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss3.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="345">
@@ -1696,21 +1690,29 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss5.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/PartitioningUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="190" column="0" selection-start-line="190" selection-start-column="0" selection-end-line="190" selection-end-column="0" />
+        <state relative-caret-position="129">
+          <caret line="86" column="24" selection-start-line="86" selection-start-column="24" selection-end-line="86" selection-end-column="24" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss4.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="269">
-          <caret line="202" column="63" selection-start-line="202" selection-start-column="63" selection-end-line="202" selection-end-column="63" />
+        <state relative-caret-position="225">
+          <caret line="89" column="33" selection-start-line="89" selection-start-column="33" selection-end-line="89" selection-end-column="33" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss5.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="239">
+          <caret line="177" column="45" selection-start-line="177" selection-start-column="45" selection-end-line="177" selection-end-column="45" />
+          <folding />
         </state>
       </provider>
     </entry>

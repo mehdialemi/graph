@@ -83,12 +83,13 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
         batchSelector = new AtomicInteger(0);
         final int maxFSize = forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().map(partition -> {
             int maxFonlSize = 0;
-            for(int u = 0 ; u < vCount; u ++) {
+            for (int u = 0; u < vCount; u++) {
                 if (partitions[u] != partition || neighbors[u][0] < 2)
                     continue;
-                    if (maxFonlSize < neighbors[u][0])
-                        maxFonlSize = neighbors[u][0];
-                    Arrays.sort(neighbors[u], neighbors[u][0] + 1, neighbors[u].length);
+                vertexCompare.quickSort(neighbors[u], 1, neighbors[u][0]);
+                if (maxFonlSize < neighbors[u][0])
+                    maxFonlSize = neighbors[u][0];
+                Arrays.sort(neighbors[u], neighbors[u][0] + 1, neighbors[u].length);
 
             }
             return maxFonlSize;
@@ -97,31 +98,29 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
         long t3 = System.currentTimeMillis();
         System.out.println("Sort fonl in " + (t3 - t2) + " ms");
 
-//        byte[][] fonlNeighborL1 = new byte[vCount][];
-//        byte[][] fonlNeighborL2 = new byte[vCount][];
         byte[][] fonlOutLinks = new byte[vCount][];
         int[][] counts = new int[vCount][];
-        for(int u = 0 ; u < vCount; u ++)
+        for (int u = 0; u < vCount; u++)
             counts[u] = new int[neighbors[u][0]];
 
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(partition -> {
             DataOutputBuffer out = new DataOutputBuffer(maxFSize * maxFSize);
-            for(int u = 0 ; u < vCount; u ++) {
+            for (int u = 0; u < vCount; u++) {
                 if (partitions[u] != partition || neighbors[u][0] < 2)
                     continue;
-                out.reset();
 
+                out.reset();
+                int[] neighborsU = neighbors[u];
                 // Find triangle by checking connectivity of neighbors
-                for (int vIndex = 1; vIndex < neighbors[u][0]; vIndex++) {
-                    int[] neighborsU = neighbors[u];
+                for (int vIndex = 1; vIndex < neighborsU[0]; vIndex++) {
                     int v = neighborsU[vIndex];
-                    int[] vNeighbors = neighbors[v];
+                    int[] neighborsV = neighbors[v];
 
                     // intersection on u neighbors and v neighbors
                     int uwIndex = vIndex + 1, vwIndex = 1;
-                    while (uwIndex < neighbors[u][0] + 1 && vwIndex < neighbors[v][0] + 1) {
-                        if (neighborsU[uwIndex] == vNeighbors[vwIndex]) {
+                    while (uwIndex < neighborsU[0] + 1 && vwIndex < neighborsV[0] + 1) {
+                        if (neighborsU[uwIndex] == neighborsV[vwIndex]) {
                             counts[u][vIndex - 1]++;
                             counts[u][uwIndex - 1]++;
                             if (partitions[v] == partition) {
@@ -131,11 +130,12 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
                                     WritableUtils.writeVInt(out, v);
                                     WritableUtils.writeVInt(out, vwIndex);
                                 } catch (IOException e) {
+                                    e.printStackTrace();
                                 }
                             }
                             uwIndex++;
                             vwIndex++;
-                        } else if (vertexCompare.compare(neighborsU[uwIndex], vNeighbors[vwIndex]) == -1)
+                        } else if (vertexCompare.compare(neighborsU[uwIndex], neighborsV[vwIndex]) == -1)
                             uwIndex++;
                         else
                             vwIndex++;
@@ -154,23 +154,11 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
         System.out.println("tc after fonl: " + (tTC - t3) + " ms");
         System.out.println("tc duration: " + (tTC - tStart) + " ms");
 
-        // ================ Partition fonls ===================
-//        int[] pSizes = new int[threads];
-//        int[] partitions = findPartition(threads, fonls, fl, fonlNeighborL1, pSizes);
-//        long tPartition = System.currentTimeMillis();
-//        PartitioningUtils.printStatus(threads, partitions, fonls, fonlNeighborL1);
-//        System.out.println("partition time: " + (tPartition - tTC) + " ms");
-
-//        int tcCount = 0;
-        DataInputBuffer in1 = new DataInputBuffer();
-        DataInputBuffer in2 = new DataInputBuffer();
-
-
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> {
             IntStream.range(0, threads).forEach(partition -> {
                 DataInputBuffer in = new DataInputBuffer();
-                for(int u = 0 ; u < vCount; u ++) {
+                for (int u = 0; u < vCount; u++) {
                     if (fonlOutLinks[u] == null)
                         continue;
                     in.reset(fonlOutLinks[u], fonlOutLinks[u].length);
@@ -179,7 +167,7 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
                             int v = WritableUtils.readVInt(in);
                             int vwIndex = WritableUtils.readVInt(in);
                             if (partitions[v] == partition)
-                                counts[v][vwIndex - 1] ++;
+                                counts[v][vwIndex - 1]++;
                         } catch (IOException e) {
                         }
                     }
@@ -187,12 +175,12 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
             });
         }).get();
 
+        long tFinal = System.currentTimeMillis();
         int sum = 0;
-        for(int i = 0 ; i < vCount ; i ++)
-            for(int j = 0 ; j < counts[i].length; j ++)
+        for (int i = 0; i < vCount; i++)
+            for (int j = 0; j < counts[i].length; j++)
                 sum += counts[i][j];
 
-        long tFinal = System.currentTimeMillis();
         System.out.println("tCount: " + sum / 3 + " find eCount in " + (tFinal - tTC) + " ms");
 //        System.out.println("tcCount: " + tcCount);
 
