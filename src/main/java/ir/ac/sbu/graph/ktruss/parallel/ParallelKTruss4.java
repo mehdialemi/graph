@@ -100,11 +100,22 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         long t3 = System.currentTimeMillis();
         System.out.println("Sort fonl in " + (t3 - t2) + " ms");
 
+        long tsCounts = System.currentTimeMillis();
+        AtomicInteger[][] counts = new AtomicInteger[vCount][];
+        for (int u = 0; u < vCount; u++) {
+            if (neighbors[u][0] == 0)
+                continue;
+            counts[u] = new AtomicInteger[neighbors[u][0]];
+            for(int i = 0 ; i < neighbors[u][0]; i ++)
+                counts[u][i] = new AtomicInteger(0);
+        }
+        long teCounts = System.currentTimeMillis();
+        System.out.println("Construct counts in " + (teCounts - tsCounts) + " ms");
+
         byte[][] fonlNeighborL1 = new byte[vCount][];
         byte[][] fonlNeighborL2 = new byte[vCount][];
-
         // number of edges in triangles per vertex
-        findTriangles(vCount, neighbors, vertexCompare, maxFSize, fonlNeighborL1, fonlNeighborL2);
+        findTriangles(vCount, counts, neighbors, vertexCompare, maxFSize, fonlNeighborL1, fonlNeighborL2);
 
         long tTC = System.currentTimeMillis();
         System.out.println("tc after fonl: " + (tTC - t3) + " ms");
@@ -119,59 +130,48 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
 //        int tcCount = 0;
 
-        long tsCounts = System.currentTimeMillis();
-        AtomicInteger[][] counts = new AtomicInteger[vCount][];
-        for (int u = 0; u < fonlNeighborL1.length; u++) {
-            if (neighbors[u][0] == 0)
-                continue;
-            counts[u] = new AtomicInteger[neighbors[u][0]];
-            for(int i = 0 ; i < neighbors[u][0]; i ++)
-                counts[u][i] = new AtomicInteger(0);
-        }
-        long teCounts = System.currentTimeMillis();
-        System.out.println("Construct counts in " + (teCounts - tsCounts) + " ms");
 
-        batchSelector = new AtomicInteger(0);
-        forkJoinPool.submit(() -> {
-            IntStream.range(0, threads).parallel().forEach(index -> {
-                DataInputBuffer in1 = new DataInputBuffer();
-                DataInputBuffer in2 = new DataInputBuffer();
-
-                try {
-                    while (true) {
-                        int start = batchSelector.getAndAdd(BATCH_SIZE);
-                        if (start > vCount)
-                            break;
-                        int end = Integer.min(vCount, start + BATCH_SIZE);
-                        for (int u = start; u < end; u++) {
-                            if (fonlNeighborL1[u] == null)
-                                continue;
-
-                            in1.reset(fonlNeighborL1[u], fonlNeighborL1[u].length);
-                            in2.reset(fonlNeighborL2[u], fonlNeighborL2[u].length);
-
-                            int size = WritableUtils.readVInt(in1);
-                            for (int i = 0; i < size; i++) {
-                                int len = WritableUtils.readVInt(in1);
-                                int vIndex = WritableUtils.readVInt(in1);
-                                counts[u][vIndex - 1].addAndGet(len);
-
-                                int v = neighbors[u][vIndex];
-                                for (int j = 0; j < len; j++) {
-                                    int uwIndex = WritableUtils.readVInt(in2);
-                                    counts[u][uwIndex - 1].incrementAndGet();
-
-                                    int vwIndex = WritableUtils.readVInt(in2);
-                                    counts[v][vwIndex - 1].incrementAndGet();
-                                }
-
-//                                tcCount += len;
-                            }
-                        }
-                    }
-                } catch (Exception e) {}
-            });
-        }).get();
+//        batchSelector = new AtomicInteger(0);
+//        forkJoinPool.submit(() -> {
+//            IntStream.range(0, threads).parallel().forEach(index -> {
+//                DataInputBuffer in1 = new DataInputBuffer();
+//                DataInputBuffer in2 = new DataInputBuffer();
+//
+//                try {
+//                    while (true) {
+//                        int start = batchSelector.getAndAdd(BATCH_SIZE);
+//                        if (start > vCount)
+//                            break;
+//                        int end = Integer.min(vCount, start + BATCH_SIZE);
+//                        for (int u = start; u < end; u++) {
+//                            if (fonlNeighborL1[u] == null)
+//                                continue;
+//
+//                            in1.reset(fonlNeighborL1[u], fonlNeighborL1[u].length);
+//                            in2.reset(fonlNeighborL2[u], fonlNeighborL2[u].length);
+//
+//                            int size = WritableUtils.readVInt(in1);
+//                            for (int i = 0; i < size; i++) {
+//                                int len = WritableUtils.readVInt(in1);
+//                                int vIndex = WritableUtils.readVInt(in1);
+//                                counts[u][vIndex - 1].addAndGet(len);
+//
+//                                int v = neighbors[u][vIndex];
+//                                for (int j = 0; j < len; j++) {
+//                                    int uwIndex = WritableUtils.readVInt(in2);
+//                                    counts[u][uwIndex - 1].incrementAndGet();
+//
+//                                    int vwIndex = WritableUtils.readVInt(in2);
+//                                    counts[v][vwIndex - 1].incrementAndGet();
+//                                }
+//
+////                                tcCount += len;
+//                            }
+//                        }
+//                    }
+//                } catch (Exception e) {}
+//            });
+//        }).get();
 
 //        for (int u = 0; u < fonlNeighborL1.length; u++) {
 //            if (fonlNeighborL1[u] == null)
@@ -200,12 +200,21 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 //        }
 
         long tFinal = System.currentTimeMillis();
+        int sum = 0;
+        for (AtomicInteger[] count : counts) {
+            if (count == null)
+                continue;
+            for (AtomicInteger atomicInteger : count) {
+                sum += atomicInteger.get();
+            }
+        }
+        System.out.println("tc: " + sum / 3);
         System.out.println("fill eSup in " + (tFinal - teCounts) + " ms");
 //        System.out.println("tcCount: " + tcCount);
 
     }
 
-    private void findTriangles(int vCount, int[][] neighbors, VertexCompare vertexCompare, int maxFSize,
+    private void findTriangles(int vCount, AtomicInteger[][] counts, int[][] neighbors, VertexCompare vertexCompare, int maxFSize,
                                byte[][] fonlNeighborL1, byte[][] fonlNeighborL2)
         throws InterruptedException, ExecutionException {
 
@@ -241,6 +250,8 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                         while (uwIndex < neighbors[u][0] + 1 && vwIndex < neighbors[v][0] + 1) {
                             if (neighborsU[uwIndex] == vNeighbors[vwIndex]) {
                                 try {
+                                    counts[u][uwIndex - 1].incrementAndGet();
+                                    counts[v][vwIndex - 1].incrementAndGet();
                                     WritableUtils.writeVInt(out2, uwIndex);
                                     WritableUtils.writeVInt(out2, vwIndex);
                                 } catch (Exception e) {
@@ -272,6 +283,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                         for (int j = 0; j < lastIndex; j++) {
                             WritableUtils.writeVInt(out1, lens[j]);
                             WritableUtils.writeVInt(out1, vIndexes[j]);
+                            counts[u][vIndexes[j] - 1].addAndGet(lens[j]);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
