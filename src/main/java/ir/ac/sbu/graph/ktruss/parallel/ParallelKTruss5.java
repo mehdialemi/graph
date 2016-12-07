@@ -8,6 +8,7 @@ import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.io.WritableUtils;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
@@ -55,7 +56,7 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
         for (int i = 0; i < vCount; i++)
             neighbors[i] = new int[d[i] + 1];
 
-        int maxSize = 0;
+//        int maxSize = 0;
         int[] pos = new int[vCount];
         for (Edge e : edges) {
             int dv1 = d[e.v1];
@@ -66,14 +67,14 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
             }
             if (dv1 < dv2) {
                 neighbors[e.v1][++neighbors[e.v1][0]] = e.v2;
-                if (neighbors[e.v1][0] > maxSize)
-                    maxSize = neighbors[e.v1][0];
+//                if (neighbors[e.v1][0] > maxSize)
+//                    maxSize = neighbors[e.v1][0];
                 neighbors[e.v2][d[e.v2] - pos[e.v2]++] = e.v1;
 
             } else {
                 neighbors[e.v2][++neighbors[e.v2][0]] = e.v1;
-                if (neighbors[e.v2][0] > maxSize)
-                    maxSize = neighbors[e.v2][0];
+//                if (neighbors[e.v2][0] > maxSize)
+//                    maxSize = neighbors[e.v2][0];
                 neighbors[e.v1][d[e.v1] - pos[e.v1]++] = e.v2;
             }
         }
@@ -83,22 +84,21 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
         long tInitFonl = System.currentTimeMillis();
         System.out.println("Initialize fonl " + (tInitFonl - t2) + " ms");
 
-//        final VertexCompare vertexCompare = new VertexCompare(d);
-//        batchSelector = new AtomicInteger(0);
-//        final int maxFSize = forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().map(partition -> {
-//            int maxFonlSize = 0;
-//            for (int u = 0; u < vCount; u++) {
-//                if (partitions[u] != partition || neighbors[u][0] < 2)
-//                    continue;
-//                vertexCompare.quickSort(neighbors[u], 1, neighbors[u][0]);
-//                if (maxFonlSize < neighbors[u][0])
-//                    maxFonlSize = neighbors[u][0];
-//                Arrays.sort(neighbors[u], neighbors[u][0] + 1, neighbors[u].length);
-//
-//            }
-//            return maxFonlSize;
-//        })).get().reduce((a, b) -> Integer.max(a, b)).getAsInt();
-        final int maxFSize = maxSize;
+        final VertexCompare vertexCompare = new VertexCompare(d);
+        batchSelector = new AtomicInteger(0);
+        final int maxFSize = forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().map(partition -> {
+            int maxFonlSize = 0;
+            for (int u = 0; u < vCount; u++) {
+                if (partitions[u] != partition || neighbors[u][0] < 2)
+                    continue;
+                vertexCompare.quickSort(neighbors[u], 1, neighbors[u][0]);
+                if (maxFonlSize < neighbors[u][0])
+                    maxFonlSize = neighbors[u][0];
+                Arrays.sort(neighbors[u], neighbors[u][0] + 1, neighbors[u].length);
+            }
+            return maxFonlSize;
+        })).get().reduce((a, b) -> Integer.max(a, b)).getAsInt();
+//        final int maxFSize = maxSize;
         long t3 = System.currentTimeMillis();
         System.out.println("Sort fonl in " + (t3 - t2) + " ms");
 
@@ -122,8 +122,8 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
                     int[] neighborsV = neighbors[v];
 
                     // intersection on u neighbors and v neighbors
-//                    int uwIndex = vIndex + 1, vwIndex = 1;
-                    int uwIndex = 1, vwIndex = 1;
+                    int uwIndex = vIndex + 1, vwIndex = 1;
+//                    int uwIndex = 1, vwIndex = 1;
                     while (uwIndex < neighborsU[0] + 1 && vwIndex < neighborsV[0] + 1) {
                         if (neighborsU[uwIndex] == neighborsV[vwIndex]) {
                             counts[u][vIndex - 1]++;
@@ -140,7 +140,8 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
                             }
                             uwIndex++;
                             vwIndex++;
-                        } else if (neighborsU[uwIndex] < neighborsV[vwIndex]) //else if (vertexCompare.compare(neighborsU[uwIndex], neighborsV[vwIndex]) == -1)
+                        } // else if (neighborsU[uwIndex] < neighborsV[vwIndex])
+                        else if (vertexCompare.compare(neighborsU[uwIndex], neighborsV[vwIndex]) == -1)
                             uwIndex++;
                         else
                             vwIndex++;
