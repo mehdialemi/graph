@@ -133,7 +133,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> {
-            IntStream.range(0, threads).forEach(index -> {
+            IntStream.range(0, threads).parallel().forEach(index -> {
                 DataInputBuffer in1 = new DataInputBuffer();
                 DataInputBuffer in2 = new DataInputBuffer();
 

@@ -156,7 +156,7 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
 
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> {
-            IntStream.range(0, threads).forEach(partition -> {
+            IntStream.range(0, threads).parallel().forEach(partition -> {
                 DataInputBuffer in = new DataInputBuffer();
                 for (int u = 0; u < vCount; u++) {
                     if (fonlOutLinks[u] == null)
