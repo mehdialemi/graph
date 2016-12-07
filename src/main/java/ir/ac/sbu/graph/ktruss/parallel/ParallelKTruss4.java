@@ -117,7 +117,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 //        PartitioningUtils.printStatus(threads, partitions, fonls, fonlNeighborL1);
 //        System.out.println("partition time: " + (tPartition - tTC) + " ms");
 
-        int tcCount = 0;
+//        int tcCount = 0;
         DataInputBuffer in1 = new DataInputBuffer();
         DataInputBuffer in2 = new DataInputBuffer();
 
@@ -130,35 +130,74 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 counts[u][i] = new AtomicInteger(0);
         }
 
-        for (int u = 0; u < fonlNeighborL1.length; u++) {
-            if (fonlNeighborL1[u] == null)
-                continue;
+        batchSelector = new AtomicInteger(0);
+        forkJoinPool.submit(() -> {
+            IntStream.range(0, threads).forEach(index -> {
+                try {
+                    while (true) {
+                        int start = batchSelector.getAndAdd(BATCH_SIZE);
+                        if (start > vCount)
+                            break;
+                        int end = Integer.min(vCount, start + BATCH_SIZE);
+                        for (int u = start; u < end; u++) {
+                            if (fonlNeighborL1[u] == null)
+                                continue;
 
-            in1.reset(fonlNeighborL1[u], fonlNeighborL1[u].length);
-            in2.reset(fonlNeighborL2[u], fonlNeighborL2[u].length);
+                            in1.reset(fonlNeighborL1[u], fonlNeighborL1[u].length);
+                            in2.reset(fonlNeighborL2[u], fonlNeighborL2[u].length);
 
-            int size = WritableUtils.readVInt(in1);
-            for (int i = 0; i < size; i++) {
-                int len = WritableUtils.readVInt(in1);
-                int vIndex = WritableUtils.readVInt(in1);
-                counts[u][vIndex - 1].addAndGet(len);
+                            int size = WritableUtils.readVInt(in1);
+                            for (int i = 0; i < size; i++) {
+                                int len = WritableUtils.readVInt(in1);
+                                int vIndex = WritableUtils.readVInt(in1);
+                                counts[u][vIndex - 1].addAndGet(len);
 
-                int v = neighbors[u][vIndex];
-                for (int j = 0; j < len; j++) {
-                    int uwIndex = WritableUtils.readVInt(in2);
-                    counts[u][uwIndex - 1].incrementAndGet();
+                                int v = neighbors[u][vIndex];
+                                for (int j = 0; j < len; j++) {
+                                    int uwIndex = WritableUtils.readVInt(in2);
+                                    counts[u][uwIndex - 1].incrementAndGet();
 
-                    int vwIndex = WritableUtils.readVInt(in2);
-                    counts[v][vwIndex - 1].incrementAndGet();
-                }
+                                    int vwIndex = WritableUtils.readVInt(in2);
+                                    counts[v][vwIndex - 1].incrementAndGet();
+                                }
 
-                tcCount += len;
-            }
-        }
+//                                tcCount += len;
+                            }
+                        }
+                    }
+                } catch (Exception e) {}
+            });
+        }).get();
+
+//        for (int u = 0; u < fonlNeighborL1.length; u++) {
+//            if (fonlNeighborL1[u] == null)
+//                continue;
+//
+//            in1.reset(fonlNeighborL1[u], fonlNeighborL1[u].length);
+//            in2.reset(fonlNeighborL2[u], fonlNeighborL2[u].length);
+//
+//            int size = WritableUtils.readVInt(in1);
+//            for (int i = 0; i < size; i++) {
+//                int len = WritableUtils.readVInt(in1);
+//                int vIndex = WritableUtils.readVInt(in1);
+//                counts[u][vIndex - 1].addAndGet(len);
+//
+//                int v = neighbors[u][vIndex];
+//                for (int j = 0; j < len; j++) {
+//                    int uwIndex = WritableUtils.readVInt(in2);
+//                    counts[u][uwIndex - 1].incrementAndGet();
+//
+//                    int vwIndex = WritableUtils.readVInt(in2);
+//                    counts[v][vwIndex - 1].incrementAndGet();
+//                }
+//
+//                tcCount += len;
+//            }
+//        }
 
         long tFinal = System.currentTimeMillis();
         System.out.println("fill eSup in " + (tFinal - tTC) + " ms");
-        System.out.println("tcCount: " + tcCount);
+//        System.out.println("tcCount: " + tcCount);
 
     }
 
