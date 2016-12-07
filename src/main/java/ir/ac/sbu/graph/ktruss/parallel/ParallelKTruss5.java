@@ -95,6 +95,9 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
                 if (maxFonlSize < neighbors[u][0])
                     maxFonlSize = neighbors[u][0];
                 Arrays.sort(neighbors[u], neighbors[u][0] + 1, neighbors[u].length);
+                int[] n = new int[neighbors[u].length];
+                System.arraycopy(neighbors[u], 0, n, 0, n.length);
+                neighbors[u] = n;
             }
             return maxFonlSize;
         })).get().reduce((a, b) -> Integer.max(a, b)).getAsInt();
