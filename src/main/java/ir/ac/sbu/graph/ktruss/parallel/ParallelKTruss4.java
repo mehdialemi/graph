@@ -9,6 +9,7 @@ import org.apache.hadoop.io.WritableUtils;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -51,7 +52,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         System.out.println("Find degrees in " + (t2 - tStart) + " ms");
 
         final int[][] neighbors = new int[vCount][];
-        for(int i = 0  ; i < vCount; i ++)
+        for (int i = 0; i < vCount; i++)
             neighbors[i] = new int[d[i] + 1];
 
         int[] pos = new int[vCount];
@@ -64,11 +65,11 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             }
             if (dv1 < dv2) {
                 neighbors[e.v1][++neighbors[e.v1][0]] = e.v2;
-                neighbors[e.v2][d[e.v2] - pos[e.v2] ++] = e.v1;
+                neighbors[e.v2][d[e.v2] - pos[e.v2]++] = e.v1;
 
             } else {
                 neighbors[e.v2][++neighbors[e.v2][0]] = e.v1;
-                neighbors[e.v1][d[e.v1] - pos[e.v1] ++] = e.v2;
+                neighbors[e.v1][d[e.v1] - pos[e.v1]++] = e.v2;
             }
         }
         long tInitFonl = System.currentTimeMillis();
@@ -102,6 +103,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         byte[][] fonlNeighborL1 = new byte[vCount][];
         byte[][] fonlNeighborL2 = new byte[vCount][];
 
+        // number of edges in triangles per vertex
         findTriangles(vCount, neighbors, vertexCompare, maxFSize, fonlNeighborL1, fonlNeighborL2);
 
         long tTC = System.currentTimeMillis();
@@ -119,33 +121,38 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         DataInputBuffer in1 = new DataInputBuffer();
         DataInputBuffer in2 = new DataInputBuffer();
 
+        int[][] counts = new int[vCount][];
+        for (int u = 0; u < fonlNeighborL1.length; u++) {
+            if (neighbors[u][0] == 0)
+                continue;
+            counts[u] = new int[neighbors[u][0]];
+        }
+
         for (int u = 0; u < fonlNeighborL1.length; u++) {
             if (fonlNeighborL1[u] == null)
                 continue;
 
             in1.reset(fonlNeighborL1[u], fonlNeighborL1[u].length);
             in2.reset(fonlNeighborL2[u], fonlNeighborL2[u].length);
-            while (true) {
-                if (in1.getPosition() >= fonlNeighborL1[u].length)
-                    break;
 
-                int size = WritableUtils.readVInt(in1);
-                for (int i = 0; i < size; i++) {
-                    int len = WritableUtils.readVInt(in1);
-                    int vIndex = WritableUtils.readVInt(in1);
-//                    int v = fonls[u][vIndex];
-//                    for (int j = 0; j < len; j++) {
-//                        int uwIndex = WritableUtils.readVInt(in2);
-//                        vertexEdges[u].add(uwIndex, v);
-//
-//                        int vwIndex = WritableUtils.readVInt(in2);
-//                        if (vertexEdges[v] == null)
-//                            vertexEdges[v] = new VertexEdge(fl[v]);
-//                        vertexEdges[v].add(vwIndex, u);
-//                    }
+            int size = WritableUtils.readVInt(in1);
+            for (int i = 0; i < size; i++) {
+                int len = WritableUtils.readVInt(in1);
+                int vIndex = WritableUtils.readVInt(in1);
+                counts[u][vIndex - 1] += len;
 
-                    tcCount += len;
+                int v = neighbors[u][vIndex];
+                for (int j = 0; j < len; j++) {
+                    int uwIndex = WritableUtils.readVInt(in2);
+                    counts[u][uwIndex - 1]++;
+
+                    int vwIndex = WritableUtils.readVInt(in2);
+                    if (counts[v] == null)
+                        System.out.println("XXX");
+                    counts[v][vwIndex - 1]++;
                 }
+
+                tcCount += len;
             }
         }
 
@@ -155,13 +162,16 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
     }
 
-    private void findTriangles(int vCount, int[][] neighbors, VertexCompare vertexCompare, int maxFSize, byte[][] fonlNeighborL1, byte[][] fonlNeighborL2) throws InterruptedException, java.util.concurrent.ExecutionException {
+    private void findTriangles(int vCount, int[][] neighbors, VertexCompare vertexCompare, int maxFSize,
+                               byte[][] fonlNeighborL1, byte[][] fonlNeighborL2)
+        throws InterruptedException, ExecutionException {
+
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(i -> {
             int[] vIndexes = new int[maxFSize];
             int[] lens = new int[maxFSize];
-            DataOutputBuffer outNeighborL1 = new DataOutputBuffer(maxFSize);
-            DataOutputBuffer outNeighborL2 = new DataOutputBuffer(maxFSize);
+            DataOutputBuffer out1 = new DataOutputBuffer(maxFSize);
+            DataOutputBuffer out2 = new DataOutputBuffer(maxFSize);
             while (true) {
                 int start = batchSelector.getAndAdd(BATCH_SIZE);
                 if (start >= vCount)
@@ -172,7 +182,8 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                     if (neighbors[u][0] < 2)
                         continue;
 
-                    int jIndex = 0;
+                    int lastIndex = 0;
+                    out2.reset();
 
                     // Find triangle by checking connectivity of neighbors
                     for (int vIndex = 1; vIndex < neighbors[u][0]; vIndex++) {
@@ -180,55 +191,54 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                         int v = neighborsU[vIndex];
                         int[] vNeighbors = neighbors[v];
 
-                        int idx = 0;
+                        int intersection = 0;
                         // intersection on u neighbors and v neighbors
-                        int f = vIndex + 1, vn = 1;
-                        
-                        while (f < neighbors[u][0] + 1 && vn < neighbors[v][0] + 1) {
-                            if (neighborsU[f] == vNeighbors[vn]) {
-                                if (idx == 0)
-                                    outNeighborL2.reset();
+                        int uwIndex = vIndex + 1, vwIndex = 1;
+
+                        while (uwIndex < neighbors[u][0] + 1 && vwIndex < neighbors[v][0] + 1) {
+                            if (neighborsU[uwIndex] == vNeighbors[vwIndex]) {
                                 try {
-                                    WritableUtils.writeVInt(outNeighborL2, f);
+                                    WritableUtils.writeVInt(out2, uwIndex);
+                                    WritableUtils.writeVInt(out2, vwIndex);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
 
-                                idx++;
-                                f++;
-                                vn++;
-                            } else if (vertexCompare.compare(neighborsU[f], vNeighbors[vn]) == -1)
-                                f++;
+                                intersection++;
+                                uwIndex++;
+                                vwIndex++;
+                            } else if (vertexCompare.compare(neighborsU[uwIndex], vNeighbors[vwIndex]) == -1)
+                                uwIndex++;
                             else
-                                vn++;
+                                vwIndex++;
                         }
 
-                        if (idx == 0)
+                        if (intersection == 0)
                             continue;
 
-                        vIndexes[jIndex] = vIndex;
-                        lens[jIndex++] = idx;
+                        vIndexes[lastIndex] = vIndex;
+                        lens[lastIndex++] = intersection;
                     }
 
-                    if (jIndex == 0)
+                    if (lastIndex == 0)
                         continue;
 
-                    outNeighborL1.reset();
+                    out1.reset();
                     try {
-                        WritableUtils.writeVInt(outNeighborL1, jIndex);
-                        for (int j = 0; j < jIndex; j++) {
-                            WritableUtils.writeVInt(outNeighborL1, lens[j]);
-                            WritableUtils.writeVInt(outNeighborL1, vIndexes[j]);
+                        WritableUtils.writeVInt(out1, lastIndex);
+                        for (int j = 0; j < lastIndex; j++) {
+                            WritableUtils.writeVInt(out1, lens[j]);
+                            WritableUtils.writeVInt(out1, vIndexes[j]);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
 
-                    fonlNeighborL1[u] = new byte[outNeighborL1.getLength()];
-                    System.arraycopy(outNeighborL1.getData(), 0, fonlNeighborL1[u], 0, outNeighborL1.getLength());
+                    fonlNeighborL1[u] = new byte[out1.getLength()];
+                    System.arraycopy(out1.getData(), 0, fonlNeighborL1[u], 0, out1.getLength());
 
-                    fonlNeighborL2[u] = new byte[outNeighborL2.getLength()];
-                    System.arraycopy(outNeighborL2.getData(), 0, fonlNeighborL2[u], 0, outNeighborL2.getLength());
+                    fonlNeighborL2[u] = new byte[out2.getLength()];
+                    System.arraycopy(out2.getData(), 0, fonlNeighborL2[u], 0, out2.getLength());
                 }
             }
         })).get();
