@@ -121,11 +121,13 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         DataInputBuffer in1 = new DataInputBuffer();
         DataInputBuffer in2 = new DataInputBuffer();
 
-        int[][] counts = new int[vCount][];
+        AtomicInteger[][] counts = new AtomicInteger[vCount][];
         for (int u = 0; u < fonlNeighborL1.length; u++) {
             if (neighbors[u][0] == 0)
                 continue;
-            counts[u] = new int[neighbors[u][0]];
+            counts[u] = new AtomicInteger[neighbors[u][0]];
+            for(int i = 0 ; i < neighbors[u][0]; i ++)
+                counts[u][i] = new AtomicInteger(0);
         }
 
         for (int u = 0; u < fonlNeighborL1.length; u++) {
@@ -139,17 +141,15 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             for (int i = 0; i < size; i++) {
                 int len = WritableUtils.readVInt(in1);
                 int vIndex = WritableUtils.readVInt(in1);
-                counts[u][vIndex - 1] += len;
+                counts[u][vIndex - 1].addAndGet(len);
 
                 int v = neighbors[u][vIndex];
                 for (int j = 0; j < len; j++) {
                     int uwIndex = WritableUtils.readVInt(in2);
-                    counts[u][uwIndex - 1]++;
+                    counts[u][uwIndex - 1].incrementAndGet();
 
                     int vwIndex = WritableUtils.readVInt(in2);
-                    if (counts[v] == null)
-                        System.out.println("XXX");
-                    counts[v][vwIndex - 1]++;
+                    counts[v][vwIndex - 1].incrementAndGet();
                 }
 
                 tcCount += len;
