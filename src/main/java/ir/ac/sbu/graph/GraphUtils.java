@@ -18,9 +18,44 @@ public class GraphUtils implements Serializable {
         conf.setAppName(name + "-" + defaultPartition + "-" + new File(inputPath).getName());
     }
 
-     public static int sortedIntersectionCount(long[] hDegs, long[] forward, List<Tuple2<Long, Integer>> output, int
+    public static Tuple3<int[][], int[], Integer> createNeighbor(Edge[] edges) {
+        long tsm = System.currentTimeMillis();
+        int maxVertexNum = 0;
+        for (Edge edge : edges) {
+            if (edge.v1 > maxVertexNum)
+                maxVertexNum = edge.v1;
+            if (edge.v2 > maxVertexNum)
+                maxVertexNum = edge.v2;
+        }
+        long tem = System.currentTimeMillis();
+        System.out.println("find maxVertexNum in " + (tem - tsm) + " ms");
+
+        // Construct degree arrayList such that vertexId is the index of the arrayList.
+        final int vCount = maxVertexNum + 1;
+        int[] d = new int[vCount];  // vertex degree
+        for (Edge e : edges) {
+            d[e.v1]++;
+            d[e.v2]++;
+        }
+
+        final int[][] neighbors = new int[vCount][];
+        for (int i = 0; i < vCount; i++)
+            neighbors[i] = new int[d[i] + 1];
+
+        int[] cIdx = new int[vCount];
+        int max = 0;
+        for (Edge e : edges) {
+            neighbors[e.v1][cIdx[e.v1] ++] = e.v2;
+            neighbors[e.v2][cIdx[e.v2] ++] = e.v1;
+            max = Integer.max(Integer.max(max, cIdx[e.v1]), cIdx[e.v2]);
+        }
+
+        return new Tuple3<>(neighbors, d, max);
+    }
+
+    public static int sortedIntersectionCount(long[] hDegs, long[] forward, List<Tuple2<Long, Integer>> output, int
         hIndex,
-                                       int fIndex) {
+                                              int fIndex) {
         int fLen = forward.length;
         int hLen = hDegs.length;
 
@@ -53,16 +88,14 @@ public class GraphUtils implements Serializable {
 
             if (h == f) {
                 if (output != null)
-                    output.add(new Tuple2<> (h, 1));
+                    output.add(new Tuple2<>(h, 1));
                 count++;
                 leftRead = true;
                 rightRead = true;
-            }
-            else if (h < f) {
+            } else if (h < f) {
                 leftRead = true;
                 rightRead = false;
-            }
-            else {
+            } else {
                 leftRead = false;
                 rightRead = true;
             }
@@ -106,12 +139,10 @@ public class GraphUtils implements Serializable {
                 list.add(h);
                 leftRead = true;
                 rightRead = true;
-            }
-            else if (h < f) {
+            } else if (h < f) {
                 leftRead = true;
                 rightRead = false;
-            }
-            else {
+            } else {
                 leftRead = false;
                 rightRead = true;
             }
@@ -121,7 +152,7 @@ public class GraphUtils implements Serializable {
 
     public static int sortedIntersectionCountInt(int[] hDegs, int[] forward, List<Tuple2<Integer, Integer>> output, int
         hIndex,
-                                       int fIndex) {
+                                                 int fIndex) {
         int fLen = forward.length;
         int hLen = hDegs.length;
 
@@ -154,16 +185,14 @@ public class GraphUtils implements Serializable {
 
             if (h == f) {
                 if (output != null)
-                    output.add(new Tuple2<> (h, 1));
+                    output.add(new Tuple2<>(h, 1));
                 count++;
                 leftRead = true;
                 rightRead = true;
-            }
-            else if (h < f) {
+            } else if (h < f) {
                 leftRead = true;
                 rightRead = false;
-            }
-            else {
+            } else {
                 leftRead = false;
                 rightRead = true;
             }
@@ -175,7 +204,8 @@ public class GraphUtils implements Serializable {
         public long vertex;
         public int degree;
 
-        public VertexDegree() {}
+        public VertexDegree() {
+        }
 
         public VertexDegree(long vertex, int degree) {
             this.vertex = vertex;

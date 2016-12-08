@@ -1,14 +1,15 @@
 package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
+import ir.ac.sbu.graph.GraphUtils;
 import ir.ac.sbu.graph.PartitioningUtils;
 import ir.ac.sbu.graph.VertexCompare;
 import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.io.WritableUtils;
+import scala.Tuple3;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
@@ -29,149 +30,87 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
 
     @Override
     public void start() throws Exception {
+        Tuple3<int[][], int[], Integer> result = GraphUtils.createNeighbor(edges);
+        int[][] neighbors = result._1();
+        int[] d = result._2();
+        int maxDeg = result._3();
+        int vCount = d.length;
         long tStart = System.currentTimeMillis();
-        batchSelector = new AtomicInteger(0);
-        int maxVertexNum = 0;
-        for (Edge edge : edges) {
-            if (edge.v1 > maxVertexNum)
-                maxVertexNum = edge.v1;
-            if (edge.v2 > maxVertexNum)
-                maxVertexNum = edge.v2;
-        }
+        final int[] partitions = PartitioningUtils.createPartitions(vCount, threads, BATCH_SIZE);
+        long tep = System.currentTimeMillis();
+        System.out.println("partition in " + (tep - tStart) + " ms");
 
-        long tMax = System.currentTimeMillis();
-        System.out.println("find maxVertexNum in " + (tMax - tStart) + " ms");
-
-        // Construct degree arrayList such that vertexId is the index of the arrayList.
-        final int vCount = maxVertexNum + 1;
-        int[] d = new int[vCount];  // vertex degree
-        for (Edge e : edges) {
-            d[e.v1]++;
-            d[e.v2]++;
-        }
-        long t2 = System.currentTimeMillis();
-        System.out.println("Find degrees in " + (t2 - tStart) + " ms");
-
-        final int[][] neighbors = new int[vCount][];
-        for (int i = 0; i < vCount; i++)
-            neighbors[i] = new int[d[i] + 1];
-
-//        int maxSize = 0;
-        int[] pos = new int[vCount];
-        for (Edge e : edges) {
-            int dv1 = d[e.v1];
-            int dv2 = d[e.v2];
-            if (dv1 == dv2) {
-                dv1 = e.v1;
-                dv2 = e.v2;
-            }
-            if (dv1 < dv2) {
-                neighbors[e.v1][++neighbors[e.v1][0]] = e.v2;
-//                if (neighbors[e.v1][0] > maxSize)
-//                    maxSize = neighbors[e.v1][0];
-                neighbors[e.v2][d[e.v2] - pos[e.v2]++] = e.v1;
-
-            } else {
-                neighbors[e.v2][++neighbors[e.v2][0]] = e.v1;
-//                if (neighbors[e.v2][0] > maxSize)
-//                    maxSize = neighbors[e.v2][0];
-                neighbors[e.v1][d[e.v1] - pos[e.v1]++] = e.v2;
-            }
-        }
-
-        int[] partitions = PartitioningUtils.createPartitions(vCount, threads, BATCH_SIZE);
-
-        long tInitFonl = System.currentTimeMillis();
-        System.out.println("Initialize fonl " + (tInitFonl - t2) + " ms");
-
-        final VertexCompare vertexCompare = new VertexCompare(d);
-        batchSelector = new AtomicInteger(0);
-        final int maxFSize = forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().map(partition -> {
-            int maxFonlSize = 0;
-            for (int u = 0; u < vCount; u++) {
-                if (partitions[u] != partition || neighbors[u][0] < 2)
-                    continue;
-                vertexCompare.quickSort(neighbors[u], 1, neighbors[u][0]);
-                if (maxFonlSize < neighbors[u][0])
-                    maxFonlSize = neighbors[u][0];
-                Arrays.sort(neighbors[u], neighbors[u][0] + 1, neighbors[u].length);
-                int[] n = new int[neighbors[u].length];
-                System.arraycopy(neighbors[u], 0, n, 0, n.length);
-                neighbors[u] = n;
-            }
-            return maxFonlSize;
-        })).get().reduce((a, b) -> Integer.max(a, b)).getAsInt();
-//        final int maxFSize = maxSize;
-        long t3 = System.currentTimeMillis();
-        System.out.println("Sort fonl in " + (t3 - t2) + " ms");
-
-        byte[][] fonlOutLinks = new byte[vCount][];
+        byte[][] externals = new byte[vCount][];
         int[][] counts = new int[vCount][];
         for (int u = 0; u < vCount; u++)
             counts[u] = new int[neighbors[u][0]];
 
+        final int maxFSize = Math.max(1, vCount / (threads * 2));
+
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(partition -> {
-            DataOutputBuffer out = new DataOutputBuffer(maxFSize * maxFSize);
+            DataOutputBuffer out = new DataOutputBuffer(maxFSize);
+            int[] h = new int[maxDeg];
+            int[] vi = new int[maxDeg]; // v indexes
+            final BitSet bitSet = new BitSet(vCount);
             for (int u = 0; u < vCount; u++) {
                 if (partitions[u] != partition || neighbors[u][0] < 2)
                     continue;
 
-                out.reset();
+                int len = d[u];
                 int[] neighborsU = neighbors[u];
-                // Find triangle by checking connectivity of neighbors
-                for (int vIndex = 1; vIndex < neighborsU[0]; vIndex++) {
+                int index = 0;
+                for (int vIndex = 0 ; vIndex < len; vIndex ++) {
                     int v = neighborsU[vIndex];
-                    int[] neighborsV = neighbors[v];
+                    if ((d[v] < d[u]) || (d[v] == d[u] && v < u))
+                        continue;
+                    vi[index] = vIndex;
+                    h[index ++] = v;
+                    bitSet.set(v);
+                }
 
-                    // intersection on u neighbors and v neighbors
-                    int uwIndex = vIndex + 1, vwIndex = 1;
-//                    int uwIndex = 1, vwIndex = 1;
-                    while (uwIndex < neighborsU[0] + 1 && vwIndex < neighborsV[0] + 1) {
-                        if (neighborsU[uwIndex] == neighborsV[vwIndex]) {
-                            counts[u][vIndex - 1]++;
-                            counts[u][uwIndex - 1]++;
-                            if (partitions[v] == partition) {
-                                counts[v][vwIndex - 1]++;
-                            } else {
-                                try {
-                                    WritableUtils.writeVInt(out, v);
-                                    WritableUtils.writeVInt(out, vwIndex);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
+                out.reset();
+
+                // Find triangle by checking connectivity of neighbors
+                for (int j = 0 ; j < index; j ++) {
+                    int[] nv = neighbors[h[j]];
+                    for (int wi = 0 ; wi < nv.length; wi ++) {
+                        // intersection on u neighbors and v neighbors
+                        if (bitSet.get(nv[wi])) {
+                            counts[u][vi[j]] ++;
+                            for (int uw = 0 ; uw < index; uw ++)
+                                if (nv[wi] == h[uw]) {
+                                    counts[u][vi[uw]] ++;
+                                    break;
                                 }
+
+                            if (partitions[h[j]] == partition) {
+                                counts[h[j]][wi]++;
                             }
-                            uwIndex++;
-                            vwIndex++;
-                        } // else if (neighborsU[uwIndex] < neighborsV[vwIndex])
-                        else if (vertexCompare.compare(neighborsU[uwIndex], neighborsV[vwIndex]) == -1)
-                            uwIndex++;
-                        else
-                            vwIndex++;
+                        }
                     }
                 }
 
                 if (out.getLength() == 0)
                     continue;
 
-                fonlOutLinks[u] = new byte[out.getLength()];
-                System.arraycopy(out.getData(), 0, fonlOutLinks[u], 0, out.getLength());
+                externals[u] = new byte[out.getLength()];
+                System.arraycopy(out.getData(), 0, externals[u], 0, out.getLength());
             }
         })).get();
 
         long tTC = System.currentTimeMillis();
-        System.out.println("tc after fonl: " + (tTC - t3) + " ms");
-        System.out.println("tc duration: " + (tTC - tStart) + " ms");
+        System.out.println("tc in " + (tTC - tStart) + " ms");
 
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> {
             IntStream.range(0, threads).parallel().forEach(partition -> {
                 DataInputBuffer in = new DataInputBuffer();
                 for (int u = 0; u < vCount; u++) {
-                    if (fonlOutLinks[u] == null)
+                    if (externals[u] == null)
                         continue;
-                    in.reset(fonlOutLinks[u], fonlOutLinks[u].length);
-                    while (in.getPosition() < fonlOutLinks[u].length) {
+                    in.reset(externals[u], externals[u].length);
+                    while (in.getPosition() < externals[u].length) {
                         try {
                             int v = WritableUtils.readVInt(in);
                             int vwIndex = WritableUtils.readVInt(in);
@@ -184,15 +123,13 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
             });
         }).get();
 
-        long tFinal = System.currentTimeMillis();
+        long tUpdateCounts = System.currentTimeMillis();
         int sum = 0;
         for (int i = 0; i < vCount; i++)
             for (int j = 0; j < counts[i].length; j++)
                 sum += counts[i][j];
 
-        System.out.println("tCount: " + sum / 3 + " find eCount in " + (tFinal - tTC) + " ms");
-//        System.out.println("tcCount: " + tcCount);
-
+        System.out.println("tCount: " + sum / 3 + " update counts in " + (tUpdateCounts - tTC) + " ms");
     }
 
     private void findTriangles(int vCount, int[][] neighbors, VertexCompare vertexCompare, int maxFSize,
