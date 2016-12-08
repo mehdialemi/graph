@@ -43,9 +43,11 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
         byte[][] externals = new byte[vCount][];
         int[][] counts = new int[vCount][];
         for (int u = 0; u < vCount; u++)
-            counts[u] = new int[neighbors[u][0]];
+            counts[u] = new int[d[u]];
 
         final int maxFSize = Math.max(1, vCount / (threads * 2));
+        System.out.println("maxDeg: " + maxDeg);
+        System.out.println("maxFSize: " + maxFSize);
 
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(partition -> {
