@@ -27,10 +27,9 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
     public void start() throws Exception {
         Tuple3<int[][], int[], int[][]> result = GraphUtils.createNeighborWithEdgeIndex(edges);
         final int[][] neighbors = result._1();
+        long tStart = System.currentTimeMillis();
         final int[] d = result._2();
         final int[][] neighborsEdge = result._3();
-
-        long tStart = System.currentTimeMillis();
 
         final AtomicInteger[] edgeSup = new AtomicInteger[edges.length];
         for (int i = 0; i < edges.length; i++) {

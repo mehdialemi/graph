@@ -1,6 +1,8 @@
 package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
+import ir.ac.sbu.graph.ResettableDataOutputBuffer;
+import ir.ac.sbu.graph.PartitioningUtils;
 import ir.ac.sbu.graph.VertexCompare;
 import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
@@ -9,7 +11,6 @@ import org.apache.hadoop.io.WritableUtils;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -19,6 +20,7 @@ import java.util.stream.IntStream;
  */
 public class ParallelKTruss4 extends ParallelKTrussBase {
 
+    public static final int INT_SIZE = 4;
     private final ForkJoinPool forkJoinPool;
 
     public ParallelKTruss4(Edge[] edges, int minSup, int threads) {
@@ -103,9 +105,9 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
         // number of edges in triangles per vertex
         long tsCounts = System.currentTimeMillis();
-        AtomicInteger[][] counts = new AtomicInteger[vCount][];
+        AtomicInteger[][] veSups = new AtomicInteger[vCount][];
         int threadCount = Math.max(Math.min(threads, 2), threads / 2);
-        System.out.println("using " + threadCount + " threads to construct counts");
+        System.out.println("using " + threadCount + " threads to construct veSups");
 
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threadCount).parallel().forEach(partition -> {
@@ -117,29 +119,31 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 for (int u = start; u < end; u++) {
                     if (neighbors[u][0] == 0)
                         continue;
-                    counts[u] = new AtomicInteger[neighbors[u][0]];
+                    veSups[u] = new AtomicInteger[neighbors[u][0]];
                     for (int i = 0; i < neighbors[u][0]; i++)
-                        counts[u][i] = new AtomicInteger(0);
+                        veSups[u][i] = new AtomicInteger(0);
                 }
             }
         })).get();
 
         long tCounts = System.currentTimeMillis();
-        System.out.println("construct counts in " + (tCounts - tsCounts) + " ms");
+        System.out.println("construct veSups in " + (tCounts - tsCounts) + " ms");
 
-        BitSet[] threadBitSets = new BitSet[threads];
-        for(int i = 0; i < threads; i ++)
-            threadBitSets[i] = new BitSet(vCount);
+//        byte[][] fonlNeighborL1 = new byte[vCount][];
+//        byte[][] fonlNeighborL2 = new byte[vCount][];
+        byte[][] seconds = new byte[vCount][];
+        byte[][][] thirds = new byte[vCount][][];
+        int[] lcCount = new int[vCount];  // local commons
+        int[] veCount = new int[vCount];
 
-        byte[][] fonlNeighborL1 = new byte[vCount][];
-        byte[][] fonlNeighborL2 = new byte[vCount][];
         batchSelector = new AtomicInteger(0);
-        BitSet involvedBitSet = new BitSet(vCount);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(thread -> {
             int[] vIndexes = new int[maxFSize];
             int[] lens = new int[maxFSize];
-            DataOutputBuffer out1 = new DataOutputBuffer(maxFSize);
-            DataOutputBuffer out2 = new DataOutputBuffer(maxFSize);
+            DataOutputBuffer outInternal = new DataOutputBuffer(maxFSize);
+            DataOutputBuffer outLocal = new DataOutputBuffer(maxFSize);
+            DataOutputBuffer outTmp = new DataOutputBuffer(maxFSize);
+            DataInputBuffer in = new DataInputBuffer();
             while (true) {
                 int start = batchSelector.getAndAdd(BATCH_SIZE);
                 if (start >= vCount)
@@ -150,8 +154,8 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                     if (neighbors[u][0] < 2)
                         continue;
 
-                    int lastIndex = 0;
-                    out2.reset();
+                    int commonSize = 0;
+                    outLocal.reset();
 
                     int[] neighborsU = neighbors[u];
                     // Find triangle by checking connectivity of neighbors
@@ -166,12 +170,15 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                         while (uwIndex < neighbors[u][0] + 1 && vwIndex < neighbors[v][0] + 1) {
                             if (neighborsU[uwIndex] == vNeighbors[vwIndex]) {
                                 try {
-                                    counts[u][uwIndex - 1].incrementAndGet();
-                                    counts[v][vwIndex - 1].incrementAndGet();
-                                    WritableUtils.writeVInt(out2, uwIndex);
-                                    WritableUtils.writeVInt(out2, vwIndex);
+                                    int num = veSups[u][uwIndex - 1].getAndIncrement();
+                                    if (num == 0)
+                                        veCount[u] ++;
+                                    num = veSups[v][vwIndex - 1].getAndIncrement();
+                                    if (num == 0)
+                                        veCount[v] ++;
+                                    WritableUtils.writeVInt(outLocal, uwIndex);
+                                    WritableUtils.writeVInt(outLocal, vwIndex);
                                 } catch (Exception e) {
-                                    e.printStackTrace();
                                 }
 
                                 intersection++;
@@ -186,46 +193,186 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                         if (intersection == 0)
                             continue;
 
-                        involvedBitSet.set(v);
-                        threadBitSets[thread].set(v);
-
-                        vIndexes[lastIndex] = vIndex;
-                        lens[lastIndex++] = intersection;
+                        vIndexes[commonSize] = vIndex;
+                        lens[commonSize++] = intersection;
                     }
 
-                    if (lastIndex == 0)
+                    if (commonSize == 0)
                         continue;
 
-                    involvedBitSet.set(u);
-
-                    out1.reset();
+                    outInternal.reset();
+                    in.reset(outLocal.getData(), outLocal.getLength());
                     try {
-                        WritableUtils.writeVInt(out1, lastIndex);
-                        for (int j = 0; j < lastIndex; j++) {
-                            WritableUtils.writeVInt(out1, lens[j]);
-                            WritableUtils.writeVInt(out1, vIndexes[j]);
-                            counts[u][vIndexes[j] - 1].addAndGet(lens[j]);
+                        thirds[u] = new byte[commonSize][];
+                        lcCount[u] = commonSize;
+                        for (int j = 0; j < commonSize; j++) {
+                            int num = veSups[u][vIndexes[j] - 1].getAndAdd(lens[j]);
+                            if (num == 0)
+                                veCount[u] ++;
+                            WritableUtils.writeVInt(outInternal, vIndexes[j]);
+                            WritableUtils.writeVInt(outInternal, lens[j]);
+                            outTmp.reset();
+                            for (int k = 0; k < lens[j]; k++) {
+                                WritableUtils.writeVInt(outTmp, WritableUtils.readVInt(in));
+                                WritableUtils.writeVInt(outTmp, WritableUtils.readVInt(in));
+                            }
+                            thirds[u][j] = new byte[outTmp.getLength()];
+                            System.arraycopy(outTmp.getData(), 0, thirds[u][j], 0, outTmp.getLength());
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
 
-                    fonlNeighborL1[u] = new byte[out1.getLength()];
-                    System.arraycopy(out1.getData(), 0, fonlNeighborL1[u], 0, out1.getLength());
-
-                    fonlNeighborL2[u] = new byte[out2.getLength()];
-                    System.arraycopy(out2.getData(), 0, fonlNeighborL2[u], 0, out2.getLength());
+                    seconds[u] = new byte[outInternal.getLength()];
+                    System.arraycopy(outInternal.getData(), 0, seconds[u], 0, outInternal.getLength());
                 }
             }
         })).get();
 
         long tTC = System.currentTimeMillis();
-        System.out.println("tc after counts: " + (tTC - tCounts) + " ms");
+        System.out.println("tc after veSups: " + (tTC - tCounts) + " ms");
         System.out.println("tc duration: " + (tTC - tStart) + " ms");
-        System.out.println("vCount: " + vCount + " involved vCount: " + involvedBitSet.cardinality());
+
+        int[] partitions = PartitioningUtils.createPartitions(vCount, threads, BATCH_SIZE);
+
+        byte[][] fonlSeconds = new byte[vCount][];
+        byte[][][] fonlThirds = new byte[vCount][][];
+        int[][] veSupSortedIndex = new int[vCount][];
+
+        batchSelector = new AtomicInteger(0);
+        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(thread -> {
+            BitSet bitSet = new BitSet(maxFSize);
+            DataOutputBuffer out = new DataOutputBuffer(maxFSize);
+
+            while (true) {
+                int start = batchSelector.getAndAdd(BATCH_SIZE);
+                if (start >= vCount)
+                    break;
+                int end = Math.min(vCount, BATCH_SIZE + start);
+
+                for (int u = start; u < end; u++) {
+                    if (neighbors[u][0] < 2 || veCount[u] == 0)
+                        continue;
+
+                    bitSet.clear();
+
+                    veSupSortedIndex[u] = new int[veCount[u]];
+
+                    int index = 0;
+                    int minIdx = 0;
+                    int min = Integer.MAX_VALUE;
+                    int first = 0;
+                    for (int i = 0 ; i < neighbors[u][0]; i ++) {
+                        if (veSups[u][i].get() == 0 || bitSet.get(i))
+                            continue;
+                        first = i;
+                        minIdx = i;
+                        min = veSups[u][i].get();
+                        for (int j = 0; j < neighbors[u][0]; j ++) {
+                            if (veSups[u][i].get() == 0 || bitSet.get(j) || j == first)
+                                continue;
+                            if (veSups[u][j].get() < min) {
+                                minIdx = j;
+                                min = veSups[u][j].get();
+                            }
+                        }
+                        bitSet.set(minIdx);
+                        veSupSortedIndex[u][index ++] = minIdx;
+                    }
+
+                    out.reset();
+                    for (int i = 0 ; i < veCount[u] ; i ++) {
+                        try {
+                            index = veSupSortedIndex[u][i];
+                            WritableUtils.writeVInt(out, veSups[u][index].get()); // write count
+                            WritableUtils.writeVInt(out, index);  // write index of vertex (v)
+                        } catch (IOException e) {
+                        }
+                    }
+
+                    fonlSeconds[u] = new byte[out.getLength()];
+                    System.arraycopy(out.getData(), 0, fonlSeconds[u], 0, out.getLength());
+
+                    int digitSize = neighbors[u][0] / 127 + 1;
+                    fonlThirds[u] = new byte[veCount[u]][];
+                    for (int i = 0 ; i < veCount[u]; i ++) {
+                        index = veSupSortedIndex[u][i];
+                        int size = veSups[u][index].get();
+                        int externalSize = size - lcCount[u];
+                        fonlThirds[u][index] =
+                            new byte[INT_SIZE + digitSize * lcCount[u] + externalSize * (INT_SIZE + 1 + digitSize + externalSize)];
+                        //         hold count of DataOutputBuffer + ...
+                    }
+                }
+            }
+        })).get();
+
+        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(partition -> {
+            DataInputBuffer in = new DataInputBuffer();
+            DataInputBuffer in2 = new DataInputBuffer();
+            ResettableDataOutputBuffer out = new ResettableDataOutputBuffer();
+            ResettableDataOutputBuffer out2 = new ResettableDataOutputBuffer();
+            int[] vIndexes = new int[maxFSize];
+            int[] lens = new int[maxFSize];
+            byte[][] localThirds = new byte[maxFSize][];
+            for (int u = 0; u < vCount; u++) {
+                int[] uNeighbors = neighbors[u];
+                if (uNeighbors[0] < 2)
+                    continue;
+
+                int lastIndex = 0;
+                boolean local = partitions[u] == partition;
+                in.reset(seconds[u], seconds[u].length);
+                for(int i = 0; i < lcCount[u]; i ++) {
+                    try {
+                        vIndexes[lastIndex] = WritableUtils.readVInt(in);
+                        int v = uNeighbors[vIndexes[lastIndex]];
+                        if (!local && partitions[v] != partition)
+                            continue;
+                        lens[lastIndex] = WritableUtils.readVInt(in);
+                        localThirds[lastIndex] = thirds[u][lastIndex];
+                        lastIndex ++;
+                    } catch (IOException e) {
+                    }
+                }
+
+                int c = 0;
+                for (int i = 0 ; i < veCount[u] ; i ++) {
+                    int index = -1;
+                    for (int j = 0 ; j < lastIndex; j ++) {
+                        if (veSupSortedIndex[u][i] == vIndexes[j]) {
+                            index = j;
+                        }
+                    }
+                    if (index == -1)
+                        continue;
+
+                    out.reset(fonlThirds[u][i]);
+                    int v = uNeighbors[vIndexes[index]];
+                    boolean update = partitions[v] == partition;
+                    try {
+                        in2.reset(localThirds[index], localThirds[index].length);
+                        WritableUtils.writeVInt(out, lens[index]);
+                        for(int j = 0 ; j < lens[index]; j ++) {
+                            int uwIndex = WritableUtils.readVInt(in2);
+                            int vwIndex = WritableUtils.readVInt(in2);
+                            if (update) {
+                                out2.reset(fonlThirds[v][vwIndex]);
+                                WritableUtils.writeVInt(out2, -1);
+                                WritableUtils.writeVInt(out2, u);
+                                WritableUtils.writeVInt(out2, vwIndex);
+                                WritableUtils.writeVInt(out2, uwIndex);
+                            }
+                            if (local)
+                                WritableUtils.writeVInt(out, uwIndex);
+                        }
+                    } catch (IOException e) {}
+                }
+            }
+        })).get();
 
         int sum = 0;
-        for (AtomicInteger[] count : counts) {
+        for (AtomicInteger[] count : veSups) {
             if (count == null)
                 continue;
             for (AtomicInteger atomicInteger : count) {
