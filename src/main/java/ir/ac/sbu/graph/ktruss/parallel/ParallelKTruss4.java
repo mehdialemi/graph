@@ -232,7 +232,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         int minIdx;
         int min;
         int first;
-        boolean[] set = new boolean[maxFSize];
+        boolean[] set = new boolean[maxFSize + 1];
         for (int u = 0; u < vCount; u++) {
             if (sup[u] == null || sup[u][0] == 0)
                 continue;
