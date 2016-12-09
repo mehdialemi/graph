@@ -307,74 +307,120 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             }
         })).get();
 
-        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(partition -> {
-            DataInputBuffer in = new DataInputBuffer();
-            DataInputBuffer in2 = new DataInputBuffer();
-            ResettableDataOutputBuffer out = new ResettableDataOutputBuffer();
-            ResettableDataOutputBuffer out2 = new ResettableDataOutputBuffer();
-            int[] vIndexes = new int[maxFSize];
-            int[] lens = new int[maxFSize];
-            byte[][] localThirds = new byte[maxFSize][];
-            for (int u = 0; u < vCount; u++) {
-                int[] uNeighbors = neighbors[u];
-                if (uNeighbors[0] < 2)
-                    continue;
+        DataInputBuffer in = new DataInputBuffer();
+        DataInputBuffer in2 = new DataInputBuffer();
+        ResettableDataOutputBuffer out = new ResettableDataOutputBuffer();
+        ResettableDataOutputBuffer out2 = new ResettableDataOutputBuffer();
+        int[] vIndexes = new int[maxFSize];
+        int[] lens = new int[maxFSize];
+        byte[][] localThirds = new byte[maxFSize][];
+        for (int u = 0 ; u < vCount; u ++) {
+            if (neighbors[u][0] < 2 || lcCount[u] == 0)
+                continue;
+            int lastIndex = 0;
+            in.reset(seconds[u], seconds[u].length);
+            for(int i = 0; i < lcCount[u]; i ++) {
+                vIndexes[i] = WritableUtils.readVInt(in);
+                lens[i] = WritableUtils.readVInt(in);
+                localThirds[i] = thirds[u][lastIndex];
+            }
 
-                int lastIndex = 0;
-                boolean local = partitions[u] == partition;
-                in.reset(seconds[u], seconds[u].length);
-                for(int i = 0; i < lcCount[u]; i ++) {
-                    try {
-                        vIndexes[lastIndex] = WritableUtils.readVInt(in);
-                        int v = uNeighbors[vIndexes[lastIndex]];
-                        if (!local && partitions[v] != partition)
-                            continue;
-                        lens[lastIndex] = WritableUtils.readVInt(in);
-                        localThirds[lastIndex] = thirds[u][lastIndex];
-                        lastIndex ++;
-                    } catch (IOException e) {
+            for (int i = 0 ; i < veCount[u] ; i ++) {
+                int index = -1;
+                for (int j = 0; j < lastIndex; j++) {
+                    if (veSupSortedIndex[u][i] == vIndexes[j]) {
+                        index = j;
+                        break;
                     }
                 }
-
-                if (lastIndex == 0)
+                if (index == -1)
                     continue;
 
-                int c = 0;
-                for (int i = 0 ; i < veCount[u] ; i ++) {
-                    int index = -1;
-                    for (int j = 0 ; j < lastIndex; j ++) {
-                        if (veSupSortedIndex[u][i] == vIndexes[j]) {
-                            index = j;
-                        }
-                    }
-                    if (index == -1)
-                        continue;
-
-                    if (local)
-                        out.reset(fonlThirds[u][i]);
-                    int v = uNeighbors[vIndexes[index]];
-                    boolean update = partitions[v] == partition;
-                    try {
-                        in2.reset(localThirds[index], localThirds[index].length);
-                        if (local)
-                            WritableUtils.writeVInt(out, lens[index]);
-                        for(int j = 0 ; j < lens[index]; j ++) {
-                            int uwIndex = WritableUtils.readVInt(in2);
-                            int vwIndex = WritableUtils.readVInt(in2);
-                            if (update) {
-                                out2.reset(fonlThirds[v][vwIndex]);
-                                WritableUtils.writeVInt(out2, -1);
-                                WritableUtils.writeVInt(out2, u);
-                                WritableUtils.writeVInt(out2, vwIndex);
-                                WritableUtils.writeVInt(out2, uwIndex);
-                            }
-                            if (local)
-                                WritableUtils.writeVInt(out, uwIndex);
-                        }
-                    } catch (IOException e) {}
+                out.reset(fonlThirds[u][i]);
+                int v = neighbors[u][vIndexes[index]];
+                in2.reset(localThirds[index], localThirds[index].length);
+                WritableUtils.writeVInt(out, lens[index]);
+                for (int j = 0; j < lens[index]; j++) {
+                    int uwIndex = WritableUtils.readVInt(in2);
+                    int vwIndex = WritableUtils.readVInt(in2);
+                    out2.reset(fonlThirds[v][vwIndex]);
+                    WritableUtils.writeVInt(out2, -1);
+                    WritableUtils.writeVInt(out2, u);
+                    WritableUtils.writeVInt(out2, vwIndex);
+                    WritableUtils.writeVInt(out2, uwIndex);
+                    WritableUtils.writeVInt(out, uwIndex);
                 }
             }
-        })).get();
+        }
+
+//        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(partition -> {
+//            DataInputBuffer in = new DataInputBuffer();
+//            DataInputBuffer in2 = new DataInputBuffer();
+//            ResettableDataOutputBuffer out = new ResettableDataOutputBuffer();
+//            ResettableDataOutputBuffer out2 = new ResettableDataOutputBuffer();
+//            int[] vIndexes = new int[maxFSize];
+//            int[] lens = new int[maxFSize];
+//            byte[][] localThirds = new byte[maxFSize][];
+//            for (int u = 0; u < vCount; u++) {
+//                int[] uNeighbors = neighbors[u];
+//                if (uNeighbors[0] < 2)
+//                    continue;
+//
+//                int lastIndex = 0;
+//                boolean local = partitions[u] == partition;
+//                in.reset(seconds[u], seconds[u].length);
+//                for(int i = 0; i < lcCount[u]; i ++) {
+//                    try {
+//                        vIndexes[lastIndex] = WritableUtils.readVInt(in);
+//                        int v = uNeighbors[vIndexes[lastIndex]];
+//                        if (!local && partitions[v] != partition)
+//                            continue;
+//                        lens[lastIndex] = WritableUtils.readVInt(in);
+//                        localThirds[lastIndex] = thirds[u][lastIndex];
+//                        lastIndex ++;
+//                    } catch (IOException e) {
+//                    }
+//                }
+//
+//                if (lastIndex == 0)
+//                    continue;
+//
+//                int c = 0;
+//                for (int i = 0 ; i < veCount[u] ; i ++) {
+//                    int index = -1;
+//                    for (int j = 0 ; j < lastIndex; j ++) {
+//                        if (veSupSortedIndex[u][i] == vIndexes[j]) {
+//                            index = j;
+//                        }
+//                    }
+//                    if (index == -1)
+//                        continue;
+//
+//                    if (local)
+//                        out.reset(fonlThirds[u][i]);
+//                    int v = uNeighbors[vIndexes[index]];
+//                    boolean update = partitions[v] == partition;
+//                    try {
+//                        in2.reset(localThirds[index], localThirds[index].length);
+//                        if (local)
+//                            WritableUtils.writeVInt(out, lens[index]);
+//                        for(int j = 0 ; j < lens[index]; j ++) {
+//                            int uwIndex = WritableUtils.readVInt(in2);
+//                            int vwIndex = WritableUtils.readVInt(in2);
+//                            if (update) {
+//                                out2.reset(fonlThirds[v][vwIndex]);
+//                                WritableUtils.writeVInt(out2, -1);
+//                                WritableUtils.writeVInt(out2, u);
+//                                WritableUtils.writeVInt(out2, vwIndex);
+//                                WritableUtils.writeVInt(out2, uwIndex);
+//                            }
+//                            if (local)
+//                                WritableUtils.writeVInt(out, uwIndex);
+//                        }
+//                    } catch (IOException e) {}
+//                }
+//            }
+//        })).get();
 
         int sum = 0;
         for (AtomicInteger[] count : veSups) {
