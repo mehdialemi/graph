@@ -239,6 +239,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         byte[][][] fonlThirds = new byte[vCount][][];
         int[][] veSupSortedIndex = new int[vCount][];
 
+
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(thread -> {
             BitSet bitSet = new BitSet(maxFSize);
@@ -335,6 +336,9 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                     }
                 }
 
+                if (lastIndex == 0)
+                    continue;
+
                 int c = 0;
                 for (int i = 0 ; i < veCount[u] ; i ++) {
                     int index = -1;
@@ -346,12 +350,14 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                     if (index == -1)
                         continue;
 
-                    out.reset(fonlThirds[u][i]);
+                    if (local)
+                        out.reset(fonlThirds[u][i]);
                     int v = uNeighbors[vIndexes[index]];
                     boolean update = partitions[v] == partition;
                     try {
                         in2.reset(localThirds[index], localThirds[index].length);
-                        WritableUtils.writeVInt(out, lens[index]);
+                        if (local)
+                            WritableUtils.writeVInt(out, lens[index]);
                         for(int j = 0 ; j < lens[index]; j ++) {
                             int uwIndex = WritableUtils.readVInt(in2);
                             int vwIndex = WritableUtils.readVInt(in2);
