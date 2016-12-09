@@ -81,12 +81,23 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
         System.out.println("construct fonl in " + (tFonl - tPartition) + " ms");
         System.out.println("max fonl size: " + maxFSize);
 
-        AtomicInteger[] edgeSup = new AtomicInteger[edges.length];
-        for (int i = 0; i < edges.length; i++) {
-            if (fLens[edges[i].v1] == 0 && fLens[edges[i].v2] == 0)
-                continue;
-            edgeSup[i] = new AtomicInteger(0);
-        }
+        batchSelector = new AtomicInteger(0);
+        final AtomicInteger[] edgeSup = new AtomicInteger[edges.length];
+        forkJoinPool.submit(() -> IntStream.range(0, threads).forEach(thread -> {
+            while (true) {
+                int start = batchSelector.getAndAdd(BATCH_SIZE);
+                if (start >= edges.length)
+                    break;
+                int end = Math.min(edges.length, BATCH_SIZE + start);
+                for (int e = start; e < end; e++) {
+                    edgeSup[e] = new AtomicInteger(0);
+                }
+            }
+        })).get();
+
+//        for (int i = 0; i < edges.length; i++) {
+//            edgeSup[i] = new AtomicInteger(0);
+//        }
 
         long tEdgeCount = System.currentTimeMillis();
         System.out.println("construct edge count in " + (tEdgeCount - tFonl) + " ms");
