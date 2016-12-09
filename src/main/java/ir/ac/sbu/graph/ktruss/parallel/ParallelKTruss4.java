@@ -113,7 +113,6 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             int[] lens = new int[maxFSize];
             DataOutputBuffer outInternal = new DataOutputBuffer(maxFSize);
             DataOutputBuffer outLocal = new DataOutputBuffer(maxFSize);
-            DataInputBuffer in = new DataInputBuffer();
             while (true) {
                 int start = batchSelector.getAndAdd(BATCH_SIZE);
                 if (start >= vCount)
@@ -189,11 +188,12 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
         DataInputBuffer in1 = new DataInputBuffer();
         DataInputBuffer in2 = new DataInputBuffer();
+
         int[][] sup = new int[vCount][];
         for (int u = 0; u < vCount; u++) {
             if (neighbors[u][0] < 2)
                 continue;
-            sup[u] = new int[neighbors[u][0] + 1];
+            sup[u] = new int[neighbors[u][0] + 2];
         }
 
         for (int u = 0; u < vCount; u++) {
