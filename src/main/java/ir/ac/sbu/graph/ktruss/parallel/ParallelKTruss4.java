@@ -248,10 +248,10 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             if (veCount[u] == 0)
                 continue;
             veSupSortedIndex[u] = new int[veCount[u]];
-            int index = 0;
             for (int i = 0 ; i < neighbors[u][0]; i ++)
                 sup[i] = veSups[u][i].intValue();
 
+            int index = 0;
             for (int i = 0; i < neighbors[u][0]; i++) {
                 if (sup[i] == 0 || bitSet.get(i))
                     continue;
@@ -259,7 +259,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 minIdx = i;
                 min = sup[i];
                 for (int j = 0; j < neighbors[u][0]; j++) {
-                    if (bitSet.get(j) || j == first)
+                    if (bitSet.get(j) || j == first || sup[j] == 0)
                         continue;
                     if (sup[j] < min) {
                         minIdx = j;
