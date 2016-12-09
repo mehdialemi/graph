@@ -239,7 +239,6 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         byte[][][] fonlThirds = new byte[vCount][][];
         int[][] veSupSortedIndex = new int[vCount][];
 
-
         BitSet bitSet = new BitSet(maxFSize);
         DataOutputBuffer out = new DataOutputBuffer(maxFSize);
         int minIdx;
@@ -248,6 +247,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         for (int u = 0; u < vCount; u++) {
             if (veCount[u] == 0)
                 continue;
+            bitSet.clear();
             veSupSortedIndex[u] = new int[veCount[u]];
             int index = 0;
             for (int i = 0; i < neighbors[u][0]; i++) {
