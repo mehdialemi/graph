@@ -39,11 +39,7 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
         long tEdgeCount = System.currentTimeMillis();
         System.out.println("construct edge count in " + (tEdgeCount - tStart) + " ms");
 
-
         int vCount = d.length;
-
-        long tPartition = System.currentTimeMillis();
-        System.out.println("partition in " + (tPartition - tStart) + " ms");
 
         final VertexCompare vertexCompare = new VertexCompare(d);
         int[] fLens = new int[vCount];
@@ -87,10 +83,8 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
         })).get().reduce((a, b) -> Math.max(a, b)).getAsInt();
 
         long tFonl = System.currentTimeMillis();
-        System.out.println("construct fonl in " + (tFonl - tPartition) + " ms");
+        System.out.println("construct fonl in " + (tFonl - tEdgeCount) + " ms");
         System.out.println("max fonl size: " + maxFSize);
-
-
 
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(partition -> {
