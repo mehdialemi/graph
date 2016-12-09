@@ -228,11 +228,11 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         byte[][][] fonlThirds = new byte[vCount][][];
         int[][] veSupSortedIndex = new int[vCount][];
 
-        BitSet bitSet = new BitSet(maxFSize);
         DataOutputBuffer out = new DataOutputBuffer(maxFSize * maxFSize);
         int minIdx;
         int min;
         int first;
+        boolean[] set = new boolean[maxFSize];
         for (int u = 0; u < vCount; u++) {
             if (sup[u] == null || sup[u][0] == 0)
                 continue;
@@ -240,24 +240,24 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             veSupSortedIndex[u] = new int[sup[u][0]];
             int index = 0;
             for (int i = 1; i < neighbors[u][0] + 1; i++) {
-                if (sup[u][i] == 0 || bitSet.get(i))
+                if (sup[u][i] == 0 || set[i])
                     continue;
                 first = i;
                 minIdx = i;
                 min = sup[u][i];
                 for (int j = 1; j < neighbors[u][0] + 1; j++) {
-                    if (bitSet.get(j) || j == first || sup[u][j] == 0)
+                    if (set[j] || j == first || sup[u][j] == 0)
                         continue;
                     if (sup[u][j] < min) {
                         minIdx = j;
                         min = sup[u][j];
                     }
                 }
-                bitSet.set(minIdx);
+                set[minIdx] = true;
                 veSupSortedIndex[u][index++] = minIdx;
             }
             for (int i = 0; i < index; i++)
-                bitSet.clear(veSupSortedIndex[u][i]);
+                set[veSupSortedIndex[u][i]] = false;
 
             out.reset();
             for (int i = 0; i < sup[u][0]; i++) {
