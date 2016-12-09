@@ -298,9 +298,8 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                     for (int i = 0 ; i < veCount[u]; i ++) {
                         index = veSupSortedIndex[u][i];
                         int size = veSups[u][index].get();
-                        int externalSize = size - lcCount[u];
                         fonlThirds[u][index] =
-                            new byte[INT_SIZE + digitSize * lcCount[u] + externalSize * (INT_SIZE + 1 + digitSize + externalSize)];
+                            new byte[INT_SIZE + digitSize * lcCount[u] + size * (INT_SIZE + 1 + digitSize + size)];
                         //         hold count of DataOutputBuffer + ...
                     }
                 }
