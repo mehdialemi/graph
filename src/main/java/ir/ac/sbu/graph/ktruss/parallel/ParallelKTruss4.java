@@ -250,7 +250,8 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             veSupSortedIndex[u] = new int[veCount[u]];
             int index = 0;
             for (int i = 0 ; i < neighbors[u][0]; i ++)
-                sup[i] = veSups[u][i].get();
+                sup[i] = veSups[u][i].intValue();
+
             for (int i = 0; i < neighbors[u][0]; i++) {
                 if (sup[i] == 0 || bitSet.get(i))
                     continue;
