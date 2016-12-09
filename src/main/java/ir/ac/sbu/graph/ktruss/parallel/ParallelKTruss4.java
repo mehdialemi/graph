@@ -109,97 +109,19 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             for(int i = 0 ; i < neighbors[u][0]; i ++)
                 counts[u][i] = new AtomicInteger(0);
         }
-        long teCounts = System.currentTimeMillis();
-        System.out.println("Construct counts in " + (teCounts - tsCounts) + " ms");
+        long tCounts = System.currentTimeMillis();
+        System.out.println("Construct counts in " + (tCounts - tsCounts) + " ms");
 
         byte[][] fonlNeighborL1 = new byte[vCount][];
         byte[][] fonlNeighborL2 = new byte[vCount][];
+
         // number of edges in triangles per vertex
         findTriangles(vCount, counts, neighbors, vertexCompare, maxFSize, fonlNeighborL1, fonlNeighborL2);
 
         long tTC = System.currentTimeMillis();
-        System.out.println("tc after fonl: " + (tTC - t3) + " ms");
+        System.out.println("tc after counts: " + (tTC - tCounts) + " ms");
         System.out.println("tc duration: " + (tTC - tStart) + " ms");
 
-        // ================ Partition fonls ===================
-//        int[] pSizes = new int[threads];
-//        int[] partitions = findPartition(threads, fonls, fl, fonlNeighborL1, pSizes);
-//        long tPartition = System.currentTimeMillis();
-//        PartitioningUtils.printStatus(threads, partitions, fonls, fonlNeighborL1);
-//        System.out.println("partition time: " + (tPartition - tTC) + " ms");
-
-//        int tcCount = 0;
-
-
-//        batchSelector = new AtomicInteger(0);
-//        forkJoinPool.submit(() -> {
-//            IntStream.range(0, threads).parallel().forEach(index -> {
-//                DataInputBuffer in1 = new DataInputBuffer();
-//                DataInputBuffer in2 = new DataInputBuffer();
-//
-//                try {
-//                    while (true) {
-//                        int start = batchSelector.getAndAdd(BATCH_SIZE);
-//                        if (start > vCount)
-//                            break;
-//                        int end = Integer.min(vCount, start + BATCH_SIZE);
-//                        for (int u = start; u < end; u++) {
-//                            if (fonlNeighborL1[u] == null)
-//                                continue;
-//
-//                            in1.reset(fonlNeighborL1[u], fonlNeighborL1[u].length);
-//                            in2.reset(fonlNeighborL2[u], fonlNeighborL2[u].length);
-//
-//                            int size = WritableUtils.readVInt(in1);
-//                            for (int i = 0; i < size; i++) {
-//                                int len = WritableUtils.readVInt(in1);
-//                                int vIndex = WritableUtils.readVInt(in1);
-//                                counts[u][vIndex - 1].addAndGet(len);
-//
-//                                int v = neighbors[u][vIndex];
-//                                for (int j = 0; j < len; j++) {
-//                                    int uwIndex = WritableUtils.readVInt(in2);
-//                                    counts[u][uwIndex - 1].incrementAndGet();
-//
-//                                    int vwIndex = WritableUtils.readVInt(in2);
-//                                    counts[v][vwIndex - 1].incrementAndGet();
-//                                }
-//
-////                                tcCount += len;
-//                            }
-//                        }
-//                    }
-//                } catch (Exception e) {}
-//            });
-//        }).get();
-
-//        for (int u = 0; u < fonlNeighborL1.length; u++) {
-//            if (fonlNeighborL1[u] == null)
-//                continue;
-//
-//            in1.reset(fonlNeighborL1[u], fonlNeighborL1[u].length);
-//            in2.reset(fonlNeighborL2[u], fonlNeighborL2[u].length);
-//
-//            int size = WritableUtils.readVInt(in1);
-//            for (int i = 0; i < size; i++) {
-//                int len = WritableUtils.readVInt(in1);
-//                int vIndex = WritableUtils.readVInt(in1);
-//                counts[u][vIndex - 1].addAndGet(len);
-//
-//                int v = neighbors[u][vIndex];
-//                for (int j = 0; j < len; j++) {
-//                    int uwIndex = WritableUtils.readVInt(in2);
-//                    counts[u][uwIndex - 1].incrementAndGet();
-//
-//                    int vwIndex = WritableUtils.readVInt(in2);
-//                    counts[v][vwIndex - 1].incrementAndGet();
-//                }
-//
-//                tcCount += len;
-//            }
-//        }
-
-        long tFinal = System.currentTimeMillis();
         int sum = 0;
         for (AtomicInteger[] count : counts) {
             if (count == null)
@@ -209,9 +131,6 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             }
         }
         System.out.println("tc: " + sum / 3);
-        System.out.println("fill eSup in " + (tFinal - teCounts) + " ms");
-//        System.out.println("tcCount: " + tcCount);
-
     }
 
     private void findTriangles(int vCount, AtomicInteger[][] counts, int[][] neighbors, VertexCompare vertexCompare, int maxFSize,
