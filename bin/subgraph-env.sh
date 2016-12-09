@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-heapSize="80g"
+heapSize="100g"
 newRatio=2
-maxPause=500
+maxPause=400
 export BASEDIR=$(dirname "$0")
 debug="-XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:$BASEDIR/gc.log"
 export GC_OPTIONS="-XX:+UseParallelGC  -Xmx$heapSize -Xms$heapSize -XX:NewRatio=$newRatio -XX:MaxGCPauseMillis=$maxPause $debug"
