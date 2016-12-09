@@ -72,6 +72,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 neighbors[e.v1][d[e.v1] - pos[e.v1]++] = e.v2;
             }
         }
+
         long tInitFonl = System.currentTimeMillis();
         System.out.println("Initialize fonl " + (tInitFonl - t2) + " ms");
 
@@ -100,43 +101,31 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         long t3 = System.currentTimeMillis();
         System.out.println("Sort fonl in " + (t3 - t2) + " ms");
 
+        // number of edges in triangles per vertex
         long tsCounts = System.currentTimeMillis();
         AtomicInteger[][] counts = new AtomicInteger[vCount][];
-        for (int u = 0; u < vCount; u++) {
-            if (neighbors[u][0] == 0)
-                continue;
-            counts[u] = new AtomicInteger[neighbors[u][0]];
-            for(int i = 0 ; i < neighbors[u][0]; i ++)
-                counts[u][i] = new AtomicInteger(0);
-        }
+        batchSelector = new AtomicInteger(0);
+        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(partition -> {
+            while (true) {
+                int start = batchSelector.getAndAdd(BATCH_SIZE);
+                if (start >= vCount)
+                    break;
+                int end = Math.min(vCount, BATCH_SIZE + start);
+                for (int u = start; u < end; u++) {
+                    if (neighbors[u][0] == 0)
+                        continue;
+                    counts[u] = new AtomicInteger[neighbors[u][0]];
+                    for (int i = 0; i < neighbors[u][0]; i++)
+                        counts[u][i] = new AtomicInteger(0);
+                }
+            }
+        })).get();
+
         long tCounts = System.currentTimeMillis();
         System.out.println("Construct counts in " + (tCounts - tsCounts) + " ms");
 
         byte[][] fonlNeighborL1 = new byte[vCount][];
         byte[][] fonlNeighborL2 = new byte[vCount][];
-
-        // number of edges in triangles per vertex
-        findTriangles(vCount, counts, neighbors, vertexCompare, maxFSize, fonlNeighborL1, fonlNeighborL2);
-
-        long tTC = System.currentTimeMillis();
-        System.out.println("tc after counts: " + (tTC - tCounts) + " ms");
-        System.out.println("tc duration: " + (tTC - tStart) + " ms");
-
-        int sum = 0;
-        for (AtomicInteger[] count : counts) {
-            if (count == null)
-                continue;
-            for (AtomicInteger atomicInteger : count) {
-                sum += atomicInteger.get();
-            }
-        }
-        System.out.println("tc: " + sum / 3);
-    }
-
-    private void findTriangles(int vCount, AtomicInteger[][] counts, int[][] neighbors, VertexCompare vertexCompare, int maxFSize,
-                               byte[][] fonlNeighborL1, byte[][] fonlNeighborL2)
-        throws InterruptedException, ExecutionException {
-
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(i -> {
             int[] vIndexes = new int[maxFSize];
@@ -216,6 +205,20 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 }
             }
         })).get();
+
+        long tTC = System.currentTimeMillis();
+        System.out.println("tc after counts: " + (tTC - tCounts) + " ms");
+        System.out.println("tc duration: " + (tTC - tStart) + " ms");
+
+        int sum = 0;
+        for (AtomicInteger[] count : counts) {
+            if (count == null)
+                continue;
+            for (AtomicInteger atomicInteger : count) {
+                sum += atomicInteger.get();
+            }
+        }
+        System.out.println("tc: " + sum / 3);
     }
 
     private int[] findPartition(int threads, int[][] fonls, int[] fl, byte[][] fonlNeighborL1, int[] pSizes) throws IOException {
