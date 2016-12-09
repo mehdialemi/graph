@@ -30,8 +30,17 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
         final int[] d = result._2();
         final int[][] neighborsEdge = result._3();
 
-        int vCount = d.length;
         long tStart = System.currentTimeMillis();
+
+        final AtomicInteger[] edgeSup = new AtomicInteger[edges.length];
+        for (int i = 0; i < edges.length; i++) {
+            edgeSup[i] = new AtomicInteger(0);
+        }
+        long tEdgeCount = System.currentTimeMillis();
+        System.out.println("construct edge count in " + (tEdgeCount - tStart) + " ms");
+
+
+        int vCount = d.length;
 
         long tPartition = System.currentTimeMillis();
         System.out.println("partition in " + (tPartition - tStart) + " ms");
@@ -81,26 +90,7 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
         System.out.println("construct fonl in " + (tFonl - tPartition) + " ms");
         System.out.println("max fonl size: " + maxFSize);
 
-        batchSelector = new AtomicInteger(0);
-        final AtomicInteger[] edgeSup = new AtomicInteger[edges.length];
-        forkJoinPool.submit(() -> IntStream.range(0, threads).forEach(thread -> {
-            while (true) {
-                int start = batchSelector.getAndAdd(BATCH_SIZE);
-                if (start >= edges.length)
-                    break;
-                int end = Math.min(edges.length, BATCH_SIZE + start);
-                for (int e = start; e < end; e++) {
-                    edgeSup[e] = new AtomicInteger(0);
-                }
-            }
-        })).get();
 
-//        for (int i = 0; i < edges.length; i++) {
-//            edgeSup[i] = new AtomicInteger(0);
-//        }
-
-        long tEdgeCount = System.currentTimeMillis();
-        System.out.println("construct edge count in " + (tEdgeCount - tFonl) + " ms");
 
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(partition -> {
