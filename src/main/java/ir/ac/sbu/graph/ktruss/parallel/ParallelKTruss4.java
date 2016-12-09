@@ -102,38 +102,10 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         long t3 = System.currentTimeMillis();
         System.out.println("sort fonl in " + (t3 - t2) + " ms");
 
-        // number of edges in triangles per vertex
-        long tsCounts = System.currentTimeMillis();
-        AtomicInteger[][] veSups = new AtomicInteger[vCount][];
-        int threadCount = Math.max(Math.min(threads, 2), threads / 2);
-        System.out.println("using " + threadCount + " threads to construct veSups");
-
-        batchSelector = new AtomicInteger(0);
-        forkJoinPool.submit(() -> IntStream.range(0, threadCount).parallel().forEach(partition -> {
-            while (true) {
-                int start = batchSelector.getAndAdd(BATCH_SIZE);
-                if (start >= vCount)
-                    break;
-                int end = Math.min(vCount, BATCH_SIZE + start);
-                for (int u = start; u < end; u++) {
-                    if (neighbors[u][0] == 0)
-                        continue;
-                    veSups[u] = new AtomicInteger[neighbors[u][0]];
-                    for (int i = 0; i < neighbors[u][0]; i++)
-                        veSups[u][i] = new AtomicInteger(0);
-                }
-            }
-        })).get();
-
-        long tCounts = System.currentTimeMillis();
-        System.out.println("construct veSups in " + (tCounts - tsCounts) + " ms");
-
-//        byte[][] fonlNeighborL1 = new byte[vCount][];
-//        byte[][] fonlNeighborL2 = new byte[vCount][];
         byte[][] seconds = new byte[vCount][];
-        byte[][][] thirds = new byte[vCount][][];
-        int[] lcCount = new int[vCount];  // local commons
-        int[] veCount = new int[vCount];
+        byte[][] thirds = new byte[vCount][];
+
+//        int[] partitions = PartitioningUtils.createPartitions(vCount, threads, BATCH_SIZE);
 
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(thread -> {
@@ -141,7 +113,6 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             int[] lens = new int[maxFSize];
             DataOutputBuffer outInternal = new DataOutputBuffer(maxFSize);
             DataOutputBuffer outLocal = new DataOutputBuffer(maxFSize);
-            DataOutputBuffer outTmp = new DataOutputBuffer(maxFSize);
             DataInputBuffer in = new DataInputBuffer();
             while (true) {
                 int start = batchSelector.getAndAdd(BATCH_SIZE);
@@ -169,12 +140,6 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                         while (uwIndex < neighbors[u][0] + 1 && vwIndex < neighbors[v][0] + 1) {
                             if (neighborsU[uwIndex] == vNeighbors[vwIndex]) {
                                 try {
-                                    int num = veSups[u][uwIndex - 1].getAndIncrement();
-                                    if (num == 0)
-                                        veCount[u]++;
-                                    num = veSups[v][vwIndex - 1].getAndIncrement();
-                                    if (num == 0)
-                                        veCount[v]++;
                                     WritableUtils.writeVInt(outLocal, uwIndex);
                                     WritableUtils.writeVInt(outLocal, vwIndex);
                                 } catch (Exception e) {
@@ -200,39 +165,62 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                         continue;
 
                     outInternal.reset();
-                    in.reset(outLocal.getData(), outLocal.getLength());
                     try {
-                        thirds[u] = new byte[commonSize][];
-                        lcCount[u] = commonSize;
                         for (int j = 0; j < commonSize; j++) {
-                            int num = veSups[u][vIndexes[j] - 1].getAndAdd(lens[j]);
-                            if (num == 0)
-                                veCount[u]++;
                             WritableUtils.writeVInt(outInternal, vIndexes[j]);
                             WritableUtils.writeVInt(outInternal, lens[j]);
-                            outTmp.reset();
-                            for (int k = 0; k < lens[j]; k++) {
-                                WritableUtils.writeVInt(outTmp, WritableUtils.readVInt(in));
-                                WritableUtils.writeVInt(outTmp, WritableUtils.readVInt(in));
-                            }
-                            thirds[u][j] = new byte[outTmp.getLength()];
-                            System.arraycopy(outTmp.getData(), 0, thirds[u][j], 0, outTmp.getLength());
                         }
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
 
                     seconds[u] = new byte[outInternal.getLength()];
                     System.arraycopy(outInternal.getData(), 0, seconds[u], 0, outInternal.getLength());
+
+                    thirds[u] = new byte[outLocal.getLength()];
+                    System.arraycopy(outLocal.getData(), 0, thirds[u], 0, outLocal.getLength());
                 }
             }
         })).get();
 
         long tTC = System.currentTimeMillis();
-        System.out.println("tc after veSups: " + (tTC - tCounts) + " ms");
         System.out.println("tc duration: " + (tTC - tStart) + " ms");
 
-//        int[] partitions = PartitioningUtils.createPartitions(vCount, threads, BATCH_SIZE);
+        DataInputBuffer in1 = new DataInputBuffer();
+        DataInputBuffer in2 = new DataInputBuffer();
+        int[][] sup = new int[vCount][];
+        for (int u = 0; u < vCount; u++) {
+            if (neighbors[u][0] < 2)
+                continue;
+            sup[u] = new int[neighbors[u][0] + 1];
+        }
+
+        for (int u = 0; u < vCount; u++) {
+            if (seconds[u] == null)
+                continue;
+            in1.reset(seconds[u], seconds[u].length);
+            in2.reset(thirds[u], thirds[u].length);
+            while (in1.getPosition() < seconds[u].length) {
+                int vIndex = WritableUtils.readVInt(in1);
+                int len = WritableUtils.readVInt(in1);
+                if (sup[u][vIndex] == 0)
+                    sup[u][0]++;
+                sup[u][vIndex] += len;
+
+                for (int i = 0; i < len; i++) {
+                    int uwIndex = WritableUtils.readVInt(in2);
+                    if (sup[u][uwIndex] == 0)
+                        sup[u][0]++;
+                    sup[u][uwIndex]++;
+                    int vwIndex = WritableUtils.readVInt(in2);
+                    int v = neighbors[u][vIndex];
+                    if (sup[v][vwIndex] == 0)
+                        sup[v][0]++;
+                    sup[v][vwIndex]++;
+                }
+            }
+        }
 
         byte[][] fonlSeconds = new byte[vCount][];
         byte[][][] fonlThirds = new byte[vCount][][];
@@ -240,42 +228,39 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
         BitSet bitSet = new BitSet(maxFSize);
         DataOutputBuffer out = new DataOutputBuffer(maxFSize * maxFSize);
-        int[] sup = new int[maxFSize];
         int minIdx;
         int min;
         int first;
         for (int u = 0; u < vCount; u++) {
-            if (veCount[u] == 0)
+            if (sup[u][0] < 2)
                 continue;
-            veSupSortedIndex[u] = new int[veCount[u]];
-            for (int i = 0 ; i < neighbors[u][0]; i ++)
-                sup[i] = veSups[u][i].intValue();
 
+            veSupSortedIndex[u] = new int[sup[u][0]];
             int index = 0;
-            for (int i = 0; i < neighbors[u][0]; i++) {
-                if (sup[i] == 0 || bitSet.get(i))
+            for (int i = 1; i < neighbors[u][0] + 1; i++) {
+                if (sup[u][i] == 0 || bitSet.get(i))
                     continue;
                 first = i;
                 minIdx = i;
-                min = sup[i];
-                for (int j = 0; j < neighbors[u][0]; j++) {
-                    if (bitSet.get(j) || j == first || sup[j] == 0)
+                min = sup[u][i];
+                for (int j = 1; j < neighbors[u][0] + 1; j++) {
+                    if (bitSet.get(j) || j == first || sup[u][j] == 0)
                         continue;
-                    if (sup[j] < min) {
+                    if (sup[u][j] < min) {
                         minIdx = j;
-                        min = sup[j];
+                        min = sup[u][j];
                     }
                 }
                 bitSet.set(minIdx);
                 veSupSortedIndex[u][index++] = minIdx;
             }
-            for(int i = 0 ; i < index; i ++)
+            for (int i = 0; i < index; i++)
                 bitSet.clear(veSupSortedIndex[u][i]);
 
             out.reset();
-            for (int i = 0; i < veCount[u]; i++) {
+            for (int i = 0; i < sup[u][0]; i++) {
                 index = veSupSortedIndex[u][i];
-                WritableUtils.writeVInt(out, sup[index]); // write count
+                WritableUtils.writeVInt(out, sup[u][index]); // write count
                 WritableUtils.writeVInt(out, index);  // write index of vertex (v)
             }
 
@@ -284,14 +269,14 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
             int digitSize = neighbors[u][0] / 127 + 1;
             fonlThirds[u] = new byte[neighbors[u][0]][];
-            for (int i = 0; i < veCount[u]; i++) {
+            for (int i = 0; i < sup[u][0]; i++) {
                 index = veSupSortedIndex[u][i];
-                int size = veSups[u][index].get();
+                int size = sup[u][index];
                 fonlThirds[u][index] =
-                    new byte[INT_SIZE + digitSize * lcCount[u] + size * (INT_SIZE + 1 + digitSize + size)];
-                //         hold count of DataOutputBuffer + ...
+                    new byte[INT_SIZE + digitSize * size + size * (INT_SIZE + 1 + digitSize + size)];
             }
         }
+
         long tFonlSecond = System.currentTimeMillis();
         System.out.println("complete fonlSecond " + (tFonlSecond - tTC) + " ms");
 //        batchSelector = new AtomicInteger(0);
@@ -361,48 +346,58 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 //            }
 //        })).get();
 
-        DataInputBuffer in = new DataInputBuffer();
-        DataInputBuffer in2 = new DataInputBuffer();
         ResettableDataOutputBuffer out1 = new ResettableDataOutputBuffer();
         ResettableDataOutputBuffer out2 = new ResettableDataOutputBuffer();
         int[] vIndexes = new int[maxFSize];
         int[] lens = new int[maxFSize];
         byte[][] localThirds = new byte[maxFSize][];
         for (int u = 0; u < vCount; u++) {
-            if (neighbors[u][0] < 2 || lcCount[u] == 0)
+            if (sup[u][0] == 0)
                 continue;
-            int lastIndex = 0;
-            in.reset(seconds[u], seconds[u].length);
-            for (int i = 0; i < lcCount[u]; i++) {
-                vIndexes[i] = WritableUtils.readVInt(in);
-                lens[i] = WritableUtils.readVInt(in);
-                localThirds[i] = thirds[u][lastIndex];
+
+            int index = 0;
+            in1.reset(seconds[u], seconds[u].length);
+            in2.reset(thirds[u], thirds[u].length);
+            while (in1.getPosition() < seconds[u].length) {
+                vIndexes[index] = WritableUtils.readVInt(in1);
+                lens[index] = WritableUtils.readVInt(in1);
+                out.reset();
+                for (int i = 0; i < lens[index]; i++) {
+                    WritableUtils.writeVInt(out, WritableUtils.readVInt(in2));
+                    WritableUtils.writeVInt(out, WritableUtils.readVInt(in2));
+                }
+                localThirds[index] = new byte[out.getLength()];
+                System.arraycopy(out.getData(), 0, localThirds[index], 0, out.getLength());
+                index++;
             }
 
-            for (int i = 0; i < veCount[u]; i++) {
-                int index = -1;
-                for (int j = 0; j < lastIndex; j++) {
+            for (int i = 0; i < sup[u][0]; i++) {
+                int idx = -1;
+                for (int j = 0; j < index; j++) {
                     if (veSupSortedIndex[u][i] == vIndexes[j]) {
                         index = j;
                         break;
                     }
                 }
-                if (index == -1)
+
+                if (idx == -1)
                     continue;
 
-                out1.reset(fonlThirds[u][i]);
-                int v = neighbors[u][vIndexes[index]];
+                int vIndex = vIndexes[index];
+                out1.reset(fonlThirds[u][vIndex]);
+                int v = neighbors[u][vIndex];
                 in2.reset(localThirds[index], localThirds[index].length);
                 WritableUtils.writeVInt(out1, lens[index]);
                 for (int j = 0; j < lens[index]; j++) {
                     int uwIndex = WritableUtils.readVInt(in2);
+                    WritableUtils.writeVInt(out1, uwIndex);
+
                     int vwIndex = WritableUtils.readVInt(in2);
                     out2.reset(fonlThirds[v][vwIndex]);
                     WritableUtils.writeVInt(out2, -1);
                     WritableUtils.writeVInt(out2, u);
                     WritableUtils.writeVInt(out2, vwIndex);
                     WritableUtils.writeVInt(out2, uwIndex);
-                    WritableUtils.writeVInt(out1, uwIndex);
                 }
             }
         }
@@ -479,12 +474,9 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 //        })).get();
 
         int sum = 0;
-        for (AtomicInteger[] count : veSups) {
-            if (count == null)
-                continue;
-            for (AtomicInteger atomicInteger : count) {
-                sum += atomicInteger.get();
-            }
+        for(int i = 0 ; i < vCount; i ++) {
+            for (int j = 1 ; j < sup[i].length; j ++)
+                sum += sup[i][j];
         }
         System.out.println("tc: " + sum / 3);
     }
