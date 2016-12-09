@@ -44,7 +44,7 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
             sumDeg += d[u];
         final int degThreshold = (int) (sumDeg / (vCount * 0.2));
         long tDegThreshold = System.currentTimeMillis();
-        System.out.println("sumDeg: " + sumDeg + " degThreshold: " + degThreshold + " in " + (tDegThreshold - tStart) + " ms");
+        System.out.println("avg degree: " + sumDeg / vCount + " degThreshold: " + degThreshold + " in " + (tDegThreshold - tStart) + " ms");
 
         final VertexCompare vertexCompare = new VertexCompare(d);
         int hCount = 0;
@@ -136,6 +136,9 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
                                     continue;
                                 if (uNeighbors[vi2] == w) {
                                     counts[u][vi2]++;
+                                    if (vi >= counts[u].length)
+                                        System.out.println("vi: " + vi + " counts[u].len: " + counts[u].length +
+                                            " hSet.get(u): " + hSet.get(u) + " d[u]: " + d[u]);
                                     counts[u][vi]++;
                                     if (partitions[v] == partition)
                                         counts[v][wi]++;
