@@ -233,7 +233,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         System.out.println("tc after veSups: " + (tTC - tCounts) + " ms");
         System.out.println("tc duration: " + (tTC - tStart) + " ms");
 
-        int[] partitions = PartitioningUtils.createPartitions(vCount, threads, BATCH_SIZE);
+//        int[] partitions = PartitioningUtils.createPartitions(vCount, threads, BATCH_SIZE);
 
         byte[][] fonlSeconds = new byte[vCount][];
         byte[][][] fonlThirds = new byte[vCount][][];
