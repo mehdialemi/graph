@@ -103,7 +103,7 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
                     out.reset();
 
                     int[] uNeighbors = neighbors[u];
-                    int uEnd = d[u] + 1;
+                    int uEnd = d[u];
                     int uStart = 0;
                     if (hSet.get(u)) {
                         uStart = 1;
@@ -118,7 +118,7 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
 
                         int[] vNeighbors = neighbors[v];
                         int vStart = 0;
-                        int vEnd = d[v] + 1;
+                        int vEnd = d[v];
                         if (hSet.get(v)) {
                             vStart = 1;
                             vEnd = vNeighbors[0] + 1;
@@ -136,9 +136,6 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
                                     continue;
                                 if (uNeighbors[vi2] == w) {
                                     counts[u][vi2]++;
-                                    if (vi >= counts[u].length)
-                                        System.out.println("vi: " + vi + " counts[u].len: " + counts[u].length +
-                                            " hSet.get(u): " + hSet.get(u) + " d[u]: " + d[u]);
                                     counts[u][vi]++;
                                     if (partitions[v] == partition)
                                         counts[v][wi]++;
