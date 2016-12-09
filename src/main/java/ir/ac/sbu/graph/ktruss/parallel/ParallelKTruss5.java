@@ -78,9 +78,11 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
         System.out.println("max fonl size: " + maxFSize);
 
         AtomicInteger[] edgeCount = new AtomicInteger[edges.length];
+
         for(int i = 0 ; i < edges.length ; i ++) {
             edgeCount[i] = new AtomicInteger(0);
         }
+
         long tEdgeCount = System.currentTimeMillis();
         System.out.println("construct edge count in " + (tEdgeCount - tFonl) + " ms");
 
