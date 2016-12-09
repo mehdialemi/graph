@@ -191,7 +191,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
         int[][] sup = new int[vCount][];
         for (int u = 0; u < vCount; u++) {
-            if (neighbors[u][0] < 2)
+            if (neighbors[u][0] == 0)
                 continue;
             sup[u] = new int[neighbors[u][0] + 2];
         }
