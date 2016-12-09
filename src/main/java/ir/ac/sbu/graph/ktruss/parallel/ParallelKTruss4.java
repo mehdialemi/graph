@@ -221,6 +221,8 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 }
             }
         }
+        long tsup = System.currentTimeMillis();
+        System.out.println("create sup in " + (tsup - tTC) + " ms");
 
         byte[][] fonlSeconds = new byte[vCount][];
         byte[][][] fonlThirds = new byte[vCount][][];
@@ -278,7 +280,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         }
 
         long tFonlSecond = System.currentTimeMillis();
-        System.out.println("complete fonlSecond " + (tFonlSecond - tTC) + " ms");
+        System.out.println("complete fonlSecond " + (tFonlSecond - tsup) + " ms");
 //        batchSelector = new AtomicInteger(0);
 //        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(thread -> {
 //            BitSet bitSet = new BitSet(maxFSize);
