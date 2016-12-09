@@ -23,8 +23,8 @@ public class VertexCompare {
         return 1;
     }
 
-    public void quickSort(int[] fonl, int low, int high) {
-        if (fonl == null || fonl.length == 0)
+    public void quickSort(int[] neighbor, int low, int high) {
+        if (neighbor == null || neighbor.length == 0)
             return;
 
         if (low >= high)
@@ -32,21 +32,21 @@ public class VertexCompare {
 
         // pick the pivot
         int middle = low + (high - low) / 2;
-        int pivot = fonl[middle];
+        int pivot = neighbor[middle];
 
         // make left < pivot and right > pivot
         int i = low, j = high;
         while (i <= j) {
-            while (compare(fonl[i], pivot) == -1)
+            while (compare(neighbor[i], pivot) == -1)
                 i++;
 
-            while (compare(fonl[j], pivot) == 1)
+            while (compare(neighbor[j], pivot) == 1)
                 j--;
 
             if (i <= j) {
-                int temp = fonl[i];
-                fonl[i] = fonl[j];
-                fonl[j] = temp;
+                int temp = neighbor[i];
+                neighbor[i] = neighbor[j];
+                neighbor[j] = temp;
                 i++;
                 j--;
             }
@@ -54,9 +54,9 @@ public class VertexCompare {
 
         // recursively quickSort two sub parts
         if (low < j)
-            quickSort(fonl, low, j);
+            quickSort(neighbor, low, j);
 
         if (high > i)
-            quickSort(fonl, i, high);
+            quickSort(neighbor, i, high);
     }
 }

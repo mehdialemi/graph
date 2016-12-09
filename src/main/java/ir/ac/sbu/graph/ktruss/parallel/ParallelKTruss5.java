@@ -35,121 +35,92 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
         final int[] d = result._2();
         int vCount = d.length;
         long tStart = System.currentTimeMillis();
-        final int[] partitions = PartitioningUtils.createPartitions(vCount, threads, BATCH_SIZE);
-        long tep = System.currentTimeMillis();
-        System.out.println("partition in " + (tep - tStart) + " ms");
 
-        int sumDeg = 0;
-        for (int u = 0; u < vCount; u++)
-            sumDeg += d[u];
-        final int degThreshold = (int) (sumDeg / (vCount * 0.2));
-        long tDegThreshold = System.currentTimeMillis();
-        System.out.println("avg degree: " + sumDeg / vCount + " degThreshold: " + degThreshold + " in " + (tDegThreshold - tStart) + " ms");
+        final int[] partitions = PartitioningUtils.createPartitions(vCount, threads, BATCH_SIZE);
+        long tPartition = System.currentTimeMillis();
+        System.out.println("partition in " + (tPartition - tStart) + " ms");
 
         final VertexCompare vertexCompare = new VertexCompare(d);
-        int hCount = 0;
-        final BitSet hSet = new BitSet();
-        for (int u = 0; u < vCount; u++) {
-            if (d[u] < degThreshold)
-                continue;
-            hSet.set(u);
-            hCount++;
-            int index = -1;
-            int[] uNeighbors = neighbors[u];
-            for (int vIdx = 0; vIdx < neighbors[u].length; vIdx++) {
-                if (vertexCompare.compare(u, uNeighbors[vIdx]) == -1) {
-                    index++;
-                    if (index == vIdx)
-                        continue;
+        int[] fLens = new int[vCount];
+        final int maxFSize = forkJoinPool.submit(() -> IntStream.range(0, threads).map(partition -> {
+            int maxLen = 0;
+            for (int u = 0; u < vCount; u++) {
+                if (d[u] < 2 || partitions[u] != partition)
+                    continue;
 
-                    int hv = uNeighbors[vIdx];
-                    uNeighbors[vIdx] = uNeighbors[index];
-                    uNeighbors[index] = hv;
+                int index = -1;
+                int[] uNeighbors = neighbors[u];
+                for (int uvIndex = 0; uvIndex < uNeighbors.length; uvIndex++) {
+                    if (vertexCompare.compare(u, uNeighbors[uvIndex]) == -1) {
+                        index++;
+                        if (index == uvIndex)
+                            continue;
+
+                        int hv = uNeighbors[uvIndex];
+                        uNeighbors[uvIndex] = uNeighbors[index];
+                        uNeighbors[index] = hv;
+                    }
                 }
+                fLens[u] = index + 1;
+                if (fLens[u] == 0)
+                    continue;
+                vertexCompare.quickSort(uNeighbors, 0, fLens[u] - 1);
+                if (fLens[u] > maxLen)
+                    maxLen = fLens[u];
             }
-            int[] n = new int[uNeighbors.length + 1];
-            n[0] = index + 1;
-            System.arraycopy(uNeighbors, 0, n, 1, uNeighbors.length);
-            neighbors[u] = n;
-        }
+            return maxLen;
+        })).get().reduce((a, b) -> Math.max(a, b)).getAsInt();
 
-        long tHighVertices = System.currentTimeMillis();
-        System.out.println("hCount " + hCount + " in " + (tHighVertices - tDegThreshold) + " ms");
+        long tFonl = System.currentTimeMillis();
+        System.out.println("construct fonl in " + (tFonl - tPartition) + " ms");
+        System.out.println("max fonl size: " + maxFSize);
 
         byte[][] externals = new byte[vCount][];
         int[][] counts = new int[vCount][];
-        int maxHDeg = 0;
         for (int u = 0; u < vCount; u++) {
-            if (hSet.get(u)) {
-                counts[u] = new int[neighbors[u][0] + 1];
-                if (neighbors[u][0] > maxHDeg)
-                    maxHDeg = neighbors[u][0];
-            } else
-                counts[u] = new int[d[u]];
+            if (fLens[u] == 0)
+                continue;
+            counts[u] = new int[fLens[u]];
         }
 
-        System.out.println("maxHDeg: " + maxHDeg);
-
-        final int maxFSize = Math.max(1, degThreshold * degThreshold);
-
         batchSelector = new AtomicInteger(0);
-
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(partition -> {
-                DataOutputBuffer out = new DataOutputBuffer(maxFSize);
+                DataOutputBuffer out = new DataOutputBuffer(maxFSize * maxFSize);
                 for (int u = 0; u < vCount; u++) {
-                    if (partitions[u] != partition || d[u] < 2)
+                    if (partitions[u] != partition || fLens[u] == 0)
                         continue;
 
                     out.reset();
-
                     int[] uNeighbors = neighbors[u];
-                    int uEnd = d[u];
-                    int uStart = 0;
-                    if (hSet.get(u)) {
-                        uStart = 1;
-                        uEnd = uNeighbors[0] + 1;
-                    }
 
                     // Find triangle by checking connectivity of neighbors
-                    for (int vi = uStart; vi < uEnd; vi++) {
-                        int v = uNeighbors[vi];
-                        if (vertexCompare.compare(u, v) == 1)
-                            continue;
-
+                    for (int uvIndex = 0; uvIndex < fLens[u]; uvIndex++) {
+                        int v = uNeighbors[uvIndex];
                         int[] vNeighbors = neighbors[v];
-                        int vStart = 0;
-                        int vEnd = d[v];
-                        if (hSet.get(v)) {
-                            vStart = 1;
-                            vEnd = vNeighbors[0] + 1;
-                        }
+
+                        int uwIndex = uvIndex + 1, vwIndex = 0;
 
                         // intersection on u neighbors and v neighbors
-                        for (int wi = vStart; wi < vEnd; wi++) {
-                            int w = vNeighbors[wi];
-
-                            if (vertexCompare.compare(v, w) != -1)
-                                continue;
-
-                            for (int vi2 = uStart; vi2 < uEnd; vi2++) {
-                                if (vi == vi2)
-                                    continue;
-                                if (uNeighbors[vi2] == w) {
-                                    counts[u][vi2]++;
-                                    counts[u][vi]++;
-                                    if (partitions[v] == partition)
-                                        counts[v][wi]++;
-                                    else {
-                                        try {
-                                            WritableUtils.writeVInt(out, v);
-                                            WritableUtils.writeVInt(out, wi);
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
+                        while (uwIndex < fLens[u] && vwIndex < fLens[v]) {
+                            if (uNeighbors[uwIndex] == vNeighbors[vwIndex]) {
+                                counts[u][uvIndex]++;
+                                counts[u][uwIndex]++;
+                                if (partitions[v] == partition)
+                                    counts[v][vwIndex]++;
+                                else {
+                                    try {
+                                        WritableUtils.writeVInt(out, v);
+                                        WritableUtils.writeVInt(out, vwIndex);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
                                     }
-                                    break;
                                 }
-                            }
+                                uwIndex++;
+                                vwIndex++;
+                            } else if (vertexCompare.compare(uNeighbors[uwIndex], vNeighbors[vwIndex]) == -1)
+                                uwIndex++;
+                            else
+                                vwIndex++;
                         }
                     }
 
@@ -188,105 +159,14 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
 
         long tUpdateCounts = System.currentTimeMillis();
         int sum = 0;
-        for (
-            int i = 0;
-            i < vCount; i++)
-            for (
-                int j = 0;
-                j < counts[i].length; j++)
+        for (int i = 0; i < vCount; i++) {
+            if (fLens[i] == 0)
+                continue;
+            for (int j = 0; j < counts[i].length; j++) {
                 sum += counts[i][j];
-
-        System.out.println("tCount: " + sum / 3 + " update counts in " + (tUpdateCounts - tTC) + " ms");
-    }
-
-    private void findTriangles(int vCount, int[][] neighbors, VertexCompare vertexCompare, int maxFSize,
-                               byte[][] fonlNeighborL1, byte[][] fonlNeighborL2)
-        throws InterruptedException, ExecutionException {
-
-
-    }
-
-    private int[] findPartition(int threads, int[][] fonls, int[] fl, byte[][] fonlNeighborL1, int[] pSizes) throws IOException {
-        int[] partitions = new int[fonls.length];
-        BitSet bitSet = new BitSet(fonls.length);
-        for (int u = 0; u < partitions.length; u++) {
-            partitions[u] = -1;
-        }
-
-        // create dominate set
-        DataInputBuffer in = new DataInputBuffer();
-        int neighborhood = 5;
-        int currentPartition = 0;
-        int added = 0;
-        for (int u = 0; u < fonls.length; u++) {
-            if (fonlNeighborL1[u] == null || bitSet.get(u))
-                continue;
-            int p = currentPartition % threads;
-            added++;
-            if (added % neighborhood == 0)
-                currentPartition++;
-
-            partitions[u] = p;
-            pSizes[p]++;
-            bitSet.set(u);
-            // set neighbors of u in the bitSet
-            in.reset(fonlNeighborL1[u], fonlNeighborL1[u].length);
-            while (true) {
-                if (in.getPosition() >= fonlNeighborL1[u].length)
-                    break;
-
-                int size = WritableUtils.readVInt(in);
-                for (int i = 0; i < size; i++) {
-                    WritableUtils.readVInt(in);  // skip len
-                    int vIndex = WritableUtils.readVInt(in);
-                    bitSet.set(fonls[u][vIndex]);
-                }
             }
         }
 
-        int[] pScores = new int[threads];
-        for (int u = 0; u < fonls.length; u++) {
-            if (fonlNeighborL1[u] == null || partitions[u] != -1)
-                continue;
-
-            // find appropriate findPartition
-            int maxScore = 0;
-            int targetPartition = 0;
-            in.reset(fonlNeighborL1[u], fonlNeighborL1[u].length);
-            for (int pIndex = 0; pIndex < pScores.length; pIndex++)
-                pScores[pIndex] = 0;
-
-            while (true) {
-                if (in.getPosition() >= fonlNeighborL1[u].length)
-                    break;
-
-                int size = WritableUtils.readVInt(in);
-                for (int i = 0; i < size; i++) {
-                    WritableUtils.readVInt(in);  // skip len
-                    int vIndex = WritableUtils.readVInt(in);
-                    int v = fonls[u][vIndex];
-                    if (partitions[v] == -1 || fonlNeighborL1[v] == null)
-                        continue;
-
-                    pScores[partitions[v]]++;
-                    if (pScores[partitions[v]] > maxScore) {
-                        maxScore = pScores[partitions[v]];
-                        targetPartition = partitions[v];
-                    }
-                }
-            }
-
-            // find target findPartition => the smallest size findPartition with maximum maxScore
-            for (int pIndex = 0; pIndex < pScores.length; pIndex++) {
-                if (pIndex == targetPartition)
-                    continue;
-                if (pSizes[pIndex] < pSizes[targetPartition])
-                    targetPartition = pIndex;
-            }
-
-            partitions[u] = targetPartition;
-            pSizes[targetPartition]++;
-        }
-        return partitions;
+        System.out.println("tc: " + sum / 3 + " update counts in " + (tUpdateCounts - tTC) + " ms");
     }
 }

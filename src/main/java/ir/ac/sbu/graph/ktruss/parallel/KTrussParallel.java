@@ -45,12 +45,12 @@ public class KTrussParallel {
             case 5: parallelKTruss = new ParallelKTruss5(edges, minSup, threads);
         }
 
-        System.out.println("Start ktruss with k = " + k + ", threads = " + threads + ", " +
+        System.out.println("start ktruss with k = " + k + ", threads = " + threads + ", " +
             "method = " + method + " input: " + inputPath);
 
         parallelKTruss.start();
         long t2 = System.currentTimeMillis();
 
-        System.out.println("Duration: " + (t2- t1) + " ms");
+        System.out.println("duration: " + (t2- t1) + " ms");
     }
 }

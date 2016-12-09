@@ -39,8 +39,8 @@ public class GraphUtils implements Serializable {
         }
 
         final int[][] neighbors = new int[vCount][];
-        for (int i = 0; i < vCount; i++)
-            neighbors[i] = new int[d[i] + 1];
+        for (int u = 0; u < vCount; u++)
+            neighbors[u] = new int[d[u]];
 
         int[] cIdx = new int[vCount];
         int max = 0;
