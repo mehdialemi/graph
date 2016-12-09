@@ -49,7 +49,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             d[e.v2]++;
         }
         long t2 = System.currentTimeMillis();
-        System.out.println("Find degrees in " + (t2 - tStart) + " ms");
+        System.out.println("find degrees in " + (t2 - tStart) + " ms");
 
         final int[][] neighbors = new int[vCount][];
         for (int i = 0; i < vCount; i++)
@@ -74,7 +74,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         }
 
         long tInitFonl = System.currentTimeMillis();
-        System.out.println("Initialize fonl " + (tInitFonl - t2) + " ms");
+        System.out.println("initialize fonl " + (tInitFonl - t2) + " ms");
 
         final VertexCompare vertexCompare = new VertexCompare(d);
         batchSelector = new AtomicInteger(0);
@@ -99,13 +99,14 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         })).get().reduce((a, b) -> Integer.max(a, b)).getAsInt();
 
         long t3 = System.currentTimeMillis();
-        System.out.println("Sort fonl in " + (t3 - t2) + " ms");
+        System.out.println("sort fonl in " + (t3 - t2) + " ms");
 
         // number of edges in triangles per vertex
         long tsCounts = System.currentTimeMillis();
         AtomicInteger[][] counts = new AtomicInteger[vCount][];
         batchSelector = new AtomicInteger(0);
-        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(partition -> {
+        int countThreads = Integer.max(4, threads / 4);
+        forkJoinPool.submit(() -> IntStream.range(0, countThreads).parallel().forEach(partition -> {
             while (true) {
                 int start = batchSelector.getAndAdd(BATCH_SIZE);
                 if (start >= vCount)
@@ -122,7 +123,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         })).get();
 
         long tCounts = System.currentTimeMillis();
-        System.out.println("Construct counts in " + (tCounts - tsCounts) + " ms");
+        System.out.println("construct counts in " + (tCounts - tsCounts) + " ms");
 
         byte[][] fonlNeighborL1 = new byte[vCount][];
         byte[][] fonlNeighborL2 = new byte[vCount][];
