@@ -105,8 +105,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         long tsCounts = System.currentTimeMillis();
         AtomicInteger[][] counts = new AtomicInteger[vCount][];
         batchSelector = new AtomicInteger(0);
-        int countThreads = Integer.max(4, threads / 4);
-        forkJoinPool.submit(() -> IntStream.range(0, countThreads).parallel().forEach(partition -> {
+        forkJoinPool.submit(() -> IntStream.range(0, 3).parallel().forEach(partition -> {
             while (true) {
                 int start = batchSelector.getAndAdd(BATCH_SIZE);
                 if (start >= vCount)
