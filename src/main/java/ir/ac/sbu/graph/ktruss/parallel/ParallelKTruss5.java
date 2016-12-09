@@ -99,7 +99,7 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
                         break;
                     int end = Math.min(vCount, BATCH_SIZE + start);
                     for (int u = start; u < end; u++) {
-                        if (neighbors[u][0] == 0)
+                        if (fLens[u] == 0)
                             continue;
 
                         int[] uNeighbors = neighbors[u];
