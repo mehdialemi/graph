@@ -232,7 +232,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         int min;
         int first;
         for (int u = 0; u < vCount; u++) {
-            if (sup[u][0] < 2)
+            if (sup[u] == null || sup[u][0] == 0)
                 continue;
 
             veSupSortedIndex[u] = new int[sup[u][0]];
