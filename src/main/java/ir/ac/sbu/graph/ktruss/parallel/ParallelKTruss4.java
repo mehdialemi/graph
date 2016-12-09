@@ -2,7 +2,6 @@ package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
 import ir.ac.sbu.graph.ResettableDataOutputBuffer;
-import ir.ac.sbu.graph.PartitioningUtils;
 import ir.ac.sbu.graph.VertexCompare;
 import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
@@ -240,14 +239,13 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         int[][] veSupSortedIndex = new int[vCount][];
 
         BitSet bitSet = new BitSet(maxFSize);
-        DataOutputBuffer out = new DataOutputBuffer(maxFSize);
+        DataOutputBuffer out = new DataOutputBuffer(maxFSize * maxFSize);
         int minIdx;
         int min;
         int first;
         for (int u = 0; u < vCount; u++) {
             if (veCount[u] == 0)
                 continue;
-            bitSet.clear();
             veSupSortedIndex[u] = new int[veCount[u]];
             int index = 0;
             for (int i = 0; i < neighbors[u][0]; i++) {
@@ -267,6 +265,9 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 bitSet.set(minIdx);
                 veSupSortedIndex[u][index++] = minIdx;
             }
+            for(int i = 0 ; i < index; i ++)
+                bitSet.clear(veSupSortedIndex[u][i]);
+
             out.reset();
             for (int i = 0; i < veCount[u]; i++) {
                 index = veSupSortedIndex[u][i];
@@ -287,7 +288,8 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 //         hold count of DataOutputBuffer + ...
             }
         }
-
+        long tFonlSecond = System.currentTimeMillis();
+        System.out.println("complete fonlSecond " + (tFonlSecond - tTC) + " ms");
 //        batchSelector = new AtomicInteger(0);
 //        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(thread -> {
 //            BitSet bitSet = new BitSet(maxFSize);
@@ -400,6 +402,8 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 }
             }
         }
+        long tcomplete = System.currentTimeMillis();
+        System.out.println("complete fonl in " + (tcomplete - tFonlSecond) + " ms");
 
 //        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(partition -> {
 //            DataInputBuffer in = new DataInputBuffer();
