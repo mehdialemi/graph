@@ -240,6 +240,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
         BitSet bitSet = new BitSet(maxFSize);
         DataOutputBuffer out = new DataOutputBuffer(maxFSize * maxFSize);
+        int[] sup = new int[maxFSize];
         int minIdx;
         int min;
         int first;
@@ -248,18 +249,20 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 continue;
             veSupSortedIndex[u] = new int[veCount[u]];
             int index = 0;
+            for (int i = 0 ; i < neighbors[u][0]; i ++)
+                sup[i] = veSups[u][i].get();
             for (int i = 0; i < neighbors[u][0]; i++) {
-                if (veSups[u][i].get() == 0 || bitSet.get(i))
+                if (sup[i] == 0 || bitSet.get(i))
                     continue;
                 first = i;
                 minIdx = i;
-                min = veSups[u][i].get();
+                min = sup[i];
                 for (int j = 0; j < neighbors[u][0]; j++) {
-                    if (veSups[u][i].get() == 0 || bitSet.get(j) || j == first)
+                    if (bitSet.get(j) || j == first)
                         continue;
-                    if (veSups[u][j].get() < min) {
+                    if (sup[j] < min) {
                         minIdx = j;
-                        min = veSups[u][j].get();
+                        min = sup[j];
                     }
                 }
                 bitSet.set(minIdx);
@@ -271,7 +274,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             out.reset();
             for (int i = 0; i < veCount[u]; i++) {
                 index = veSupSortedIndex[u][i];
-                WritableUtils.writeVInt(out, veSups[u][index].get()); // write count
+                WritableUtils.writeVInt(out, sup[index]); // write count
                 WritableUtils.writeVInt(out, index);  // write index of vertex (v)
             }
 
