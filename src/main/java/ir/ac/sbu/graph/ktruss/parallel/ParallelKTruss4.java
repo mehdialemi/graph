@@ -126,9 +126,11 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         long tCounts = System.currentTimeMillis();
         System.out.println("construct counts in " + (tCounts - tsCounts) + " ms");
 
+
         byte[][] fonlNeighborL1 = new byte[vCount][];
         byte[][] fonlNeighborL2 = new byte[vCount][];
         batchSelector = new AtomicInteger(0);
+        BitSet bitSet = new BitSet(vCount);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(i -> {
             int[] vIndexes = new int[maxFSize];
             int[] lens = new int[maxFSize];
@@ -180,12 +182,16 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                         if (intersection == 0)
                             continue;
 
+                        bitSet.set(v);
+
                         vIndexes[lastIndex] = vIndex;
                         lens[lastIndex++] = intersection;
                     }
 
                     if (lastIndex == 0)
                         continue;
+
+                    bitSet.set(u);
 
                     out1.reset();
                     try {
@@ -211,6 +217,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         long tTC = System.currentTimeMillis();
         System.out.println("tc after counts: " + (tTC - tCounts) + " ms");
         System.out.println("tc duration: " + (tTC - tStart) + " ms");
+        System.out.println("vCount: " + vCount + " involved vCount: " + bitSet.cardinality());
 
         int sum = 0;
         for (AtomicInteger[] count : counts) {
