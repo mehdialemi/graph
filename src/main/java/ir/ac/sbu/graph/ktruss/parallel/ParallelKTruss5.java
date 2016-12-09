@@ -26,7 +26,7 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
     @Override
     public void start() throws Exception {
         Tuple3<int[][], int[], int[][]> result = GraphUtils.createNeighborWithEdgeIndex(edges);
-        int[][] neighbors = result._1();
+        final int[][] neighbors = result._1();
         final int[] d = result._2();
         final int[][] neighborsEdge = result._3();
 
