@@ -33,42 +33,48 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
         int vCount = d.length;
         long tStart = System.currentTimeMillis();
 
-        final int[] partitions = PartitioningUtils.createPartitions(vCount, threads, BATCH_SIZE);
         long tPartition = System.currentTimeMillis();
         System.out.println("partition in " + (tPartition - tStart) + " ms");
 
         final VertexCompare vertexCompare = new VertexCompare(d);
         int[] fLens = new int[vCount];
-        final int maxFSize = forkJoinPool.submit(() -> IntStream.range(0, threads).map(partition -> {
+        batchSelector = new AtomicInteger(0);
+        final int maxFSize = forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().map(thread -> {
             int maxLen = 0;
-            for (int u = 0; u < vCount; u++) {
-                if (d[u] < 2 || partitions[u] != partition)
-                    continue;
+            while (true) {
+                int start = batchSelector.getAndAdd(BATCH_SIZE);
+                if (start >= vCount)
+                    break;
+                int end = Math.min(vCount, BATCH_SIZE + start);
+                for (int u = start; u < end; u++) {
+                    if (neighbors[u][0] == 0)
+                        continue;
 
-                int index = -1;
-                int[] uNeighbors = neighbors[u];
-                int[] uNeighborsEdges = neighborsEdge[u];
-                for (int uvIndex = 0; uvIndex < uNeighbors.length; uvIndex++) {
-                    if (vertexCompare.compare(u, uNeighbors[uvIndex]) == -1) {
-                        index++;
-                        if (index == uvIndex)
-                            continue;
+                    int index = -1;
+                    int[] uNeighbors = neighbors[u];
+                    int[] uNeighborsEdges = neighborsEdge[u];
+                    for (int uvIndex = 0; uvIndex < uNeighbors.length; uvIndex++) {
+                        if (vertexCompare.compare(u, uNeighbors[uvIndex]) == -1) {
+                            index++;
+                            if (index == uvIndex)
+                                continue;
 
-                        int tmp = uNeighbors[uvIndex];
-                        uNeighbors[uvIndex] = uNeighbors[index];
-                        uNeighbors[index] = tmp;
+                            int tmp = uNeighbors[uvIndex];
+                            uNeighbors[uvIndex] = uNeighbors[index];
+                            uNeighbors[index] = tmp;
 
-                        tmp = uNeighborsEdges[uvIndex];
-                        uNeighborsEdges[uvIndex] = uNeighborsEdges[index];
-                        uNeighborsEdges[index] = tmp;
+                            tmp = uNeighborsEdges[uvIndex];
+                            uNeighborsEdges[uvIndex] = uNeighborsEdges[index];
+                            uNeighborsEdges[index] = tmp;
+                        }
                     }
+                    fLens[u] = index + 1;
+                    if (fLens[u] == 0)
+                        continue;
+                    vertexCompare.quickSort(uNeighbors, 0, fLens[u] - 1);
+                    if (fLens[u] > maxLen)
+                        maxLen = fLens[u];
                 }
-                fLens[u] = index + 1;
-                if (fLens[u] == 0)
-                    continue;
-                vertexCompare.quickSort(uNeighbors, 0, fLens[u] - 1);
-                if (fLens[u] > maxLen)
-                    maxLen = fLens[u];
             }
             return maxLen;
         })).get().reduce((a, b) -> Math.max(a, b)).getAsInt();
@@ -78,8 +84,7 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
         System.out.println("max fonl size: " + maxFSize);
 
         AtomicInteger[] edgeCount = new AtomicInteger[edges.length];
-
-        for(int i = 0 ; i < edges.length ; i ++) {
+        for (int i = 0; i < edges.length; i++) {
             edgeCount[i] = new AtomicInteger(0);
         }
 
@@ -88,39 +93,40 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
 
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(partition -> {
-                DataOutputBuffer out = new DataOutputBuffer(maxFSize * maxFSize);
-                for (int u = 0; u < vCount; u++) {
-                    if (partitions[u] != partition || fLens[u] == 0)
-                        continue;
+                while (true) {
+                    int start = batchSelector.getAndAdd(BATCH_SIZE);
+                    if (start >= vCount)
+                        break;
+                    int end = Math.min(vCount, BATCH_SIZE + start);
+                    for (int u = start; u < end; u++) {
+                        if (neighbors[u][0] == 0)
+                            continue;
 
-                    out.reset();
-                    int[] uNeighbors = neighbors[u];
-                    int[] uNeighborsEdges = neighborsEdge[u];
+                        int[] uNeighbors = neighbors[u];
+                        int[] uNeighborsEdges = neighborsEdge[u];
 
-                    // Find triangle by checking connectivity of neighbors
-                    for (int uvIndex = 0; uvIndex < fLens[u]; uvIndex++) {
-                        int v = uNeighbors[uvIndex];
-                        int[] vNeighbors = neighbors[v];
+                        // Find triangle by checking connectivity of neighbors
+                        for (int uvIndex = 0; uvIndex < fLens[u]; uvIndex++) {
+                            int v = uNeighbors[uvIndex];
+                            int[] vNeighbors = neighbors[v];
 
-                        int uwIndex = uvIndex + 1, vwIndex = 0;
+                            int uwIndex = uvIndex + 1, vwIndex = 0;
 
-                        // intersection on u neighbors and v neighbors
-                        while (uwIndex < fLens[u] && vwIndex < fLens[v]) {
-                            if (uNeighbors[uwIndex] == vNeighbors[vwIndex]) {
-                                edgeCount[uNeighborsEdges[uvIndex]].incrementAndGet();
-                                edgeCount[uNeighborsEdges[uwIndex]].incrementAndGet();
-                                edgeCount[neighborsEdge[v][vwIndex]].incrementAndGet();
-                                uwIndex++;
-                                vwIndex++;
-                            } else if (vertexCompare.compare(uNeighbors[uwIndex], vNeighbors[vwIndex]) == -1)
-                                uwIndex++;
-                            else
-                                vwIndex++;
+                            // intersection on u neighbors and v neighbors
+                            while (uwIndex < fLens[u] && vwIndex < fLens[v]) {
+                                if (uNeighbors[uwIndex] == vNeighbors[vwIndex]) {
+                                    edgeCount[uNeighborsEdges[uvIndex]].incrementAndGet();
+                                    edgeCount[uNeighborsEdges[uwIndex]].incrementAndGet();
+                                    edgeCount[neighborsEdge[v][vwIndex]].incrementAndGet();
+                                    uwIndex++;
+                                    vwIndex++;
+                                } else if (vertexCompare.compare(uNeighbors[uwIndex], vNeighbors[vwIndex]) == -1)
+                                    uwIndex++;
+                                else
+                                    vwIndex++;
+                            }
                         }
                     }
-
-                    if (out.getLength() == 0)
-                        continue;
                 }
             }
         )).get();
@@ -129,7 +135,7 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
         System.out.println("tc in " + (tTC - tStart) + " ms");
 
         int sum = 0;
-        for(int i = 0 ; i < edgeCount.length; i ++) {
+        for (int i = 0; i < edgeCount.length; i++) {
             sum += edgeCount[i].get();
         }
 
