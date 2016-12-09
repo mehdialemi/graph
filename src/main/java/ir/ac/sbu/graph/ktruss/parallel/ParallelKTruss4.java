@@ -294,7 +294,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                     System.arraycopy(out.getData(), 0, fonlSeconds[u], 0, out.getLength());
 
                     int digitSize = neighbors[u][0] / 127 + 1;
-                    fonlThirds[u] = new byte[veCount[u]][];
+                    fonlThirds[u] = new byte[neighbors[u][0]][];
                     for (int i = 0 ; i < veCount[u]; i ++) {
                         index = veSupSortedIndex[u][i];
                         int size = veSups[u][index].get();
