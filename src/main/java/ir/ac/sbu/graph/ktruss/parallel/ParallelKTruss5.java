@@ -47,7 +47,6 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
                     break;
                 int end = Math.min(vCount, BATCH_SIZE + start);
                 for (int u = start; u < end; u++) {
-
                     int index = -1;
                     int[] uNeighbors = neighbors[u];
                     int[] uNeighborsEdges = neighborsEdge[u];
@@ -69,6 +68,7 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
                     fLens[u] = index + 1;
                     if (fLens[u] == 0)
                         continue;
+
                     vertexCompare.quickSort(uNeighbors, 0, fLens[u] - 1);
                     if (fLens[u] > maxLen)
                         maxLen = fLens[u];
@@ -81,9 +81,11 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
         System.out.println("construct fonl in " + (tFonl - tPartition) + " ms");
         System.out.println("max fonl size: " + maxFSize);
 
-        AtomicInteger[] edgeCount = new AtomicInteger[edges.length];
+        AtomicInteger[] edgeSup = new AtomicInteger[edges.length];
         for (int i = 0; i < edges.length; i++) {
-            edgeCount[i] = new AtomicInteger(0);
+            if (fLens[edges[i].v1] == 0 && fLens[edges[i].v2] == 0)
+                continue;
+            edgeSup[i] = new AtomicInteger(0);
         }
 
         long tEdgeCount = System.currentTimeMillis();
@@ -113,9 +115,9 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
                             // intersection on u neighbors and v neighbors
                             while (uwIndex < fLens[u] && vwIndex < fLens[v]) {
                                 if (uNeighbors[uwIndex] == vNeighbors[vwIndex]) {
-                                    edgeCount[uNeighborsEdges[uvIndex]].incrementAndGet();
-                                    edgeCount[uNeighborsEdges[uwIndex]].incrementAndGet();
-                                    edgeCount[neighborsEdge[v][vwIndex]].incrementAndGet();
+                                    edgeSup[uNeighborsEdges[uvIndex]].incrementAndGet();
+                                    edgeSup[uNeighborsEdges[uwIndex]].incrementAndGet();
+                                    edgeSup[neighborsEdge[v][vwIndex]].incrementAndGet();
                                     uwIndex++;
                                     vwIndex++;
                                 } else if (vertexCompare.compare(uNeighbors[uwIndex], vNeighbors[vwIndex]) == -1)
@@ -129,12 +131,13 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
             }
         )).get();
 
+
         long tTC = System.currentTimeMillis();
         System.out.println("tc in " + (tTC - tStart) + " ms");
 
         int sum = 0;
-        for (int i = 0; i < edgeCount.length; i++) {
-            sum += edgeCount[i].get();
+        for (int i = 0; i < edgeSup.length; i++) {
+            sum += edgeSup[i].get();
         }
 
         System.out.println("tc: " + sum / 3);
