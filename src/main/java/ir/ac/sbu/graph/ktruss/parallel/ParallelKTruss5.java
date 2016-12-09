@@ -4,14 +4,9 @@ import ir.ac.sbu.graph.Edge;
 import ir.ac.sbu.graph.GraphUtils;
 import ir.ac.sbu.graph.PartitioningUtils;
 import ir.ac.sbu.graph.VertexCompare;
-import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
-import org.apache.hadoop.io.WritableUtils;
 import scala.Tuple3;
 
-import java.io.IOException;
-import java.util.BitSet;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -30,9 +25,11 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
 
     @Override
     public void start() throws Exception {
-        Tuple3<int[][], int[], Integer> result = GraphUtils.createNeighbor(edges);
+        Tuple3<int[][], int[], int[][]> result = GraphUtils.createNeighborWithEdgeIndex(edges);
         int[][] neighbors = result._1();
         final int[] d = result._2();
+        int[][] neighborsEdge = result._3();
+
         int vCount = d.length;
         long tStart = System.currentTimeMillis();
 
@@ -50,15 +47,20 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
 
                 int index = -1;
                 int[] uNeighbors = neighbors[u];
+                int[] uNeighborsEdges = neighborsEdge[u];
                 for (int uvIndex = 0; uvIndex < uNeighbors.length; uvIndex++) {
                     if (vertexCompare.compare(u, uNeighbors[uvIndex]) == -1) {
                         index++;
                         if (index == uvIndex)
                             continue;
 
-                        int hv = uNeighbors[uvIndex];
+                        int tmp = uNeighbors[uvIndex];
                         uNeighbors[uvIndex] = uNeighbors[index];
-                        uNeighbors[index] = hv;
+                        uNeighbors[index] = tmp;
+
+                        tmp = uNeighborsEdges[uvIndex];
+                        uNeighborsEdges[uvIndex] = uNeighborsEdges[index];
+                        uNeighborsEdges[index] = tmp;
                     }
                 }
                 fLens[u] = index + 1;
@@ -75,13 +77,12 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
         System.out.println("construct fonl in " + (tFonl - tPartition) + " ms");
         System.out.println("max fonl size: " + maxFSize);
 
-        byte[][] externals = new byte[vCount][];
-        int[][] counts = new int[vCount][];
-        for (int u = 0; u < vCount; u++) {
-            if (fLens[u] == 0)
-                continue;
-            counts[u] = new int[fLens[u]];
+        AtomicInteger[] edgeCount = new AtomicInteger[edges.length];
+        for(int i = 0 ; i < edges.length ; i ++) {
+            edgeCount[i] = new AtomicInteger(0);
         }
+        long tEdgeCount = System.currentTimeMillis();
+        System.out.println("construct edge count in " + (tEdgeCount - tFonl) + " ms");
 
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(partition -> {
@@ -92,6 +93,7 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
 
                     out.reset();
                     int[] uNeighbors = neighbors[u];
+                    int[] uNeighborsEdges = neighborsEdge[u];
 
                     // Find triangle by checking connectivity of neighbors
                     for (int uvIndex = 0; uvIndex < fLens[u]; uvIndex++) {
@@ -103,18 +105,9 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
                         // intersection on u neighbors and v neighbors
                         while (uwIndex < fLens[u] && vwIndex < fLens[v]) {
                             if (uNeighbors[uwIndex] == vNeighbors[vwIndex]) {
-                                counts[u][uvIndex]++;
-                                counts[u][uwIndex]++;
-                                if (partitions[v] == partition)
-                                    counts[v][vwIndex]++;
-                                else {
-                                    try {
-                                        WritableUtils.writeVInt(out, v);
-                                        WritableUtils.writeVInt(out, vwIndex);
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
+                                edgeCount[uNeighborsEdges[uvIndex]].incrementAndGet();
+                                edgeCount[uNeighborsEdges[uwIndex]].incrementAndGet();
+                                edgeCount[neighborsEdge[v][vwIndex]].incrementAndGet();
                                 uwIndex++;
                                 vwIndex++;
                             } else if (vertexCompare.compare(uNeighbors[uwIndex], vNeighbors[vwIndex]) == -1)
@@ -126,9 +119,6 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
 
                     if (out.getLength() == 0)
                         continue;
-
-                    externals[u] = new byte[out.getLength()];
-                    System.arraycopy(out.getData(), 0, externals[u], 0, out.getLength());
                 }
             }
         )).get();
@@ -136,37 +126,11 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
         long tTC = System.currentTimeMillis();
         System.out.println("tc in " + (tTC - tStart) + " ms");
 
-        batchSelector = new AtomicInteger(0);
-        forkJoinPool.submit(() -> {
-            IntStream.range(0, threads).parallel().forEach(partition -> {
-                DataInputBuffer in = new DataInputBuffer();
-                for (int u = 0; u < vCount; u++) {
-                    if (externals[u] == null)
-                        continue;
-                    in.reset(externals[u], externals[u].length);
-                    while (in.getPosition() < externals[u].length) {
-                        try {
-                            int v = WritableUtils.readVInt(in);
-                            int vwIndex = WritableUtils.readVInt(in);
-                            if (partitions[v] == partition)
-                                counts[v][vwIndex]++;
-                        } catch (IOException e) {
-                        }
-                    }
-                }
-            });
-        }).get();
-
-        long tUpdateCounts = System.currentTimeMillis();
         int sum = 0;
-        for (int i = 0; i < vCount; i++) {
-            if (fLens[i] == 0)
-                continue;
-            for (int j = 0; j < counts[i].length; j++) {
-                sum += counts[i][j];
-            }
+        for(int i = 0 ; i < edgeCount.length; i ++) {
+            sum += edgeCount[i].get();
         }
 
-        System.out.println("tc: " + sum / 3 + " update counts in " + (tUpdateCounts - tTC) + " ms");
+        System.out.println("tc: " + sum / 3);
     }
 }

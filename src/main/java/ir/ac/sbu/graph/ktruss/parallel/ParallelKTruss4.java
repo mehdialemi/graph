@@ -107,7 +107,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         batchSelector = new AtomicInteger(0);
         int threadCount = Math.max(Math.min(threads, 2), threads / 2);
         System.out.println("using " + threadCount + " threads to construct counts");
-        BitSet[] threadBitSets = new BitSet[vCount];
+
         forkJoinPool.submit(() -> IntStream.range(0, threadCount).parallel().forEach(partition -> {
             while (true) {
                 int start = batchSelector.getAndAdd(BATCH_SIZE);
@@ -117,7 +117,6 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 for (int u = start; u < end; u++) {
                     if (neighbors[u][0] == 0)
                         continue;
-                    threadBitSets[u] = new BitSet(threads);
                     counts[u] = new AtomicInteger[neighbors[u][0]];
                     for (int i = 0; i < neighbors[u][0]; i++)
                         counts[u][i] = new AtomicInteger(0);
@@ -127,6 +126,10 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
         long tCounts = System.currentTimeMillis();
         System.out.println("construct counts in " + (tCounts - tsCounts) + " ms");
+
+        BitSet[] threadBitSets = new BitSet[threads];
+        for(int i = 0; i < threads; i ++)
+            threadBitSets[i] = new BitSet(vCount);
 
         byte[][] fonlNeighborL1 = new byte[vCount][];
         byte[][] fonlNeighborL2 = new byte[vCount][];
@@ -184,7 +187,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                             continue;
 
                         involvedBitSet.set(v);
-                        threadBitSets[v].set(thread);
+                        threadBitSets[thread].set(v);
 
                         vIndexes[lastIndex] = vIndex;
                         lens[lastIndex++] = intersection;
@@ -194,7 +197,6 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                         continue;
 
                     involvedBitSet.set(u);
-                    threadBitSets[u].set(thread);
 
                     out1.reset();
                     try {

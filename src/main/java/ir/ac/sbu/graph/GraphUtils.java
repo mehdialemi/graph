@@ -18,7 +18,7 @@ public class GraphUtils implements Serializable {
         conf.setAppName(name + "-" + defaultPartition + "-" + new File(inputPath).getName());
     }
 
-    public static Tuple3<int[][], int[], Integer> createNeighbor(Edge[] edges) {
+    public static Tuple2<int[][], int[]> createNeighbor(Edge[] edges) {
         long tsm = System.currentTimeMillis();
         int maxVertexNum = 0;
         for (Edge edge : edges) {
@@ -43,14 +43,52 @@ public class GraphUtils implements Serializable {
             neighbors[u] = new int[d[u]];
 
         int[] cIdx = new int[vCount];
-        int max = 0;
         for (Edge e : edges) {
             neighbors[e.v1][cIdx[e.v1] ++] = e.v2;
             neighbors[e.v2][cIdx[e.v2] ++] = e.v1;
-            max = Integer.max(Integer.max(max, cIdx[e.v1]), cIdx[e.v2]);
         }
 
-        return new Tuple3<>(neighbors, d, max);
+        return new Tuple2<>(neighbors, d);
+    }
+
+    public static Tuple3<int[][], int[], int[][]> createNeighborWithEdgeIndex(Edge[] edges) {
+        long tsm = System.currentTimeMillis();
+        int maxVertexNum = 0;
+        for (Edge edge : edges) {
+            if (edge.v1 > maxVertexNum)
+                maxVertexNum = edge.v1;
+            if (edge.v2 > maxVertexNum)
+                maxVertexNum = edge.v2;
+        }
+
+        long tem = System.currentTimeMillis();
+        System.out.println("find maxVertexNum in " + (tem - tsm) + " ms");
+
+        // Construct degree arrayList such that vertexId is the index of the arrayList.
+        final int vCount = maxVertexNum + 1;
+        int[] d = new int[vCount];  // vertex degree
+        for (Edge e : edges) {
+            d[e.v1]++;
+            d[e.v2]++;
+        }
+
+        final int[][] neighbors = new int[vCount][];
+        final int[][] neighborsEdges = new int[vCount][];
+        for (int u = 0; u < vCount; u++) {
+            neighbors[u] = new int[d[u]];
+            neighbors[u] = new int[d[u]];
+        }
+
+        int[] cIdx = new int[vCount];
+        for(int i = 0 ; i < edges.length; i ++) {
+            Edge e = edges[i];
+            neighbors[e.v1][cIdx[e.v1]] = e.v2;
+            neighbors[e.v2][cIdx[e.v2]] = e.v1;
+            neighborsEdges[e.v1][cIdx[e.v1] ++] = i;
+            neighborsEdges[e.v2][cIdx[e.v2] ++] = i;
+        }
+
+        return new Tuple3<>(neighbors, d, neighborsEdges);
     }
 
     public static int sortedIntersectionCount(long[] hDegs, long[] forward, List<Tuple2<Long, Integer>> output, int
