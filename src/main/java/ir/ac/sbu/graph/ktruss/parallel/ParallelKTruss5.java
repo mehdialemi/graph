@@ -47,8 +47,6 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
                     break;
                 int end = Math.min(vCount, BATCH_SIZE + start);
                 for (int u = start; u < end; u++) {
-                    if (neighbors[u][0] == 0)
-                        continue;
 
                     int index = -1;
                     int[] uNeighbors = neighbors[u];
