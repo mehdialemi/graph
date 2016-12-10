@@ -268,6 +268,9 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 continue;
             veSupSortedIndex[u] = new int[veCount[u]];
             fonlSeconds[u] = new byte[neighbors[u][0] / 127 * veCount[u]];
+            for(int i = 0 ; i < neighbors[u][0]; i++) {
+                int sup = veSups[u][i].get();
+            }
         }
         long tsorted2 = System.currentTimeMillis();
         System.out.println("initialize sort index in " + (tsorted2 - tsorted1) + " ms");
