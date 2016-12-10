@@ -76,7 +76,7 @@ public class ResettableDataOutputBuffer extends DataOutputStream {
     }
 
     public void reset(byte[] buf) {
-        buffer.reset(buf, ((buf[0] << 24) + (buf[1] << 16) + (buf[2] << 8) + (buf[3] << 0)));
+        buffer.reset(buf, 4 + ((buf[0] << 24) + (buf[1] << 16) + (buf[2] << 8) + (buf[3] << 0)));
         this.written = buffer.getLength();
     }
 
