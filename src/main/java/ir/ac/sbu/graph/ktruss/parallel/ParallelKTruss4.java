@@ -267,9 +267,15 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             if(veCount[u] == 0)
                 continue;
             veSupSortedIndex[u] = new int[veCount[u]];
-            fonlSeconds[u] = new byte[neighbors[u][0] / 127 * veCount[u]];
+            int digitSize = neighbors[u][0] / 127;
+            fonlSeconds[u] = new byte[digitSize * veCount[u]];
+            fonlThirds[u] = new byte[neighbors[u][0]][];
             for(int i = 0 ; i < neighbors[u][0]; i++) {
                 int sup = veSups[u][i].get();
+                if (sup == 0)
+                    continue;
+
+                fonlThirds[u][i] = new byte[(3 * digitSize + 4) * sup];
             }
         }
         long tsorted2 = System.currentTimeMillis();
