@@ -261,6 +261,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         byte[][] fonlSeconds = new byte[vCount][];
         byte[][][] fonlThirds = new byte[vCount][][];
         int[][] veSupSortedIndex = new int[vCount][];
+        int[] tmp = new int[maxFSize];
 
         long tsorted1 = System.currentTimeMillis();
         for(int u = 0 ; u < vCount; u ++) {
@@ -270,32 +271,13 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             int digitSize = neighbors[u][0] / 127;
             fonlSeconds[u] = new byte[digitSize * veCount[u]];
             fonlThirds[u] = new byte[neighbors[u][0]][];
+            int idx = 0;
             for(int i = 0 ; i < neighbors[u][0]; i++) {
                 int sup = veSups[u][i].get();
                 if (sup == 0)
                     continue;
 
                 fonlThirds[u][i] = new byte[(3 * digitSize + 4) * sup];
-            }
-        }
-
-        long tsorted2 = System.currentTimeMillis();
-        System.out.println("initialize sort index in " + (tsorted2 - tsorted1) + " ms");
-
-        long tupdate1 = System.currentTimeMillis();
-        int[] vIndexes = new int[maxFSize];
-        int[] lens = new int[maxFSize];
-        byte[][] localThirds = new byte[maxFSize][];
-        DataOutputBuffer out = new DataOutputBuffer(maxFSize * maxFSize);
-        int[] tmp = new int[maxFSize];
-        for(int u = 0 ; u < vCount; u ++) {
-            if(veCount[u] == 0)
-                continue;
-            int idx = 0;
-            for(int i = 0 ; i < neighbors[u][0]; i ++) {
-                int sup = veSups[u][i].get();
-                if (sup == 0)
-                    continue;
                 tmp[idx ++] = i;
             }
 
@@ -316,6 +298,45 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
                 veSupSortedIndex[u][i] = tmp[i];
             }
+        }
+
+        long tsorted2 = System.currentTimeMillis();
+        System.out.println("initialize sort index in " + (tsorted2 - tsorted1) + " ms");
+
+        long tupdate1 = System.currentTimeMillis();
+        int[] vIndexes = new int[maxFSize];
+        int[] lens = new int[maxFSize];
+        byte[][] localThirds = new byte[maxFSize][];
+        DataOutputBuffer out = new DataOutputBuffer(maxFSize * maxFSize);
+
+//        for(int u = 0 ; u < vCount; u ++) {
+//            if(veCount[u] == 0)
+//                continue;
+//            int idx = 0;
+//            for(int i = 0 ; i < neighbors[u][0]; i ++) {
+//                int sup = veSups[u][i].get();
+//                if (sup == 0)
+//                    continue;
+//                tmp[idx ++] = i;
+//            }
+//
+//            for(int i = 0 ; i < veCount[u]; i ++) {
+//                int selected = i;
+//                int min = veSups[u][tmp[i]].get();
+//                for(int j = i + 1 ; j < veCount[u]; j ++) {
+//                    if (min < veSups[u][tmp[j]].get()) {
+//                        min = veSups[u][tmp[j]].get();
+//                        selected = j;
+//                    }
+//                }
+//                if (selected != i) {
+//                    int temp = tmp[i];
+//                    tmp[i] = tmp[selected];
+//                    tmp[selected] = temp;
+//                }
+//
+//                veSupSortedIndex[u][i] = tmp[i];
+//            }
 
 //            int index = 0;
 //            in1.reset(seconds[u], seconds[u].length);
@@ -332,7 +353,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 //                System.arraycopy(out.getData(), 0, localThirds[index], 0, out.getLength());
 //                index++;
 //            }
-        }
+//        }
         long tupdate2 = System.currentTimeMillis();
         System.out.println("update in " + (tupdate2 - tupdate1) + " ms");
 
