@@ -278,8 +278,64 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 fonlThirds[u][i] = new byte[(3 * digitSize + 4) * sup];
             }
         }
+
         long tsorted2 = System.currentTimeMillis();
         System.out.println("initialize sort index in " + (tsorted2 - tsorted1) + " ms");
+
+        long tupdate1 = System.currentTimeMillis();
+        int[] vIndexes = new int[maxFSize];
+        int[] lens = new int[maxFSize];
+        byte[][] localThirds = new byte[maxFSize][];
+        DataOutputBuffer out = new DataOutputBuffer(maxFSize * maxFSize);
+        int[] tmp = new int[maxFSize];
+        for(int u = 0 ; u < vCount; u ++) {
+            if(veCount[u] == 0)
+                continue;
+            int idx = 0;
+            for(int i = 0 ; i < neighbors[u][0]; i ++) {
+                int sup = veSups[u][i].get();
+                if (sup == 0)
+                    continue;
+                tmp[idx] = i;
+
+            }
+
+            for(int i = 0 ; i < veCount[u]; i ++) {
+                int selected = i;
+                int min = veSups[u][tmp[i]].get();
+                for(int j = i + 1 ; j < veCount[u]; j ++) {
+                    if (min < veSups[u][tmp[j]].get()) {
+                        min = veSups[u][tmp[j]].get();
+                        selected = j;
+                    }
+                }
+                if (selected != i) {
+                    int temp = tmp[i];
+                    tmp[i] = tmp[selected];
+                    tmp[selected] = temp;
+                }
+
+                veSupSortedIndex[u][i] = tmp[i];
+            }
+
+//            int index = 0;
+//            in1.reset(seconds[u], seconds[u].length);
+//            in2.reset(thirds[u], thirds[u].length);
+//            while (in1.getPosition() < seconds[u].length) {
+//                vIndexes[index] = WritableUtils.readVInt(in1);
+//                lens[index] = WritableUtils.readVInt(in1);
+//                out.reset();
+//                for (int i = 0; i < lens[index]; i++) {
+//                    WritableUtils.writeVInt(out, WritableUtils.readVInt(in2));
+//                    WritableUtils.writeVInt(out, WritableUtils.readVInt(in2));
+//                }
+//                localThirds[index] = new byte[out.getLength()];
+//                System.arraycopy(out.getData(), 0, localThirds[index], 0, out.getLength());
+//                index++;
+//            }
+        }
+        long tupdate2 = System.currentTimeMillis();
+        System.out.println("partial update in " + (tupdate2 - tupdate1) + " ms");
 
 //        DataOutputBuffer out = new DataOutputBuffer(maxFSize * maxFSize);
 //        int minIdx;
