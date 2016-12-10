@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph;
+package ir.ac.sbu.graph.utils;
 
 /**
  * Utility class to perform some operations on arrays like intersection

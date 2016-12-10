@@ -1,7 +1,7 @@
 package ir.ac.sbu.graph.ktruss.sequential;
 
 import ir.ac.sbu.graph.Edge;
-import ir.ac.sbu.graph.VertexCompare;
+import ir.ac.sbu.graph.utils.VertexCompare;
 import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.io.WritableUtils;

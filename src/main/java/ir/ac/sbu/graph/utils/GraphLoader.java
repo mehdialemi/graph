@@ -1,5 +1,6 @@
-package ir.ac.sbu.graph;
+package ir.ac.sbu.graph.utils;
 
+import ir.ac.sbu.graph.Edge;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.PairFlatMapFunction;

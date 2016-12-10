@@ -1,7 +1,7 @@
 package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
-import ir.ac.sbu.graph.MultiCoreUtils;
+import ir.ac.sbu.graph.utils.MultiCoreUtils;
 import scala.Tuple2;
 
 import java.util.*;
@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static ir.ac.sbu.graph.MultiCoreUtils.createBuckets;
+import static ir.ac.sbu.graph.utils.MultiCoreUtils.createBuckets;
 
 /**
  *

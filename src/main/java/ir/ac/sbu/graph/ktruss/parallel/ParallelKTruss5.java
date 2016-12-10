@@ -1,10 +1,8 @@
 package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
-import ir.ac.sbu.graph.GraphUtils;
-import ir.ac.sbu.graph.PartitioningUtils;
-import ir.ac.sbu.graph.VertexCompare;
-import org.apache.hadoop.io.DataOutputBuffer;
+import ir.ac.sbu.graph.utils.GraphUtils;
+import ir.ac.sbu.graph.utils.VertexCompare;
 import scala.Tuple3;
 
 import java.util.concurrent.ForkJoinPool;

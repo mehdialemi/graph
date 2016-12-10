@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph;
+package ir.ac.sbu.graph.utils;
 
 /**
  * Sort based on degree

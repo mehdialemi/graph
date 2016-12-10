@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph;
+package ir.ac.sbu.graph.utils;
 
 import java.io.DataOutput;
 import java.io.IOException;

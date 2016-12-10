@@ -1,7 +1,7 @@
 package ir.ac.sbu.graph.ktruss.sequential;
 
 import ir.ac.sbu.graph.Edge;
-import ir.ac.sbu.graph.GraphLoader;
+import ir.ac.sbu.graph.utils.GraphLoader;
 
 /**
  * Truss Decomposition based on Edge TriangleParallel list.

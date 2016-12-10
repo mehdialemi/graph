@@ -1,9 +1,9 @@
 package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
-import ir.ac.sbu.graph.GraphLoader;
+import ir.ac.sbu.graph.utils.GraphLoader;
 
-import static ir.ac.sbu.graph.MultiCoreUtils.createBuckets;
+import static ir.ac.sbu.graph.utils.MultiCoreUtils.createBuckets;
 
 /**
  * Truss Decomposition based on Edge TriangleParallel list.

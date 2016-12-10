@@ -1,6 +1,6 @@
 package ir.ac.sbu.graph.ktruss;
 
-import ir.ac.sbu.graph.GraphUtils;
+import ir.ac.sbu.graph.utils.GraphUtils;
 import ir.ac.sbu.graph.clusteringco.CohenTC;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;

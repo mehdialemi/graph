@@ -1,5 +1,6 @@
-package ir.ac.sbu.graph;
+package ir.ac.sbu.graph.utils;
 
+import ir.ac.sbu.graph.Edge;
 import org.apache.spark.SparkConf;
 import scala.Tuple2;
 import scala.Tuple3;

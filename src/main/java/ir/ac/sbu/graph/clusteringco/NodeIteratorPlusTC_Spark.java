@@ -1,7 +1,7 @@
 package ir.ac.sbu.graph.clusteringco;
 
-import ir.ac.sbu.graph.GraphUtils;
-import ir.ac.sbu.graph.OutUtils;
+import ir.ac.sbu.graph.utils.GraphUtils;
+import ir.ac.sbu.graph.utils.OutUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;

@@ -1,8 +1,8 @@
 package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
-import ir.ac.sbu.graph.PartitioningUtils;
-import ir.ac.sbu.graph.VertexCompare;
+import ir.ac.sbu.graph.utils.PartitioningUtils;
+import ir.ac.sbu.graph.utils.VertexCompare;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntList;
 import org.apache.hadoop.io.DataInputBuffer;

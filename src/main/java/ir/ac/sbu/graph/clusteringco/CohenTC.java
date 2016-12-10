@@ -1,8 +1,8 @@
 package ir.ac.sbu.graph.clusteringco;
 
-import ir.ac.sbu.graph.GraphLoader;
-import ir.ac.sbu.graph.GraphUtils;
-import ir.ac.sbu.graph.OutUtils;
+import ir.ac.sbu.graph.utils.GraphLoader;
+import ir.ac.sbu.graph.utils.GraphUtils;
+import ir.ac.sbu.graph.utils.OutUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -12,7 +12,7 @@ import scala.Tuple2;
 
 import java.util.*;
 
-import static ir.ac.sbu.graph.GraphUtils.VertexDegree;
+import static ir.ac.sbu.graph.utils.GraphUtils.VertexDegree;
 
 /**
  * Cohen TriangleParallel listing implementation on Apache Spark

@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static ir.ac.sbu.graph.MultiCoreUtils.createBuckets;
+import static ir.ac.sbu.graph.utils.MultiCoreUtils.createBuckets;
 
 /**
  * Utility used in parallel ktruss

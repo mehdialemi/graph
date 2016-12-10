@@ -1,6 +1,6 @@
 package ir.ac.sbu.graph.ktruss.old;
 
-import ir.ac.sbu.graph.GraphOps;
+import ir.ac.sbu.graph.utils.GraphOps;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;

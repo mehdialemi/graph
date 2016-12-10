@@ -1,8 +1,8 @@
 package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
-import ir.ac.sbu.graph.ResettableDataOutputBuffer;
-import ir.ac.sbu.graph.VertexCompare;
+import ir.ac.sbu.graph.utils.ResettableDataOutputBuffer;
+import ir.ac.sbu.graph.utils.VertexCompare;
 import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.io.WritableUtils;

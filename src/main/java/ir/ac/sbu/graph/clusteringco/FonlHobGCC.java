@@ -1,8 +1,8 @@
 package ir.ac.sbu.graph.clusteringco;
 
-import ir.ac.sbu.graph.GraphLoader;
-import ir.ac.sbu.graph.GraphUtils;
-import ir.ac.sbu.graph.OutUtils;
+import ir.ac.sbu.graph.utils.GraphLoader;
+import ir.ac.sbu.graph.utils.GraphUtils;
+import ir.ac.sbu.graph.utils.OutUtils;
 import org.apache.spark.Accumulator;
 import org.apache.spark.AccumulatorParam;
 import org.apache.spark.SparkConf;

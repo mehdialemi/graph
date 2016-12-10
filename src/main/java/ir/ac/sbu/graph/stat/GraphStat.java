@@ -1,7 +1,7 @@
 package ir.ac.sbu.graph.stat;
 
-import ir.ac.sbu.graph.GraphLoader;
-import ir.ac.sbu.graph.GraphUtils;
+import ir.ac.sbu.graph.utils.GraphLoader;
+import ir.ac.sbu.graph.utils.GraphUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;

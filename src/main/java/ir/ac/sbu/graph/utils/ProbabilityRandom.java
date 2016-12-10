@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph;
+package ir.ac.sbu.graph.utils;
 
 import java.util.Random;
 

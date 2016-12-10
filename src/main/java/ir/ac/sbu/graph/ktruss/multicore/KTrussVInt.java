@@ -1,11 +1,7 @@
 package ir.ac.sbu.graph.ktruss.multicore;
 
-import ir.ac.sbu.graph.GraphLoader;
-import ir.ac.sbu.graph.VertexCompare;
+import ir.ac.sbu.graph.utils.GraphLoader;
 import ir.ac.sbu.graph.Edge;
-import org.apache.hadoop.io.DataInputBuffer;
-import org.apache.hadoop.io.DataOutputBuffer;
-import org.apache.hadoop.io.WritableUtils;
 
 import java.io.IOException;
 
