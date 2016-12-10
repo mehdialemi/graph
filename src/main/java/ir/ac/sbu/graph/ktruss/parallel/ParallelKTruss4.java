@@ -296,8 +296,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 int sup = veSups[u][i].get();
                 if (sup == 0)
                     continue;
-                tmp[idx] = i;
-
+                tmp[idx ++] = i;
             }
 
             for(int i = 0 ; i < veCount[u]; i ++) {
@@ -335,7 +334,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 //            }
         }
         long tupdate2 = System.currentTimeMillis();
-        System.out.println("partial update in " + (tupdate2 - tupdate1) + " ms");
+        System.out.println("update in " + (tupdate2 - tupdate1) + " ms");
 
 //        DataOutputBuffer out = new DataOutputBuffer(maxFSize * maxFSize);
 //        int minIdx;
