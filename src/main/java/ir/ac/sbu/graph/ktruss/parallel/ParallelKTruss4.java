@@ -53,9 +53,10 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
         final int[][] neighbors = new int[vCount][];
         for (int i = 0; i < vCount; i++)
-            neighbors[i] = new int[d[i] + 1];
+            neighbors[i] = new int[d[i]];
 
         int[] pos = new int[vCount];
+        int[] flen = new int[vCount];
         for (Edge e : edges) {
             int dv1 = d[e.v1];
             int dv2 = d[e.v2];
@@ -64,11 +65,11 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 dv2 = e.v2;
             }
             if (dv1 < dv2) {
-                neighbors[e.v1][++neighbors[e.v1][0]] = e.v2;
+                neighbors[e.v1][flen[e.v1]++] = e.v2;
                 neighbors[e.v2][d[e.v2] - pos[e.v2]++] = e.v1;
 
             } else {
-                neighbors[e.v2][++neighbors[e.v2][0]] = e.v1;
+                neighbors[e.v2][flen[e.v2]++] = e.v1;
                 neighbors[e.v1][d[e.v1] - pos[e.v1]++] = e.v2;
             }
         }
@@ -87,12 +88,12 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 int end = Math.min(vCount, BATCH_SIZE + start);
 
                 for (int u = start; u < end; u++) {
-                    if (neighbors[u][0] < 2)
+                    if (flen[u] < 2)
                         continue;
-                    vertexCompare.quickSort(neighbors[u], 1, neighbors[u][0]);
-                    if (maxFonlSize < neighbors[u][0])
-                        maxFonlSize = neighbors[u][0];
-                    Arrays.sort(neighbors[u], neighbors[u][0] + 1, neighbors[u].length);
+                    vertexCompare.quickSort(neighbors[u], 1, flen[u]);
+                    if (maxFonlSize < flen[u])
+                        maxFonlSize = flen[u];
+                    Arrays.sort(neighbors[u], flen[u], neighbors[u].length);
                 }
             }
             return maxFonlSize;
@@ -114,10 +115,10 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                     break;
                 int end = Math.min(vCount, BATCH_SIZE + start);
                 for (int u = start; u < end; u++) {
-                    if (neighbors[u][0] == 0)
+                    if (flen[u] == 0)
                         continue;
-                    veSups[u] = new AtomicInteger[neighbors[u][0]];
-                    for (int i = 0; i < neighbors[u][0]; i++)
+                    veSups[u] = new AtomicInteger[flen[u]];
+                    for (int i = 0; i < flen[u]; i++)
                         veSups[u][i] = new AtomicInteger(0);
                 }
             }
@@ -146,7 +147,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 int end = Math.min(vCount, BATCH_SIZE + start);
 
                 for (int u = start; u < end; u++) {
-                    if (neighbors[u][0] < 2)
+                    if (flen[u] < 2)
                         continue;
 
                     int commonSize = 0;
@@ -154,21 +155,21 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
                     int[] neighborsU = neighbors[u];
                     // Find triangle by checking connectivity of neighbors
-                    for (int vIndex = 1; vIndex < neighborsU[0]; vIndex++) {
+                    for (int vIndex = 1; vIndex < flen[u]; vIndex++) {
                         int v = neighborsU[vIndex];
                         int[] vNeighbors = neighbors[v];
 
                         int intersection = 0;
                         // intersection on u neighbors and v neighbors
-                        int uwIndex = vIndex + 1, vwIndex = 1;
+                        int uwIndex = vIndex, vwIndex = 0;
 
-                        while (uwIndex < neighbors[u][0] + 1 && vwIndex < neighbors[v][0] + 1) {
+                        while (uwIndex < flen[u] && vwIndex < flen[v]) {
                             if (neighborsU[uwIndex] == vNeighbors[vwIndex]) {
                                 try {
-                                    int num = veSups[u][uwIndex - 1].getAndIncrement();
+                                    int num = veSups[u][uwIndex].getAndIncrement();
                                     if (num == 0)
                                         veCount[u] ++;
-                                    num = veSups[v][vwIndex - 1].getAndIncrement();
+                                    num = veSups[v][vwIndex].getAndIncrement();
                                     if (num == 0)
                                         veCount[v] ++;
                                     WritableUtils.writeVInt(outLocal, uwIndex);
@@ -202,7 +203,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                         for (int j = 0; j < commonSize; j++) {
                             WritableUtils.writeVInt(outInternal, vIndexes[j]);
                             WritableUtils.writeVInt(outInternal, lens[j]);
-                            int num = veSups[u][vIndexes[j] - 1].getAndAdd(lens[j]);
+                            int num = veSups[u][vIndexes[j]].getAndAdd(lens[j]);
                             outTmp.reset();
                             if (num == 0)
                                 veCount[u] ++;
@@ -246,18 +247,17 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                         continue;
                     }
                     veSupSortedIndex[u] = new int[veCount[u]];
-                    int digitSize = neighbors[u][0] / 127;
+                    int digitSize = flen[u] / 127;
                     fonlSeconds[u] = new byte[digitSize * veCount[u]];
-                    int thirdSize = neighbors[u][0] + 1;
-                    fonlThirds[u] = new DataOutputBuffer[thirdSize];
+                    fonlThirds[u] = new DataOutputBuffer[flen[u]];
                     int idx = 0;
-                    for(int i = 0 ; i < neighbors[u][0]; i++) {
+                    for(int i = 0 ; i < flen[u]; i++) {
                         int sup = veSups[u][i].get();
                         if (sup == 0) {
                             continue;
                         }
 
-                        fonlThirds[u][i + 1] = new DataOutputBuffer((3 * digitSize + 4) * sup);
+                        fonlThirds[u][i] = new DataOutputBuffer((3 * digitSize + 4) * sup);
                         tmp[idx ++] = i;
                     }
 
