@@ -256,7 +256,6 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                             continue;
                         }
 
-
                         fonlThirds[u][i] = new DataOutputBuffer((3 * digitSize + 4) * sup * 4);
                         tmp[idx ++] = i;
                     }
@@ -323,6 +322,10 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                     WritableUtils.writeVInt(fonlThirds[u][vIndexes[i]], uwIndex);
 
                     int vwIndex = WritableUtils.readVInt(in2);
+                    if (vwIndex > fonlThirds[v].length) {
+                        System.out.println("For v: " + v + " vwIndex: " + vwIndex + ", len: " + fonlThirds[v].length +
+                        " neighbor: " + u + " len: " + len);
+                    }
                     WritableUtils.writeVInt(fonlThirds[v][vwIndex], -u);
                     WritableUtils.writeVInt(fonlThirds[v][vwIndex], vwIndex);
                     WritableUtils.writeVInt(fonlThirds[v][vwIndex], uwIndex);
