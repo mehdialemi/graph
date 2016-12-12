@@ -288,21 +288,30 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         long tupdate1 = System.currentTimeMillis();
         DataInputBuffer in1 = new DataInputBuffer();
         DataInputBuffer in2 = new DataInputBuffer();
+        int[] vIndexes = new int[maxFSize];
+        int[] lens = new int[maxFSize];
 
         for (int u = 0; u < vCount; u++) {
             if (seconds[u] == null)
                 continue;
 
+            int index = 0;
             in1.reset(seconds[u], seconds[u].length);
             while (in1.getPosition() < seconds[u].length) {
-                int vindex = WritableUtils.readVInt(in1);
-                int v = neighbors[u][vindex];
-                int len = WritableUtils.readVInt(in1);
+                vIndexes[index] = WritableUtils.readVInt(in1);
+                lens[index] = WritableUtils.readVInt(in1);
+                index++;
+            }
 
-                in2.reset(thirds[u][vindex], thirds[u][vindex].length);
+            for(int i = 0 ; i < index; i ++) {
+                int v = vIndexes[i];
+                int len = lens[i];
+
+                in2.reset(thirds[u][i], thirds[u][i].length);
                 for(int j = 0 ; j < len; j ++) {
                     int uwIndex = WritableUtils.readVInt(in2);
-                    WritableUtils.writeVInt(fonlThirds[u][vindex], uwIndex);
+
+                    WritableUtils.writeVInt(fonlThirds[u][vIndexes[i]], uwIndex);
 
                     int vwIndex = WritableUtils.readVInt(in2);
                     WritableUtils.writeVInt(fonlThirds[v][vwIndex], -u);
