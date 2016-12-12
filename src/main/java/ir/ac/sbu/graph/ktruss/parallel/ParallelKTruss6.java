@@ -181,18 +181,27 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                 max = mapThreads[i].size();
         }
 
-        Long2ObjectOpenHashMap<IntSet> map = new Long2ObjectOpenHashMap<>(max * 2);
+        Long2ObjectMap<IntSet> map = Long2ObjectMaps.synchronize(mapThreads[0]);
+//        Long2ObjectOpenHashMap<IntSet> map = new Long2ObjectOpenHashMap<>(max * 2);
         map.putAll(mapThreads[0]);
         for (int i = 1 ; i < threads; i ++) {
-            ObjectIterator<Long2ObjectMap.Entry<IntSet>> iter = mapThreads[i].long2ObjectEntrySet().fastIterator();
-            while (iter.hasNext()) {
-                Long2ObjectMap.Entry<IntSet> entry = iter.next();
-                IntSet set = map.get(entry.getLongKey());
+            final int index = i;
+            forkJoinPool.submit(() -> mapThreads[index].long2ObjectEntrySet().parallelStream().forEach(edge -> {
+                IntSet set = map.get(edge.getLongKey());
                 if (set == null)
-                    map.put(entry.getLongKey(), entry.getValue());
+                    map.put(edge.getLongKey(), edge.getValue());
                 else
-                    set.addAll(entry.getValue());
-            }
+                    set.addAll(edge.getValue());
+            })).get();
+//            ObjectIterator<Long2ObjectMap.Entry<IntSet>> iter = mapThreads[i].long2ObjectEntrySet().fastIterator();
+//            while (iter.hasNext()) {
+//                Long2ObjectMap.Entry<IntSet> entry = iter.next();
+//                IntSet set = map.get(entry.getLongKey());
+//                if (set == null)
+//                    map.put(entry.getLongKey(), entry.getValue());
+//                else
+//                    set.addAll(entry.getValue());
+//            }
         }
 //        forkJoinPool.submit(() -> IntStream.range(1, threads).parallel().forEach(thread -> {
 //            map.putAll(mapThreads[thread]);
