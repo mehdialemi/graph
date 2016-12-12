@@ -285,142 +285,23 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         long tsorted2 = System.currentTimeMillis();
         System.out.println("initialize and create sort index in " + (tsorted2 - tsorted1) + " ms");
 
-
-//        DataInputBuffer in1 = new DataInputBuffer();
-//        DataInputBuffer in2 = new DataInputBuffer();
-//        int[] vIndexes = new int[maxFSize];
-//        DataOutputBuffer out = new DataOutputBuffer(maxFSize * maxFSize);
-//        int[] lens = new int[maxFSize];
-//        for(int u = 0 ; u < vCount; u ++) {
-//            if(veCount[u] == 0)
-//                continue;
-//
-//
-//            int index = 0;
-//            in1.reset(seconds[u], seconds[u].length);
-//            while (in1.getPosition() < seconds[u].length) {
-//                vIndexes[index] = WritableUtils.readVInt(in1);
-//                lens[index] = WritableUtils.readVInt(in1);
-//                out.reset();
-//                for (int i = 0; i < lens[index]; i++) {
-//                    WritableUtils.writeVInt(out, WritableUtils.readVInt(in2));
-//                    WritableUtils.writeVInt(out, WritableUtils.readVInt(in2));
-//                }
-//                localThirds[index] = new byte[out.getLength()];
-//                System.arraycopy(out.getData(), 0, localThirds[index], 0, out.getLength());
-//                index++;
-//            }
-//        }
-
-//        batchSelector = new AtomicInteger(0);
-//        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(thread -> {
-//            BitSet bitSet = new BitSet(maxFSize);
-//            DataOutputBuffer out = new DataOutputBuffer(maxFSize);
-//
-//            while (true) {
-//                int start = batchSelector.getAndAdd(BATCH_SIZE);
-//                if (start >= vCount)
-//                    break;
-//                int end = Math.min(vCount, BATCH_SIZE + start);
-//
-//                for (int u = start; u < end; u++) {
-//                    if (neighbors[u][0] < 2 || veCount[u] == 0)
-//                        continue;
-//
-//                    bitSet.clear();
-//
-//                    veSupSortedIndex[u] = new int[veCount[u]];
-//
-//                    int index = 0;
-//                    int minIdx = 0;
-//                    int min = Integer.MAX_VALUE;
-//                    int first = 0;
-//                    for (int i = 0 ; i < neighbors[u][0]; i ++) {
-//                        if (veSups[u][i].get() == 0 || bitSet.get(i))
-//                            continue;
-//                        first = i;
-//                        minIdx = i;
-//                        min = veSups[u][i].get();
-//                        for (int j = 0; j < neighbors[u][0]; j ++) {
-//                            if (veSups[u][i].get() == 0 || bitSet.get(j) || j == first)
-//                                continue;
-//                            if (veSups[u][j].get() < min) {
-//                                minIdx = j;
-//                                min = veSups[u][j].get();
-//                            }
-//                        }
-//                        bitSet.set(minIdx);
-//                        veSupSortedIndex[u][index ++] = minIdx;
-//                    }
-//
-//                    out.reset();
-//                    for (int i = 0 ; i < veCount[u] ; i ++) {
-//                        try {
-//                            index = veSupSortedIndex[u][i];
-//                            WritableUtils.writeVInt(out, veSups[u][index].get()); // write count
-//                            WritableUtils.writeVInt(out, index);  // write index of vertex (v)
-//                        } catch (IOException e) {
-//                        }
-//                    }
-//
-//                    fonlSeconds[u] = new byte[out.getLength()];
-//                    System.arraycopy(out.getData(), 0, fonlSeconds[u], 0, out.getLength());
-//
-//                    int digitSize = neighbors[u][0] / 127 + 1;
-//                    fonlThirds[u] = new byte[neighbors[u][0]][];
-//                    for (int i = 0 ; i < veCount[u]; i ++) {
-//                        index = veSupSortedIndex[u][i];
-//                        int size = veSups[u][index].get();
-//                        fonlThirds[u][index] =
-//                            new byte[INT_SIZE + digitSize * lcCount[u] + size * (INT_SIZE + 1 + digitSize + size)];
-//                        //         hold count of DataOutputBuffer + ...
-//                    }
-//                }
-//            }
-//        })).get();
-
         long tupdate1 = System.currentTimeMillis();
-        DataInputBuffer in1 = new DataInputBuffer();
-        DataInputBuffer in2 = new DataInputBuffer();
-        DataOutputBuffer out1 = new DataOutputBuffer();
-        DataOutputBuffer out2 = new DataOutputBuffer();
-        int[] vIndexes = new int[maxFSize];
-        int[] lens = new int[maxFSize];
-        byte[][] localThirds = new byte[maxFSize][];
+        DataInputBuffer in = new DataInputBuffer();
+
         for (int u = 0; u < vCount; u++) {
             if (veCount[u] == 0)
                 continue;
 
-            int index = 0;
-            in1.reset(seconds[u], seconds[u].length);
-            while (in1.getPosition() < seconds[u].length) {
-                vIndexes[index] = WritableUtils.readVInt(in1);
-                lens[index] = WritableUtils.readVInt(in1);
-                localThirds[index] = thirds[u][index];
-                index++;
-            }
-
             for (int i = 0; i < veCount[u]; i++) {
-                int idx = -1;
-                for (int j = 0; j < index; j++) {
-                    if (veSupSortedIndex[u][i] == vIndexes[j]) {
-                        index = j;
-                        break;
-                    }
-                }
+                int index = veSupSortedIndex[u][i];
+                int v = neighbors[u][index];
+                int count = veSups[u][index].get();
 
-                if (idx == -1)
-                    continue;
+                for(int j = 0 ; j < count ; j ++ ) {
+                    int uwIndex = WritableUtils.readVInt(in);
+                    WritableUtils.writeVInt(fonlThirds[u][i], uwIndex);
 
-                int vIndex = vIndexes[index];
-                int v = neighbors[u][vIndex];
-                in2.reset(localThirds[index], localThirds[index].length);
-                WritableUtils.writeVInt(out1, lens[index]);
-                for (int j = 0; j < lens[index]; j++) {
-                    int uwIndex = WritableUtils.readVInt(in2);
-                    WritableUtils.writeVInt(out1, uwIndex);
-
-                    int vwIndex = WritableUtils.readVInt(in2);
+                    int vwIndex = WritableUtils.readVInt(in);
                     WritableUtils.writeVInt(fonlThirds[v][vwIndex], -1);
                     WritableUtils.writeVInt(fonlThirds[v][vwIndex], u);
                     WritableUtils.writeVInt(fonlThirds[v][vwIndex], vwIndex);
@@ -428,12 +309,13 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 }
             }
         }
+        
         long tupdate2 = System.currentTimeMillis();
         System.out.println("complete fonl in " + (tupdate2 - tupdate1) + " ms");
 
 //        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(partition -> {
 //            DataInputBuffer in = new DataInputBuffer();
-//            DataInputBuffer in2 = new DataInputBuffer();
+//            DataInputBuffer in = new DataInputBuffer();
 //            ResettableDataOutputBuffer out = new ResettableDataOutputBuffer();
 //            ResettableDataOutputBuffer out2 = new ResettableDataOutputBuffer();
 //            int[] vIndexes = new int[maxFSize];
@@ -479,12 +361,12 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 //                    int v = uNeighbors[vIndexes[index]];
 //                    boolean update = partitions[v] == partition;
 //                    try {
-//                        in2.reset(localThirds[index], localThirds[index].length);
+//                        in.reset(localThirds[index], localThirds[index].length);
 //                        if (local)
 //                            WritableUtils.writeVInt(out, lens[index]);
 //                        for(int j = 0 ; j < lens[index]; j ++) {
-//                            int uwIndex = WritableUtils.readVInt(in2);
-//                            int vwIndex = WritableUtils.readVInt(in2);
+//                            int uwIndex = WritableUtils.readVInt(in);
+//                            int vwIndex = WritableUtils.readVInt(in);
 //                            if (update) {
 //                                out2.reset(fonlThirds[v][vwIndex]);
 //                                WritableUtils.writeVInt(out2, -1);
