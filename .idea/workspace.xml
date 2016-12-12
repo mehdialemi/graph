@@ -10,13 +10,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss4.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss4.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/graph/clusteringco/GraphX_GCC.scala" afterPath="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/graph/clusteringco/GraphX_GCC.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/graph/clusteringco/GraphX_LCC.scala" afterPath="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/graph/clusteringco/GraphX_LCC.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/graph/clusteringco/GraphX_TC.scala" afterPath="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/graph/clusteringco/GraphX_TC.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/graph/clusteringco/PregelTC.scala" afterPath="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/graph/clusteringco/PregelTC.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/graph/utils/GraphStatRedis.scala" afterPath="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/graph/utils/GraphStatRedis.scala" />
     </list>
     <ignored path="graph-processing.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -39,11 +33,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="ParallelKTruss4.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="ParallelKTruss4.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss4.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="252" column="83" selection-start-line="252" selection-start-column="83" selection-end-line="252" selection-end-column="83" />
+            <state vertical-scroll-proportion="0.6334056">
+              <caret line="205" column="43" selection-start-line="205" selection-start-column="43" selection-end-line="205" selection-end-column="43" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -99,10 +93,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PregelTC.scala" pinned="false" current-in-tab="true">
+      <file leaf-file-name="PregelTC.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/ir/ac/sbu/graph/clusteringco/PregelTC.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.21169356">
+            <state vertical-scroll-proportion="0.0">
               <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
               <folding>
                 <element signature="e#38#89#0" expanded="true" />
@@ -223,12 +217,12 @@
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ResettableDataOutputBuffer.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/utils/OutUtils.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/utils/VIntUtils.java" />
-        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss4.java" />
         <option value="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/graph/utils/GraphStatRedis.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/graph/clusteringco/GraphX_GCC.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/graph/clusteringco/GraphX_LCC.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/graph/clusteringco/GraphX_TC.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/ir/ac/sbu/graph/clusteringco/PregelTC.scala" />
+        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss4.java" />
       </list>
     </option>
   </component>
@@ -245,7 +239,32 @@
     </option>
   </component>
   <component name="MavenProjectNavigator">
-    <treeState />
+    <treeState>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="subgraph-mining" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$RootNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="subgraph-mining" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$ProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Lifecycle" />
+          <option name="myItemType" value="org.jetbrains.idea.maven.navigator.MavenProjectsStructure$LifecycleNode" />
+        </PATH_ELEMENT>
+      </PATH>
+    </treeState>
   </component>
   <component name="ProjectFrameBounds">
     <option name="width" value="1600" />
@@ -1034,12 +1053,12 @@
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2825789" sideWeight="0.49706745" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2825789" sideWeight="0.49706745" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5682183" sideWeight="0.37829912" order="10" side_tool="true" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17302053" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17265725" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30642954" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33058986" sideWeight="0.6217009" order="2" side_tool="false" content_ui="tabs" x="0" y="72" width="1366" height="628" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33058986" sideWeight="0.6217009" order="2" side_tool="false" content_ui="tabs" x="0" y="72" width="1366" height="628" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32744783" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26123235" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -1512,16 +1531,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss4.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="252" column="83" selection-start-line="252" selection-start-column="83" selection-end-line="252" selection-end-column="83" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/ir/ac/sbu/graph/utils/GraphStatRedis.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1564,10 +1573,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/ir/ac/sbu/graph/clusteringco/PregelTC.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.21169356">
+        <state vertical-scroll-proportion="0.0">
           <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
           <folding>
             <element signature="e#38#89#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss4.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6334056">
+          <caret line="205" column="43" selection-start-line="205" selection-start-column="43" selection-end-line="205" selection-end-column="43" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>

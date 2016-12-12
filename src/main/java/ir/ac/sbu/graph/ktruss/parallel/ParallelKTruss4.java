@@ -203,6 +203,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                             WritableUtils.writeVInt(outInternal, vIndexes[j]);
                             WritableUtils.writeVInt(outInternal, lens[j]);
                             int num = veSups[u][vIndexes[j] - 1].getAndAdd(lens[j]);
+                            outTmp.reset();
                             if (num == 0)
                                 veCount[u] ++;
                             for (int k = 0; k < lens[j]; k++) {
