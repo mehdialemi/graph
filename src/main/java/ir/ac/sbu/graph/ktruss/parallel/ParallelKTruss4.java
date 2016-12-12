@@ -129,7 +129,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         byte[][][] thirds = new byte[vCount][][];
         int[] veCount = new int[vCount];
 
-//        int[] partitions = PartitioningUtils.createPartitions(vCount, threads, BATCH_SIZE);
+
 
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(thread -> {
@@ -284,25 +284,27 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
         long tsorted2 = System.currentTimeMillis();
         System.out.println("initialize and create sort index in " + (tsorted2 - tsorted1) + " ms");
-
+//        int[] partitions = PartitioningUtils.createPartitions(vCount, threads, BATCH_SIZE);
         long tupdate1 = System.currentTimeMillis();
-        DataInputBuffer in = new DataInputBuffer();
+        DataInputBuffer in1 = new DataInputBuffer();
+        DataInputBuffer in2 = new DataInputBuffer();
 
         for (int u = 0; u < vCount; u++) {
-            if (veCount[u] == 0)
+            if (seconds[u] == null)
                 continue;
 
-            for (int i = 0; i < veCount[u]; i++) {
-                int index = veSupSortedIndex[u][i];
-                int v = neighbors[u][index];
-                int count = veSups[u][index].get();
+            in1.reset(seconds[u], seconds[u].length);
+            while (in1.getPosition() < seconds[u].length) {
+                int vindex = WritableUtils.readVInt(in1);
+                int v = neighbors[u][vindex];
+                int len = WritableUtils.readVInt(in1);
 
-                in.reset(thirds[u][index], thirds[u][index].length);
-                for(int j = 0 ; j < count ; j ++ ) {
-                    int uwIndex = WritableUtils.readVInt(in);
-                    WritableUtils.writeVInt(fonlThirds[u][i], uwIndex);
+                in2.reset(thirds[u][vindex], thirds[u][vindex].length);
+                for(int j = 0 ; j < len; j ++) {
+                    int uwIndex = WritableUtils.readVInt(in2);
+                    WritableUtils.writeVInt(fonlThirds[u][vindex], uwIndex);
 
-                    int vwIndex = WritableUtils.readVInt(in);
+                    int vwIndex = WritableUtils.readVInt(in2);
                     WritableUtils.writeVInt(fonlThirds[v][vwIndex], -u);
                     WritableUtils.writeVInt(fonlThirds[v][vwIndex], vwIndex);
                     WritableUtils.writeVInt(fonlThirds[v][vwIndex], uwIndex);
