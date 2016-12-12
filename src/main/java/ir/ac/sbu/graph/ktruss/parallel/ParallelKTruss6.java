@@ -77,7 +77,7 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
 
         final VertexCompare vertexCompare = new VertexCompare(d);
         batchSelector = new AtomicInteger(0);
-        final int maxFSize = forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().map(i -> {
+        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(i -> {
             int maxFonlSize = 0;
             while (true) {
                 int start = batchSelector.getAndAdd(BATCH_SIZE);
@@ -94,33 +94,10 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                     Arrays.sort(neighbors[u], flen[u], neighbors[u].length);
                 }
             }
-            return maxFonlSize;
-        })).get().reduce((a, b) -> Integer.max(a, b)).getAsInt();
+        })).get();
 
         long t3 = System.currentTimeMillis();
         System.out.println("sort fonl in " + (t3 - t2) + " ms");
-
-        long tsCounts = System.currentTimeMillis();
-        AtomicInteger[][] veSups = new AtomicInteger[vCount][];
-
-        batchSelector = new AtomicInteger(0);
-        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(partition -> {
-            while (true) {
-                int start = batchSelector.getAndAdd(BATCH_SIZE);
-                if (start >= vCount)
-                    break;
-                int end = Math.min(vCount, BATCH_SIZE + start);
-                for (int u = start; u < end; u++) {
-                    if (flen[u] == 0)
-                        continue;
-                    veSups[u] = new AtomicInteger[flen[u]];
-                    for (int i = 0; i < flen[u]; i++)
-                        veSups[u][i] = new AtomicInteger(0);
-                }
-            }
-        })).get();
-        long tCounts = System.currentTimeMillis();
-        System.out.println("construct veSups in " + (tCounts - tsCounts) + " ms");
 
         Long2ObjectOpenHashMap<IntSet>[] map = new Long2ObjectOpenHashMap[threads];
         for (int i = 0; i < threads; i++) {
@@ -176,10 +153,6 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                                     map[thread].put(vw, set);
                                 }
                                 set.add(u);
-
-                                veSups[u][vIndex].getAndIncrement();
-                                veSups[u][uwIndex].getAndIncrement();
-                                veSups[v][vwIndex].getAndIncrement();
 
                                 uwIndex++;
                                 vwIndex++;
