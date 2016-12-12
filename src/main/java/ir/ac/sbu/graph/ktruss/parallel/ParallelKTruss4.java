@@ -231,49 +231,99 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         DataInputBuffer in2 = new DataInputBuffer();
 
         byte[][] fonlSeconds = new byte[vCount][];
-//        byte[][][] fonlThirds = new byte[vCount][][];
         DataOutputBuffer[][] fonlThirds = new DataOutputBuffer[vCount][];
         int[][] veSupSortedIndex = new int[vCount][];
-        int[] tmp = new int[maxFSize];
 
         long tsorted1 = System.currentTimeMillis();
-        for(int u = 0 ; u < vCount; u ++) {
-            if(veCount[u] == 0)
-                continue;
-            veSupSortedIndex[u] = new int[veCount[u]];
-            int digitSize = neighbors[u][0] / 127;
-            fonlSeconds[u] = new byte[digitSize * veCount[u]];
-//            fonlThirds[u] = new byte[neighbors[u][0]][];
-            fonlThirds[u] = new DataOutputBuffer[neighbors[u][0]];
-            int idx = 0;
-            for(int i = 0 ; i < neighbors[u][0]; i++) {
-                int sup = veSups[u][i].get();
-                if (sup == 0)
-                    continue;
+        batchSelector = new AtomicInteger(0);
+        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(thread -> {
+            int[] tmp = new int[maxFSize];
+            while (true) {
+                int start = batchSelector.getAndAdd(BATCH_SIZE);
+                if (start >= vCount) {
+                    break;
+                }
+                int end = Math.min(vCount, BATCH_SIZE + start);
+                for (int u = start; u < end; u++) {
+                    if(veCount[u] == 0) {
+                        continue;
+                    }
+                    veSupSortedIndex[u] = new int[veCount[u]];
+                    int digitSize = neighbors[u][0] / 127;
+                    fonlSeconds[u] = new byte[digitSize * veCount[u]];
+                    fonlThirds[u] = new DataOutputBuffer[neighbors[u][0]];
+                    int idx = 0;
+                    for(int i = 0 ; i < neighbors[u][0]; i++) {
+                        int sup = veSups[u][i].get();
+                        if (sup == 0) {
+                            continue;
+                        }
 
-                fonlThirds[u][i] = new DataOutputBuffer((3 * digitSize + 4) * sup);
-//                fonlThirds[u][i] = new byte[(3 * digitSize + 4) * sup];
-                tmp[idx ++] = i;
-            }
+                        fonlThirds[u][i] = new DataOutputBuffer((3 * digitSize + 4) * sup);
+                        tmp[idx ++] = i;
+                    }
 
-            for(int i = 0 ; i < veCount[u]; i ++) {
-                int selected = i;
-                int min = veSups[u][tmp[i]].get();
-                for(int j = i + 1 ; j < veCount[u]; j ++) {
-                    if (min < veSups[u][tmp[j]].get()) {
-                        min = veSups[u][tmp[j]].get();
-                        selected = j;
+                    for(int i = 0 ; i < veCount[u]; i ++) {
+                        int selected = i;
+                        int min = veSups[u][tmp[i]].get();
+                        for(int j = i + 1 ; j < veCount[u]; j ++) {
+                            if (min < veSups[u][tmp[j]].get()) {
+                                min = veSups[u][tmp[j]].get();
+                                selected = j;
+                            }
+                        }
+                        if (selected != i) {
+                            int temp = tmp[i];
+                            tmp[i] = tmp[selected];
+                            tmp[selected] = temp;
+                        }
+
+                        veSupSortedIndex[u][i] = tmp[i];
                     }
                 }
-                if (selected != i) {
-                    int temp = tmp[i];
-                    tmp[i] = tmp[selected];
-                    tmp[selected] = temp;
-                }
-
-                veSupSortedIndex[u][i] = tmp[i];
             }
-        }
+        })).get();
+
+//        int[] tmp = new int[maxFSize];
+//        byte[][][] fonlThirds = new byte[vCount][][];
+//        for(int u = 0 ; u < vCount; u ++) {
+//            if(veCount[u] == 0) {
+//                continue;
+//            }
+//            veSupSortedIndex[u] = new int[veCount[u]];
+//            int digitSize = neighbors[u][0] / 127;
+//            fonlSeconds[u] = new byte[digitSize * veCount[u]];
+//            fonlThirds[u] = new byte[neighbors[u][0]][];
+//            fonlThirds[u] = new DataOutputBuffer[neighbors[u][0]];
+//            int idx = 0;
+//            for(int i = 0 ; i < neighbors[u][0]; i++) {
+//                int sup = veSups[u][i].get();
+//                if (sup == 0)
+//                    continue;
+//
+//                fonlThirds[u][i] = new DataOutputBuffer((3 * digitSize + 4) * sup);
+////                fonlThirds[u][i] = new byte[(3 * digitSize + 4) * sup];
+//                tmp[idx ++] = i;
+//            }
+//
+//            for(int i = 0 ; i < veCount[u]; i ++) {
+//                int selected = i;
+//                int min = veSups[u][tmp[i]].get();
+//                for(int j = i + 1 ; j < veCount[u]; j ++) {
+//                    if (min < veSups[u][tmp[j]].get()) {
+//                        min = veSups[u][tmp[j]].get();
+//                        selected = j;
+//                    }
+//                }
+//                if (selected != i) {
+//                    int temp = tmp[i];
+//                    tmp[i] = tmp[selected];
+//                    tmp[selected] = temp;
+//                }
+//
+//                veSupSortedIndex[u][i] = tmp[i];
+//            }
+//        }
 
         long tsorted2 = System.currentTimeMillis();
         System.out.println("initialize and create sort index in " + (tsorted2 - tsorted1) + " ms");
