@@ -312,7 +312,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             }
 
             for(int i = 0 ; i < index; i ++) {
-                int v = vIndexes[i];
+                int v = neighbors[u][vIndexes[i]];
                 int len = lens[i];
 
                 in2.reset(thirds[u][i], thirds[u][i].length);
