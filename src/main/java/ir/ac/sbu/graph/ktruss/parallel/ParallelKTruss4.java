@@ -66,11 +66,11 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             }
             if (dv1 < dv2) {
                 neighbors[e.v1][flen[e.v1]++] = e.v2;
-                neighbors[e.v2][d[e.v2] - pos[e.v2]++] = e.v1;
+                neighbors[e.v2][d[e.v2] - 1 - pos[e.v2]++] = e.v1;
 
             } else {
                 neighbors[e.v2][flen[e.v2]++] = e.v1;
-                neighbors[e.v1][d[e.v1] - pos[e.v1]++] = e.v2;
+                neighbors[e.v1][d[e.v1] - 1 - pos[e.v1]++] = e.v2;
             }
         }
 
@@ -155,13 +155,13 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
                     int[] neighborsU = neighbors[u];
                     // Find triangle by checking connectivity of neighbors
-                    for (int vIndex = 1; vIndex < flen[u]; vIndex++) {
+                    for (int vIndex = 0; vIndex < flen[u]; vIndex++) {
                         int v = neighborsU[vIndex];
                         int[] vNeighbors = neighbors[v];
 
                         int intersection = 0;
                         // intersection on u neighbors and v neighbors
-                        int uwIndex = vIndex, vwIndex = 0;
+                        int uwIndex = vIndex + 1, vwIndex = 0;
 
                         while (uwIndex < flen[u] && vwIndex < flen[v]) {
                             if (neighborsU[uwIndex] == vNeighbors[vwIndex]) {
