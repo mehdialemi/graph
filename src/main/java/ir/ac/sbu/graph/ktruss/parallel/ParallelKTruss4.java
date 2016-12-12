@@ -233,7 +233,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         long tsorted1 = System.currentTimeMillis();
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(thread -> {
-            DataOutputBuffer out = new DataOutputBuffer(maxFSize);
+            DataOutputBuffer out = new DataOutputBuffer(maxFSize * 8);
             int[] tmp = new int[maxFSize];
             while (true) {
                 int start = batchSelector.getAndAdd(BATCH_SIZE);
@@ -257,7 +257,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                         }
 
 
-                        fonlThirds[u][i] = new DataOutputBuffer((3 * digitSize + 4) * sup);
+                        fonlThirds[u][i] = new DataOutputBuffer((3 * digitSize + 4) * sup * 4);
                         tmp[idx ++] = i;
                     }
 
