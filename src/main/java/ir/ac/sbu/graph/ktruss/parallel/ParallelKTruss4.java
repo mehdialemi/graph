@@ -297,6 +297,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 int v = neighbors[u][index];
                 int count = veSups[u][index].get();
 
+                in.reset(thirds[u][index], thirds[u][index].length);
                 for(int j = 0 ; j < count ; j ++ ) {
                     int uwIndex = WritableUtils.readVInt(in);
                     WritableUtils.writeVInt(fonlThirds[u][i], uwIndex);
@@ -309,7 +310,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 }
             }
         }
-        
+
         long tupdate2 = System.currentTimeMillis();
         System.out.println("complete fonl in " + (tupdate2 - tupdate1) + " ms");
 
