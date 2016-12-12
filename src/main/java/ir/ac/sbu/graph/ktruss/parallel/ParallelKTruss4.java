@@ -233,6 +233,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         long tsorted1 = System.currentTimeMillis();
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(thread -> {
+            DataOutputBuffer out = new DataOutputBuffer(maxFSize);
             int[] tmp = new int[maxFSize];
             while (true) {
                 int start = batchSelector.getAndAdd(BATCH_SIZE);
@@ -246,7 +247,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                     }
                     veSupSortedIndex[u] = new int[veCount[u]];
                     int digitSize = flen[u] / 127;
-                    fonlSeconds[u] = new byte[digitSize * veCount[u]];
+//                    fonlSeconds[u] = new byte[digitSize * veCount[u]];
                     fonlThirds[u] = new DataOutputBuffer[flen[u]];
                     int idx = 0;
                     for(int i = 0 ; i < flen[u]; i++) {
@@ -255,10 +256,12 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                             continue;
                         }
 
+
                         fonlThirds[u][i] = new DataOutputBuffer((3 * digitSize + 4) * sup);
                         tmp[idx ++] = i;
                     }
 
+                    out.reset();
                     for(int i = 0 ; i < veCount[u]; i ++) {
                         int selected = i;
                         int min = veSups[u][tmp[i]].get();
@@ -275,7 +278,15 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                         }
 
                         veSupSortedIndex[u][i] = tmp[i];
+                        try {
+                            WritableUtils.writeVInt(out, tmp[i]);
+                            WritableUtils.writeVInt(out, veSups[u][tmp[i]].get());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
+                    fonlSeconds[u] = new byte[out.getLength()];
+                    System.arraycopy(out.getData(), 0, fonlSeconds[u], 0, out.getLength());
                 }
             }
         })).get();
