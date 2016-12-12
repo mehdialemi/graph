@@ -12,6 +12,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -58,7 +59,6 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
         for (int i = 0; i < vCount; i++)
             neighbors[i] = new int[d[i]];
 
-        int[] pos = new int[vCount];
         int[] flen = new int[vCount];
         for (Edge e : edges) {
             int dv1 = d[e.v1];
@@ -69,20 +69,19 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
             }
             if (dv1 < dv2) {
                 neighbors[e.v1][flen[e.v1]++] = e.v2;
-                neighbors[e.v2][d[e.v2] - 1 - pos[e.v2]++] = e.v1;
 
             } else {
                 neighbors[e.v2][flen[e.v2]++] = e.v1;
-                neighbors[e.v1][d[e.v1] - 1 - pos[e.v1]++] = e.v2;
             }
         }
 
         long tInitFonl = System.currentTimeMillis();
         System.out.println("initialize fonl " + (tInitFonl - t2) + " ms");
+        AtomicInteger[][] veSups = new AtomicInteger[vCount][];
 
         final VertexCompare vertexCompare = new VertexCompare(d);
         batchSelector = new AtomicInteger(0);
-        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(i -> {
+        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(thread -> {
             int maxFonlSize = 0;
             while (true) {
                 int start = batchSelector.getAndAdd(BATCH_SIZE);
@@ -91,12 +90,19 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                 int end = Math.min(vCount, BATCH_SIZE + start);
 
                 for (int u = start; u < end; u++) {
-                    if (flen[u] < 2)
+                    if (flen[u] == 0)
                         continue;
+
+                    veSups[u] = new AtomicInteger[flen[u]];
+                    for (int i = 0; i < flen[u]; i++)
+                        veSups[u][i] = new AtomicInteger(0);
+
+                    if (flen[u] < 2) {
+                        continue;
+                    }
                     vertexCompare.quickSort(neighbors[u], 0, flen[u] - 1);
                     if (maxFonlSize < flen[u])
                         maxFonlSize = flen[u];
-                    Arrays.sort(neighbors[u], flen[u], neighbors[u].length);
                 }
             }
         })).get();
@@ -129,7 +135,6 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
 
                         long uv = (long) u << 32 | v & 0xFFFFFFFFL;
 
-                        int count = 0;
                         // intersection on u neighbors and v neighbors
                         int uwIndex = vIndex + 1, vwIndex = 0;
 
@@ -142,6 +147,7 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                                     mapThreads[thread].put(uv, set);
                                 }
                                 set.add(w);
+                                veSups[u][vIndex].getAndIncrement();
 
                                 long uw = (long) u << 32 | w & 0xFFFFFFFFL;
                                 set = mapThreads[thread].get(uw);
@@ -150,6 +156,7 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                                     mapThreads[thread].put(uw, set);
                                 }
                                 set.add(v);
+                                veSups[u][uwIndex].getAndIncrement();
 
                                 long vw = (long) v << 32 | w & 0xFFFFFFFFL;
                                 set = mapThreads[thread].get(vw);
@@ -158,6 +165,7 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                                     mapThreads[thread].put(vw, set);
                                 }
                                 set.add(u);
+                                veSups[v][vwIndex].getAndIncrement();
 
                                 uwIndex++;
                                 vwIndex++;
@@ -166,7 +174,6 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                             else
                                 vwIndex++;
                         }
-
                     }
                 }
             }
@@ -182,7 +189,6 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
         }
 
         Long2ObjectMap<IntSet> map = Long2ObjectMaps.synchronize(mapThreads[0]);
-//        Long2ObjectOpenHashMap<IntSet> map = new Long2ObjectOpenHashMap<>(max * 2);
         map.putAll(mapThreads[0]);
         for (int i = 1 ; i < threads; i ++) {
             final int index = i;
@@ -193,20 +199,14 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                 else
                     set.addAll(edge.getValue());
             })).get();
-//            ObjectIterator<Long2ObjectMap.Entry<IntSet>> iter = mapThreads[i].long2ObjectEntrySet().fastIterator();
-//            while (iter.hasNext()) {
-//                Long2ObjectMap.Entry<IntSet> entry = iter.next();
-//                IntSet set = map.get(entry.getLongKey());
-//                if (set == null)
-//                    map.put(entry.getLongKey(), entry.getValue());
-//                else
-//                    set.addAll(entry.getValue());
-//            }
         }
-//        forkJoinPool.submit(() -> IntStream.range(1, threads).parallel().forEach(thread -> {
-//            map.putAll(mapThreads[thread]);
-//        })).get();
         long tAgg = System.currentTimeMillis();
         System.out.println("Aggregate in " + (tAgg - tTC) + " ms");
+
+        int sum = 0;
+        for (Map.Entry<Long, IntSet> entry : map.entrySet()) {
+            sum += entry.getValue().size();
+        }
+        System.out.println("tc: " + sum / 3);
     }
 }
