@@ -227,7 +227,6 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         long tTC = System.currentTimeMillis();
         System.out.println("tc duration: " + (tTC - tStart) + " ms");
 
-
         byte[][] fonlSeconds = new byte[vCount][];
         DataOutputBuffer[][] fonlThirds = new DataOutputBuffer[vCount][];
         int[][] veSupSortedIndex = new int[vCount][];
@@ -249,7 +248,8 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                     veSupSortedIndex[u] = new int[veCount[u]];
                     int digitSize = neighbors[u][0] / 127;
                     fonlSeconds[u] = new byte[digitSize * veCount[u]];
-                    fonlThirds[u] = new DataOutputBuffer[neighbors[u][0]];
+                    int thirdSize = neighbors[u][0] + 1;
+                    fonlThirds[u] = new DataOutputBuffer[thirdSize];
                     int idx = 0;
                     for(int i = 0 ; i < neighbors[u][0]; i++) {
                         int sup = veSups[u][i].get();
@@ -303,8 +303,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                     WritableUtils.writeVInt(fonlThirds[u][i], uwIndex);
 
                     int vwIndex = WritableUtils.readVInt(in);
-                    WritableUtils.writeVInt(fonlThirds[v][vwIndex], -1);
-                    WritableUtils.writeVInt(fonlThirds[v][vwIndex], u);
+                    WritableUtils.writeVInt(fonlThirds[v][vwIndex], -u);
                     WritableUtils.writeVInt(fonlThirds[v][vwIndex], vwIndex);
                     WritableUtils.writeVInt(fonlThirds[v][vwIndex], uwIndex);
                 }
