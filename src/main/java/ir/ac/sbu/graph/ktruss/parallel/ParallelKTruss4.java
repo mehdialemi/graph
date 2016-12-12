@@ -248,7 +248,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                     veSupSortedIndex[u] = new int[veCount[u]];
                     int digitSize = neighbors[u][0] / 127;
                     fonlSeconds[u] = new byte[digitSize * veCount[u]];
-                    int thirdSize = neighbors[u][0] + 1;
+                    int thirdSize = neighbors[u][0];
                     fonlThirds[u] = new DataOutputBuffer[thirdSize];
                     int idx = 0;
                     for(int i = 0 ; i < neighbors[u][0]; i++) {
@@ -257,7 +257,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                             continue;
                         }
 
-                        fonlThirds[u][i] = new DataOutputBuffer((3 * digitSize + 4) * sup);
+                        fonlThirds[u][i + 1] = new DataOutputBuffer((3 * digitSize + 4) * sup);
                         tmp[idx ++] = i;
                     }
 
