@@ -174,10 +174,19 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
         long tTC = System.currentTimeMillis();
         System.out.println("tc duration: " + (tTC - tSort) + " ms");
 
-        Long2ObjectMap<IntSet> map = Long2ObjectMaps.synchronize(threadMaps[0]);
-        forkJoinPool.submit(() -> IntStream.range(1, threads).parallel().forEach(thread -> {
-            map.putAll(threadMaps[thread]);
-        })).get();
+        int max = 0;
+        for (int i = 0 ; i < threads; i ++) {
+            if (max < threadMaps[i].size())
+                max = threadMaps[i].size();
+        }
+
+        Long2ObjectOpenHashMap<IntSet> map = new Long2ObjectOpenHashMap<>(max * 2);
+        for (int i = 0 ; i < threads; i ++) {
+            map.putAll(threadMaps[i]);
+        }
+//        forkJoinPool.submit(() -> IntStream.range(1, threads).parallel().forEach(thread -> {
+//            map.putAll(threadMaps[thread]);
+//        })).get();
         long tAgg = System.currentTimeMillis();
         System.out.println("Aggregate in " + (tAgg - tTC) + " ms");
     }
