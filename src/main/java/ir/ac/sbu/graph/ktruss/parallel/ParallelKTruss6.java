@@ -2,8 +2,12 @@ package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
 import ir.ac.sbu.graph.utils.VertexCompare;
+import it.unimi.dsi.fastutil.ints.Int2IntMaps;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 import java.util.Arrays;
@@ -96,12 +100,12 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
             }
         })).get();
 
-        long t3 = System.currentTimeMillis();
-        System.out.println("sort fonl in " + (t3 - t2) + " ms");
+        long tSort = System.currentTimeMillis();
+        System.out.println("sort fonl in " + (tSort - t2) + " ms");
 
-        Long2ObjectOpenHashMap<IntSet>[] map = new Long2ObjectOpenHashMap[threads];
+        Long2ObjectOpenHashMap<IntSet>[] threadMaps = new Long2ObjectOpenHashMap[threads];
         for (int i = 0; i < threads; i++) {
-            map[i] = new Long2ObjectOpenHashMap(vCount);
+            threadMaps[i] = new Long2ObjectOpenHashMap(vCount);
         }
 
         batchSelector = new AtomicInteger(0);
@@ -131,26 +135,26 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                         while (uwIndex < flen[u] && vwIndex < flen[v]) {
                             if (neighborsU[uwIndex] == vNeighbors[vwIndex]) {
                                 int w = neighborsU[uwIndex];
-                                IntSet set = map[thread].get(uv);
+                                IntSet set = threadMaps[thread].get(uv);
                                 if (set == null) {
                                     set = new IntOpenHashSet();
-                                    map[thread].put(uv, set);
+                                    threadMaps[thread].put(uv, set);
                                 }
                                 set.add(w);
 
                                 long uw = (long) u << 32 | w & 0xFFFFFFFFL;
-                                set = map[thread].get(uw);
+                                set = threadMaps[thread].get(uw);
                                 if (set == null) {
                                     set = new IntOpenHashSet();
-                                    map[thread].put(uw, set);
+                                    threadMaps[thread].put(uw, set);
                                 }
                                 set.add(v);
 
                                 long vw = (long) v << 32 | w & 0xFFFFFFFFL;
-                                set = map[thread].get(vw);
+                                set = threadMaps[thread].get(vw);
                                 if (set == null) {
                                     set = new IntOpenHashSet();
-                                    map[thread].put(vw, set);
+                                    threadMaps[thread].put(vw, set);
                                 }
                                 set.add(u);
 
@@ -168,7 +172,13 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
         })).get();
 
         long tTC = System.currentTimeMillis();
-        System.out.println("tc duration: " + (tTC - tStart) + " ms");
+        System.out.println("tc duration: " + (tTC - tSort) + " ms");
 
+        Long2ObjectMap<IntSet> map = Long2ObjectMaps.synchronize(threadMaps[0]);
+        forkJoinPool.submit(() -> IntStream.range(1, threads).parallel().forEach(thread -> {
+            map.putAll(threadMaps[thread]);
+        })).get();
+        long tAgg = System.currentTimeMillis();
+        System.out.println("Aggregate in " + (tAgg - tTC) + " ms");
     }
 }
