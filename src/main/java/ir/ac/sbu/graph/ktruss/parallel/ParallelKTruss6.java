@@ -9,6 +9,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 import java.util.Arrays;
 import java.util.concurrent.ForkJoinPool;
@@ -103,9 +104,9 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
         long tSort = System.currentTimeMillis();
         System.out.println("sort fonl in " + (tSort - t2) + " ms");
 
-        Long2ObjectOpenHashMap<IntSet>[] threadMaps = new Long2ObjectOpenHashMap[threads];
+        Long2ObjectOpenHashMap<IntSet>[] mapThreads = new Long2ObjectOpenHashMap[threads];
         for (int i = 0; i < threads; i++) {
-            threadMaps[i] = new Long2ObjectOpenHashMap(vCount);
+            mapThreads[i] = new Long2ObjectOpenHashMap(vCount);
         }
 
         batchSelector = new AtomicInteger(0);
@@ -135,26 +136,26 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                         while (uwIndex < flen[u] && vwIndex < flen[v]) {
                             if (neighborsU[uwIndex] == vNeighbors[vwIndex]) {
                                 int w = neighborsU[uwIndex];
-                                IntSet set = threadMaps[thread].get(uv);
+                                IntSet set = mapThreads[thread].get(uv);
                                 if (set == null) {
                                     set = new IntOpenHashSet();
-                                    threadMaps[thread].put(uv, set);
+                                    mapThreads[thread].put(uv, set);
                                 }
                                 set.add(w);
 
                                 long uw = (long) u << 32 | w & 0xFFFFFFFFL;
-                                set = threadMaps[thread].get(uw);
+                                set = mapThreads[thread].get(uw);
                                 if (set == null) {
                                     set = new IntOpenHashSet();
-                                    threadMaps[thread].put(uw, set);
+                                    mapThreads[thread].put(uw, set);
                                 }
                                 set.add(v);
 
                                 long vw = (long) v << 32 | w & 0xFFFFFFFFL;
-                                set = threadMaps[thread].get(vw);
+                                set = mapThreads[thread].get(vw);
                                 if (set == null) {
                                     set = new IntOpenHashSet();
-                                    threadMaps[thread].put(vw, set);
+                                    mapThreads[thread].put(vw, set);
                                 }
                                 set.add(u);
 
@@ -176,16 +177,25 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
 
         int max = 0;
         for (int i = 0 ; i < threads; i ++) {
-            if (max < threadMaps[i].size())
-                max = threadMaps[i].size();
+            if (max < mapThreads[i].size())
+                max = mapThreads[i].size();
         }
 
         Long2ObjectOpenHashMap<IntSet> map = new Long2ObjectOpenHashMap<>(max * 2);
-        for (int i = 0 ; i < threads; i ++) {
-            map.putAll(threadMaps[i]);
+        map.putAll(mapThreads[0]);
+        for (int i = 1 ; i < threads; i ++) {
+            ObjectIterator<Long2ObjectMap.Entry<IntSet>> iter = mapThreads[i].long2ObjectEntrySet().fastIterator();
+            while (iter.hasNext()) {
+                Long2ObjectMap.Entry<IntSet> entry = iter.next();
+                IntSet set = map.get(entry.getLongKey());
+                if (set == null)
+                    map.put(entry.getLongKey(), entry.getValue());
+                else
+                    set.addAll(entry.getValue());
+            }
         }
 //        forkJoinPool.submit(() -> IntStream.range(1, threads).parallel().forEach(thread -> {
-//            map.putAll(threadMaps[thread]);
+//            map.putAll(mapThreads[thread]);
 //        })).get();
         long tAgg = System.currentTimeMillis();
         System.out.println("Aggregate in " + (tAgg - tTC) + " ms");
