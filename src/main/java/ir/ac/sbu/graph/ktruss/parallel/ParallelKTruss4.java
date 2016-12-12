@@ -90,7 +90,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 for (int u = start; u < end; u++) {
                     if (flen[u] < 2)
                         continue;
-                    vertexCompare.quickSort(neighbors[u], 1, flen[u]);
+                    vertexCompare.quickSort(neighbors[u], 0, flen[u] - 1);
                     if (maxFonlSize < flen[u])
                         maxFonlSize = flen[u];
                     Arrays.sort(neighbors[u], flen[u], neighbors[u].length);
@@ -129,8 +129,6 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         byte[][] seconds = new byte[vCount][];
         byte[][][] thirds = new byte[vCount][][];
         int[] veCount = new int[vCount];
-
-
 
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(thread -> {
