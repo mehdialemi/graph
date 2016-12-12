@@ -1,6 +1,5 @@
 package ir.ac.sbu.graph.utils
 
-import GraphUtils
 import ir.ac.sbu.redispark.{RedisContext, RedisEndpoint}
 import org.apache.spark.{SparkConf, SparkContext}
 import redis.clients.jedis.Jedis
