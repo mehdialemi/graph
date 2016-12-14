@@ -31,7 +31,7 @@ public class GraphLoader {
         while (offset < channel.size()) {
             long end = Math.min(offset + Integer.MAX_VALUE, offset + channel.size());
             MappedByteBuffer mapBB = channel.map(FileChannel.MapMode.READ_ONLY, offset, end);
-            byte[] buf = new byte[(int) channel.size()];
+            byte[] buf = new byte[(int) (end - offset)];
             mapBB.get(buf);
             ByteArrayInputStream isr = new ByteArrayInputStream(buf);
             InputStreamReader ip = new InputStreamReader(isr);
