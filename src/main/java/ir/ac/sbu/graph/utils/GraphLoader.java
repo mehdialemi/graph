@@ -1,6 +1,7 @@
 package ir.ac.sbu.graph.utils;
 
 import ir.ac.sbu.graph.Edge;
+import it.unimi.dsi.fastutil.BigArrays;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
@@ -22,28 +23,50 @@ public class GraphLoader {
     public static Edge[] loadFromLocalFile(String inputPath) throws IOException {
         System.out.println("Loading " + inputPath);
 
-        long tr1 = System.currentTimeMillis();
+        List<List<Edge>> edgeLists = new ArrayList<>();
         final FileChannel channel = new FileInputStream(inputPath).getChannel();
-        MappedByteBuffer mapBB = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
-        byte[] buf = new byte[(int) channel.size()];
-        mapBB.get(buf);
-        ByteArrayInputStream isr = new ByteArrayInputStream(buf);
-        InputStreamReader ip = new InputStreamReader(isr);
-        BufferedReader reader = new BufferedReader(ip);
-        List<Edge> edgeList = new ArrayList<>(buf.length / 20);
-        while (true) {
-            String line = reader.readLine();
-            if (line == null)
-                break;
-            if (line.startsWith("#"))
-                continue;
-            String[] split = line.split("\\s+");
-            edgeList.add(new Edge(Integer.parseInt(split[0]), Integer.parseInt(split[1])));
-        }
-        long tr2 = System.currentTimeMillis();
-        System.out.println("Graph loaded, edges: " + edgeList.size() + ", load time: " + (tr2 - tr1) + " ms");
+        long tr1 = System.currentTimeMillis();
 
-        return edgeList.toArray(new Edge[0]);
+        long offset = 0;
+        while (offset < channel.size()) {
+            long end = Math.min(offset + Integer.MAX_VALUE, offset + channel.size());
+            MappedByteBuffer mapBB = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+            byte[] buf = new byte[(int) channel.size()];
+            mapBB.get(buf);
+            ByteArrayInputStream isr = new ByteArrayInputStream(buf);
+            InputStreamReader ip = new InputStreamReader(isr);
+            BufferedReader reader = new BufferedReader(ip);
+            List<Edge> edgeList = new ArrayList<>(buf.length / 20);
+            while (true) {
+                String line = reader.readLine();
+                if (line == null)
+                    break;
+                if (line.startsWith("#"))
+                    continue;
+                String[] split = line.split("\\s+");
+                edgeList.add(new Edge(Integer.parseInt(split[0]), Integer.parseInt(split[1])));
+            }
+            edgeLists.add(edgeList);
+            offset += end;
+        }
+
+        int size = 0;
+        for (List<Edge> edgeList : edgeLists) {
+            size += edgeList.size();
+        }
+
+        Edge[] edges = new Edge[size];
+        int start = 0;
+        for (List<Edge> edgeList : edgeLists) {
+            Edge[] edgeArray = edgeList.toArray(new Edge[0]);
+            System.arraycopy(edgeArray, 0, edges, start, edgeArray.length);
+            start += edgeArray.length;
+        }
+
+        long tr2 = System.currentTimeMillis();
+        System.out.println("Graph loaded, edges: " + edges.length + ", load time: " + (tr2 - tr1) + " ms");
+
+        return edges;
     }
 
     public static JavaPairRDD<Long, Long> loadEdges(JavaRDD<String> input) {
