@@ -45,6 +45,9 @@ public class GraphLoader {
                 if (line.startsWith("#"))
                     continue;
                 String[] split = line.split("\\s+");
+                if (split == null || split.length != 2)
+                    continue;
+                
                 edgeList.add(new Edge(Integer.parseInt(split[0]), Integer.parseInt(split[1])));
             }
             edgeLists.add(edgeList);
