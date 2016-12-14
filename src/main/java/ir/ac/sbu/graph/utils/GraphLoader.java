@@ -10,6 +10,8 @@ import scala.Tuple2;
 import java.io.*;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -23,49 +25,62 @@ public class GraphLoader {
     public static Edge[] loadFromLocalFile(String inputPath) throws IOException {
         System.out.println("Loading " + inputPath);
 
-        List<List<Edge>> edgeLists = new ArrayList<>();
-        final FileChannel channel = new FileInputStream(inputPath).getChannel();
         long tr1 = System.currentTimeMillis();
-
-        long offset = 0;
-        int batchSize = Integer.MAX_VALUE / 2;
-        while (offset < channel.size()) {
-            long end = Math.min(offset + batchSize, offset + channel.size());
-            MappedByteBuffer mapBB = channel.map(FileChannel.MapMode.READ_ONLY, offset, end);
-            byte[] buf = new byte[(int) (end - offset)];
-            mapBB.get(buf);
-            ByteArrayInputStream isr = new ByteArrayInputStream(buf);
-            InputStreamReader ip = new InputStreamReader(isr);
-            BufferedReader reader = new BufferedReader(ip);
-            List<Edge> edgeList = new ArrayList<>(buf.length / 20);
-            while (true) {
-                String line = reader.readLine();
-                if (line == null)
-                    break;
-                if (line.startsWith("#"))
-                    continue;
-                String[] split = line.split("\\s+");
-                if (split == null || split.length != 2)
-                    continue;
-                
-                edgeList.add(new Edge(Integer.parseInt(split[0]), Integer.parseInt(split[1])));
+        List<String> lines = Files.readAllLines(new File(inputPath).toPath());
+        Edge[] edges = new Edge[lines.size()];
+        int i = 0;
+        for (String line : lines) {
+            if (line.startsWith("#")) {
+                continue;
             }
-            edgeLists.add(edgeList);
-            offset += end;
+            String[] split = line.split("\\s+");
+            if (split == null || split.length != 2) {
+                continue;
+            }
+            edges[i ++] = new Edge(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
         }
 
-        int size = 0;
-        for (List<Edge> edgeList : edgeLists) {
-            size += edgeList.size();
-        }
-
-        Edge[] edges = new Edge[size];
-        int start = 0;
-        for (List<Edge> edgeList : edgeLists) {
-            Edge[] edgeArray = edgeList.toArray(new Edge[0]);
-            System.arraycopy(edgeArray, 0, edges, start, edgeArray.length);
-            start += edgeArray.length;
-        }
+//        List<List<Edge>> edgeLists = new ArrayList<>();
+//        final FileChannel channel = new FileInputStream(inputPath).getChannel();
+//        long offset = 0;
+//        int batchSize = Integer.MAX_VALUE / 2;
+//        while (offset < channel.size()) {
+//            long end = Math.min(offset + batchSize, offset + channel.size());
+//            MappedByteBuffer mapBB = channel.map(FileChannel.MapMode.READ_ONLY, offset, end);
+//            byte[] buf = new byte[(int) (end - offset)];
+//            mapBB.get(buf);
+//            ByteArrayInputStream isr = new ByteArrayInputStream(buf);
+//            InputStreamReader ip = new InputStreamReader(isr);
+//            BufferedReader reader = new BufferedReader(ip);
+//            List<Edge> edgeList = new ArrayList<>(buf.length / 20);
+//            while (true) {
+//                String line = reader.readLine();
+//                if (line == null)
+//                    break;
+//                if (line.startsWith("#"))
+//                    continue;
+//                String[] split = line.split("\\s+");
+//                if (split == null || split.length != 2)
+//                    continue;
+//
+//                edgeList.add(new Edge(Integer.parseInt(split[0]), Integer.parseInt(split[1])));
+//            }
+//            edgeLists.add(edgeList);
+//            offset += end;
+//        }
+//
+//        int size = 0;
+//        for (List<Edge> edgeList : edgeLists) {
+//            size += edgeList.size();
+//        }
+//
+//        Edge[] edges = new Edge[size];
+//        int start = 0;
+//        for (List<Edge> edgeList : edgeLists) {
+//            Edge[] edgeArray = edgeList.toArray(new Edge[0]);
+//            System.arraycopy(edgeArray, 0, edges, start, edgeArray.length);
+//            start += edgeArray.length;
+//        }
 
         long tr2 = System.currentTimeMillis();
         System.out.println("Graph loaded, edges: " + edges.length + ", load time: " + (tr2 - tr1) + " ms");
