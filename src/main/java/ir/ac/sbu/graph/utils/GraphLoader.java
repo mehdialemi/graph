@@ -28,8 +28,9 @@ public class GraphLoader {
         long tr1 = System.currentTimeMillis();
 
         long offset = 0;
+        int batchSize = Integer.MAX_VALUE / 2;
         while (offset < channel.size()) {
-            long end = Math.min(offset + Integer.MAX_VALUE, offset + channel.size());
+            long end = Math.min(offset + batchSize, offset + channel.size());
             MappedByteBuffer mapBB = channel.map(FileChannel.MapMode.READ_ONLY, offset, end);
             byte[] buf = new byte[(int) (end - offset)];
             mapBB.get(buf);
