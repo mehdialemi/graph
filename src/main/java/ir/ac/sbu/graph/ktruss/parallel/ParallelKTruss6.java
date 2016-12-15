@@ -6,9 +6,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntMaps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.*;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 import java.util.Arrays;
@@ -115,8 +113,10 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
             mapThreads[i] = new Long2ObjectOpenHashMap(vCount);
         }
 
+        boolean[] veCount = new boolean[vCount];
         batchSelector = new AtomicInteger(0);
-        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(thread -> {
+        int maxSup = forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().map(thread -> {
+            int max = 0;
             while (true) {
                 int start = batchSelector.getAndAdd(BATCH_SIZE);
                 if (start >= vCount)
@@ -147,7 +147,11 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                                     mapThreads[thread].put(uv, set);
                                 }
                                 set.add(w);
-                                veSups[u][vIndex].getAndIncrement();
+                                int sup = veSups[u][vIndex].incrementAndGet();
+                                if (sup > max)
+                                    max = sup;
+                                if (!veCount[u] && sup == 1)
+                                    veCount[u] = true;
 
                                 long uw = (long) u << 32 | w & 0xFFFFFFFFL;
                                 set = mapThreads[thread].get(uw);
@@ -156,7 +160,11 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                                     mapThreads[thread].put(uw, set);
                                 }
                                 set.add(v);
-                                veSups[u][uwIndex].getAndIncrement();
+                                sup = veSups[u][uwIndex].incrementAndGet();
+                                if (sup > max)
+                                    max = sup;
+                                if (!veCount[u] && sup == 1)
+                                    veCount[u] = true;
 
                                 long vw = (long) v << 32 | w & 0xFFFFFFFFL;
                                 set = mapThreads[thread].get(vw);
@@ -165,7 +173,11 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                                     mapThreads[thread].put(vw, set);
                                 }
                                 set.add(u);
-                                veSups[v][vwIndex].getAndIncrement();
+                                sup = veSups[v][vwIndex].incrementAndGet();
+                                if (sup > max)
+                                    max = sup;
+                                if (!veCount[v] && sup == 1)
+                                    veCount[v] = true;
 
                                 uwIndex++;
                                 vwIndex++;
@@ -177,10 +189,46 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                     }
                 }
             }
-        })).get();
+            return max;
+        })).get().reduce((a, b) -> Math.max(a, b)).getAsInt();
+
+
 
         long tTC = System.currentTimeMillis();
         System.out.println("tc duration: " + (tTC - tSort) + " ms");
+
+        int len = maxSup + 1;
+        AtomicInteger[] eCounts = new AtomicInteger[len];
+        for(int u = 0 ; u < vCount; u ++) {
+            if (veCount[u])
+                continue;
+            for(int i = 0 ; i < flen[u]; i ++) {
+                if (veSups[u][i].get() == 0)
+                    continue;
+                eCounts[veSups[u][i].get()].incrementAndGet();
+            }
+        }
+
+        for(int i = 1 ; i < len; i ++)
+            eCounts[i].addAndGet(eCounts[i - 1].get());
+
+        len = eCounts[maxSup].get();
+        long[] eSorted = new long[len];
+        Long2IntMap edgeToIndexMap = new Long2IntOpenHashMap();
+        for(int u = 0 ; u < vCount; u ++) {
+            if (veCount[u])
+                continue;
+            for(int i = 0 ; i < flen[u]; i ++) {
+                if (veSups[u][i].get() == 0)
+                    continue;
+                long e = (long) u << 32 | neighbors[u][i] & 0xFFFFFFFFL;
+                int index = eCounts[veSups[u][i].get()].decrementAndGet();
+                eSorted[index] = e;
+                edgeToIndexMap.put(e, index);
+            }
+        }
+        long tSortE = System.currentTimeMillis();
+        System.out.println("Sort edges based on counts in " + (tSortE - tTC) + " ms");
 
         int max = 0;
         for (int i = 0 ; i < threads; i ++) {
@@ -201,7 +249,7 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
             })).get();
         }
         long tAgg = System.currentTimeMillis();
-        System.out.println("Aggregate in " + (tAgg - tTC) + " ms");
+        System.out.println("Aggregate in " + (tAgg - tSortE) + " ms");
 
         int sum = 0;
         for (Map.Entry<Long, IntSet> entry : map.entrySet()) {
