@@ -191,16 +191,14 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
             }
             return max;
         })).get().reduce((a, b) -> Math.max(a, b)).getAsInt();
-
-
-
         long tTC = System.currentTimeMillis();
         System.out.println("tc duration: " + (tTC - tSort) + " ms");
 
         int len = maxSup + 1;
+        System.out.println("len: " + len);
         int[] eCounts = new int[len];
         for(int u = 0 ; u < vCount; u ++) {
-            if (veCount[u])
+            if (!veCount[u])
                 continue;
             for(int i = 0 ; i < flen[u]; i ++) {
                 if (veSups[u][i].get() == 0)
@@ -209,8 +207,11 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
             }
         }
 
-        for(int i = 1 ; i < len; i ++)
+        for(int i = 1 ; i < len; i ++) {
             eCounts[i] += eCounts[i - 1];
+        }
+
+        System.out.println("edge triangle: " + eCounts[maxSup]);
 
         len = eCounts[maxSup];
         long[] eSorted = new long[len];
@@ -227,6 +228,7 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                 edgeToIndexMap.put(e, index);
             }
         }
+
         long tSortE = System.currentTimeMillis();
         System.out.println("Sort edges based on counts in " + (tSortE - tTC) + " ms");
 
