@@ -198,21 +198,21 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
         System.out.println("tc duration: " + (tTC - tSort) + " ms");
 
         int len = maxSup + 1;
-        AtomicInteger[] eCounts = new AtomicInteger[len];
+        int[] eCounts = new int[len];
         for(int u = 0 ; u < vCount; u ++) {
             if (veCount[u])
                 continue;
             for(int i = 0 ; i < flen[u]; i ++) {
                 if (veSups[u][i].get() == 0)
                     continue;
-                eCounts[veSups[u][i].get()].incrementAndGet();
+                eCounts[veSups[u][i].get()] ++;
             }
         }
 
         for(int i = 1 ; i < len; i ++)
-            eCounts[i].addAndGet(eCounts[i - 1].get());
+            eCounts[i] += eCounts[i - 1];
 
-        len = eCounts[maxSup].get();
+        len = eCounts[maxSup];
         long[] eSorted = new long[len];
         Long2IntMap edgeToIndexMap = new Long2IntOpenHashMap();
         for(int u = 0 ; u < vCount; u ++) {
@@ -222,7 +222,7 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                 if (veSups[u][i].get() == 0)
                     continue;
                 long e = (long) u << 32 | neighbors[u][i] & 0xFFFFFFFFL;
-                int index = eCounts[veSups[u][i].get()].decrementAndGet();
+                int index = eCounts[veSups[u][i].get()] --;
                 eSorted[index] = e;
                 edgeToIndexMap.put(e, index);
             }
