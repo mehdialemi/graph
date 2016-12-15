@@ -2,17 +2,16 @@ package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
 import ir.ac.sbu.graph.utils.VertexCompare;
-import it.unimi.dsi.fastutil.ints.Int2IntMaps;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.longs.*;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -211,52 +210,102 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
             eCounts[i] += eCounts[i - 1];
         }
 
-        System.out.println("edge triangle: " + eCounts[maxSup]);
+        int eCountLen = eCounts[maxSup];
+        System.out.println("edge triangle: " + eCountLen);
 
-        len = eCounts[maxSup];
+        System.out.println("minSup: " + minSup);
+        len = eCounts[maxSup] + 1;
         long[] eSorted = new long[len];
+        AtomicInteger[] edgeSup = new AtomicInteger[len];
         Long2IntMap edgeToIndexMap = new Long2IntOpenHashMap();
+        BitSet invalidSet = new BitSet(eCountLen);
         for(int u = 0 ; u < vCount; u ++) {
-            if (veCount[u])
+            if (!veCount[u]) {
                 continue;
+            }
             for(int i = 0 ; i < flen[u]; i ++) {
-                if (veSups[u][i].get() == 0)
+                int sup = veSups[u][i].get();
+                if (sup == 0) {
                     continue;
+                }
                 long e = (long) u << 32 | neighbors[u][i] & 0xFFFFFFFFL;
-                int index = eCounts[veSups[u][i].get()] --;
+                int index = eCounts[sup] --;
+                if (sup < minSup)
+                    invalidSet.set(index);
                 eSorted[index] = e;
+                edgeSup[index] = new AtomicInteger(sup);
                 edgeToIndexMap.put(e, index);
             }
         }
 
         long tSortE = System.currentTimeMillis();
-        System.out.println("Sort edges based on counts in " + (tSortE - tTC) + " ms");
+        System.out.println("sort edges based on counts in " + (tSortE - tTC) + " ms");
+        System.out.println("cardinality: " + invalidSet.cardinality());
+        int iter = 0;
+        while (true) {
+            final int[] invalidIndexes = invalidSet.stream().toArray();
+            System.out.println("iteration " + ++ iter + ", invalid size: " + invalidIndexes.length);
 
-        int max = 0;
-        for (int i = 0 ; i < threads; i ++) {
-            if (max < mapThreads[i].size())
-                max = mapThreads[i].size();
-        }
+            if (invalidIndexes.length == 0)
+                break;
 
-        Long2ObjectMap<IntSet> map = Long2ObjectMaps.synchronize(mapThreads[0]);
-        map.putAll(mapThreads[0]);
-        for (int i = 1 ; i < threads; i ++) {
-            final int index = i;
-            forkJoinPool.submit(() -> mapThreads[index].long2ObjectEntrySet().parallelStream().forEach(edge -> {
-                IntSet set = map.get(edge.getLongKey());
-                if (set == null)
-                    map.put(edge.getLongKey(), edge.getValue());
-                else
-                    set.addAll(edge.getValue());
+            for (int invalidIndex : invalidIndexes) {
+                invalidSet.clear(invalidIndex);
+            }
+
+            forkJoinPool.submit(() -> IntStream.range(0, threads).forEach(thread -> {
+                for (int i = 0; i < invalidIndexes.length; i++) {
+                    if (invalidIndexes[i] == -1)
+                        continue;
+                    long edge = eSorted[invalidIndexes[i]];
+                    IntSet list = mapThreads[thread].get(edge);
+                    if (list == null || list.isEmpty())
+                        continue;
+
+                    IntIterator iterator = list.iterator();
+                    while (iterator.hasNext()) {
+                        int w = iterator.nextInt();
+                        int u = (int)(edge >> 32);
+                        int v = (int)edge;
+                        long e;
+                        if (vertexCompare.compare(u, w) == -1) {
+                            e = (long) u << 32 | w & 0xFFFFFFFFL;
+                        } else {
+                            e =  (long) w << 32 | u & 0xFFFFFFFFL;
+                        }
+                        int index = edgeToIndexMap.get(e);
+                        int sup = edgeSup[index].decrementAndGet();
+                        if (sup < minSup) {
+                            // add index to invalid indexes
+                            invalidSet.set(index);
+                        }
+
+                        IntSet list1 = mapThreads[thread].get(eSorted[index]);
+                        if(list1 != null)
+                            list1.remove(v);
+
+                        if (vertexCompare.compare(v, w) == -1) {
+                            e = (long) v << 32 | w & 0xFFFFFFFFL;
+                        } else {
+                            e =  (long) w << 32 | v & 0xFFFFFFFFL;
+                        }
+                        index = edgeToIndexMap.get(e);
+                        sup = edgeSup[index].decrementAndGet();
+                        if (sup < minSup) {
+                            // add index to invalid indexes
+                            invalidSet.set(index);
+                        }
+
+                        list1 = mapThreads[thread].get(eSorted[index]);
+                        if(list1 != null)
+                            list1.remove(u);
+
+                    }
+                }
             })).get();
         }
-        long tAgg = System.currentTimeMillis();
-        System.out.println("Aggregate in " + (tAgg - tSortE) + " ms");
 
-        int sum = 0;
-        for (Map.Entry<Long, IntSet> entry : map.entrySet()) {
-            sum += entry.getValue().size();
-        }
-        System.out.println("tc: " + sum / 3);
+        long tk = System.currentTimeMillis();
+        System.out.println("Complete in " + (tk - tSortE) + " ms");
     }
 }
