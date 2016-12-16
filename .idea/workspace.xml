@@ -36,8 +36,8 @@
       <file leaf-file-name="ParallelKTruss6.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss6.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="292" column="76" selection-start-line="292" selection-start-column="76" selection-end-line="292" selection-end-column="76" />
+            <state relative-caret-position="287">
+              <caret line="297" column="33" selection-start-line="297" selection-start-column="33" selection-end-line="297" selection-end-column="33" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -1389,8 +1389,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss6.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="292" column="76" selection-start-line="292" selection-start-column="76" selection-end-line="292" selection-end-column="76" />
+        <state relative-caret-position="287">
+          <caret line="297" column="33" selection-start-line="297" selection-start-column="33" selection-end-line="297" selection-end-column="33" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
