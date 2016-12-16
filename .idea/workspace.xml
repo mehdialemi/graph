@@ -10,7 +10,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss6.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss6.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/subgraph-env.sh" afterPath="$PROJECT_DIR$/bin/subgraph-env.sh" />
     </list>
     <ignored path="graph-processing.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -33,11 +33,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="ParallelKTruss6.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ParallelKTruss6.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss6.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="287">
-              <caret line="297" column="33" selection-start-line="297" selection-start-column="33" selection-end-line="297" selection-end-column="33" />
+            <state relative-caret-position="75">
+              <caret line="267" column="17" selection-start-line="267" selection-start-column="17" selection-end-line="267" selection-end-column="17" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -140,11 +140,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="subgraph-env.sh" pinned="false" current-in-tab="false">
+      <file leaf-file-name="subgraph-env.sh" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/bin/subgraph-env.sh">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="165">
-              <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
+              <caret line="11" column="1" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
               <folding />
             </state>
           </provider>
@@ -223,8 +223,8 @@
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss4.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/KTrussParallel.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/utils/GraphLoader.java" />
-        <option value="$PROJECT_DIR$/bin/subgraph-env.sh" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss6.java" />
+        <option value="$PROJECT_DIR$/bin/subgraph-env.sh" />
       </list>
     </option>
   </component>
@@ -1337,14 +1337,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/bin/subgraph-env.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTrussBase.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="130">
@@ -1389,11 +1381,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss6.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="287">
-          <caret line="297" column="33" selection-start-line="297" selection-start-column="33" selection-end-line="297" selection-end-column="33" />
+        <state relative-caret-position="75">
+          <caret line="267" column="17" selection-start-line="267" selection-start-column="17" selection-end-line="267" selection-end-column="17" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bin/subgraph-env.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="1" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
+          <folding />
         </state>
       </provider>
     </entry>
