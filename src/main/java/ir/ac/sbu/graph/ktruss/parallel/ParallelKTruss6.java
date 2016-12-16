@@ -217,6 +217,7 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
         len = eCounts[maxSup] + 1;
         long[] eSorted = new long[len];
         AtomicInteger[] edgeSup = new AtomicInteger[len];
+        int[] invalidIndexes = new int[len];
         Long2IntMap edgeToIndexMap = new Long2IntOpenHashMap();
         BitSet invalidSet = new BitSet(eCountLen);
         for(int u = 0 ; u < vCount; u ++) {
@@ -243,18 +244,19 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
         System.out.println("cardinality: " + invalidSet.cardinality());
         int iter = 0;
         while (true) {
-            final int[] invalidIndexes = invalidSet.stream().toArray();
-            System.out.println("iteration " + ++ iter + ", invalid size: " + invalidIndexes.length);
+            AtomicInteger counter = new AtomicInteger(0);
 
-            if (invalidIndexes.length == 0)
+            invalidSet.stream().forEach(index -> invalidIndexes[counter.getAndIncrement()] = index);
+            System.out.println("iteration " + ++ iter + ", invalid size: " + counter.get());
+
+            if (counter.get() == 0)
                 break;
 
-            for (int invalidIndex : invalidIndexes) {
-                invalidSet.clear(invalidIndex);
-            }
+            for(int i = 0 ; i < counter.get(); i ++)
+                invalidSet.clear(invalidIndexes[i]);
 
             forkJoinPool.submit(() -> IntStream.range(0, threads).forEach(thread -> {
-                for (int i = 0; i < invalidIndexes.length; i++) {
+                for (int i = 0; i < counter.get(); i++) {
                     if (invalidIndexes[i] == -1)
                         continue;
                     long edge = eSorted[invalidIndexes[i]];
