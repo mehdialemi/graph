@@ -290,7 +290,7 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                 invalidEdgePerThread[i].clear();
 
             batchSelector = new AtomicInteger(0);
-            forkJoinPool.submit(() -> IntStream.range(0, threads).forEach(thread -> {
+            forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(thread -> {
                 for (int i = 0; i < invalidSize; i++) {
                     int index = invalidIndexes[i];
                     long edge = eSorted[index];
