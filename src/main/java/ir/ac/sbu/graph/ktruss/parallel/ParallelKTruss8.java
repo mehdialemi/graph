@@ -246,5 +246,14 @@ public class ParallelKTruss8 extends ParallelKTrussBase {
                 }
             })).get();
         }
+
+        int size = 0;
+        for(int i = 0 ; i < threads; i ++) {
+            ObjectIterator<Long2ObjectMap.Entry<IntSet>> iterator = ev[i].long2ObjectEntrySet().fastIterator();
+            while (iterator.hasNext()) {
+                size += iterator.next().getValue().size();
+            }
+        }
+        System.out.println("size: " + size);
     }
 }
