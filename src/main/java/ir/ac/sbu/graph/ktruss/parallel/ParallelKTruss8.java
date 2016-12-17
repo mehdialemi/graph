@@ -58,6 +58,8 @@ public class ParallelKTruss8 extends ParallelKTrussBase {
         for (int i = 0; i < threads; i++)
             ev[i] = new Long2ObjectOpenHashMap<>(edges.length / threads);
 
+        long tpartition = System.currentTimeMillis();
+        System.out.println("partition in " + (tpartition - tneighbor) + " ms");
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(t -> {
             for (int i = 0; i < edges.length; i++) {
                 int v1 = edges[i].v1;
@@ -104,7 +106,7 @@ public class ParallelKTruss8 extends ParallelKTrussBase {
             }
         })).get();
         long tesup = System.currentTimeMillis();
-        System.out.println("calculate esup " + (tesup - tneighbor) + " ms");
+        System.out.println("calculate esup " + (tesup - tpartition) + " ms");
 
         int sum = 0;
         for (Long2ObjectOpenHashMap<IntSet> x : ev) {
