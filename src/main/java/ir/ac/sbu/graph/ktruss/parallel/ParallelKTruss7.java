@@ -242,7 +242,7 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
 
                     int u = (int) (edge >> 32);
                     int v = (int) edge;
-                    while (iterator.hasNext()) {-
+                    while (iterator.hasNext()) {
                         int w = iterator.nextInt();
                         long e;
                         if (vertexCompare.compare(u, w) == -1) {
