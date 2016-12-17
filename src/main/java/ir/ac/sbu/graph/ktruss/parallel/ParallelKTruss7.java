@@ -153,8 +153,14 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
         long ttc = System.currentTimeMillis();
         System.out.println("find triangles in " + (ttc - tpartition) + " ms");
 
-        Long2IntMap ei = new Long2IntOpenHashMap();
-        Int2LongMap ie = new Int2LongOpenHashMap();
+        int sum = 0;
+        for (Long2ObjectOpenHashMap<IntSet> map : evMap) {
+            sum += map.size();
+        }
+        int avg = sum / threads;
+
+        Long2IntMap ei = new Long2IntOpenHashMap(avg * 2);
+        Int2LongMap ie = new Int2LongOpenHashMap(avg * 2);
         int count = 0;
         for (int i = 0 ; i < threads; i ++) {
             for (Long e : evMap[i].keySet()) {
