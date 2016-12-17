@@ -22,7 +22,6 @@ import java.util.stream.IntStream;
  */
 public class ParallelKTruss6 extends ParallelKTrussBase {
 
-    public static final int INT_SIZE = 4;
     private final ForkJoinPool forkJoinPool;
 
     public ParallelKTruss6(Edge[] edges, int minSup, int threads) {

@@ -26,7 +26,7 @@ public class KTrussParallel {
         if (args.length > 2)
             threads = Integer.parseInt(args[2]);
 
-        int method = 6;
+        int method = 7;
         if (args.length > 3)
             method = Integer.parseInt(args[3]);
         Edge[] edges = GraphLoader.loadFromLocalFile(inputPath);
@@ -45,6 +45,9 @@ public class KTrussParallel {
             case 5: parallelKTruss = new ParallelKTruss5(edges, minSup, threads);
                 break;
             case 6: parallelKTruss = new ParallelKTruss6(edges, minSup, threads);
+                break;
+            case 7: parallelKTruss = new ParallelKTruss7(edges, minSup, threads);
+                break;
         }
 
         System.out.println("start ktruss with k = " + k + ", threads = " + threads + ", " +

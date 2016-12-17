@@ -1,10 +1,12 @@
 package ir.ac.sbu.graph.utils;
 
+import it.unimi.dsi.fastutil.ints.*;
 import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.WritableUtils;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.BitSet;
 
 /**
@@ -83,6 +85,23 @@ public class PartitioningUtils {
         System.out.println("total inE: " + totalIn + ", total outE: " + totalOut + ", " +
             "total ratio: " + df.format(totalIn / (double) (totalIn + totalOut)));
 
+    }
+
+    public static Int2IntMap createPartition(Int2ObjectOpenHashMap<IntArrayList> neighbors, int threads) {
+        int[] sizes = new int[threads];
+        Int2IntMap p = new Int2IntOpenHashMap();
+        for (Int2ObjectMap.Entry<IntArrayList> unl : neighbors.int2ObjectEntrySet()) {
+            int min = sizes[0];
+            int idx = 0;
+            for(int i = 1 ; i < sizes.length; i ++)
+                if (sizes[i] < min) {
+                    min = sizes[i];
+                    idx = i;
+                }
+            p.put(unl.getIntKey(), idx);
+            sizes[idx] += unl.getValue().size();
+        }
+        return p;
     }
 
     public static int[] createPartitions(int vCount, int threads, int batchSize) {
