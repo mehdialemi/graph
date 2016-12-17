@@ -293,7 +293,7 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                 for (int i = 0; i < invalidSize; i++) {
                     int index = invalidIndexes[i];
                     long edge = eSorted[index];
-                    IntSet list = mapThreads[thread].remove(edge);
+                    IntSet list = mapThreads[thread].get(edge);
                     if (list == null)
                         continue;
                     IntIterator iterator = list.iterator();
