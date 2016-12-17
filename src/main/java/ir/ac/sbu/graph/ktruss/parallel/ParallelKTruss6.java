@@ -316,8 +316,11 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                             invalidEdgePerThread[thread].add(index);
                         }
                         IntSet vList = mapThreads[thread].get(eSorted[index]);
-                        if (vList != null)
+                        if (vList != null) {
                             vList.remove(v);
+                            if (vList.size() == 0)
+                                mapThreads[thread].remove(eSorted[index]);
+                        }
 
                         if (vertexCompare.compare(v, w) == -1) {
                             e = (long) v << 32 | w & 0xFFFFFFFFL;
@@ -331,8 +334,11 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                             invalidEdgePerThread[thread].add(index);
                         }
                         vList = mapThreads[thread].get(eSorted[index]);
-                        if (vList != null)
+                        if (vList != null) {
                             vList.remove(u);
+                            if (vList.size() == 0)
+                                mapThreads[thread].remove(eSorted[index]);
+                        }
                     }
                 }
             })).get();
