@@ -89,7 +89,7 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
 
         Long2ObjectOpenHashMap<IntSet>[] evMap = new Long2ObjectOpenHashMap[threads];
         for (int i = 0; i < threads; i++) {
-            evMap[i] = new Long2ObjectOpenHashMap(edges.length / threads);
+            evMap[i] = new Long2ObjectOpenHashMap(edges.length);
         }
 
         forkJoinPool.submit(() -> partitions.int2IntEntrySet().parallelStream().forEach(vp -> {
@@ -262,11 +262,5 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
             long tUpdate = System.currentTimeMillis();
             System.out.println("Update in " + (tUpdate - tInvalid) + " ms");
         }
-
-        c = 0;
-        for(int i = 0 ; i < eSup.length; i ++)
-            if (eSup[i] != null && eSup[i].get() >= minSup)
-                c ++;
-        System.out.println("total edges: " + c);
     }
 }
