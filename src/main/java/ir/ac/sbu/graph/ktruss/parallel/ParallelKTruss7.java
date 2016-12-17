@@ -4,12 +4,14 @@ import ir.ac.sbu.graph.Edge;
 import ir.ac.sbu.graph.utils.PartitioningUtils;
 import ir.ac.sbu.graph.utils.VertexCompare;
 import it.unimi.dsi.fastutil.ints.*;
-import it.unimi.dsi.fastutil.longs.*;
+import it.unimi.dsi.fastutil.longs.Long2IntMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import scala.Tuple2;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -55,24 +57,15 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
         System.out.println("calculate deg in " + (tDeg - tMax) + " ms");
 
         final VertexCompare vertexCompare = new VertexCompare(d);
-        int idx = 0;
-        final Long2IntMap eIndexMap = new Long2IntOpenHashMap(edges.length);
-        final AtomicInteger[] eSup = new AtomicInteger[edges.length];
-        final long[] edgeArray = new long[edges.length];
         final Int2ObjectOpenHashMap<IntArrayList> fonl = new Int2ObjectOpenHashMap<>(vCount);
         for (Edge e : edges) {
             if (d[e.v1] < 2 || d[e.v2] < 2)
                 continue;
-            eSup[idx] = new AtomicInteger(0);
             int v1 = e.v1, v2 = e.v2;
-
             if (vertexCompare.compare(e.v1, e.v2) == 1) {
                 v1 = e.v2;
                 v2 = e.v1;
             }
-            long v12 = (long) v1 << 32 | v2 & 0xFFFFFFFFL;
-            edgeArray[idx] = v12;
-            eIndexMap.put(v12, idx++);
             IntArrayList list = fonl.get(v1);
             if (list == null) {
                 list = new IntArrayList();
@@ -92,9 +85,9 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
         long tpartition = System.currentTimeMillis();
         System.out.println("find partitions in " + (tpartition - tneighbors) + " ms");
 
-        Int2ObjectOpenHashMap<IntSet>[] evMap = new Int2ObjectOpenHashMap[threads];
+        Long2ObjectOpenHashMap<IntSet>[] evMap = new Long2ObjectOpenHashMap[threads];
         for (int i = 0; i < threads; i++) {
-            evMap[i] = new Int2ObjectOpenHashMap(vCount);
+            evMap[i] = new Long2ObjectOpenHashMap(vCount);
         }
 
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(p -> {
@@ -116,7 +109,6 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
                     }
 
                     long uv = (long) u << 32 | v & 0xFFFFFFFFL;
-                    int uvi = eIndexMap.get(uv);
                     int ui = i + 1, vi = 0;
                     int c = 0;
                     while (ui < fu.size() && vi < fv.size()) {
@@ -124,29 +116,24 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
                             int w = fu.getInt(ui);
                             long uw = (long) u << 32 | w & 0xFFFFFFFFL;
                             long vw = (long) v << 32 | w & 0xFFFFFFFFL;
-                            int uwi = eIndexMap.get(uw);
-                            int vwi = eIndexMap.get(vw);
-                            eSup[uwi].incrementAndGet();
-                            eSup[vwi].incrementAndGet();
-
-                            IntSet set = evMap[p].get(uvi);
+                            IntSet set = evMap[p].get(uv);
                             if (set == null) {
                                 set = new IntOpenHashSet(); // TODO set size
-                                evMap[p].put(uvi, set);
+                                evMap[p].put(uv, set);
                             }
                             set.add(w);
 
-                            set = evMap[p].get(uwi);
+                            set = evMap[p].get(uw);
                             if (set == null) {
                                 set = new IntOpenHashSet(); // TODO set size
-                                evMap[p].put(uwi, set);
+                                evMap[p].put(uw, set);
                             }
                             set.add(v);
 
-                            set = evMap[p].get(vwi);
+                            set = evMap[p].get(vw);
                             if (set == null) {
                                 set = new IntOpenHashSet(); // TODO set size
-                                evMap[p].put(vwi, set);
+                                evMap[p].put(vw, set);
                             }
                             set.add(u);
 
@@ -160,25 +147,44 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
                     }
                     if (c == 0)
                         continue;
-                    eSup[uvi].addAndGet(c);
                 }
             }
         })).get();
         long ttc = System.currentTimeMillis();
         System.out.println("find triangles in " + (ttc - tpartition) + " ms");
 
-        int c = 0;
-        for (int i = 0; i < eSup.length; i++)
-            if (eSup[i] != null && eSup[i].get() > 0)
-                c++;
+        Long2IntMap ei = new Long2IntOpenHashMap();
+        Int2LongMap ie = new Int2LongOpenHashMap();
+        int count = 0;
+        for (int i = 0 ; i < threads; i ++) {
+            for (Long e : evMap[i].keySet()) {
+                Integer prevVal = ei.putIfAbsent(e, count);
+                if (prevVal == null) {
+                    ie.put(count, e.longValue());
+                    count++;
+                }
+            }
+        }
+
+        AtomicInteger[] eSup = new AtomicInteger[count];
+        for(int i = 0 ; i < count ; i ++)
+            eSup[i] = new AtomicInteger(0);
+
+        forkJoinPool.submit(() -> IntStream.range(0, threads).forEach(t -> {
+            ObjectIterator<Long2ObjectMap.Entry<IntSet>> iterator = evMap[t].long2ObjectEntrySet().fastIterator();
+            while (iterator.hasNext()) {
+                Long2ObjectMap.Entry<IntSet> entry = iterator.next();
+                eSup[ei.get(entry.getLongKey())].addAndGet(entry.getValue().size());
+            }
+        })).get();
 
         long tcount = System.currentTimeMillis();
-        System.out.println("tcount: " + c + " in " + (tcount - ttc) + " ms");
+        System.out.println("tcount: " + count + " in " + (tcount - ttc) + " ms");
 
-        int[] invalids = new int[c];
+        int[] invalids = new int[count];
         final IntArrayList[] localInvalids = new IntArrayList[threads];
         for (int i = 0; i < threads; i++)
-            localInvalids[i] = new IntArrayList(c / threads);
+            localInvalids[i] = new IntArrayList(count / threads);
 
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(t -> {
@@ -235,8 +241,9 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
 
                     while (iterator.hasNext()) {
                         int w = iterator.nextInt();
-                        int u = (int) (edgeArray[eIndex] >> 32);
-                        int v = (int) edgeArray[eIndex];
+                        long edge = ie.get(eIndex);
+                        int u = (int) (edge >> 32);
+                        int v = (int) edge;
                         long e;
                         if (vertexCompare.compare(u, w) == -1) {
                             e = (long) u << 32 | w & 0xFFFFFFFFL;
@@ -244,7 +251,7 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
                             e = (long) w << 32 | u & 0xFFFFFFFFL;
                         }
 
-                        int index = eIndexMap.get(e);
+                        int index = ei.get(e);
                         int sup = eSup[index].decrementAndGet();
                         if (sup == minSup - 1) {
                             // add index to invalid indexes
@@ -262,7 +269,7 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
                         } else {
                             e = (long) w << 32 | v & 0xFFFFFFFFL;
                         }
-                        index = eIndexMap.get(e);
+                        index = ei.get(e);
                         sup = eSup[index].decrementAndGet();
                         if (sup == minSup - 1) {
                             // add index to invalid indexes
