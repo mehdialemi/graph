@@ -58,7 +58,7 @@ public class ParallelKTruss8 extends ParallelKTrussBase {
         for (int i = 0; i < threads; i++)
             ev[i] = new Long2ObjectOpenHashMap<>(edges.length / threads);
 
-        forkJoinPool.submit(() -> IntStream.range(0, threads).forEach(t -> {
+        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(t -> {
             for (int i = 0; i < edges.length; i++) {
                 int v1 = edges[i].v1;
                 int v2 = edges[i].v2;
