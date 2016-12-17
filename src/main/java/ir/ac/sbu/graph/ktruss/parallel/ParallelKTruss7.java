@@ -234,16 +234,16 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
             forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(p -> {
                 for (int i = 0; i < invalidSize; i++) {
                     int eIndex = invalids[i];
-                    IntSet set = evMap[p].get(eIndex);
+                    long edge = ie.get(eIndex);
+                    IntSet set = evMap[p].get(edge);
                     if (set == null)
                         continue;
                     IntIterator iterator = set.iterator();
 
-                    while (iterator.hasNext()) {
+                    int u = (int) (edge >> 32);
+                    int v = (int) edge;
+                    while (iterator.hasNext()) {-
                         int w = iterator.nextInt();
-                        long edge = ie.get(eIndex);
-                        int u = (int) (edge >> 32);
-                        int v = (int) edge;
                         long e;
                         if (vertexCompare.compare(u, w) == -1) {
                             e = (long) u << 32 | w & 0xFFFFFFFFL;
@@ -257,11 +257,11 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
                             // add index to invalid indexes
                             localInvalids[p].add(index);
                         }
-                        IntSet vList = evMap[p].get(index);
+                        IntSet vList = evMap[p].get(e);
                         if (vList != null) {
                             vList.remove(v);
                             if (vList.size() == 0)
-                                evMap[p].remove(index);
+                                evMap[p].remove(e);
                         }
 
                         if (vertexCompare.compare(v, w) == -1) {
@@ -275,11 +275,11 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
                             // add index to invalid indexes
                             localInvalids[p].add(index);
                         }
-                        vList = evMap[p].get(index);
+                        vList = evMap[p].get(e);
                         if (vList != null) {
                             vList.remove(u);
                             if (vList.size() == 0)
-                                evMap[p].remove(index);
+                                evMap[p].remove(e);
                         }
                     }
                 }
