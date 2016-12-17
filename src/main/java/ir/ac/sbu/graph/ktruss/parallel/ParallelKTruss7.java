@@ -49,6 +49,8 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
             d[e.v1]++;
             d[e.v2]++;
         }
+
+
         long tDeg = System.currentTimeMillis();
         System.out.println("calculate deg in " + (tDeg - tMax) + " ms");
 
@@ -67,7 +69,7 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
                 v2 = e.v1;
             }
             long v12 = (long) v1 << 32 | v2 & 0xFFFFFFFFL;
-            eIndexMap.put(v12, idx ++);
+            eIndexMap.put(v12, idx++);
             IntArrayList list = fonl.get(v1);
             if (list == null) {
                 list = new IntArrayList();
@@ -89,76 +91,83 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
 
         Long2ObjectOpenHashMap<IntSet>[] evMap = new Long2ObjectOpenHashMap[threads];
         for (int i = 0; i < threads; i++) {
-            evMap[i] = new Long2ObjectOpenHashMap(edges.length);
+            evMap[i] = new Long2ObjectOpenHashMap(vCount);
         }
 
-        forkJoinPool.submit(() -> partitions.int2IntEntrySet().parallelStream().forEach(vp -> {
-            int p = vp.getIntValue();
-            int u = vp.getIntKey();
-            IntArrayList fu = fonl.get(vp.getIntKey());
-            for (int i = 0; i < fu.size(); i++) {
-                int v = fu.getInt(i);
-
-                IntArrayList fv = fonl.get(v);
-                if (fv == null) {
+        forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(p -> {
+            ObjectIterator<Int2ObjectMap.Entry<IntArrayList>> iterator = fonl.int2ObjectEntrySet().fastIterator();
+            while (iterator.hasNext()) {
+                Int2ObjectMap.Entry<IntArrayList> f = iterator.next();
+                if (partitions.get(f.getIntKey()) != p)
                     continue;
+
+                int u = f.getIntKey();
+
+                IntArrayList fu = f.getValue();
+                for (int i = 0; i < fu.size(); i++) {
+                    int v = fu.getInt(i);
+
+                    IntArrayList fv = fonl.get(v);
+                    if (fv == null) {
+                        continue;
+                    }
+
+                    long uv = (long) u << 32 | v & 0xFFFFFFFFL;
+                    int uvi = eIndexMap.get(uv);
+                    int ui = i + 1, vi = 0;
+                    int c = 0;
+                    while (ui < fu.size() && vi < fv.size()) {
+                        if (fu.getInt(ui) == fv.getInt(vi)) {
+                            int w = fu.getInt(ui);
+                            long uw = (long) u << 32 | w & 0xFFFFFFFFL;
+                            long vw = (long) v << 32 | w & 0xFFFFFFFFL;
+                            int uwi = eIndexMap.get(uw);
+                            int vwi = eIndexMap.get(vw);
+                            eSup[uwi].incrementAndGet();
+                            eSup[vwi].incrementAndGet();
+
+                            IntSet set = evMap[p].get(uv);
+                            if (set == null) {
+                                set = new IntOpenHashSet(); // TODO set size
+                                evMap[p].put(uv, set);
+                            }
+                            set.add(w);
+
+                            set = evMap[p].get(uw);
+                            if (set == null) {
+                                set = new IntOpenHashSet(); // TODO set size
+                                evMap[p].put(uw, set);
+                            }
+                            set.add(v);
+
+                            set = evMap[p].get(vw);
+                            if (set == null) {
+                                set = new IntOpenHashSet(); // TODO set size
+                                evMap[p].put(vw, set);
+                            }
+                            set.add(u);
+
+                            c++;
+                            ui++;
+                            vi++;
+                        } else if (vertexCompare.compare(fu.getInt(ui), fv.getInt(vi)) == -1)
+                            ui++;
+                        else
+                            vi++;
+                    }
+                    if (c == 0)
+                        continue;
+                    eSup[uvi].addAndGet(c);
                 }
-
-                long uv = (long) u << 32 | v & 0xFFFFFFFFL;
-                int uvi = eIndexMap.get(uv);
-                int ui = i + 1, vi = 0;
-                int c = 0;
-                while (ui < fu.size() && vi < fv.size()) {
-                    if (fu.getInt(ui) == fv.getInt(vi)) {
-                        int w = fu.getInt(ui);
-                        long uw = (long) u << 32 | w & 0xFFFFFFFFL;
-                        long vw = (long) v << 32 | w & 0xFFFFFFFFL;
-                        int uwi = eIndexMap.get(uw);
-                        int vwi = eIndexMap.get(vw);
-                        eSup[uwi].incrementAndGet();
-                        eSup[vwi].incrementAndGet();
-
-                        IntSet set = evMap[p].get(uv);
-                        if (set == null) {
-                            set = new IntOpenHashSet(); // TODO set size
-                            evMap[p].put(uv, set);
-                        }
-                        set.add(w);
-
-                        set = evMap[p].get(uw);
-                        if (set == null) {
-                            set = new IntOpenHashSet(); // TODO set size
-                            evMap[p].put(uw, set);
-                        }
-                        set.add(v);
-
-                        set = evMap[p].get(vw);
-                        if (set == null) {
-                            set = new IntOpenHashSet(); // TODO set size
-                            evMap[p].put(vw, set);
-                        }
-                        set.add(u);
-
-                        c++;
-                        ui ++;
-                        vi ++;
-                    } else if (vertexCompare.compare(fu.getInt(ui), fv.getInt(vi)) == -1)
-                        ui++;
-                    else
-                        vi++;
-                }
-                if (c == 0)
-                    continue;
-                eSup[uvi].addAndGet(c);
             }
         })).get();
         long ttc = System.currentTimeMillis();
         System.out.println("find triangles in " + (ttc - tpartition) + " ms");
 
         int c = 0;
-        for(int i = 0 ; i < eSup.length; i ++)
+        for (int i = 0; i < eSup.length; i++)
             if (eSup[i] != null && eSup[i].get() > 0)
-                c ++;
+                c++;
 
         long tcount = System.currentTimeMillis();
         System.out.println("tcount: " + c + " in " + (tcount - ttc) + " ms");
@@ -204,7 +213,7 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
             if (invalidSize == 0)
                 break;
 
-            for(int i = 0 ; i < localInvalids.length; i ++)
+            for (int i = 0; i < localInvalids.length; i++)
                 localInvalids[i].clear();
 
             forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(p -> {
