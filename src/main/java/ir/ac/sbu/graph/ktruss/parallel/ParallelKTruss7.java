@@ -188,7 +188,7 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
                     break;
                 int end = Math.min(eSup.length, BATCH_SIZE + start);
                 for(int i = start ; i < end; i ++) {
-                    if (eSup[i] == null || eSup[i].get() >= minSup)
+                    if (eSup[i] == null || eSup[i].get() >= minSup || eSup[i].get() == 0)
                         continue;
                     localInvalids[t].add(i);
                 }
