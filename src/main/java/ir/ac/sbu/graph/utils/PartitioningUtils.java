@@ -1,6 +1,9 @@
 package ir.ac.sbu.graph.utils;
 
+import ir.ac.sbu.graph.Edge;
 import it.unimi.dsi.fastutil.ints.*;
+import it.unimi.dsi.fastutil.longs.Long2IntMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import org.apache.hadoop.io.DataInputBuffer;
 import org.apache.hadoop.io.WritableUtils;
 
@@ -102,6 +105,36 @@ public class PartitioningUtils {
             sizes[idx] += unl.getValue().size();
         }
         return p;
+    }
+
+    public static Long2IntMap createPartition(Edge[] edges, Int2ObjectOpenHashMap<IntSet> neighbors, int threads) {
+        int[] sizes = new int[threads];
+        int batchSize = 50;
+        int p = 0;
+        Long2IntMap partitions = new Long2IntOpenHashMap(edges.length);
+        for (int i = 0; i < edges.length; i++) {
+            if ((i + 1) % batchSize == 0) {
+                int min = sizes[0];
+                int index = 0;
+                for (int j = 1 ; j < sizes.length; j ++) {
+                    if (sizes[j] < min) {
+                        min = sizes[j];
+                        index = j;
+                    }
+                }
+                p = index;
+            }
+            int v1 = edges[i].v1;
+            int v2 = edges[i].v2;
+            sizes[p] = Math.min(neighbors.get(v1).size(), neighbors.get(v2).size());
+            if (edges[i].v2 < edges[i].v1) {
+                v1 = edges[i].v2;
+                v2 = edges[i].v1;
+            }
+            long e = (long) v1 << 32 | v2 & 0xFFFFFFFFL;
+            partitions.put(e, p);
+        }
+        return partitions;
     }
 
     public static int[] createPartitions(int vCount, int threads, int batchSize) {

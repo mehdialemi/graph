@@ -104,6 +104,7 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
                         maxFonlSize = flen[u];
                 }
             }
+            System.out.println("thread " + thread + " finished");
         })).get();
 
         long tSort = System.currentTimeMillis();
