@@ -215,7 +215,7 @@ public class ParallelKTruss8 extends ParallelKTrussBase {
                                 iset = new IntOpenHashSet();
                                 others[t][p].put(e, iset);
                             }
-                            iset.add(v);
+                            iset.add(u);
                         } else {
                             IntSet iset = ev[t].get(e);
                             if (iset != null) {
