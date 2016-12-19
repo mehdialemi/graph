@@ -1,0 +1,1354 @@
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 954 ms
+start ktruss with k = 3, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 165 ms
+tc duration: 1313 ms
+iteration 1, invalid size: 0 time: 21 ms
+Complete in 276 ms
+Total: 1754 ms, iteration count: 0
+duration: 1948 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 925 ms
+start ktruss with k = 4, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 194 ms
+tc duration: 1359 ms
+iteration 1, invalid size: 68476 time: 29 ms
+Update in 100 ms
+iteration 2, invalid size: 14247 time: 1 ms
+Update in 35 ms
+iteration 3, invalid size: 2866 time: 1 ms
+Update in 8 ms
+iteration 4, invalid size: 671 time: 0 ms
+Update in 2 ms
+iteration 5, invalid size: 184 time: 0 ms
+Update in 1 ms
+iteration 6, invalid size: 51 time: 0 ms
+Update in 0 ms
+iteration 7, invalid size: 23 time: 1 ms
+Update in 0 ms
+iteration 8, invalid size: 10 time: 0 ms
+Update in 1 ms
+iteration 9, invalid size: 3 time: 0 ms
+Update in 0 ms
+iteration 10, invalid size: 0 time: 1 ms
+Complete in 417 ms
+Total: 1970 ms, iteration count: 9
+duration: 2205 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 953 ms
+start ktruss with k = 5, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 185 ms
+tc duration: 1398 ms
+iteration 1, invalid size: 142916 time: 33 ms
+Update in 336 ms
+iteration 2, invalid size: 35497 time: 2 ms
+Update in 71 ms
+iteration 3, invalid size: 10572 time: 2 ms
+Update in 31 ms
+iteration 4, invalid size: 3968 time: 1 ms
+Update in 11 ms
+iteration 5, invalid size: 1608 time: 0 ms
+Update in 5 ms
+iteration 6, invalid size: 658 time: 1 ms
+Update in 2 ms
+iteration 7, invalid size: 297 time: 0 ms
+Update in 1 ms
+iteration 8, invalid size: 146 time: 0 ms
+Update in 0 ms
+iteration 9, invalid size: 74 time: 1 ms
+Update in 0 ms
+iteration 10, invalid size: 41 time: 0 ms
+Update in 1 ms
+iteration 11, invalid size: 23 time: 0 ms
+Update in 0 ms
+iteration 12, invalid size: 15 time: 0 ms
+Update in 0 ms
+iteration 13, invalid size: 14 time: 0 ms
+Update in 1 ms
+iteration 14, invalid size: 5 time: 0 ms
+Update in 0 ms
+iteration 15, invalid size: 1 time: 0 ms
+Update in 1 ms
+iteration 16, invalid size: 1 time: 0 ms
+Update in 0 ms
+iteration 17, invalid size: 1 time: 0 ms
+Update in 1 ms
+iteration 18, invalid size: 0 time: 0 ms
+Complete in 724 ms
+Total: 2307 ms, iteration count: 17
+duration: 2464 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 922 ms
+start ktruss with k = 6, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 176 ms
+tc duration: 1290 ms
+iteration 1, invalid size: 217659 time: 33 ms
+Update in 385 ms
+iteration 2, invalid size: 59960 time: 6 ms
+Update in 121 ms
+iteration 3, invalid size: 21669 time: 2 ms
+Update in 50 ms
+iteration 4, invalid size: 9107 time: 1 ms
+Update in 9 ms
+iteration 5, invalid size: 4450 time: 1 ms
+Update in 6 ms
+iteration 6, invalid size: 2350 time: 0 ms
+Update in 3 ms
+iteration 7, invalid size: 1147 time: 0 ms
+Update in 2 ms
+iteration 8, invalid size: 607 time: 0 ms
+Update in 1 ms
+iteration 9, invalid size: 324 time: 0 ms
+Update in 1 ms
+iteration 10, invalid size: 201 time: 8 ms
+Update in 1 ms
+iteration 11, invalid size: 111 time: 1 ms
+Update in 0 ms
+iteration 12, invalid size: 57 time: 1 ms
+Update in 0 ms
+iteration 13, invalid size: 41 time: 0 ms
+Update in 1 ms
+iteration 14, invalid size: 26 time: 0 ms
+Update in 0 ms
+iteration 15, invalid size: 20 time: 0 ms
+Update in 0 ms
+iteration 16, invalid size: 9 time: 1 ms
+Update in 0 ms
+iteration 17, invalid size: 9 time: 0 ms
+Update in 0 ms
+iteration 18, invalid size: 8 time: 1 ms
+Update in 0 ms
+iteration 19, invalid size: 6 time: 0 ms
+Update in 0 ms
+iteration 20, invalid size: 6 time: 1 ms
+Update in 0 ms
+iteration 21, invalid size: 4 time: 0 ms
+Update in 1 ms
+iteration 22, invalid size: 1 time: 0 ms
+Update in 0 ms
+iteration 23, invalid size: 0 time: 1 ms
+Complete in 883 ms
+Total: 2349 ms, iteration count: 22
+duration: 2570 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 926 ms
+start ktruss with k = 7, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 175 ms
+tc duration: 1224 ms
+iteration 1, invalid size: 290906 time: 44 ms
+Update in 379 ms
+iteration 2, invalid size: 83683 time: 15 ms
+Update in 86 ms
+iteration 3, invalid size: 32983 time: 8 ms
+Update in 44 ms
+iteration 4, invalid size: 15465 time: 5 ms
+Update in 36 ms
+iteration 5, invalid size: 7707 time: 1 ms
+Update in 24 ms
+iteration 6, invalid size: 4241 time: 0 ms
+Update in 14 ms
+iteration 7, invalid size: 2363 time: 0 ms
+Update in 8 ms
+iteration 8, invalid size: 1383 time: 0 ms
+Update in 2 ms
+iteration 9, invalid size: 859 time: 0 ms
+Update in 1 ms
+iteration 10, invalid size: 536 time: 1 ms
+Update in 1 ms
+iteration 11, invalid size: 327 time: 0 ms
+Update in 3 ms
+iteration 12, invalid size: 202 time: 0 ms
+Update in 1 ms
+iteration 13, invalid size: 116 time: 0 ms
+Update in 1 ms
+iteration 14, invalid size: 74 time: 0 ms
+Update in 1 ms
+iteration 15, invalid size: 35 time: 0 ms
+Update in 0 ms
+iteration 16, invalid size: 22 time: 0 ms
+Update in 1 ms
+iteration 17, invalid size: 21 time: 0 ms
+Update in 0 ms
+iteration 18, invalid size: 8 time: 0 ms
+Update in 0 ms
+iteration 19, invalid size: 4 time: 0 ms
+Update in 1 ms
+iteration 20, invalid size: 3 time: 0 ms
+Update in 0 ms
+iteration 21, invalid size: 2 time: 1 ms
+Update in 1 ms
+iteration 22, invalid size: 0 time: 0 ms
+Complete in 944 ms
+Total: 2343 ms, iteration count: 21
+duration: 2496 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 891 ms
+start ktruss with k = 8, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 198 ms
+tc duration: 1185 ms
+iteration 1, invalid size: 360396 time: 46 ms
+Update in 446 ms
+iteration 2, invalid size: 104858 time: 13 ms
+Update in 115 ms
+iteration 3, invalid size: 43358 time: 1 ms
+Update in 53 ms
+iteration 4, invalid size: 21058 time: 1 ms
+Update in 28 ms
+iteration 5, invalid size: 11192 time: 1 ms
+Update in 15 ms
+iteration 6, invalid size: 6487 time: 1 ms
+Update in 10 ms
+iteration 7, invalid size: 3941 time: 0 ms
+Update in 6 ms
+iteration 8, invalid size: 2511 time: 0 ms
+Update in 5 ms
+iteration 9, invalid size: 1590 time: 1 ms
+Update in 2 ms
+iteration 10, invalid size: 963 time: 1 ms
+Update in 2 ms
+iteration 11, invalid size: 678 time: 1 ms
+Update in 1 ms
+iteration 12, invalid size: 387 time: 0 ms
+Update in 2 ms
+iteration 13, invalid size: 293 time: 0 ms
+Update in 1 ms
+iteration 14, invalid size: 244 time: 0 ms
+Update in 1 ms
+iteration 15, invalid size: 164 time: 0 ms
+Update in 0 ms
+iteration 16, invalid size: 118 time: 0 ms
+Update in 1 ms
+iteration 17, invalid size: 68 time: 0 ms
+Update in 0 ms
+iteration 18, invalid size: 38 time: 1 ms
+Update in 0 ms
+iteration 19, invalid size: 24 time: 0 ms
+Update in 0 ms
+iteration 20, invalid size: 20 time: 1 ms
+Update in 0 ms
+iteration 21, invalid size: 21 time: 0 ms
+Update in 1 ms
+iteration 22, invalid size: 13 time: 0 ms
+Update in 0 ms
+iteration 23, invalid size: 6 time: 0 ms
+Update in 1 ms
+iteration 24, invalid size: 7 time: 0 ms
+Update in 0 ms
+iteration 25, invalid size: 3 time: 1 ms
+Update in 0 ms
+iteration 26, invalid size: 1 time: 0 ms
+Update in 1 ms
+iteration 27, invalid size: 0 time: 0 ms
+Complete in 994 ms
+Total: 2377 ms, iteration count: 26
+duration: 2593 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 910 ms
+start ktruss with k = 9, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 192 ms
+tc duration: 1149 ms
+iteration 1, invalid size: 425567 time: 56 ms
+Update in 674 ms
+iteration 2, invalid size: 124177 time: 20 ms
+Update in 159 ms
+iteration 3, invalid size: 53101 time: 4 ms
+Update in 70 ms
+iteration 4, invalid size: 26469 time: 1 ms
+Update in 35 ms
+iteration 5, invalid size: 14334 time: 0 ms
+Update in 22 ms
+iteration 6, invalid size: 8511 time: 1 ms
+Update in 14 ms
+iteration 7, invalid size: 5224 time: 1 ms
+Update in 14 ms
+iteration 8, invalid size: 3315 time: 0 ms
+Update in 6 ms
+iteration 9, invalid size: 2193 time: 0 ms
+Update in 5 ms
+iteration 10, invalid size: 1418 time: 0 ms
+Update in 3 ms
+iteration 11, invalid size: 959 time: 0 ms
+Update in 3 ms
+iteration 12, invalid size: 641 time: 1 ms
+Update in 1 ms
+iteration 13, invalid size: 451 time: 0 ms
+Update in 2 ms
+iteration 14, invalid size: 296 time: 0 ms
+Update in 1 ms
+iteration 15, invalid size: 259 time: 0 ms
+Update in 1 ms
+iteration 16, invalid size: 170 time: 0 ms
+Update in 0 ms
+iteration 17, invalid size: 106 time: 1 ms
+Update in 0 ms
+iteration 18, invalid size: 87 time: 0 ms
+Update in 1 ms
+iteration 19, invalid size: 58 time: 0 ms
+Update in 0 ms
+iteration 20, invalid size: 47 time: 0 ms
+Update in 1 ms
+iteration 21, invalid size: 37 time: 0 ms
+Update in 0 ms
+iteration 22, invalid size: 24 time: 1 ms
+Update in 0 ms
+iteration 23, invalid size: 14 time: 1 ms
+Update in 0 ms
+iteration 24, invalid size: 12 time: 1 ms
+Update in 0 ms
+iteration 25, invalid size: 8 time: 0 ms
+Update in 1 ms
+iteration 26, invalid size: 7 time: 0 ms
+Update in 1 ms
+iteration 27, invalid size: 2 time: 0 ms
+Update in 0 ms
+iteration 28, invalid size: 0 time: 1 ms
+Complete in 1344 ms
+Total: 2685 ms, iteration count: 27
+duration: 2920 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 937 ms
+start ktruss with k = 10, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 222 ms
+tc duration: 1207 ms
+iteration 1, invalid size: 486397 time: 37 ms
+Update in 706 ms
+iteration 2, invalid size: 140210 time: 8 ms
+Update in 164 ms
+iteration 3, invalid size: 59493 time: 1 ms
+Update in 85 ms
+iteration 4, invalid size: 29560 time: 0 ms
+Update in 37 ms
+iteration 5, invalid size: 16692 time: 0 ms
+Update in 23 ms
+iteration 6, invalid size: 9629 time: 0 ms
+Update in 17 ms
+iteration 7, invalid size: 5956 time: 1 ms
+Update in 11 ms
+iteration 8, invalid size: 4157 time: 1 ms
+Update in 8 ms
+iteration 9, invalid size: 2782 time: 0 ms
+Update in 6 ms
+iteration 10, invalid size: 1961 time: 0 ms
+Update in 3 ms
+iteration 11, invalid size: 1316 time: 1 ms
+Update in 2 ms
+iteration 12, invalid size: 902 time: 1 ms
+Update in 1 ms
+iteration 13, invalid size: 564 time: 0 ms
+Update in 2 ms
+iteration 14, invalid size: 411 time: 0 ms
+Update in 1 ms
+iteration 15, invalid size: 278 time: 0 ms
+Update in 1 ms
+iteration 16, invalid size: 237 time: 1 ms
+Update in 1 ms
+iteration 17, invalid size: 188 time: 0 ms
+Update in 0 ms
+iteration 18, invalid size: 136 time: 0 ms
+Update in 1 ms
+iteration 19, invalid size: 94 time: 0 ms
+Update in 1 ms
+iteration 20, invalid size: 77 time: 0 ms
+Update in 1 ms
+iteration 21, invalid size: 63 time: 0 ms
+Update in 1 ms
+iteration 22, invalid size: 41 time: 1 ms
+Update in 1 ms
+iteration 23, invalid size: 30 time: 0 ms
+Update in 0 ms
+iteration 24, invalid size: 26 time: 1 ms
+Update in 0 ms
+iteration 25, invalid size: 23 time: 0 ms
+Update in 1 ms
+iteration 26, invalid size: 13 time: 0 ms
+Update in 0 ms
+iteration 27, invalid size: 6 time: 0 ms
+Update in 1 ms
+iteration 28, invalid size: 2 time: 0 ms
+Update in 0 ms
+iteration 29, invalid size: 4 time: 0 ms
+Update in 1 ms
+iteration 30, invalid size: 4 time: 0 ms
+Update in 0 ms
+iteration 31, invalid size: 1 time: 0 ms
+Update in 0 ms
+iteration 32, invalid size: 1 time: 0 ms
+Update in 0 ms
+iteration 33, invalid size: 0 time: 1 ms
+Complete in 1368 ms
+Total: 2797 ms, iteration count: 32
+duration: 3032 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 900 ms
+start ktruss with k = 11, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 175 ms
+tc duration: 1167 ms
+iteration 1, invalid size: 543087 time: 53 ms
+Update in 635 ms
+iteration 2, invalid size: 152711 time: 3 ms
+Update in 348 ms
+iteration 3, invalid size: 63378 time: 1 ms
+Update in 98 ms
+iteration 4, invalid size: 31415 time: 1 ms
+Update in 44 ms
+iteration 5, invalid size: 17453 time: 1 ms
+Update in 26 ms
+iteration 6, invalid size: 10589 time: 1 ms
+Update in 17 ms
+iteration 7, invalid size: 6606 time: 1 ms
+Update in 14 ms
+iteration 8, invalid size: 4068 time: 0 ms
+Update in 9 ms
+iteration 9, invalid size: 2901 time: 1 ms
+Update in 6 ms
+iteration 10, invalid size: 1966 time: 0 ms
+Update in 4 ms
+iteration 11, invalid size: 1371 time: 1 ms
+Update in 3 ms
+iteration 12, invalid size: 984 time: 1 ms
+Update in 2 ms
+iteration 13, invalid size: 779 time: 0 ms
+Update in 2 ms
+iteration 14, invalid size: 543 time: 0 ms
+Update in 1 ms
+iteration 15, invalid size: 448 time: 1 ms
+Update in 1 ms
+iteration 16, invalid size: 417 time: 0 ms
+Update in 1 ms
+iteration 17, invalid size: 280 time: 0 ms
+Update in 1 ms
+iteration 18, invalid size: 234 time: 0 ms
+Update in 1 ms
+iteration 19, invalid size: 179 time: 0 ms
+Update in 1 ms
+iteration 20, invalid size: 165 time: 0 ms
+Update in 1 ms
+iteration 21, invalid size: 84 time: 0 ms
+Update in 0 ms
+iteration 22, invalid size: 71 time: 1 ms
+Update in 0 ms
+iteration 23, invalid size: 48 time: 0 ms
+Update in 0 ms
+iteration 24, invalid size: 37 time: 0 ms
+Update in 0 ms
+iteration 25, invalid size: 23 time: 0 ms
+Update in 0 ms
+iteration 26, invalid size: 10 time: 1 ms
+Update in 0 ms
+iteration 27, invalid size: 5 time: 0 ms
+Update in 0 ms
+iteration 28, invalid size: 5 time: 1 ms
+Update in 0 ms
+iteration 29, invalid size: 6 time: 0 ms
+Update in 1 ms
+iteration 30, invalid size: 8 time: 0 ms
+Update in 0 ms
+iteration 31, invalid size: 8 time: 1 ms
+Update in 0 ms
+iteration 32, invalid size: 17 time: 0 ms
+Update in 0 ms
+iteration 33, invalid size: 11 time: 0 ms
+Update in 1 ms
+iteration 34, invalid size: 16 time: 1 ms
+Update in 0 ms
+iteration 35, invalid size: 5 time: 0 ms
+Update in 1 ms
+iteration 36, invalid size: 5 time: 0 ms
+Update in 0 ms
+iteration 37, invalid size: 12 time: 0 ms
+Update in 1 ms
+iteration 38, invalid size: 5 time: 0 ms
+Update in 0 ms
+iteration 39, invalid size: 5 time: 0 ms
+Update in 1 ms
+iteration 40, invalid size: 8 time: 0 ms
+Update in 0 ms
+iteration 41, invalid size: 8 time: 0 ms
+Update in 1 ms
+iteration 42, invalid size: 11 time: 0 ms
+Update in 0 ms
+iteration 43, invalid size: 6 time: 0 ms
+Update in 1 ms
+iteration 44, invalid size: 2 time: 0 ms
+Update in 0 ms
+iteration 45, invalid size: 5 time: 0 ms
+Update in 0 ms
+iteration 46, invalid size: 7 time: 1 ms
+Update in 0 ms
+iteration 47, invalid size: 5 time: 0 ms
+Update in 0 ms
+iteration 48, invalid size: 7 time: 0 ms
+Update in 1 ms
+iteration 49, invalid size: 2 time: 0 ms
+Update in 0 ms
+iteration 50, invalid size: 1 time: 0 ms
+Update in 0 ms
+iteration 51, invalid size: 1 time: 0 ms
+Update in 0 ms
+iteration 52, invalid size: 0 time: 0 ms
+Complete in 1516 ms
+Total: 2858 ms, iteration count: 51
+duration: 3020 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 919 ms
+start ktruss with k = 12, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 204 ms
+tc duration: 1340 ms
+iteration 1, invalid size: 595675 time: 57 ms
+Update in 825 ms
+iteration 2, invalid size: 161928 time: 2 ms
+Update in 192 ms
+iteration 3, invalid size: 65414 time: 0 ms
+Update in 82 ms
+iteration 4, invalid size: 33136 time: 1 ms
+Update in 59 ms
+iteration 5, invalid size: 18153 time: 1 ms
+Update in 30 ms
+iteration 6, invalid size: 10617 time: 1 ms
+Update in 18 ms
+iteration 7, invalid size: 6856 time: 1 ms
+Update in 13 ms
+iteration 8, invalid size: 4621 time: 0 ms
+Update in 8 ms
+iteration 9, invalid size: 3107 time: 0 ms
+Update in 6 ms
+iteration 10, invalid size: 2215 time: 0 ms
+Update in 5 ms
+iteration 11, invalid size: 1525 time: 0 ms
+Update in 4 ms
+iteration 12, invalid size: 1076 time: 1 ms
+Update in 2 ms
+iteration 13, invalid size: 763 time: 0 ms
+Update in 3 ms
+iteration 14, invalid size: 610 time: 0 ms
+Update in 2 ms
+iteration 15, invalid size: 452 time: 0 ms
+Update in 1 ms
+iteration 16, invalid size: 346 time: 1 ms
+Update in 1 ms
+iteration 17, invalid size: 273 time: 0 ms
+Update in 1 ms
+iteration 18, invalid size: 168 time: 1 ms
+Update in 0 ms
+iteration 19, invalid size: 179 time: 1 ms
+Update in 0 ms
+iteration 20, invalid size: 114 time: 1 ms
+Update in 1 ms
+iteration 21, invalid size: 92 time: 0 ms
+Update in 0 ms
+iteration 22, invalid size: 78 time: 1 ms
+Update in 0 ms
+iteration 23, invalid size: 50 time: 1 ms
+Update in 1 ms
+iteration 24, invalid size: 28 time: 0 ms
+Update in 1 ms
+iteration 25, invalid size: 11 time: 0 ms
+Update in 0 ms
+iteration 26, invalid size: 8 time: 0 ms
+Update in 1 ms
+iteration 27, invalid size: 8 time: 0 ms
+Update in 0 ms
+iteration 28, invalid size: 6 time: 1 ms
+Update in 0 ms
+iteration 29, invalid size: 14 time: 1 ms
+Update in 1 ms
+iteration 30, invalid size: 10 time: 1 ms
+Update in 0 ms
+iteration 31, invalid size: 2 time: 0 ms
+Update in 1 ms
+iteration 32, invalid size: 4 time: 0 ms
+Update in 0 ms
+iteration 33, invalid size: 13 time: 1 ms
+Update in 0 ms
+iteration 34, invalid size: 24 time: 1 ms
+Update in 0 ms
+iteration 35, invalid size: 19 time: 1 ms
+Update in 1 ms
+iteration 36, invalid size: 0 time: 0 ms
+Complete in 1579 ms
+Total: 3123 ms, iteration count: 35
+duration: 3281 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 973 ms
+start ktruss with k = 13, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 189 ms
+tc duration: 1143 ms
+iteration 1, invalid size: 643748 time: 47 ms
+Update in 764 ms
+iteration 2, invalid size: 168487 time: 2 ms
+Update in 235 ms
+iteration 3, invalid size: 65927 time: 1 ms
+Update in 89 ms
+iteration 4, invalid size: 32124 time: 0 ms
+Update in 61 ms
+iteration 5, invalid size: 18211 time: 1 ms
+Update in 34 ms
+iteration 6, invalid size: 10418 time: 0 ms
+Update in 20 ms
+iteration 7, invalid size: 6416 time: 0 ms
+Update in 14 ms
+iteration 8, invalid size: 4165 time: 0 ms
+Update in 10 ms
+iteration 9, invalid size: 3137 time: 0 ms
+Update in 7 ms
+iteration 10, invalid size: 2325 time: 1 ms
+Update in 5 ms
+iteration 11, invalid size: 1533 time: 1 ms
+Update in 3 ms
+iteration 12, invalid size: 1137 time: 0 ms
+Update in 3 ms
+iteration 13, invalid size: 821 time: 0 ms
+Update in 3 ms
+iteration 14, invalid size: 637 time: 0 ms
+Update in 2 ms
+iteration 15, invalid size: 463 time: 0 ms
+Update in 1 ms
+iteration 16, invalid size: 286 time: 1 ms
+Update in 1 ms
+iteration 17, invalid size: 208 time: 0 ms
+Update in 1 ms
+iteration 18, invalid size: 183 time: 0 ms
+Update in 1 ms
+iteration 19, invalid size: 119 time: 0 ms
+Update in 1 ms
+iteration 20, invalid size: 78 time: 0 ms
+Update in 1 ms
+iteration 21, invalid size: 61 time: 1 ms
+Update in 1 ms
+iteration 22, invalid size: 51 time: 1 ms
+Update in 0 ms
+iteration 23, invalid size: 52 time: 0 ms
+Update in 1 ms
+iteration 24, invalid size: 31 time: 0 ms
+Update in 1 ms
+iteration 25, invalid size: 13 time: 1 ms
+Update in 0 ms
+iteration 26, invalid size: 25 time: 1 ms
+Update in 0 ms
+iteration 27, invalid size: 4 time: 0 ms
+Update in 0 ms
+iteration 28, invalid size: 3 time: 1 ms
+Update in 0 ms
+iteration 29, invalid size: 3 time: 0 ms
+Update in 1 ms
+iteration 30, invalid size: 5 time: 0 ms
+Update in 0 ms
+iteration 31, invalid size: 3 time: 0 ms
+Update in 0 ms
+iteration 32, invalid size: 1 time: 0 ms
+Update in 0 ms
+iteration 33, invalid size: 0 time: 1 ms
+Complete in 1549 ms
+Total: 2881 ms, iteration count: 32
+duration: 3098 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 969 ms
+start ktruss with k = 14, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 207 ms
+tc duration: 1298 ms
+iteration 1, invalid size: 688340 time: 101 ms
+Update in 1022 ms
+iteration 2, invalid size: 172305 time: 4 ms
+Update in 273 ms
+iteration 3, invalid size: 64694 time: 1 ms
+Update in 91 ms
+iteration 4, invalid size: 31570 time: 2 ms
+Update in 59 ms
+iteration 5, invalid size: 17275 time: 1 ms
+Update in 31 ms
+iteration 6, invalid size: 10792 time: 1 ms
+Update in 21 ms
+iteration 7, invalid size: 6355 time: 0 ms
+Update in 14 ms
+iteration 8, invalid size: 3935 time: 0 ms
+Update in 7 ms
+iteration 9, invalid size: 2727 time: 1 ms
+Update in 6 ms
+iteration 10, invalid size: 1912 time: 1 ms
+Update in 5 ms
+iteration 11, invalid size: 1333 time: 0 ms
+Update in 4 ms
+iteration 12, invalid size: 983 time: 1 ms
+Update in 2 ms
+iteration 13, invalid size: 644 time: 0 ms
+Update in 2 ms
+iteration 14, invalid size: 540 time: 0 ms
+Update in 1 ms
+iteration 15, invalid size: 451 time: 1 ms
+Update in 1 ms
+iteration 16, invalid size: 353 time: 0 ms
+Update in 1 ms
+iteration 17, invalid size: 297 time: 1 ms
+Update in 1 ms
+iteration 18, invalid size: 213 time: 0 ms
+Update in 1 ms
+iteration 19, invalid size: 178 time: 1 ms
+Update in 1 ms
+iteration 20, invalid size: 99 time: 1 ms
+Update in 1 ms
+iteration 21, invalid size: 117 time: 0 ms
+Update in 2 ms
+iteration 22, invalid size: 134 time: 0 ms
+Update in 1 ms
+iteration 23, invalid size: 106 time: 1 ms
+Update in 1 ms
+iteration 24, invalid size: 70 time: 0 ms
+Update in 1 ms
+iteration 25, invalid size: 46 time: 0 ms
+Update in 0 ms
+iteration 26, invalid size: 23 time: 0 ms
+Update in 0 ms
+iteration 27, invalid size: 22 time: 1 ms
+Update in 0 ms
+iteration 28, invalid size: 17 time: 0 ms
+Update in 1 ms
+iteration 29, invalid size: 12 time: 0 ms
+Update in 0 ms
+iteration 30, invalid size: 11 time: 1 ms
+Update in 0 ms
+iteration 31, invalid size: 12 time: 0 ms
+Update in 0 ms
+iteration 32, invalid size: 8 time: 0 ms
+Update in 0 ms
+iteration 33, invalid size: 8 time: 0 ms
+Update in 2 ms
+iteration 34, invalid size: 6 time: 0 ms
+Update in 0 ms
+iteration 35, invalid size: 3 time: 0 ms
+Update in 1 ms
+iteration 36, invalid size: 13 time: 0 ms
+Update in 0 ms
+iteration 37, invalid size: 2 time: 0 ms
+Update in 1 ms
+iteration 38, invalid size: 0 time: 0 ms
+Complete in 1945 ms
+Total: 3450 ms, iteration count: 37
+duration: 3684 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 914 ms
+start ktruss with k = 15, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 193 ms
+tc duration: 1207 ms
+iteration 1, invalid size: 729557 time: 106 ms
+Update in 870 ms
+iteration 2, invalid size: 174075 time: 2 ms
+Update in 254 ms
+iteration 3, invalid size: 63324 time: 0 ms
+Update in 104 ms
+iteration 4, invalid size: 29666 time: 1 ms
+Update in 50 ms
+iteration 5, invalid size: 15884 time: 2 ms
+Update in 28 ms
+iteration 6, invalid size: 9483 time: 1 ms
+Update in 18 ms
+iteration 7, invalid size: 6255 time: 1 ms
+Update in 11 ms
+iteration 8, invalid size: 4400 time: 0 ms
+Update in 9 ms
+iteration 9, invalid size: 3317 time: 0 ms
+Update in 7 ms
+iteration 10, invalid size: 2290 time: 0 ms
+Update in 6 ms
+iteration 11, invalid size: 1594 time: 0 ms
+Update in 4 ms
+iteration 12, invalid size: 1387 time: 0 ms
+Update in 3 ms
+iteration 13, invalid size: 898 time: 0 ms
+Update in 2 ms
+iteration 14, invalid size: 779 time: 1 ms
+Update in 2 ms
+iteration 15, invalid size: 593 time: 0 ms
+Update in 2 ms
+iteration 16, invalid size: 425 time: 0 ms
+Update in 1 ms
+iteration 17, invalid size: 320 time: 1 ms
+Update in 1 ms
+iteration 18, invalid size: 164 time: 1 ms
+Update in 0 ms
+iteration 19, invalid size: 128 time: 1 ms
+Update in 0 ms
+iteration 20, invalid size: 108 time: 1 ms
+Update in 1 ms
+iteration 21, invalid size: 92 time: 0 ms
+Update in 1 ms
+iteration 22, invalid size: 86 time: 0 ms
+Update in 2 ms
+iteration 23, invalid size: 78 time: 0 ms
+Update in 1 ms
+iteration 24, invalid size: 69 time: 1 ms
+Update in 1 ms
+iteration 25, invalid size: 49 time: 0 ms
+Update in 1 ms
+iteration 26, invalid size: 59 time: 0 ms
+Update in 1 ms
+iteration 27, invalid size: 48 time: 0 ms
+Update in 0 ms
+iteration 28, invalid size: 28 time: 0 ms
+Update in 1 ms
+iteration 29, invalid size: 10 time: 0 ms
+Update in 1 ms
+iteration 30, invalid size: 6 time: 0 ms
+Update in 1 ms
+iteration 31, invalid size: 5 time: 0 ms
+Update in 0 ms
+iteration 32, invalid size: 2 time: 0 ms
+Update in 0 ms
+iteration 33, invalid size: 2 time: 1 ms
+Update in 0 ms
+iteration 34, invalid size: 2 time: 1 ms
+Update in 0 ms
+iteration 35, invalid size: 0 time: 0 ms
+Complete in 1746 ms
+Total: 3146 ms, iteration count: 34
+duration: 3348 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 951 ms
+start ktruss with k = 16, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 199 ms
+tc duration: 1361 ms
+iteration 1, invalid size: 767221 time: 90 ms
+Update in 993 ms
+iteration 2, invalid size: 174380 time: 2 ms
+Update in 246 ms
+iteration 3, invalid size: 60927 time: 1 ms
+Update in 102 ms
+iteration 4, invalid size: 28251 time: 0 ms
+Update in 52 ms
+iteration 5, invalid size: 15371 time: 0 ms
+Update in 32 ms
+iteration 6, invalid size: 9671 time: 25 ms
+Update in 19 ms
+iteration 7, invalid size: 6048 time: 1 ms
+Update in 14 ms
+iteration 8, invalid size: 4243 time: 0 ms
+Update in 11 ms
+iteration 9, invalid size: 2991 time: 1 ms
+Update in 7 ms
+iteration 10, invalid size: 1829 time: 0 ms
+Update in 5 ms
+iteration 11, invalid size: 1400 time: 1 ms
+Update in 3 ms
+iteration 12, invalid size: 1008 time: 0 ms
+Update in 3 ms
+iteration 13, invalid size: 822 time: 1 ms
+Update in 2 ms
+iteration 14, invalid size: 566 time: 1 ms
+Update in 2 ms
+iteration 15, invalid size: 397 time: 0 ms
+Update in 2 ms
+iteration 16, invalid size: 315 time: 1 ms
+Update in 1 ms
+iteration 17, invalid size: 231 time: 0 ms
+Update in 1 ms
+iteration 18, invalid size: 191 time: 0 ms
+Update in 1 ms
+iteration 19, invalid size: 210 time: 0 ms
+Update in 1 ms
+iteration 20, invalid size: 230 time: 1 ms
+Update in 0 ms
+iteration 21, invalid size: 219 time: 1 ms
+Update in 1 ms
+iteration 22, invalid size: 195 time: 0 ms
+Update in 1 ms
+iteration 23, invalid size: 166 time: 1 ms
+Update in 0 ms
+iteration 24, invalid size: 133 time: 1 ms
+Update in 0 ms
+iteration 25, invalid size: 88 time: 0 ms
+Update in 1 ms
+iteration 26, invalid size: 60 time: 0 ms
+Update in 0 ms
+iteration 27, invalid size: 54 time: 1 ms
+Update in 0 ms
+iteration 28, invalid size: 58 time: 1 ms
+Update in 0 ms
+iteration 29, invalid size: 63 time: 0 ms
+Update in 1 ms
+iteration 30, invalid size: 78 time: 0 ms
+Update in 0 ms
+iteration 31, invalid size: 60 time: 0 ms
+Update in 0 ms
+iteration 32, invalid size: 19 time: 1 ms
+Update in 0 ms
+iteration 33, invalid size: 16 time: 0 ms
+Update in 1 ms
+iteration 34, invalid size: 13 time: 0 ms
+Update in 0 ms
+iteration 35, invalid size: 10 time: 0 ms
+Update in 0 ms
+iteration 36, invalid size: 19 time: 0 ms
+Update in 0 ms
+iteration 37, invalid size: 3 time: 1 ms
+Update in 0 ms
+iteration 38, invalid size: 4 time: 0 ms
+Update in 1 ms
+iteration 39, invalid size: 5 time: 1 ms
+Update in 0 ms
+iteration 40, invalid size: 6 time: 0 ms
+Update in 0 ms
+iteration 41, invalid size: 11 time: 1 ms
+Update in 1 ms
+iteration 42, invalid size: 7 time: 0 ms
+Update in 1 ms
+iteration 43, invalid size: 2 time: 0 ms
+Update in 0 ms
+iteration 44, invalid size: 0 time: 0 ms
+Complete in 1900 ms
+Total: 3460 ms, iteration count: 43
+duration: 3704 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 944 ms
+start ktruss with k = 17, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 183 ms
+tc duration: 1276 ms
+iteration 1, invalid size: 801871 time: 109 ms
+Update in 1079 ms
+iteration 2, invalid size: 173244 time: 6 ms
+Update in 277 ms
+iteration 3, invalid size: 58234 time: 1 ms
+Update in 107 ms
+iteration 4, invalid size: 27069 time: 1 ms
+Update in 53 ms
+iteration 5, invalid size: 15367 time: 1 ms
+Update in 29 ms
+iteration 6, invalid size: 9506 time: 1 ms
+Update in 19 ms
+iteration 7, invalid size: 5909 time: 0 ms
+Update in 14 ms
+iteration 8, invalid size: 3871 time: 1 ms
+Update in 8 ms
+iteration 9, invalid size: 2624 time: 1 ms
+Update in 7 ms
+iteration 10, invalid size: 2066 time: 1 ms
+Update in 4 ms
+iteration 11, invalid size: 1580 time: 0 ms
+Update in 5 ms
+iteration 12, invalid size: 1079 time: 0 ms
+Update in 4 ms
+iteration 13, invalid size: 703 time: 0 ms
+Update in 2 ms
+iteration 14, invalid size: 465 time: 0 ms
+Update in 1 ms
+iteration 15, invalid size: 328 time: 1 ms
+Update in 1 ms
+iteration 16, invalid size: 310 time: 0 ms
+Update in 1 ms
+iteration 17, invalid size: 312 time: 0 ms
+Update in 1 ms
+iteration 18, invalid size: 153 time: 0 ms
+Update in 1 ms
+iteration 19, invalid size: 117 time: 0 ms
+Update in 1 ms
+iteration 20, invalid size: 114 time: 0 ms
+Update in 1 ms
+iteration 21, invalid size: 49 time: 0 ms
+Update in 2 ms
+iteration 22, invalid size: 47 time: 1 ms
+Update in 0 ms
+iteration 23, invalid size: 22 time: 0 ms
+Update in 1 ms
+iteration 24, invalid size: 15 time: 1 ms
+Update in 1 ms
+iteration 25, invalid size: 12 time: 0 ms
+Update in 0 ms
+iteration 26, invalid size: 6 time: 0 ms
+Update in 1 ms
+iteration 27, invalid size: 3 time: 0 ms
+Update in 0 ms
+iteration 28, invalid size: 0 time: 1 ms
+Complete in 1978 ms
+Total: 3437 ms, iteration count: 27
+duration: 3599 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 959 ms
+start ktruss with k = 18, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 184 ms
+tc duration: 1327 ms
+iteration 1, invalid size: 834043 time: 101 ms
+Update in 1141 ms
+iteration 2, invalid size: 170848 time: 2 ms
+Update in 267 ms
+iteration 3, invalid size: 56281 time: 1 ms
+Update in 102 ms
+iteration 4, invalid size: 26798 time: 0 ms
+Update in 65 ms
+iteration 5, invalid size: 14694 time: 1 ms
+Update in 36 ms
+iteration 6, invalid size: 8477 time: 0 ms
+Update in 21 ms
+iteration 7, invalid size: 5404 time: 1 ms
+Update in 13 ms
+iteration 8, invalid size: 3540 time: 0 ms
+Update in 9 ms
+iteration 9, invalid size: 2372 time: 0 ms
+Update in 6 ms
+iteration 10, invalid size: 1634 time: 0 ms
+Update in 5 ms
+iteration 11, invalid size: 1132 time: 0 ms
+Update in 3 ms
+iteration 12, invalid size: 684 time: 1 ms
+Update in 2 ms
+iteration 13, invalid size: 524 time: 1 ms
+Update in 1 ms
+iteration 14, invalid size: 451 time: 1 ms
+Update in 1 ms
+iteration 15, invalid size: 361 time: 0 ms
+Update in 2 ms
+iteration 16, invalid size: 267 time: 1 ms
+Update in 1 ms
+iteration 17, invalid size: 198 time: 0 ms
+Update in 1 ms
+iteration 18, invalid size: 140 time: 1 ms
+Update in 0 ms
+iteration 19, invalid size: 82 time: 1 ms
+Update in 1 ms
+iteration 20, invalid size: 73 time: 0 ms
+Update in 1 ms
+iteration 21, invalid size: 93 time: 0 ms
+Update in 1 ms
+iteration 22, invalid size: 104 time: 0 ms
+Update in 1 ms
+iteration 23, invalid size: 47 time: 1 ms
+Update in 0 ms
+iteration 24, invalid size: 37 time: 1 ms
+Update in 0 ms
+iteration 25, invalid size: 23 time: 1 ms
+Update in 0 ms
+iteration 26, invalid size: 16 time: 2 ms
+Update in 0 ms
+iteration 27, invalid size: 15 time: 1 ms
+Update in 0 ms
+iteration 28, invalid size: 6 time: 0 ms
+Update in 1 ms
+iteration 29, invalid size: 10 time: 0 ms
+Update in 0 ms
+iteration 30, invalid size: 10 time: 0 ms
+Update in 1 ms
+iteration 31, invalid size: 18 time: 0 ms
+Update in 1 ms
+iteration 32, invalid size: 23 time: 0 ms
+Update in 0 ms
+iteration 33, invalid size: 2 time: 1 ms
+Update in 0 ms
+iteration 34, invalid size: 5 time: 0 ms
+Update in 0 ms
+iteration 35, invalid size: 3 time: 0 ms
+Update in 1 ms
+iteration 36, invalid size: 2 time: 0 ms
+Update in 1 ms
+iteration 37, invalid size: 5 time: 0 ms
+Update in 1 ms
+iteration 38, invalid size: 16 time: 0 ms
+Update in 0 ms
+iteration 39, invalid size: 19 time: 1 ms
+Update in 0 ms
+iteration 40, invalid size: 21 time: 1 ms
+Update in 1 ms
+iteration 41, invalid size: 0 time: 0 ms
+Complete in 2100 ms
+Total: 3611 ms, iteration count: 40
+duration: 3765 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 887 ms
+start ktruss with k = 19, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 194 ms
+tc duration: 1375 ms
+iteration 1, invalid size: 863481 time: 82 ms
+Update in 1033 ms
+iteration 2, invalid size: 167975 time: 4 ms
+Update in 310 ms
+iteration 3, invalid size: 54247 time: 1 ms
+Update in 92 ms
+iteration 4, invalid size: 24888 time: 1 ms
+Update in 44 ms
+iteration 5, invalid size: 13530 time: 1 ms
+Update in 28 ms
+iteration 6, invalid size: 7859 time: 0 ms
+Update in 15 ms
+iteration 7, invalid size: 4524 time: 0 ms
+Update in 11 ms
+iteration 8, invalid size: 2913 time: 0 ms
+Update in 7 ms
+iteration 9, invalid size: 2112 time: 1 ms
+Update in 5 ms
+iteration 10, invalid size: 1615 time: 0 ms
+Update in 5 ms
+iteration 11, invalid size: 1013 time: 0 ms
+Update in 3 ms
+iteration 12, invalid size: 885 time: 1 ms
+Update in 2 ms
+iteration 13, invalid size: 698 time: 0 ms
+Update in 2 ms
+iteration 14, invalid size: 446 time: 0 ms
+Update in 1 ms
+iteration 15, invalid size: 342 time: 0 ms
+Update in 1 ms
+iteration 16, invalid size: 188 time: 1 ms
+Update in 0 ms
+iteration 17, invalid size: 147 time: 1 ms
+Update in 1 ms
+iteration 18, invalid size: 151 time: 0 ms
+Update in 1 ms
+iteration 19, invalid size: 124 time: 0 ms
+Update in 1 ms
+iteration 20, invalid size: 106 time: 0 ms
+Update in 1 ms
+iteration 21, invalid size: 44 time: 1 ms
+Update in 1 ms
+iteration 22, invalid size: 61 time: 0 ms
+Update in 1 ms
+iteration 23, invalid size: 78 time: 1 ms
+Update in 1 ms
+iteration 24, invalid size: 45 time: 0 ms
+Update in 0 ms
+iteration 25, invalid size: 45 time: 1 ms
+Update in 0 ms
+iteration 26, invalid size: 19 time: 0 ms
+Update in 1 ms
+iteration 27, invalid size: 18 time: 0 ms
+Update in 1 ms
+iteration 28, invalid size: 14 time: 0 ms
+Update in 0 ms
+iteration 29, invalid size: 11 time: 0 ms
+Update in 1 ms
+iteration 30, invalid size: 14 time: 0 ms
+Update in 0 ms
+iteration 31, invalid size: 3 time: 1 ms
+Update in 1 ms
+iteration 32, invalid size: 4 time: 0 ms
+Update in 0 ms
+iteration 33, invalid size: 3 time: 1 ms
+Update in 0 ms
+iteration 34, invalid size: 1 time: 0 ms
+Update in 1 ms
+iteration 35, invalid size: 3 time: 0 ms
+Update in 0 ms
+iteration 36, invalid size: 2 time: 0 ms
+Update in 0 ms
+iteration 37, invalid size: 1 time: 0 ms
+Update in 1 ms
+iteration 38, invalid size: 1 time: 0 ms
+Update in 1 ms
+iteration 39, invalid size: 3 time: 0 ms
+Update in 0 ms
+iteration 40, invalid size: 3 time: 0 ms
+Update in 1 ms
+iteration 41, invalid size: 0 time: 0 ms
+Complete in 1919 ms
+Total: 3488 ms, iteration count: 40
+duration: 3718 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 898 ms
+start ktruss with k = 20, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 201 ms
+tc duration: 1214 ms
+iteration 1, invalid size: 890680 time: 60 ms
+Update in 1231 ms
+iteration 2, invalid size: 164907 time: 4 ms
+Update in 259 ms
+iteration 3, invalid size: 51449 time: 0 ms
+Update in 118 ms
+iteration 4, invalid size: 23639 time: 1 ms
+Update in 43 ms
+iteration 5, invalid size: 11892 time: 1 ms
+Update in 28 ms
+iteration 6, invalid size: 7007 time: 1 ms
+Update in 13 ms
+iteration 7, invalid size: 4156 time: 1 ms
+Update in 11 ms
+iteration 8, invalid size: 2551 time: 0 ms
+Update in 6 ms
+iteration 9, invalid size: 1638 time: 0 ms
+Update in 6 ms
+iteration 10, invalid size: 1281 time: 1 ms
+Update in 4 ms
+iteration 11, invalid size: 1077 time: 0 ms
+Update in 4 ms
+iteration 12, invalid size: 832 time: 1 ms
+Update in 2 ms
+iteration 13, invalid size: 704 time: 1 ms
+Update in 2 ms
+iteration 14, invalid size: 467 time: 0 ms
+Update in 1 ms
+iteration 15, invalid size: 322 time: 1 ms
+Update in 1 ms
+iteration 16, invalid size: 313 time: 1 ms
+Update in 0 ms
+iteration 17, invalid size: 273 time: 1 ms
+Update in 1 ms
+iteration 18, invalid size: 219 time: 0 ms
+Update in 1 ms
+iteration 19, invalid size: 241 time: 0 ms
+Update in 1 ms
+iteration 20, invalid size: 74 time: 1 ms
+Update in 0 ms
+iteration 21, invalid size: 72 time: 1 ms
+Update in 1 ms
+iteration 22, invalid size: 52 time: 1 ms
+Update in 0 ms
+iteration 23, invalid size: 76 time: 2 ms
+Update in 0 ms
+iteration 24, invalid size: 67 time: 0 ms
+Update in 1 ms
+iteration 25, invalid size: 78 time: 0 ms
+Update in 0 ms
+iteration 26, invalid size: 53 time: 1 ms
+Update in 0 ms
+iteration 27, invalid size: 64 time: 0 ms
+Update in 1 ms
+iteration 28, invalid size: 19 time: 1 ms
+Update in 0 ms
+iteration 29, invalid size: 22 time: 1 ms
+Update in 0 ms
+iteration 30, invalid size: 53 time: 0 ms
+Update in 1 ms
+iteration 31, invalid size: 40 time: 0 ms
+Update in 0 ms
+iteration 32, invalid size: 40 time: 1 ms
+Update in 0 ms
+iteration 33, invalid size: 41 time: 1 ms
+Update in 0 ms
+iteration 34, invalid size: 49 time: 0 ms
+Update in 1 ms
+iteration 35, invalid size: 89 time: 0 ms
+Update in 0 ms
+iteration 36, invalid size: 28 time: 1 ms
+Update in 0 ms
+iteration 37, invalid size: 30 time: 1 ms
+Update in 0 ms
+iteration 38, invalid size: 44 time: 0 ms
+Update in 1 ms
+iteration 39, invalid size: 38 time: 0 ms
+Update in 0 ms
+iteration 40, invalid size: 81 time: 1 ms
+Update in 0 ms
+iteration 41, invalid size: 64 time: 0 ms
+Update in 1 ms
+iteration 42, invalid size: 65 time: 1 ms
+Update in 0 ms
+iteration 43, invalid size: 43 time: 1 ms
+Update in 1 ms
+iteration 44, invalid size: 24 time: 0 ms
+Update in 0 ms
+iteration 45, invalid size: 29 time: 1 ms
+Update in 0 ms
+iteration 46, invalid size: 64 time: 0 ms
+Update in 0 ms
+iteration 47, invalid size: 47 time: 1 ms
+Update in 0 ms
+iteration 48, invalid size: 64 time: 0 ms
+Update in 1 ms
+iteration 49, invalid size: 60 time: 0 ms
+Update in 0 ms
+iteration 50, invalid size: 49 time: 0 ms
+Update in 0 ms
+iteration 51, invalid size: 95 time: 0 ms
+Update in 1 ms
+iteration 52, invalid size: 93 time: 0 ms
+Update in 0 ms
+iteration 53, invalid size: 91 time: 0 ms
+Update in 1 ms
+iteration 54, invalid size: 127 time: 0 ms
+Update in 0 ms
+iteration 55, invalid size: 103 time: 0 ms
+Update in 1 ms
+iteration 56, invalid size: 42 time: 0 ms
+Update in 0 ms
+iteration 57, invalid size: 112 time: 0 ms
+Update in 0 ms
+iteration 58, invalid size: 98 time: 1 ms
+Update in 0 ms
+iteration 59, invalid size: 0 time: 0 ms
+Complete in 2103 ms
+Total: 3518 ms, iteration count: 58
+duration: 3676 ms
+**********************************
+
+

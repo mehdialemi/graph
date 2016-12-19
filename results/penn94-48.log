@@ -1,0 +1,75 @@
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 965 ms
+start ktruss with k = 48, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 193 ms
+tc duration: 1227 ms
+iteration 1, invalid size: 1220898 time: 55 ms
+Update in 1675 ms
+iteration 2, invalid size: 73272 time: 2 ms
+Update in 193 ms
+iteration 3, invalid size: 14192 time: 0 ms
+Update in 23 ms
+iteration 4, invalid size: 2271 time: 1 ms
+Update in 5 ms
+iteration 5, invalid size: 57 time: 0 ms
+Update in 1 ms
+iteration 6, invalid size: 114 time: 0 ms
+Update in 1 ms
+iteration 7, invalid size: 155 time: 1 ms
+Update in 1 ms
+iteration 8, invalid size: 0 time: 1 ms
+Complete in 2227 ms
+Total: 3647 ms, iteration count: 7
+duration: 3827 ms
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 946 ms
+start ktruss with k = 48, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 241 ms
+tc duration: 1386 ms
+iteration 1, invalid size: 1220898 time: 156 ms
+Update in 2174 ms
+iteration 2, invalid size: 73272 time: 5 ms
+Update in 186 ms
+iteration 3, invalid size: 14192 time: 1 ms
+Update in 25 ms
+iteration 4, invalid size: 2271 time: 1 ms
+Update in 5 ms
+iteration 5, invalid size: 57 time: 1 ms
+Update in 1 ms
+iteration 6, invalid size: 114 time: 0 ms
+Update in 2 ms
+iteration 7, invalid size: 155 time: 0 ms
+Update in 2 ms
+iteration 8, invalid size: 0 time: 0 ms
+Complete in 2823 ms
+Total: 4450 ms, iteration count: 7
+duration: 4700 ms
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 935 ms
+start ktruss with k = 48, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 227 ms
+tc duration: 1306 ms
+iteration 1, invalid size: 1220898 time: 99 ms
+Update in 1977 ms
+iteration 2, invalid size: 73272 time: 2 ms
+Update in 196 ms
+iteration 3, invalid size: 14192 time: 1 ms
+Update in 19 ms
+iteration 4, invalid size: 2271 time: 1 ms
+Update in 4 ms
+iteration 5, invalid size: 57 time: 1 ms
+Update in 0 ms
+iteration 6, invalid size: 114 time: 0 ms
+Update in 1 ms
+iteration 7, invalid size: 155 time: 0 ms
+Update in 1 ms
+iteration 8, invalid size: 0 time: 1 ms
+Complete in 2556 ms
+Total: 4089 ms, iteration count: 7
+duration: 4288 ms

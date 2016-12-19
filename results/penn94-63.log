@@ -1,0 +1,51 @@
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 983 ms
+start ktruss with k = 63, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 212 ms
+tc duration: 1197 ms
+iteration 1, invalid size: 1274471 time: 197 ms
+Update in 1760 ms
+iteration 2, invalid size: 37382 time: 4 ms
+Update in 98 ms
+iteration 3, invalid size: 569 time: 0 ms
+Update in 1 ms
+iteration 4, invalid size: 0 time: 2 ms
+Complete in 2334 ms
+Total: 3743 ms, iteration count: 3
+duration: 3979 ms
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 943 ms
+start ktruss with k = 63, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 183 ms
+tc duration: 1222 ms
+iteration 1, invalid size: 1274471 time: 86 ms
+Update in 1867 ms
+iteration 2, invalid size: 37382 time: 2 ms
+Update in 97 ms
+iteration 3, invalid size: 569 time: 1 ms
+Update in 2 ms
+iteration 4, invalid size: 0 time: 0 ms
+Complete in 2339 ms
+Total: 3744 ms, iteration count: 3
+duration: 3901 ms
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/penn94
+Graph loaded, edges: 1362220, load time: 968 ms
+start ktruss with k = 63, threads = 12, method = 6 input: /home/i/graph-data/penn94
+create fonl in 195 ms
+tc duration: 1230 ms
+iteration 1, invalid size: 1274471 time: 145 ms
+Update in 2023 ms
+iteration 2, invalid size: 37382 time: 2 ms
+Update in 84 ms
+iteration 3, invalid size: 569 time: 1 ms
+Update in 15 ms
+iteration 4, invalid size: 0 time: 0 ms
+Complete in 2542 ms
+Total: 3967 ms, iteration count: 3
+duration: 4210 ms

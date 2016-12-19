@@ -1,0 +1,57 @@
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/as-skitter
+Graph loaded, edges: 11095298, load time: 7429 ms
+start ktruss with k = 112, threads = 12, method = 6 input: /home/i/graph-data/as-skitter
+create fonl in 398 ms
+tc duration: 2076 ms
+iteration 1, invalid size: 8710016 time: 87 ms
+Update in 2946 ms
+iteration 2, invalid size: 58466 time: 7 ms
+Update in 226 ms
+iteration 3, invalid size: 6823 time: 1 ms
+Update in 22 ms
+iteration 4, invalid size: 186 time: 1 ms
+Update in 0 ms
+iteration 5, invalid size: 0 time: 1 ms
+Complete in 5957 ms
+Total: 8431 ms, iteration count: 4
+duration: 9618 ms
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/as-skitter
+Graph loaded, edges: 11095298, load time: 6976 ms
+start ktruss with k = 112, threads = 12, method = 6 input: /home/i/graph-data/as-skitter
+create fonl in 448 ms
+tc duration: 2509 ms
+iteration 1, invalid size: 8710016 time: 238 ms
+Update in 3249 ms
+iteration 2, invalid size: 58466 time: 4 ms
+Update in 303 ms
+iteration 3, invalid size: 6823 time: 1 ms
+Update in 19 ms
+iteration 4, invalid size: 186 time: 0 ms
+Update in 1 ms
+iteration 5, invalid size: 0 time: 1 ms
+Complete in 6267 ms
+Total: 9224 ms, iteration count: 4
+duration: 10334 ms
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/as-skitter
+Graph loaded, edges: 11095298, load time: 7443 ms
+start ktruss with k = 112, threads = 12, method = 6 input: /home/i/graph-data/as-skitter
+create fonl in 471 ms
+tc duration: 2182 ms
+iteration 1, invalid size: 8710016 time: 306 ms
+Update in 2530 ms
+iteration 2, invalid size: 58466 time: 9 ms
+Update in 150 ms
+iteration 3, invalid size: 6823 time: 0 ms
+Update in 29 ms
+iteration 4, invalid size: 186 time: 0 ms
+Update in 1 ms
+iteration 5, invalid size: 0 time: 0 ms
+Complete in 5155 ms
+Total: 7808 ms, iteration count: 4
+duration: 9063 ms

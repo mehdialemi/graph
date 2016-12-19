@@ -1,0 +1,99 @@
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/live-journal
+Graph loaded, edges: 34681189, load time: 21851 ms
+start ktruss with k = 214, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+create fonl in 626 ms
+tc duration: 14514 ms
+iteration 1, invalid size: 28362206 time: 88 ms
+Update in 23334 ms
+iteration 2, invalid size: 154157 time: 14 ms
+Update in 2095 ms
+iteration 3, invalid size: 38778 time: 2 ms
+Update in 761 ms
+iteration 4, invalid size: 17080 time: 0 ms
+Update in 352 ms
+iteration 5, invalid size: 8542 time: 1 ms
+Update in 282 ms
+iteration 6, invalid size: 12552 time: 1 ms
+Update in 487 ms
+iteration 7, invalid size: 15149 time: 1 ms
+Update in 410 ms
+iteration 8, invalid size: 11097 time: 1 ms
+Update in 129 ms
+iteration 9, invalid size: 207 time: 1 ms
+Update in 18 ms
+iteration 10, invalid size: 241 time: 1 ms
+Update in 25 ms
+iteration 11, invalid size: 182 time: 1 ms
+Update in 16 ms
+iteration 12, invalid size: 0 time: 1 ms
+Complete in 34578 ms
+Total: 49718 ms, iteration count: 11
+duration: 52519 ms
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/live-journal
+Graph loaded, edges: 34681189, load time: 23734 ms
+start ktruss with k = 214, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+create fonl in 497 ms
+tc duration: 13465 ms
+iteration 1, invalid size: 28362206 time: 249 ms
+Update in 19711 ms
+iteration 2, invalid size: 154157 time: 6 ms
+Update in 2007 ms
+iteration 3, invalid size: 38778 time: 1 ms
+Update in 703 ms
+iteration 4, invalid size: 17080 time: 0 ms
+Update in 385 ms
+iteration 5, invalid size: 8542 time: 1 ms
+Update in 291 ms
+iteration 6, invalid size: 12552 time: 1 ms
+Update in 363 ms
+iteration 7, invalid size: 15149 time: 1 ms
+Update in 359 ms
+iteration 8, invalid size: 11097 time: 1 ms
+Update in 120 ms
+iteration 9, invalid size: 207 time: 2 ms
+Update in 17 ms
+iteration 10, invalid size: 241 time: 0 ms
+Update in 25 ms
+iteration 11, invalid size: 182 time: 1 ms
+Update in 16 ms
+iteration 12, invalid size: 0 time: 0 ms
+Complete in 31027 ms
+Total: 44989 ms, iteration count: 11
+duration: 48056 ms
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/live-journal
+Graph loaded, edges: 34681189, load time: 21506 ms
+start ktruss with k = 214, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+create fonl in 502 ms
+tc duration: 13809 ms
+iteration 1, invalid size: 28362206 time: 155 ms
+Update in 21521 ms
+iteration 2, invalid size: 154157 time: 10 ms
+Update in 1984 ms
+iteration 3, invalid size: 38778 time: 3 ms
+Update in 869 ms
+iteration 4, invalid size: 17080 time: 0 ms
+Update in 461 ms
+iteration 5, invalid size: 8542 time: 0 ms
+Update in 317 ms
+iteration 6, invalid size: 12552 time: 1 ms
+Update in 396 ms
+iteration 7, invalid size: 15149 time: 1 ms
+Update in 413 ms
+iteration 8, invalid size: 11097 time: 1 ms
+Update in 100 ms
+iteration 9, invalid size: 207 time: 1 ms
+Update in 13 ms
+iteration 10, invalid size: 241 time: 1 ms
+Update in 21 ms
+iteration 11, invalid size: 182 time: 1 ms
+Update in 16 ms
+iteration 12, invalid size: 0 time: 0 ms
+Complete in 32868 ms
+Total: 47179 ms, iteration count: 11
+duration: 49988 ms

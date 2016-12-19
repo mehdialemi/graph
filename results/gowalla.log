@@ -1,0 +1,576 @@
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/gowalla
+Graph loaded, edges: 1900654, load time: 1310 ms
+start ktruss with k = 3, threads = 12, method = 6 input: /home/i/graph-data/gowalla
+create fonl in 385 ms
+tc duration: 822 ms
+iteration 1, invalid size: 0 time: 22 ms
+Complete in 231 ms
+Total: 1438 ms, iteration count: 0
+duration: 1799 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/gowalla
+Graph loaded, edges: 1900654, load time: 1324 ms
+start ktruss with k = 4, threads = 12, method = 6 input: /home/i/graph-data/gowalla
+create fonl in 399 ms
+tc duration: 786 ms
+iteration 1, invalid size: 0 time: 24 ms
+Complete in 224 ms
+Total: 1409 ms, iteration count: 0
+duration: 1716 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/gowalla
+Graph loaded, edges: 1900654, load time: 1231 ms
+start ktruss with k = 5, threads = 12, method = 6 input: /home/i/graph-data/gowalla
+create fonl in 358 ms
+tc duration: 947 ms
+iteration 1, invalid size: 288514 time: 39 ms
+Update in 228 ms
+iteration 2, invalid size: 29553 time: 4 ms
+Update in 44 ms
+iteration 3, invalid size: 879 time: 1 ms
+Update in 1 ms
+iteration 4, invalid size: 0 time: 1 ms
+Complete in 542 ms
+Total: 1847 ms, iteration count: 3
+duration: 2164 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/gowalla
+Graph loaded, edges: 1900654, load time: 1320 ms
+start ktruss with k = 6, threads = 12, method = 6 input: /home/i/graph-data/gowalla
+create fonl in 367 ms
+tc duration: 812 ms
+iteration 1, invalid size: 288514 time: 37 ms
+Update in 237 ms
+iteration 2, invalid size: 29553 time: 2 ms
+Update in 68 ms
+iteration 3, invalid size: 3268 time: 1 ms
+Update in 8 ms
+iteration 4, invalid size: 638 time: 0 ms
+Update in 2 ms
+iteration 5, invalid size: 150 time: 0 ms
+Update in 1 ms
+iteration 6, invalid size: 47 time: 0 ms
+Update in 0 ms
+iteration 7, invalid size: 15 time: 1 ms
+Update in 0 ms
+iteration 8, invalid size: 7 time: 0 ms
+Update in 0 ms
+iteration 9, invalid size: 2 time: 1 ms
+Update in 0 ms
+iteration 10, invalid size: 0 time: 0 ms
+Complete in 589 ms
+Total: 1768 ms, iteration count: 9
+duration: 2071 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/gowalla
+Graph loaded, edges: 1900654, load time: 1321 ms
+start ktruss with k = 7, threads = 12, method = 6 input: /home/i/graph-data/gowalla
+create fonl in 400 ms
+tc duration: 928 ms
+iteration 1, invalid size: 491060 time: 39 ms
+Update in 240 ms
+iteration 2, invalid size: 49591 time: 6 ms
+Update in 101 ms
+iteration 3, invalid size: 3357 time: 0 ms
+Update in 7 ms
+iteration 4, invalid size: 310 time: 0 ms
+Update in 1 ms
+iteration 5, invalid size: 23 time: 1 ms
+Update in 0 ms
+iteration 6, invalid size: 5 time: 1 ms
+Update in 0 ms
+iteration 7, invalid size: 1 time: 0 ms
+Update in 0 ms
+iteration 8, invalid size: 0 time: 1 ms
+Complete in 607 ms
+Total: 1935 ms, iteration count: 7
+duration: 2239 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/gowalla
+Graph loaded, edges: 1900654, load time: 1325 ms
+start ktruss with k = 8, threads = 12, method = 6 input: /home/i/graph-data/gowalla
+create fonl in 390 ms
+tc duration: 986 ms
+iteration 1, invalid size: 491060 time: 81 ms
+Update in 256 ms
+iteration 2, invalid size: 49591 time: 7 ms
+Update in 105 ms
+iteration 3, invalid size: 8196 time: 1 ms
+Update in 18 ms
+iteration 4, invalid size: 1963 time: 0 ms
+Update in 4 ms
+iteration 5, invalid size: 539 time: 0 ms
+Update in 1 ms
+iteration 6, invalid size: 170 time: 1 ms
+Update in 0 ms
+iteration 7, invalid size: 47 time: 0 ms
+Update in 1 ms
+iteration 8, invalid size: 16 time: 0 ms
+Update in 0 ms
+iteration 9, invalid size: 10 time: 1 ms
+Update in 0 ms
+iteration 10, invalid size: 1 time: 1 ms
+Update in 0 ms
+iteration 11, invalid size: 0 time: 0 ms
+Complete in 697 ms
+Total: 2073 ms, iteration count: 10
+duration: 2335 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/gowalla
+Graph loaded, edges: 1900654, load time: 1229 ms
+start ktruss with k = 9, threads = 12, method = 6 input: /home/i/graph-data/gowalla
+create fonl in 388 ms
+tc duration: 1063 ms
+iteration 1, invalid size: 639322 time: 98 ms
+Update in 293 ms
+iteration 2, invalid size: 60623 time: 7 ms
+Update in 145 ms
+iteration 3, invalid size: 5692 time: 0 ms
+Update in 14 ms
+iteration 4, invalid size: 918 time: 1 ms
+Update in 2 ms
+iteration 5, invalid size: 165 time: 0 ms
+Update in 1 ms
+iteration 6, invalid size: 30 time: 0 ms
+Update in 1 ms
+iteration 7, invalid size: 4 time: 0 ms
+Update in 0 ms
+iteration 8, invalid size: 1 time: 1 ms
+Update in 0 ms
+iteration 9, invalid size: 0 time: 0 ms
+Complete in 841 ms
+Total: 2292 ms, iteration count: 8
+duration: 2625 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/gowalla
+Graph loaded, edges: 1900654, load time: 1209 ms
+start ktruss with k = 10, threads = 12, method = 6 input: /home/i/graph-data/gowalla
+create fonl in 420 ms
+tc duration: 851 ms
+iteration 1, invalid size: 639322 time: 90 ms
+Update in 301 ms
+iteration 2, invalid size: 60623 time: 6 ms
+Update in 122 ms
+iteration 3, invalid size: 11513 time: 1 ms
+Update in 25 ms
+iteration 4, invalid size: 3356 time: 1 ms
+Update in 8 ms
+iteration 5, invalid size: 1062 time: 0 ms
+Update in 2 ms
+iteration 6, invalid size: 379 time: 1 ms
+Update in 1 ms
+iteration 7, invalid size: 116 time: 0 ms
+Update in 0 ms
+iteration 8, invalid size: 37 time: 1 ms
+Update in 0 ms
+iteration 9, invalid size: 7 time: 0 ms
+Update in 0 ms
+iteration 10, invalid size: 2 time: 0 ms
+Update in 1 ms
+iteration 11, invalid size: 0 time: 0 ms
+Complete in 805 ms
+Total: 2076 ms, iteration count: 10
+duration: 2378 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/gowalla
+Graph loaded, edges: 1900654, load time: 1329 ms
+start ktruss with k = 11, threads = 12, method = 6 input: /home/i/graph-data/gowalla
+create fonl in 396 ms
+tc duration: 819 ms
+iteration 1, invalid size: 754540 time: 45 ms
+Update in 365 ms
+iteration 2, invalid size: 66274 time: 5 ms
+Update in 100 ms
+iteration 3, invalid size: 7611 time: 1 ms
+Update in 16 ms
+iteration 4, invalid size: 1618 time: 0 ms
+Update in 4 ms
+iteration 5, invalid size: 381 time: 0 ms
+Update in 7 ms
+iteration 6, invalid size: 119 time: 0 ms
+Update in 0 ms
+iteration 7, invalid size: 25 time: 1 ms
+Update in 0 ms
+iteration 8, invalid size: 3 time: 0 ms
+Update in 1 ms
+iteration 9, invalid size: 1 time: 0 ms
+Update in 0 ms
+iteration 10, invalid size: 1 time: 1 ms
+Update in 0 ms
+iteration 11, invalid size: 0 time: 0 ms
+Complete in 790 ms
+Total: 2005 ms, iteration count: 10
+duration: 2288 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/gowalla
+Graph loaded, edges: 1900654, load time: 1312 ms
+start ktruss with k = 12, threads = 12, method = 6 input: /home/i/graph-data/gowalla
+create fonl in 350 ms
+tc duration: 1001 ms
+iteration 1, invalid size: 754540 time: 52 ms
+Update in 341 ms
+iteration 2, invalid size: 66274 time: 4 ms
+Update in 143 ms
+iteration 3, invalid size: 13556 time: 1 ms
+Update in 30 ms
+iteration 4, invalid size: 4224 time: 1 ms
+Update in 10 ms
+iteration 5, invalid size: 1421 time: 0 ms
+Update in 3 ms
+iteration 6, invalid size: 485 time: 0 ms
+Update in 2 ms
+iteration 7, invalid size: 149 time: 0 ms
+Update in 0 ms
+iteration 8, invalid size: 48 time: 1 ms
+Update in 0 ms
+iteration 9, invalid size: 23 time: 1 ms
+Update in 0 ms
+iteration 10, invalid size: 4 time: 0 ms
+Update in 0 ms
+iteration 11, invalid size: 0 time: 1 ms
+Complete in 851 ms
+Total: 2202 ms, iteration count: 10
+duration: 2535 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/gowalla
+Graph loaded, edges: 1900654, load time: 1230 ms
+start ktruss with k = 13, threads = 12, method = 6 input: /home/i/graph-data/gowalla
+create fonl in 363 ms
+tc duration: 937 ms
+iteration 1, invalid size: 845230 time: 54 ms
+Update in 388 ms
+iteration 2, invalid size: 69165 time: 6 ms
+Update in 175 ms
+iteration 3, invalid size: 8974 time: 1 ms
+Update in 21 ms
+iteration 4, invalid size: 2445 time: 1 ms
+Update in 6 ms
+iteration 5, invalid size: 749 time: 0 ms
+Update in 2 ms
+iteration 6, invalid size: 259 time: 0 ms
+Update in 1 ms
+iteration 7, invalid size: 78 time: 0 ms
+Update in 0 ms
+iteration 8, invalid size: 22 time: 1 ms
+Update in 0 ms
+iteration 9, invalid size: 8 time: 0 ms
+Update in 0 ms
+iteration 10, invalid size: 3 time: 1 ms
+Update in 0 ms
+iteration 11, invalid size: 0 time: 1 ms
+Complete in 912 ms
+Total: 2212 ms, iteration count: 10
+duration: 2462 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/gowalla
+Graph loaded, edges: 1900654, load time: 1316 ms
+start ktruss with k = 14, threads = 12, method = 6 input: /home/i/graph-data/gowalla
+create fonl in 266 ms
+tc duration: 811 ms
+iteration 1, invalid size: 845230 time: 91 ms
+Update in 373 ms
+iteration 2, invalid size: 69165 time: 11 ms
+Update in 168 ms
+iteration 3, invalid size: 14831 time: 0 ms
+Update in 38 ms
+iteration 4, invalid size: 4998 time: 1 ms
+Update in 15 ms
+iteration 5, invalid size: 1846 time: 0 ms
+Update in 5 ms
+iteration 6, invalid size: 784 time: 1 ms
+Update in 2 ms
+iteration 7, invalid size: 300 time: 0 ms
+Update in 1 ms
+iteration 8, invalid size: 111 time: 0 ms
+Update in 1 ms
+iteration 9, invalid size: 42 time: 0 ms
+Update in 1 ms
+iteration 10, invalid size: 7 time: 0 ms
+Update in 0 ms
+iteration 11, invalid size: 0 time: 0 ms
+Complete in 951 ms
+Total: 2028 ms, iteration count: 10
+duration: 2323 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/gowalla
+Graph loaded, edges: 1900654, load time: 1318 ms
+start ktruss with k = 15, threads = 12, method = 6 input: /home/i/graph-data/gowalla
+create fonl in 400 ms
+tc duration: 876 ms
+iteration 1, invalid size: 920112 time: 63 ms
+Update in 694 ms
+iteration 2, invalid size: 70751 time: 5 ms
+Update in 62 ms
+iteration 3, invalid size: 9951 time: 1 ms
+Update in 20 ms
+iteration 4, invalid size: 3007 time: 1 ms
+Update in 2 ms
+iteration 5, invalid size: 1066 time: 1 ms
+Update in 0 ms
+iteration 6, invalid size: 389 time: 1 ms
+Update in 0 ms
+iteration 7, invalid size: 149 time: 0 ms
+Update in 7 ms
+iteration 8, invalid size: 48 time: 1 ms
+Update in 0 ms
+iteration 9, invalid size: 16 time: 1 ms
+Update in 0 ms
+iteration 10, invalid size: 7 time: 1 ms
+Update in 0 ms
+iteration 11, invalid size: 1 time: 1 ms
+Update in 0 ms
+iteration 12, invalid size: 1 time: 0 ms
+Update in 1 ms
+iteration 13, invalid size: 0 time: 12 ms
+Complete in 1134 ms
+Total: 2410 ms, iteration count: 12
+duration: 2684 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/gowalla
+Graph loaded, edges: 1900654, load time: 1322 ms
+start ktruss with k = 16, threads = 12, method = 6 input: /home/i/graph-data/gowalla
+create fonl in 409 ms
+tc duration: 823 ms
+iteration 1, invalid size: 920112 time: 46 ms
+Update in 508 ms
+iteration 2, invalid size: 70751 time: 4 ms
+Update in 153 ms
+iteration 3, invalid size: 15145 time: 1 ms
+Update in 25 ms
+iteration 4, invalid size: 5156 time: 1 ms
+Update in 15 ms
+iteration 5, invalid size: 1909 time: 0 ms
+Update in 5 ms
+iteration 6, invalid size: 828 time: 0 ms
+Update in 1 ms
+iteration 7, invalid size: 337 time: 0 ms
+Update in 0 ms
+iteration 8, invalid size: 115 time: 0 ms
+Update in 0 ms
+iteration 9, invalid size: 43 time: 1 ms
+Update in 0 ms
+iteration 10, invalid size: 13 time: 0 ms
+Update in 0 ms
+iteration 11, invalid size: 3 time: 0 ms
+Update in 1 ms
+iteration 12, invalid size: 2 time: 0 ms
+Update in 0 ms
+iteration 13, invalid size: 0 time: 1 ms
+Complete in 1018 ms
+Total: 2250 ms, iteration count: 12
+duration: 2558 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/gowalla
+Graph loaded, edges: 1900654, load time: 1244 ms
+start ktruss with k = 17, threads = 12, method = 6 input: /home/i/graph-data/gowalla
+create fonl in 427 ms
+tc duration: 809 ms
+iteration 1, invalid size: 981934 time: 63 ms
+Update in 777 ms
+iteration 2, invalid size: 70301 time: 8 ms
+Update in 168 ms
+iteration 3, invalid size: 10356 time: 1 ms
+Update in 28 ms
+iteration 4, invalid size: 3186 time: 1 ms
+Update in 8 ms
+iteration 5, invalid size: 1179 time: 0 ms
+Update in 3 ms
+iteration 6, invalid size: 492 time: 1 ms
+Update in 1 ms
+iteration 7, invalid size: 209 time: 0 ms
+Update in 1 ms
+iteration 8, invalid size: 75 time: 1 ms
+Update in 0 ms
+iteration 9, invalid size: 33 time: 1 ms
+Update in 0 ms
+iteration 10, invalid size: 13 time: 0 ms
+Update in 0 ms
+iteration 11, invalid size: 6 time: 0 ms
+Update in 1 ms
+iteration 12, invalid size: 3 time: 0 ms
+Update in 1 ms
+iteration 13, invalid size: 0 time: 0 ms
+Complete in 1335 ms
+Total: 2571 ms, iteration count: 12
+duration: 2822 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/gowalla
+Graph loaded, edges: 1900654, load time: 1292 ms
+start ktruss with k = 18, threads = 12, method = 6 input: /home/i/graph-data/gowalla
+create fonl in 398 ms
+tc duration: 815 ms
+iteration 1, invalid size: 981934 time: 70 ms
+Update in 429 ms
+iteration 2, invalid size: 70301 time: 9 ms
+Update in 171 ms
+iteration 3, invalid size: 15055 time: 0 ms
+Update in 48 ms
+iteration 4, invalid size: 5118 time: 0 ms
+Update in 16 ms
+iteration 5, invalid size: 2106 time: 0 ms
+Update in 6 ms
+iteration 6, invalid size: 968 time: 0 ms
+Update in 9 ms
+iteration 7, invalid size: 460 time: 0 ms
+Update in 2 ms
+iteration 8, invalid size: 182 time: 0 ms
+Update in 1 ms
+iteration 9, invalid size: 68 time: 0 ms
+Update in 0 ms
+iteration 10, invalid size: 25 time: 1 ms
+Update in 0 ms
+iteration 11, invalid size: 8 time: 1 ms
+Update in 1 ms
+iteration 12, invalid size: 3 time: 0 ms
+Update in 0 ms
+iteration 13, invalid size: 1 time: 0 ms
+Update in 1 ms
+iteration 14, invalid size: 0 time: 0 ms
+Complete in 1025 ms
+Total: 2238 ms, iteration count: 13
+duration: 2439 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/gowalla
+Graph loaded, edges: 1900654, load time: 1302 ms
+start ktruss with k = 19, threads = 12, method = 6 input: /home/i/graph-data/gowalla
+create fonl in 392 ms
+tc duration: 833 ms
+iteration 1, invalid size: 1034068 time: 103 ms
+Update in 479 ms
+iteration 2, invalid size: 69496 time: 9 ms
+Update in 117 ms
+iteration 3, invalid size: 10466 time: 0 ms
+Update in 25 ms
+iteration 4, invalid size: 3366 time: 1 ms
+Update in 10 ms
+iteration 5, invalid size: 1320 time: 0 ms
+Update in 3 ms
+iteration 6, invalid size: 600 time: 1 ms
+Update in 1 ms
+iteration 7, invalid size: 235 time: 0 ms
+Update in 1 ms
+iteration 8, invalid size: 116 time: 0 ms
+Update in 1 ms
+iteration 9, invalid size: 40 time: 0 ms
+Update in 1 ms
+iteration 10, invalid size: 13 time: 0 ms
+Update in 1 ms
+iteration 11, invalid size: 4 time: 0 ms
+Update in 0 ms
+iteration 12, invalid size: 1 time: 0 ms
+Update in 0 ms
+iteration 13, invalid size: 0 time: 1 ms
+Complete in 1018 ms
+Total: 2243 ms, iteration count: 12
+duration: 2558 ms
+**********************************
+
+
+GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
+JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+Loading /home/i/graph-data/gowalla
+Graph loaded, edges: 1900654, load time: 1256 ms
+start ktruss with k = 20, threads = 12, method = 6 input: /home/i/graph-data/gowalla
+create fonl in 280 ms
+tc duration: 944 ms
+iteration 1, invalid size: 1034068 time: 78 ms
+Update in 728 ms
+iteration 2, invalid size: 69496 time: 4 ms
+Update in 168 ms
+iteration 3, invalid size: 14431 time: 1 ms
+Update in 38 ms
+iteration 4, invalid size: 4937 time: 1 ms
+Update in 8 ms
+iteration 5, invalid size: 1998 time: 1 ms
+Update in 6 ms
+iteration 6, invalid size: 948 time: 0 ms
+Update in 3 ms
+iteration 7, invalid size: 461 time: 1 ms
+Update in 1 ms
+iteration 8, invalid size: 235 time: 1 ms
+Update in 0 ms
+iteration 9, invalid size: 113 time: 1 ms
+Update in 0 ms
+iteration 10, invalid size: 45 time: 0 ms
+Update in 1 ms
+iteration 11, invalid size: 19 time: 0 ms
+Update in 1 ms
+iteration 12, invalid size: 12 time: 0 ms
+Update in 0 ms
+iteration 13, invalid size: 6 time: 1 ms
+Update in 0 ms
+iteration 14, invalid size: 1 time: 0 ms
+Update in 0 ms
+iteration 15, invalid size: 0 time: 1 ms
+Complete in 1323 ms
+Total: 2547 ms, iteration count: 14
+duration: 2768 ms
+**********************************
+
+
