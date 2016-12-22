@@ -51,15 +51,15 @@ case $task in
 	;;
 	"Dist_Redis") main_class="ir.ac.sbu.graph.utils.GraphStatRedis"
 	;;
-	"KT_RT") main_class="ir.ac.sbu.graph.ktruss.RebuildTriangles"
+	"KT_RT") main_class="ir.ac.sbu.graph.ktruss.distributed.RebuildTriangles"
 	;;
-	"KT_EVL") main_class="ir.ac.sbu.graph.ktruss.EdgeVertexList"
+	"KT_EVL") main_class="ir.ac.sbu.graph.ktruss.distributed.EdgeVertexList"
 	;;
-	"KT_EVL_ITER") main_class="ir.ac.sbu.graph.ktruss.EdgeNodesIterByThreshold"
+	"KT_EVL_ITER") main_class="ir.ac.sbu.graph.ktruss.distributed.EdgeNodesIterByThreshold"
 	;;
-	"KT_EVL_ITER2") main_class="ir.ac.sbu.graph.ktruss.EdgeNodesIterByConstant"
+	"KT_EVL_ITER2") main_class="ir.ac.sbu.graph.ktruss.distributed.EdgeNodesIterByConstant"
 	;;
-	"KT_Cohen") main_class="ir.ac.sbu.graph.ktruss.Cohen"
+	"KT_Cohen") main_class="ir.ac.sbu.graph.ktruss.distributed.Cohen"
 	;;
 	"KT_Pregel") main_class="ir.ac.sbu.graph.ktruss.KTrussPregel"
 	;;

@@ -53,11 +53,6 @@
             <artifactId>fastutil</artifactId>
             <version>7.0.13</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-core</artifactId>
-            <version>LATEST</version>
-        </dependency>
         <!--<dependency>-->
             <!--<groupId>net.debasishg</groupId>-->
             <!--<artifactId>redisclient_2.11</artifactId>-->

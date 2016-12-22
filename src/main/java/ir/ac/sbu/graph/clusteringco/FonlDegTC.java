@@ -96,8 +96,13 @@ public class FonlDegTC {
     }
 
     public static JavaPairRDD<Long, long[]> generateCandidates(JavaPairRDD<Long, long[]> fonl, final boolean addFirst) {
+        return generateCandidates(fonl, addFirst, true);
+    }
+
+    public static JavaPairRDD<Long, long[]> generateCandidates(JavaPairRDD<Long, long[]> fonl, final boolean addFirst,
+                                                               final boolean sortById) {
         return fonl.filter(t -> t._2.length > 2).flatMapToPair(t -> {
-            int size = t._2.length - 1;
+            int size = t._2.length - 1; // one is for the first index holding node's degree
 
             if (size == 1)
                 return Collections.emptyIterator();
@@ -110,18 +115,20 @@ public class FonlDegTC {
 
             for (int index = 1; index < size; index++) {
                 int len = size - index;
-                long[] forward;
+                long[] cvalue;
                 if (addFirst) {
-                    forward = new long[len + 1];
-                    forward[0] = t._1; // First vertex in the triangle
-                    System.arraycopy(t._2, index + 1, forward, 1, len);
-                    Arrays.sort(forward, 1, forward.length); // quickSort to comfort with fonl
+                    cvalue = new long[len + 1];
+                    cvalue[0] = t._1; // First vertex in the triangle
+                    System.arraycopy(t._2, index + 1, cvalue, 1, len);
+                    if (sortById)
+                        Arrays.sort(cvalue, 1, cvalue.length); // quickSort to comfort with fonl
                 } else {
-                    forward = new long[len];
-                    System.arraycopy(t._2, index + 1, forward, 0, len);
-                    Arrays.sort(forward);
+                    cvalue = new long[len];
+                    System.arraycopy(t._2, index + 1, cvalue, 0, len);
+                    if (sortById)
+                        Arrays.sort(cvalue);
                 }
-                output.add(new Tuple2<>(t._2[index], forward));
+                output.add(new Tuple2<>(t._2[index], cvalue));
             }
             return output.iterator();
         });

@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.ktruss;
+package ir.ac.sbu.graph.ktruss.distributed;
 
 import ir.ac.sbu.graph.utils.GraphUtils;
 import ir.ac.sbu.graph.clusteringco.CohenTC;
