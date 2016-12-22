@@ -49,7 +49,7 @@ public class GraphLoader {
     }
 
     public static JavaPairRDD<Long, Long> loadEdges(JavaRDD<String> input) {
-        JavaPairRDD<Long, Long> edges = input.flatMapToPair((PairFlatMapFunction<String, Long, Long>) line -> {
+        return input.flatMapToPair((PairFlatMapFunction<String, Long, Long>) line -> {
             if (line.startsWith("#"))
                 return Collections.emptyIterator();
 
@@ -69,7 +69,6 @@ public class GraphLoader {
             list.add(new Tuple2<>(e2, e1));
             return list.iterator();
         });
-        return edges;
     }
 
     public static JavaPairRDD<Integer, Integer> loadEdgesInt(JavaRDD<String> input) {
