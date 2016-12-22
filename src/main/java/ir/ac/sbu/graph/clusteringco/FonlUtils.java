@@ -119,7 +119,7 @@ public class FonlUtils implements Serializable {
      */
     public static JavaPairRDD<Long, long[]> createWith2Reduce(JavaPairRDD<Long, Long> edges, int partition, boolean
         persistOnDisk, boolean repartition) {
-        JavaPairRDD<Long, long[]> fonl = edges.groupByKey().flatMapToPair(t -> {
+        JavaPairRDD<Long, long[]> fonl = edges.groupByKey(partition).flatMapToPair(t -> {
             HashSet<Long> neighborSet = new HashSet<>();
             for (Long neighbor : t._2) {
                 neighborSet.add(neighbor);
@@ -305,7 +305,7 @@ public class FonlUtils implements Serializable {
     }
 
     public static JavaPairRDD<Long, long[]> loadFonl(JavaSparkContext sc, String inputPath, int partition) {
-        JavaRDD<String> input = sc.textFile(inputPath, partition);
+        JavaRDD<String> input = sc.textFile(inputPath, partition).repartition(partition);
         JavaPairRDD<Long, Long> edges = GraphLoader.loadEdges(input);
         return FonlUtils.createWith2Reduce(edges, partition);
     }
