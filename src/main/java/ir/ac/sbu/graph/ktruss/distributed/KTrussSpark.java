@@ -40,7 +40,6 @@ public class KTrussSpark {
 
         long start = System.currentTimeMillis();
         JavaPairRDD<Long, long[]> fonl = FonlUtils.loadFonl(sc, inputPath, partition);
-        System.out.println("fonl count: " + fonl.count());
         JavaPairRDD<Long, long[]> candidates = FonlDegTC.generateCandidates(fonl, true, false);
         JavaPairRDD<Tuple2<Long, Long>, Set<Long>> evMap = candidates.cogroup(fonl, partition).mapPartitions(p -> {
             Map<Tuple2<Long, Long>, Set<Long>> map = new HashMap<>();
