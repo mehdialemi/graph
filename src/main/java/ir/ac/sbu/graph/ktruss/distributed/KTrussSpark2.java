@@ -61,12 +61,14 @@ public class KTrussSpark2 {
                 int lastIndex = 1;
                 int index = lastIndex;
                 long u = cvalue[0];
-                Tuple2<Long, Long> uv = new Tuple2<>(u, v);
+                Tuple2<Long, Long> uv = null;
                 for (int i = 1; i < cvalue.length && lastIndex < fv.length; i++) {
                     long w = cvalue[i];
                     boolean common = false;
                     for (int j = index; j < fv.length; j++, index++) {
                         if (w == fv[j]) {
+                            if (uv == null)
+                                uv = new Tuple2<>(u, v);
                             common = true;
                             lastIndex = index + 1;
                             // report a triangle with
