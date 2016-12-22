@@ -2,9 +2,11 @@ package ir.ac.sbu.graph.ktruss.distributed;
 
 import ir.ac.sbu.graph.clusteringco.FonlDegTC;
 import ir.ac.sbu.graph.clusteringco.FonlUtils;
+import ir.ac.sbu.graph.utils.GraphLoader;
 import ir.ac.sbu.graph.utils.GraphUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import scala.Tuple2;
 
@@ -39,7 +41,10 @@ public class KTrussSpark {
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         long start = System.currentTimeMillis();
-        JavaPairRDD<Long, long[]> fonl = FonlUtils.loadFonl(sc, inputPath, partition);
+        JavaRDD<String> input = sc.textFile(inputPath, partition);
+        JavaPairRDD<Long, Long> edges = GraphLoader.loadEdges(input);
+        JavaPairRDD<Long, long[]> fonl = FonlUtils.createWith2ReduceNoSort(edges, partition);
+
         JavaPairRDD<Long, long[]> candidates = FonlDegTC.generateCandidates(fonl, true, false);
         JavaPairRDD<Tuple2<Long, Long>, Set<Long>> evMap = candidates.cogroup(fonl, partition).mapPartitions(p -> {
 
