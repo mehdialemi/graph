@@ -105,7 +105,7 @@ public class KTrussSpark {
                 }
             }
             return list.iterator();
-        }).groupByKey(partition * 10);
+        }).groupByKey().repartition(partition * 10);
 
         int iteration = 1;
         JavaPairRDD<Tuple2<Long, Long>, Iterable<Long>> current = evMap.cache();
