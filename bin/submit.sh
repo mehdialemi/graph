@@ -5,7 +5,7 @@ if [ -z ${SPARK_HOME+X} ]; then
 fi
 
 jar_path="$PWD/target/subgraph-mining-1.0-jar-with-dependencies.jar"
-master="malemi-2"
+master="alemi-1"
 
 if [ ! -z ${TOTAL_CORES+X} ]; then
     total_cores=$TOTAL_CORES
