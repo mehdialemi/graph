@@ -17,6 +17,8 @@ import java.util.*;
  */
 public class KTrussSparkTriangle {
 
+    public static final int CO_PARTITION_FACTOR = 10;
+
     public static void main(String[] args) {
         String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
 //        String inputPath = "/home/mehdi/graph-data/cit-Patents.txt";
@@ -47,7 +49,7 @@ public class KTrussSparkTriangle {
         JavaPairRDD<Long, long[]> fonl = FonlUtils.createWith2ReduceNoSort(edges, partition);
 
         JavaPairRDD<Long, long[]> candidates = FonlDegTC.generateCandidates(fonl, true, false);
-        JavaPairRDD<Tuple2<Long, Long>, long[]> eTriangleMap = candidates.cogroup(fonl, partition).flatMapToPair(t -> {
+        JavaPairRDD<Tuple2<Long, Long>, long[]> eTriangleMap = candidates.cogroup(fonl, partition * CO_PARTITION_FACTOR).flatMapToPair(t -> {
             Iterator<long[]> cvalues = t._2._2.iterator();
             List<Tuple2<Tuple2<Long, Long>, long[]>> list = new ArrayList<>();
 
@@ -99,7 +101,7 @@ public class KTrussSparkTriangle {
             }
 
             return list.iterator();
-        }).repartition(partition * 10).cache();
+        }).repartition(partition * CO_PARTITION_FACTOR).cache();
 
         JavaPairRDD<Tuple2<Long, Long>, Integer> edgeSup = eTriangleMap.flatMapToPair(t -> {
             long u = t._1._1;
