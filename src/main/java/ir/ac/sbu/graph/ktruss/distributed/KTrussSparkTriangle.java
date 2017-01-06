@@ -46,7 +46,7 @@ public class KTrussSparkTriangle {
 
         JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
 
-        JavaPairRDD<Integer, int[]> fonl = FonlUtils.createWith2ReduceNoSort(edges, partition);
+        JavaPairRDD<Integer, int[]> fonl = FonlUtils.createWith2ReduceNoSortInt(edges, partition);
 
         JavaPairRDD<Integer, int[]> candidates = FonlDegTC.generateCandidatesInteger(fonl, true, false);
         JavaPairRDD<Long, int[]> eTriangleMap = candidates.cogroup(fonl, partition * CO_PARTITION_FACTOR).flatMapToPair(t -> {

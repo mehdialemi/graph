@@ -188,7 +188,7 @@ public class FonlUtils implements Serializable {
 //        return fonl;
     }
 
-    public static JavaPairRDD<Integer, int[]> createWith2ReduceNoSort(JavaPairRDD<Integer, Integer> edges, int partition) {
+    public static JavaPairRDD<Integer, int[]> createWith2ReduceNoSortInt(JavaPairRDD<Integer, Integer> edges, int partition) {
         return edges.groupByKey().flatMapToPair(t -> {
             HashSet<Integer> neighborSet = new HashSet<>();
             for (int neighbor : t._2) {
