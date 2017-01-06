@@ -60,19 +60,20 @@ public class KTrussSparkTriangleCompress {
 
             int[] fv = cvalues.next();
             cvalues = t._2._1.iterator();
+            IntList wList = new IntArrayList();
             while (cvalues.hasNext()) {
                 int v = t._1;
                 int[] cvalue = cvalues.next();
                 int lastIndex = 1;
                 int index = lastIndex;
                 int u = cvalue[0];
-                List<Integer> wSet = null;
+                wList.clear();
                 for (int i = 1; i < cvalue.length && lastIndex < fv.length; i++) {
                     int w = cvalue[i];
                     boolean common = false;
                     for (int j = index; j < fv.length; j++, index++) {
                         if (w == fv[j]) {
-                            wSet.add(w);
+                            wList.add(w);
                             common = true;
                             lastIndex = index + 1;
                             break;
@@ -82,13 +83,14 @@ public class KTrussSparkTriangleCompress {
                         index = lastIndex;
                 }
 
+                if (wList.isEmpty())
+                    continue;
+
                 // TODO use min1 and min2 as u and v and others should be sorted
-                if (wSet != null) {
-                    int[] wArray = new int[wSet.size() + 1];
-                    wArray[0] = v;
-                    for (int i = 1; i < wSet.size(); i++) {
-                        wArray[i] = wSet.get(i);
-                    }
+                int[] wArray = new int[wList.size() + 1];
+                wArray[0] = v;
+                for (int i = 0; i < wList.size(); i++) {
+                    wArray[i + 1] = wList.get(i);
                     list.add(new Tuple2<>(u, wArray));
                 }
             }
@@ -112,7 +114,7 @@ public class KTrussSparkTriangleCompress {
             IntIterator iterator = map.keySet().iterator();
             int i = 0;
             while (iterator.hasNext()) {
-                keys[i ++] = iterator.nextInt();
+                keys[i++] = iterator.nextInt();
             }
             Arrays.sort(keys);
             int[][] values = new int[size][];
@@ -145,5 +147,6 @@ public class KTrussSparkTriangleCompress {
         }).reduceByKey((a, b) -> a + b).cache();
 
         System.out.println("count, " + edgeSup.count());
-        sc.close();    }
+        sc.close();
+    }
 }
