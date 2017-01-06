@@ -188,6 +188,74 @@ public class FonlUtils implements Serializable {
 //        return fonl;
     }
 
+    public static JavaPairRDD<Integer, int[]> createWith2ReduceNoSort(JavaPairRDD<Integer, Integer> edges, int partition) {
+        return edges.groupByKey().flatMapToPair(t -> {
+            HashSet<Integer> neighborSet = new HashSet<>();
+            for (int neighbor : t._2) {
+                neighborSet.add(neighbor);
+            }
+
+            if (neighborSet.size() == 0)
+                return Collections.emptyIterator();
+
+            int degree = neighborSet.size();
+
+            GraphUtils.VertexDegreeInteger vd = new GraphUtils.VertexDegreeInteger(t._1, degree);
+
+            List<Tuple2<Integer, GraphUtils.VertexDegreeInteger>> degreeList = new ArrayList<>(degree);
+
+            // Add degree information of the current vertex to its neighbor
+            for (int neighbor : neighborSet) {
+                degreeList.add(new Tuple2<>(neighbor, vd));
+            }
+
+            if (degreeList.size() == 0)
+                return Collections.emptyIterator();
+
+            return degreeList.iterator();
+        }).groupByKey()
+            .mapToPair(v -> {
+                int degree = 0;
+
+                if (v._2 == null)
+                    return new Tuple2<>(v._1, new int[]{0});
+
+                // Iterate over higherIds to calculate degree of the current vertex
+                for (GraphUtils.VertexDegreeInteger vd : v._2) {
+                    degree++;
+                }
+
+                SortedSet<GraphUtils.VertexDegreeInteger> list = new TreeSet<>((a, b) -> {
+                    int x, y;
+                    if (a.degree != b.degree) {
+                        x = a.degree;
+                        y = b.degree;
+                    } else {
+                        x = a.vertex;
+                        y = b.vertex;
+                        if (x == y) {
+                            x = a.vertex;
+                            y = b.vertex;
+                        }
+                    }
+                    return x - y;
+                });
+
+                for (GraphUtils.VertexDegreeInteger vd : v._2)
+                    if (vd.degree > degree || (vd.degree == degree && vd.vertex > v._1))
+                        list.add(vd);
+
+                int[] higherDegs = new int[list.size() + 1];
+                higherDegs[0] = degree;
+                int i = 0;
+                for (GraphUtils.VertexDegreeInteger vertex : list) {
+                    higherDegs[++i] = vertex.vertex;
+                }
+
+                return new Tuple2<>(v._1, higherDegs);
+            }).repartition(partition).cache();
+    }
+
     /**
      * Create a fonl in key-value structure. Here, key is a vertex id and value is an array which first element of it
      * stores degree of the key vertex and the other elements are neighbor vertices with higher degree than the key

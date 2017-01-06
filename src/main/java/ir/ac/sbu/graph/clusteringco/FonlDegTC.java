@@ -133,4 +133,39 @@ public class FonlDegTC {
             return output.iterator();
         });
     }
+
+    public static JavaPairRDD<Integer, int[]> generateCandidatesInteger(JavaPairRDD<Integer, int[]> fonl, final boolean addFirst,
+                                                               final boolean sortById) {
+        return fonl.filter(t -> t._2.length > 2).flatMapToPair(t -> {
+            int size = t._2.length - 1; // one is for the first index holding node's degree
+
+            if (size == 1)
+                return Collections.emptyIterator();
+
+            List<Tuple2<Integer, int[]>> output;
+            if (addFirst)
+                output = new ArrayList<>(size);
+            else
+                output = new ArrayList<>(size - 1);
+
+            for (int index = 1; index < size; index++) {
+                int len = size - index;
+                int[] cvalue;
+                if (addFirst) {
+                    cvalue = new int[len + 1];
+                    cvalue[0] = t._1; // First vertex in the triangle
+                    System.arraycopy(t._2, index + 1, cvalue, 1, len);
+                    if (sortById)
+                        Arrays.sort(cvalue, 1, cvalue.length); // quickSort to comfort with fonl
+                } else {
+                    cvalue = new int[len];
+                    System.arraycopy(t._2, index + 1, cvalue, 0, len);
+                    if (sortById)
+                        Arrays.sort(cvalue);
+                }
+                output.add(new Tuple2<>(t._2[index], cvalue));
+            }
+            return output.iterator();
+        });
+    }
 }

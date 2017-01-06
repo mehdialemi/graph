@@ -239,6 +239,19 @@ public class GraphUtils implements Serializable {
         return count;
     }
 
+    public static class VertexDegreeInteger {
+        public int vertex;
+        public int degree;
+
+        public VertexDegreeInteger() {
+        }
+
+        public VertexDegreeInteger(int vertex, int degree) {
+            this.vertex = vertex;
+            this.degree = degree;
+        }
+    }
+
     public static class VertexDegree {
         public long vertex;
         public int degree;

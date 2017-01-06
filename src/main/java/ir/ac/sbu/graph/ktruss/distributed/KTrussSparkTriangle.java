@@ -44,38 +44,38 @@ public class KTrussSparkTriangle {
 
         JavaRDD<String> input = sc.textFile(inputPath, partition);
 
-        JavaPairRDD<Long, Long> edges = GraphLoader.loadEdges(input);
+        JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
 
-        JavaPairRDD<Long, long[]> fonl = FonlUtils.createWith2ReduceNoSort(edges, partition);
+        JavaPairRDD<Integer, int[]> fonl = FonlUtils.createWith2ReduceNoSort(edges, partition);
 
-        JavaPairRDD<Long, long[]> candidates = FonlDegTC.generateCandidates(fonl, true, false);
-        JavaPairRDD<Tuple2<Long, Long>, long[]> eTriangleMap = candidates.cogroup(fonl, partition * CO_PARTITION_FACTOR).flatMapToPair(t -> {
-            Iterator<long[]> cvalues = t._2._2.iterator();
-            List<Tuple2<Tuple2<Long, Long>, long[]>> list = new ArrayList<>();
+        JavaPairRDD<Integer, int[]> candidates = FonlDegTC.generateCandidatesInteger(fonl, true, false);
+        JavaPairRDD<Long, int[]> eTriangleMap = candidates.cogroup(fonl, partition * CO_PARTITION_FACTOR).flatMapToPair(t -> {
+            Iterator<int[]> cvalues = t._2._2.iterator();
+            List<Tuple2<Long, int[]>> list = new ArrayList<>();
 
             if (!cvalues.hasNext())
                 return Collections.emptyIterator();
 
-            long[] fv = cvalues.next();
+            int[] fv = cvalues.next();
             cvalues = t._2._1.iterator();
             while (cvalues.hasNext()) {
-                long v = t._1.longValue();
-                long[] cvalue = cvalues.next();
+                int v = t._1;
+                int[] cvalue = cvalues.next();
                 int lastIndex = 1;
                 int index = lastIndex;
-                long u = cvalue[0];
-                Tuple2<Long, Long> uv = null;
-                List<Long> wSet = null;
+                int u = cvalue[0];
+                Long uv = null;
+                List<Integer> wSet = null;
                 for (int i = 1; i < cvalue.length && lastIndex < fv.length; i++) {
-                    long w = cvalue[i];
+                    int w = cvalue[i];
                     boolean common = false;
                     for (int j = index; j < fv.length; j++, index++) {
                         if (w == fv[j]) {
                             if (uv == null) {
                                 if (u < v)
-                                    uv = new Tuple2<>(u, v);
+                                    uv = (long) u << 32 | v & 0xFFFFFFFFL;
                                 else
-                                    uv = new Tuple2<>(v, u);
+                                    uv = (long) v << 32 | u & 0xFFFFFFFFL;
                                 wSet = new ArrayList<>(Math.min(fv.length, cvalue.length) / 2);
                             }
                             // report a triangle with
@@ -91,7 +91,7 @@ public class KTrussSparkTriangle {
 
                 // TODO use min1 and min2 as u and v and others should be sorted
                 if (wSet != null) {
-                    long[] wArray = new long[wSet.size()];
+                    int[] wArray = new int[wSet.size()];
                     for (int i = 0; i < wSet.size(); i++) {
                         wArray[i] = wSet.get(i);
                     }
@@ -103,23 +103,24 @@ public class KTrussSparkTriangle {
             return list.iterator();
         }).repartition(partition * CO_PARTITION_FACTOR).cache();
 
-        JavaPairRDD<Tuple2<Long, Long>, Integer> edgeSup = eTriangleMap.flatMapToPair(t -> {
-            long u = t._1._1;
-            long v = t._1._2;
-            List<Tuple2<Tuple2<Long, Long>, Integer>> list = new ArrayList<>(t._2.length * 2 + 1);
+        JavaPairRDD<Long, Integer> edgeSup = eTriangleMap.flatMapToPair(t -> {
+            int u = (int) (t._1 >> 32);
+            int v = (int) t._1.longValue();
+
+            List<Tuple2<Long, Integer>> list = new ArrayList<>(t._2.length * 2 + 1);
             list.add(new Tuple2<>(t._1, t._2.length));
-            for (Long w : t._2) {
-                Tuple2<Long, Long> t1;
-                Tuple2<Long, Long> t2;
+            for (int w : t._2) {
+                Long t1;
+                Long t2;
                 if (w < u) {
-                    t1 = new Tuple2<>(w, u);
-                    t2 = new Tuple2<>(w, v);
+                    t1 = (long) w << 32 | u & 0xFFFFFFFFL;
+                    t2 = (long) w << 32 | v & 0xFFFFFFFFL;
                 } else if (w > v) {
-                    t1 = new Tuple2<>(u, w);
-                    t2 = new Tuple2<>(v, w);
+                    t1 = (long) u << 32 | w & 0xFFFFFFFFL;
+                    t2 = (long) v << 32 | w & 0xFFFFFFFFL;
                 } else {
-                    t1 = new Tuple2<>(u, w);
-                    t2 = new Tuple2<>(w, v);
+                    t1 = (long) u << 32 | w & 0xFFFFFFFFL;
+                    t2 = (long) w << 32 | v & 0xFFFFFFFFL;
                 }
                 list.add(new Tuple2<>(t1, 1));
                 list.add(new Tuple2<>(t2, 1));
