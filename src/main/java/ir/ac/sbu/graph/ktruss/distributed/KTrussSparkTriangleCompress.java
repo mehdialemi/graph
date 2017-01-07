@@ -6,6 +6,8 @@ import ir.ac.sbu.graph.clusteringco.FonlUtils;
 import ir.ac.sbu.graph.utils.GraphLoader;
 import ir.ac.sbu.graph.utils.GraphUtils;
 import it.unimi.dsi.fastutil.ints.*;
+import it.unimi.dsi.fastutil.longs.Long2IntMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -128,23 +130,50 @@ public class KTrussSparkTriangleCompress {
             return sg;
         }).repartition(partition * CO_PARTITION_FACTOR).cache();
 
-        JavaPairRDD<Tuple2<Integer, Integer>, Integer> edgeSup = triangles.flatMapToPair(p -> {
+        JavaPairRDD<Tuple2<Integer, Integer>, int[]> edgeSup = triangles.flatMapToPair(p -> {
             int u = p._1;
             Triangle triangle = p._2;
-            List<Tuple2<Tuple2<Integer, Integer>, Integer>> list = new ArrayList<>(p._2.keys.length * p._2.values.length);
+            List<Tuple2<Tuple2<Integer, Integer>, int[]>> list = new ArrayList<>(p._2.keys.length * p._2.values.length);
+            Long2IntOpenHashMap map = new Long2IntOpenHashMap(p._2.keys.length * p._2.values.length / 2);
+
             for (int i = 0; i < triangle.keys.length; i++) {
                 int v = triangle.keys[i];
-                Tuple2<Integer, Integer> uv = new Tuple2<>(u, v);
-                list.add(new Tuple2<>(uv, triangle.values.length));
+//                Tuple2<Integer, Integer> uv = new Tuple2<>(u, v);
+                long uv = (long) u << 32 | v & 0xFFFFFFFFL;
+                map.put(uv, triangle.values.length);
+
+                //list.add(new Tuple2<>(uv, triangle.values.length));
 
                 int[] wArray = triangle.values[i];
                 for (int w : wArray) {
-                    list.add(new Tuple2<>(new Tuple2<>(u, w), 1));
-                    list.add(new Tuple2<>(new Tuple2<>(v, w), 1));
+                    long uw = (long) u << 32 | w & 0xFFFFFFFFL;
+                    map.compute(uw, (f1, f2) -> f2 == null ? 1 : f2.intValue() + 1);
+
+                    long vw = (long) v << 32 | w & 0xFFFFFFFFL;
+                    map.compute(vw, (f1, f2) -> f2 == null ? 1 : f2.intValue() + 1);
                 }
             }
+
+            for (Long2IntMap.Entry entry : map.long2IntEntrySet()) {
+                long e = entry.getLongKey();
+                int v1 = (int) (e >> 32);
+                int v2 = (int) e;
+                list.add(new Tuple2<>(new Tuple2<>(v1, v2), new int[] {entry.getIntValue(), u}));
+            }
+
             return list.iterator();
-        }).reduceByKey((a, b) -> a + b).cache();
+        }).groupByKey().mapValues(value -> {
+            int sup = 0;
+            IntSet set = new IntOpenHashSet();
+            for (int[] val : value) {
+                sup += val[0];
+                set.add(val[1]);
+            }
+            int[] result = new int[set.size() + 1];
+            result[0] = sup;
+            System.arraycopy(set.toIntArray(), 0, result, 1, set.size());
+            return result;
+        }).repartition(partition * CO_PARTITION_FACTOR).cache();
 
         System.out.println("count, " + edgeSup.count());
         sc.close();
