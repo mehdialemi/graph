@@ -21,7 +21,7 @@ import java.util.*;
  */
 public class KTrussSparkTriangleCompress {
 
-    public static final int CO_PARTITION_FACTOR = 10;
+    public static final int CO_PARTITION_FACTOR = 5;
 
     public static void main(String[] args) {
         String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
@@ -130,7 +130,7 @@ public class KTrussSparkTriangleCompress {
             return sg;
         }).repartition(partition * CO_PARTITION_FACTOR).cache();
 
-        JavaPairRDD<Tuple2<Integer, Integer>, int[]> edgeSup = triangles.flatMapToPair(p -> {
+        JavaPairRDD<Tuple2<Integer, Integer>, int[]> edgeSupTriangle = triangles.flatMapToPair(p -> {
             int u = p._1;
             Triangle triangle = p._2;
             List<Tuple2<Tuple2<Integer, Integer>, int[]>> list = new ArrayList<>(p._2.keys.length * p._2.values.length);
@@ -174,6 +174,8 @@ public class KTrussSparkTriangleCompress {
             System.arraycopy(set.toIntArray(), 0, result, 1, set.size());
             return result;
         }).repartition(partition * CO_PARTITION_FACTOR).cache();
+
+        JavaPairRDD<Tuple2<Integer, Integer>, Integer> edgeSup = edgeSupTriangle.mapValues(value -> value[0]);
 
         System.out.println("count, " + edgeSup.count());
         sc.close();
