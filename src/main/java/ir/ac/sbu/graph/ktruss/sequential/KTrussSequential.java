@@ -21,7 +21,7 @@ public class KTrussSequential {
             k = Integer.parseInt(args[1]);
         int minSup = k - 2;
         
-        int method = 3;
+        int method = 1;
         if (args.length > 1)
             method = Integer.parseInt(args[2]);
         

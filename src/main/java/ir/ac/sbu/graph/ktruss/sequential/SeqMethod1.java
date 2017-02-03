@@ -21,17 +21,21 @@ public class SeqMethod1 extends SequentialBase {
         long triangleTime = System.currentTimeMillis() - t1;
         Set<Integer>[] eTriangles = result._2;
         List<int[]> triangles = result._1;
-        System.out.println("Triangle time: " + triangleTime);
+        System.out.println("TriangleSubgraph time: " + triangleTime);
 
         int[] sorted = null;
         int iteration = 0;
         int lastIndex = 0;
+        int prev = eTriangles.length;
         while (true) {
             System.out.println("iteration: " + ++iteration);
             long t1_sort = System.currentTimeMillis();
             sorted = SequentialUtils.sort(eTriangles, sorted, lastIndex);
+            int invalids = prev - sorted.length;
+            prev = sorted.length;
             long t2_sort = System.currentTimeMillis();
-            System.out.println("Valid edges: " + sorted.length + ", quickSort time: " + (t2_sort - t1_sort) + " ms");
+            System.out.println("Valid edges: " + sorted.length + ", invalid: " + invalids +
+                ", quickSort time: " + (t2_sort - t1_sort) + " ms");
             lastIndex = 0;
             for (; lastIndex < sorted.length; lastIndex++) {
                 int eIndex = sorted[lastIndex];
@@ -166,7 +170,7 @@ public class SeqMethod1 extends SequentialBase {
         }
 
         long t10 = System.currentTimeMillis();
-        System.out.println("Triangle finished in " + (t10 - t9) + " ms");
+        System.out.println("TriangleSubgraph finished in " + (t10 - t9) + " ms");
         return new Tuple2<>(triangles, eTriangles);
     }
 }

@@ -20,7 +20,7 @@ public class SeqMethod2 extends SequentialBase {
         long tStart = System.currentTimeMillis();
         Map<Edge, Set<Integer>> edgeMap = findET(edges);
         long tt = System.currentTimeMillis();
-        System.out.println("Triangle finding in " + (tt - tStart) + " ms");
+        System.out.println("TriangleSubgraph finding in " + (tt - tStart) + " ms");
 
         int iteration = 0;
         long tStartLoop = System.currentTimeMillis();

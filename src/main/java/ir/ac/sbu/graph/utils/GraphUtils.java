@@ -1,6 +1,7 @@
 package ir.ac.sbu.graph.utils;
 
 import ir.ac.sbu.graph.Edge;
+import it.unimi.dsi.fastutil.ints.*;
 import org.apache.spark.SparkConf;
 import scala.Tuple2;
 import scala.Tuple3;
@@ -142,6 +143,91 @@ public class GraphUtils implements Serializable {
         return count;
     }
 
+    public static int sortedIntersectionInt(int[] fVal, int fValIndex, int[] cVal, int cValIndex, int u,
+                                             Int2ObjectMap<IntSet> map) {
+        if (fValIndex >= fVal.length || cValIndex >= cVal.length)
+            return 0;
+
+        int fv = fVal[fValIndex ++];
+        int cv = cVal[cValIndex ++];
+        int count = 0;
+        while (true) {
+            if (fv == cv) {
+                count ++;
+                map.computeIfAbsent(fv, value -> new IntOpenHashSet());
+                map.get(fv).add(u);
+                fValIndex ++;
+                cValIndex ++;
+                if (fValIndex >= fVal.length || cValIndex >= cVal.length)
+                    break;
+
+                fv = fVal[fValIndex];
+                cv = cVal[cValIndex];
+            } else if (fv < cv) {
+                fValIndex ++;
+                if (fValIndex >= fVal.length)
+                    break;
+                fv = fVal[fValIndex];
+            } else {
+                cValIndex ++;
+                if (cValIndex >= cVal.length)
+                    break;
+                cv = cVal[cValIndex];
+            }
+        }
+
+        return count;
+    }
+
+    public static IntList sortedIntersectionTest(int[] hDegs, int hIndex, int[] forward, int fIndex) {
+        int fLen = forward.length;
+        int hLen = hDegs.length;
+
+        if (hDegs.length == 0 || fLen == 0)
+            return null;
+
+        boolean leftRead = true;
+        boolean rightRead = true;
+
+        int h = 0;
+        int f = 0;
+
+        IntList list = null;
+        boolean finish = false;
+        while (!finish) {
+
+            if (hIndex >= hLen && fIndex >= fLen)
+                break;
+
+            if ((hIndex >= hLen && !rightRead) || (fIndex >= fLen && !leftRead))
+                break;
+
+            if (leftRead && hIndex < hLen) {
+                h = hDegs[hIndex++];
+            }
+
+            if (rightRead && fIndex < fLen) {
+                f = forward[fIndex++];
+            }
+
+            if (h == f) {
+                if (list == null)
+                    list = new IntArrayList();
+                list.add(h);
+                leftRead = true;
+                rightRead = true;
+            } else if (h < f) {
+                leftRead = true;
+                rightRead = false;
+            } else {
+                leftRead = false;
+                rightRead = true;
+            }
+        }
+        return list;
+    }
+
+
     public static List<Long> sortedIntersection(long[] hDegs, long[] forward, int hIndex, int fIndex) {
         int fLen = forward.length;
         int hLen = hDegs.length;
@@ -265,6 +351,19 @@ public class GraphUtils implements Serializable {
         }
     }
 
+    public static class VertexDegreeInt {
+        public int vertex;
+        public int degree;
+
+        public VertexDegreeInt() {
+        }
+
+        public VertexDegreeInt(int vertex, int degree) {
+            this.vertex = vertex;
+            this.degree = degree;
+        }
+    }
+
     public static class CandidateState {
         public int[] higherIds;
         public int firstNodeId;
@@ -277,6 +376,43 @@ public class GraphUtils implements Serializable {
 
     public static Tuple3<Long, Long, Long> createSorted(long u, long v, long w) {
         long first, second, third;
+        if (u < v) {
+            if (v < w) {
+                first = u;
+                second = v;
+                third = w;
+            } else {
+                third = v;
+                if (u < w) {
+                    first = u;
+                    second = w;
+                } else {
+                    first = w;
+                    second = u;
+                }
+            }
+        } else { // u > v
+            if (v > w) { // u > v > w
+                first = w;
+                second = v;
+                third = u;
+            } else { // u > v & v < w
+                first = v;
+                if (u < w) {
+                    second = u;
+                    third = w;
+                } else {
+                    second = w;
+                    third = u;
+                }
+            }
+        }
+
+        return new Tuple3<>(first, second, third);
+    }
+
+    public static Tuple3<Integer, Integer, Integer> createSorted(int u, int v, int w) {
+        int first, second, third;
         if (u < v) {
             if (v < w) {
                 first = u;

@@ -188,72 +188,62 @@ public class FonlUtils implements Serializable {
 //        return fonl;
     }
 
-    public static JavaPairRDD<Integer, int[]> createWith2ReduceNoSortInt(JavaPairRDD<Integer, Integer> edges, int partition) {
-        return edges.groupByKey().flatMapToPair(t -> {
+    public static JavaPairRDD<Integer, int[]> createWith2ReduceDegreeSortInt(JavaPairRDD<Integer, Integer> edges, int partition) {
+        return edges.groupByKey(partition).flatMapToPair(t -> {
             HashSet<Integer> neighborSet = new HashSet<>();
             for (int neighbor : t._2) {
                 neighborSet.add(neighbor);
             }
 
-            if (neighborSet.size() == 0)
-                return Collections.emptyIterator();
-
             int degree = neighborSet.size();
 
-            GraphUtils.VertexDegreeInteger vd = new GraphUtils.VertexDegreeInteger(t._1, degree);
+            if (degree == 0)
+                return Collections.emptyIterator();
 
-            List<Tuple2<Integer, GraphUtils.VertexDegreeInteger>> degreeList = new ArrayList<>(degree);
+            GraphUtils.VertexDegreeInt vd = new GraphUtils.VertexDegreeInt(t._1, degree);
+
+            List<Tuple2<Integer, GraphUtils.VertexDegreeInt>> degreeList = new ArrayList<>(degree);
 
             // Add degree information of the current vertex to its neighbor
             for (int neighbor : neighborSet) {
                 degreeList.add(new Tuple2<>(neighbor, vd));
             }
 
-            if (degreeList.size() == 0)
-                return Collections.emptyIterator();
-
             return degreeList.iterator();
-        }).groupByKey()
-            .mapToPair(v -> {
-                int degree = 0;
+        }).groupByKey().mapToPair(v -> {
+            int degree = 0;
+            // Iterate over higherIds to calculate degree of the current vertex
+            if (v._2 == null)
+                return new Tuple2<>(v._1, new int[]{0});
 
-                if (v._2 == null)
-                    return new Tuple2<>(v._1, new int[]{0});
+            for (GraphUtils.VertexDegreeInt vd : v._2) {
+                degree++;
+            }
 
-                // Iterate over higherIds to calculate degree of the current vertex
-                for (GraphUtils.VertexDegreeInteger vd : v._2) {
-                    degree++;
+            List<GraphUtils.VertexDegreeInt> list = new ArrayList<>();
+            for (GraphUtils.VertexDegreeInt vd : v._2)
+                if (vd.degree > degree || (vd.degree == degree && vd.vertex > v._1))
+                    list.add(vd);
+
+            Collections.sort(list, (a, b) -> {
+                int x, y;
+                if (a.degree != b.degree) {
+                    x = a.degree;
+                    y = b.degree;
+                } else {
+                    x = a.vertex;
+                    y = b.vertex;
                 }
+                return x - y;
+            });
 
-                SortedSet<GraphUtils.VertexDegreeInteger> list = new TreeSet<>((a, b) -> {
-                    int x, y;
-                    if (a.degree != b.degree) {
-                        x = a.degree;
-                        y = b.degree;
-                    } else {
-                        x = a.vertex;
-                        y = b.vertex;
-                        if (x == y) {
-                            x = a.vertex;
-                            y = b.vertex;
-                        }
-                    }
-                    return x - y;
-                });
+            int[] higherDegs = new int[list.size() + 1];
+            higherDegs[0] = degree;
+            for (int i = 1; i < higherDegs.length; i++)
+                higherDegs[i] = list.get(i - 1).vertex;
 
-                for (GraphUtils.VertexDegreeInteger vd : v._2)
-                    if (vd.degree > degree || (vd.degree == degree && vd.vertex > v._1))
-                        list.add(vd);
-
-                int[] higherDegs = new int[list.size() + 1];
-                higherDegs[0] = degree;
-                int i = 0;
-                for (GraphUtils.VertexDegreeInteger vertex : list) {
-                    higherDegs[++i] = vertex.vertex;
-                }
-
-                return new Tuple2<>(v._1, higherDegs);
-            }).repartition(partition).cache();
+            return new Tuple2<>(v._1, higherDegs);
+        }).repartition(partition).cache();
     }
 
     /**

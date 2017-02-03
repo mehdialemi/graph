@@ -285,7 +285,7 @@ public class ParallelKTruss2 extends ParallelKTrussBase {
             })).get();
 
         long t4 = System.currentTimeMillis();
-        System.out.println("Triangle finished, edgeMapSize: " + eMap.size() + ", duration: " + (t4 - t3) + " ms");
+        System.out.println("TriangleSubgraph finished, edgeMapSize: " + eMap.size() + ", duration: " + (t4 - t3) + " ms");
 
         return eMap;
     }

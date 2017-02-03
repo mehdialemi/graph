@@ -31,7 +31,7 @@ public class ParallelKTruss1 extends ParallelKTrussBase {
         long triangleTime = System.currentTimeMillis() - t1;
         Set<Integer>[] eTriangles = result._2;
         int[][] triangles = result._1;
-        System.out.println("Triangle time: " + triangleTime);
+        System.out.println("TriangleSubgraph time: " + triangleTime);
 
         Tuple2<Integer, int[]> sorted = null;
         int iteration = 0;
@@ -266,7 +266,7 @@ public class ParallelKTruss1 extends ParallelKTrussBase {
             )).get();
 
         long t10 = System.currentTimeMillis();
-        System.out.println("Triangle finished in " + (t10 - t9));
+        System.out.println("TriangleSubgraph finished in " + (t10 - t9));
         return new Tuple2<>(triangles, edgeTriangles);
     }
 

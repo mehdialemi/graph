@@ -201,7 +201,7 @@ public class TriangleParallel {
         });
 
         long t10 = System.currentTimeMillis();
-        System.out.println("Triangle finished in " + (t10 - t9));
+        System.out.println("TriangleSubgraph finished in " + (t10 - t9));
 
         return new Tuple2<>(triangleArray, validEdges);
     }

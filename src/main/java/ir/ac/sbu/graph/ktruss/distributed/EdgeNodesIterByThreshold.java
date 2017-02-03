@@ -40,6 +40,10 @@ public class EdgeNodesIterByThreshold {
 
         JavaPairRDD<Tuple2<Long, Long>, List<Long>> edgeNodes = RebuildTriangles.listEdgeNodes(sc, inputPath, partition);
 
+        System.out.println(edgeNodes.count());
+
+        System.exit(0);
+
         int iteration = 0;
         boolean stop = false;
 
