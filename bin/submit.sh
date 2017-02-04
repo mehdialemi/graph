@@ -69,6 +69,8 @@ case $task in
 	;;
 	"KT_TRIANGLE_COMP") main_class="ir.ac.sbu.graph.ktruss.distributed.KTrussSparkTriangleSet"
 	;;
+	"KT_INV_VERTICES") main_class="ir.ac.sbu.graph.ktruss.distributed.KTrussSparkInvalidVertices"
+	;;
 	*)	echo "please determine your task in the argument
 	[GCC_Hob|GCC_Deg|LCC_Deg|TC_Deg|GCC_Id|LCC_Id|GCC_GraphX|LCC_GraphX|TC_GraphX|GCC_NodeIter|TC_NodeIter"
 		exit 1
