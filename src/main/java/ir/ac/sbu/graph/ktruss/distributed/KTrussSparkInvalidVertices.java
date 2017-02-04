@@ -14,12 +14,13 @@ import scala.Tuple2;
 import java.util.*;
 
 /**
- *
+ * This class find k-truss sub-graphs from the big graph stored as edge list in the hdfs (Hadoop File System).
+ * This program is written by spark framework and would be run on the spark cluster. To extract k-truss sub-graphs,
+ * the following tasks is performed:
+ * 1- Find triangles and produce key-values as (edge, triangle vertices).
+ * 2- Repetitively remove edges which have support lower than the specified value.
  */
 public class KTrussSparkInvalidVertices {
-
-    public static final int CO_PARTITION_FACTOR = 10;
-    public static final int[] ZERO_INT = new int[]{0};
 
     public static void main(String[] args) {
         String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
@@ -54,17 +55,21 @@ public class KTrussSparkInvalidVertices {
 
         JavaPairRDD<Integer, int[]> candidates = FonlDegTC.generateCandidatesInteger(fonl);
 
-        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> edgeVertexes = candidates.cogroup(fonl).flatMapToPair(t -> {
+        // Generate kv such that key is an edge and value is its triangle vertices.
+        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> edgeVertices = candidates.cogroup(fonl).flatMapToPair(t -> {
             int[] fVal = t._2._2.iterator().next();
             Arrays.sort(fVal, 1, fVal.length);
             int v = t._1;
             List<Tuple2<Tuple2<Integer, Integer>, Integer>> output = new ArrayList<>();
             for (int[] cVal : t._2._1) {
                 int u = cVal[0];
+
+                // The intersection determines triangles which u and v are two of their vertices.
                 IntList wList = GraphUtils.sortedIntersectionTest(fVal, 1, cVal, 1);
                 if (wList == null)
                     continue;
 
+                // Always generate and edge (u, v) such that u < v.
                 Tuple2<Integer, Integer> uv;
                 if (u < v)
                     uv = new Tuple2<>(u, v);
@@ -90,13 +95,13 @@ public class KTrussSparkInvalidVertices {
             return output.iterator();
         }).groupByKey().mapValues(values -> {
             IntSet set = new IntOpenHashSet();
-            for (Integer v : values) {
-                set.add(v.intValue());
+            for (int v : values) {
+                set.add(v);
             }
             return set;
         }).repartition(partition).cache();
 
-        JavaPairRDD<Tuple2<Integer, Integer>, int[]> edgeSup = edgeVertexes.mapValues(v -> new int[]{v.size()}).cache();
+        JavaPairRDD<Tuple2<Integer, Integer>, int[]> edgeSup = edgeVertices.mapValues(v -> new int[]{v.size()}).cache();
 
         JavaPairRDD<Tuple2<Integer, Integer>, int[]> prevEdgeSup = edgeSup;
         int iteration = 0;
@@ -111,59 +116,75 @@ public class KTrussSparkInvalidVertices {
             if (count == 0)
                 break;
 
-            // Join invalids with  edgeVertexes
+            // Join invalids with  edgeVertices
             JavaPairRDD<Tuple2<Integer, Integer>, Iterable<Integer>> invalidUpdate =
-                invalids.join(edgeVertexes)
-                    .flatMapToPair(kv -> {
-                        for (int i = 1; i < kv._2._1.length; i++) {
-                            kv._2._2.remove(kv._2._1[i]);
-                        }
+                invalids.join(edgeVertices).flatMapToPair(kv -> {
 
-                        List<Tuple2<Tuple2<Integer, Integer>, Integer>> out = new ArrayList<>(kv._2._2.size() * 2);
+                    // Remove invalid vertices from those which are not marked as invalid for the current edge.
+                    // TODO this remove could be replaced with contains and skip in the following loop
+                    for (int i = 1; i < kv._2._1.length; i++) {
+                        kv._2._2.remove(kv._2._1[i]);
+                    }
 
-                        int u = kv._1._1;
-                        int v = kv._1._2;
-                        for (int w : kv._2._2) {
-                            if (u < w)
-                                out.add(new Tuple2<>(new Tuple2<>(u, w), v));
-                            else
-                                out.add(new Tuple2<>(new Tuple2<>(w, u), v));
+                    List<Tuple2<Tuple2<Integer, Integer>, Integer>> out = new ArrayList<>(kv._2._2.size() * 2);
 
-                            if (v < w)
-                                out.add(new Tuple2<>(new Tuple2<>(v, w), u));
-                            else
-                                out.add(new Tuple2<>(new Tuple2<>(w, v), u));
-                        }
+                    // Generate the vertices which should be reported as invalid for the edge of the current triangles.
+                    int u = kv._1._1;
+                    int v = kv._1._2;
+                    for (int w : kv._2._2) {
+                        if (u < w)
+                            out.add(new Tuple2<>(new Tuple2<>(u, w), v));
+                        else
+                            out.add(new Tuple2<>(new Tuple2<>(w, u), v));
 
-                        return out.iterator();
-                    }).groupByKey();
+                        if (v < w)
+                            out.add(new Tuple2<>(new Tuple2<>(v, w), u));
+                        else
+                            out.add(new Tuple2<>(new Tuple2<>(w, v), u));
+                    }
 
+                    return out.iterator();
+                }).groupByKey();
+
+            // Join invalid update with edgeSup to update the current edgeSup.
+            // By this join the list in the value part would be updated with those invalid vertices for the current edge
             edgeSup = invalidUpdate.rightOuterJoin(edgeSup).mapValues(joinValue -> {
+
+                // Calculate previous support
                 int initSup = joinValue._2[0];
                 int prevSup = initSup + 1 - joinValue._2.length;
                 if (!joinValue._1.isPresent()) {
-                    if (prevSup < minSup) {
+                    if (prevSup < minSup) { // Skip if this edge is already detected as invalid
                         return null;
                     }
                     return joinValue._2;
                 }
 
-                IntSortedSet invalidVertexes = new IntAVLTreeSet(joinValue._2, 1, joinValue._2.length - 1);
+                // Update the invalid list for the current value.
+                // TODO we can store SortedSet or Set as value
+                IntSortedSet invalidVertices = new IntAVLTreeSet(joinValue._2, 1, joinValue._2.length - 1);
                 for (int u : joinValue._1.get()) {
-                    invalidVertexes.add(u);
+                    invalidVertices.add(u);
                 }
 
-                int newSup = initSup - invalidVertexes.size();
+                // If new support is zero this means that no additional
+                // invalid update would be produced by the current edge
+                int newSup = initSup - invalidVertices.size();
                 if (newSup == 0)
                     return null;
 
-                int[] outVal = new int[1 + invalidVertexes.size()];
+                // Generate output value such that the value in index zero is init support and
+                // the remaining is related to maintain invalid vertices of the current edge.
+                // TODO value in the edgeSup could be replaced with a Tuple2(initSup, invalidVertices)
+                int[] outVal = new int[1 + invalidVertices.size()];
                 outVal[0] = initSup;
-                System.arraycopy(invalidVertexes.toIntArray(), 0, outVal, 1, outVal.length - 1);
+                System.arraycopy(invalidVertices.toIntArray(), 0, outVal, 1, outVal.length - 1);
                 return outVal;
             }).filter(kv -> kv._2 != null).cache();
 
             prevEdgeSup.unpersist();
+
+            // TODO update edgeVertices if necessary using some condition such as the size of update reaches to a specified thresholds
         }
 
         long tEnd = System.currentTimeMillis();
