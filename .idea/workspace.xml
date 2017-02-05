@@ -7,6 +7,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/distributed/KTrussSparkInvalidVertices.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/distributed/KTrussSparkInvalidVertices.java" />
     </list>
     <ignored path="graph-processing.iws" />
@@ -33,23 +34,18 @@
       <file leaf-file-name="KTrussSparkInvalidVertices.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/distributed/KTrussSparkInvalidVertices.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="161" column="58" selection-start-line="161" selection-start-column="58" selection-end-line="161" selection-end-column="58" />
-              <folding>
-                <element signature="e#11180#11181#0" expanded="true" />
-                <element signature="e#11219#11220#0" expanded="true" />
-                <element signature="e#11262#11263#0" expanded="true" />
-                <element signature="e#11290#11291#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="-342">
+              <caret line="115" column="88" selection-start-line="115" selection-start-column="88" selection-end-line="115" selection-end-column="88" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="IntCollection.java" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/IntCollection.java">
+      <file leaf-file-name="Partitioner.scala" pinned="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/org/apache/spark/spark-core_2.11/2.0.0/spark-core_2.11-2.0.0-sources.jar!/org/apache/spark/Partitioner.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="121">
-              <caret line="115" column="10" selection-start-line="115" selection-start-column="10" selection-end-line="115" selection-end-column="10" />
+            <state relative-caret-position="198">
+              <caret line="77" column="6" selection-start-line="77" selection-start-column="6" selection-end-line="77" selection-end-column="6" />
               <folding />
             </state>
           </provider>
@@ -58,9 +54,61 @@
       <file leaf-file-name="JavaPairRDD.scala" pinned="false" current-in-tab="false">
         <entry file="jar://$MAVEN_REPOSITORY$/org/apache/spark/spark-core_2.11/2.0.0/spark-core_2.11-2.0.0-sources.jar!/org/apache/spark/api/java/JavaPairRDD.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="226">
-              <caret line="64" column="43" selection-start-line="64" selection-start-column="43" selection-end-line="64" selection-end-column="43" />
+            <state relative-caret-position="198">
+              <caret line="494" column="6" selection-start-line="494" selection-start-column="6" selection-end-line="494" selection-end-column="6" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Tuple2.scala" pinned="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.11.8/scala-library-2.11.8-sources.jar!/scala/Tuple2.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="330">
+              <caret line="28" column="32" selection-start-line="28" selection-start-column="32" selection-end-line="28" selection-end-column="32" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Function0.scala" pinned="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.11.8/scala-library-2.11.8-sources.jar!/scala/Function0.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="345">
+              <caret line="29" column="6" selection-start-line="29" selection-start-column="6" selection-end-line="29" selection-end-column="6" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Product2.scala" pinned="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.11.8/scala-library-2.11.8-sources.jar!/scala/Product2.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="195">
+              <caret line="19" column="111" selection-start-line="19" selection-start-column="111" selection-end-line="19" selection-end-column="111" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Product.scala" pinned="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.11.8/scala-library-2.11.8-sources.jar!/scala/Product.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="105">
+              <caret line="19" column="6" selection-start-line="19" selection-start-column="6" selection-end-line="19" selection-end-column="6" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="IntCollection.java" pinned="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/IntCollection.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1065">
+              <caret line="115" column="10" selection-start-line="115" selection-start-column="10" selection-end-line="115" selection-end-column="10" />
+              <folding>
+                <element signature="e#0#5378#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -68,54 +116,85 @@
       <file leaf-file-name="IntAVLTreeSet.java" pinned="false" current-in-tab="false">
         <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/IntAVLTreeSet.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="121">
+            <state relative-caret-position="240">
               <caret line="64" column="13" selection-start-line="64" selection-start-column="13" selection-end-line="64" selection-end-column="13" />
               <folding>
-                <element signature="e#7073#7074#0" expanded="true" />
-                <element signature="e#7109#7110#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AbstractIntSortedSet.java" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/AbstractIntSortedSet.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="121">
-              <caret line="53" column="55" selection-start-line="53" selection-start-column="55" selection-end-line="53" selection-end-column="55" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AbstractIntSet.java" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/AbstractIntSet.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="121">
-              <caret line="55" column="52" selection-start-line="55" selection-start-column="52" selection-end-line="55" selection-end-column="52" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AbstractIntCollection.java" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/AbstractIntCollection.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="140">
-              <caret line="70" column="18" selection-start-line="70" selection-start-column="18" selection-end-line="70" selection-end-column="18" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="IntIterators.java" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/IntIterators.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="326" column="16" selection-start-line="326" selection-start-column="16" selection-end-line="326" selection-end-column="16" />
-              <folding>
-                <element signature="e#8343#8344#0" expanded="true" />
-                <element signature="e#8390#8391#0" expanded="true" />
+                <element signature="e#0#38434#0" expanded="false" />
+                <element signature="imports" expanded="false" />
+                <element signature="e#4076#4077#0" expanded="false" />
+                <element signature="e#4130#4131#0" expanded="false" />
+                <element signature="e#5980#5981#0" expanded="false" />
+                <element signature="e#6022#6023#0" expanded="false" />
+                <element signature="e#10061#10062#0" expanded="false" />
+                <element signature="e#10093#10094#0" expanded="false" />
+                <element signature="e#18353#18354#0" expanded="false" />
+                <element signature="e#18385#18386#0" expanded="false" />
+                <element signature="e#19923#19924#0" expanded="false" />
+                <element signature="e#19976#19977#0" expanded="false" />
+                <element signature="e#20139#20140#0" expanded="false" />
+                <element signature="e#20193#20194#0" expanded="false" />
+                <element signature="e#20349#20350#0" expanded="false" />
+                <element signature="e#20388#20389#0" expanded="false" />
+                <element signature="e#20542#20543#0" expanded="false" />
+                <element signature="e#20581#20582#0" expanded="false" />
+                <element signature="e#22087#22088#0" expanded="false" />
+                <element signature="e#22114#22115#0" expanded="false" />
+                <element signature="e#22389#22390#0" expanded="false" />
+                <element signature="e#22452#22453#0" expanded="false" />
+                <element signature="e#22529#22530#0" expanded="false" />
+                <element signature="e#22592#22593#0" expanded="false" />
+                <element signature="e#23630#23631#0" expanded="false" />
+                <element signature="e#23651#23652#0" expanded="false" />
+                <element signature="e#23681#23682#0" expanded="false" />
+                <element signature="e#23716#23717#0" expanded="false" />
+                <element signature="e#24448#24449#0" expanded="false" />
+                <element signature="e#24467#24468#0" expanded="false" />
+                <element signature="e#24496#24497#0" expanded="false" />
+                <element signature="e#24520#24521#0" expanded="false" />
+                <element signature="e#25689#25690#0" expanded="false" />
+                <element signature="e#25715#25716#0" expanded="false" />
+                <element signature="e#25940#25941#0" expanded="false" />
+                <element signature="e#25968#25969#0" expanded="false" />
+                <element signature="e#26001#26002#0" expanded="false" />
+                <element signature="e#26029#26030#0" expanded="false" />
+                <element signature="e#26052#26053#0" expanded="false" />
+                <element signature="e#26079#26080#0" expanded="false" />
+                <element signature="e#26259#26260#0" expanded="false" />
+                <element signature="e#26290#26291#0" expanded="false" />
+                <element signature="e#26319#26320#0" expanded="false" />
+                <element signature="e#26354#26355#0" expanded="false" />
+                <element signature="e#26381#26382#0" expanded="false" />
+                <element signature="e#26408#26409#0" expanded="false" />
+                <element signature="e#26602#26603#0" expanded="false" />
+                <element signature="e#26623#26624#0" expanded="false" />
+                <element signature="e#26655#26656#0" expanded="false" />
+                <element signature="e#26680#26681#0" expanded="false" />
+                <element signature="e#27121#27122#0" expanded="false" />
+                <element signature="e#27152#27153#0" expanded="false" />
+                <element signature="e#27213#27214#0" expanded="false" />
+                <element signature="e#27248#27249#0" expanded="false" />
+                <element signature="e#27286#27287#0" expanded="false" />
+                <element signature="e#27316#27317#0" expanded="false" />
+                <element signature="e#27362#27363#0" expanded="false" />
+                <element signature="e#27408#27409#0" expanded="false" />
+                <element signature="e#27456#27457#0" expanded="false" />
+                <element signature="e#27504#27505#0" expanded="false" />
+                <element signature="e#27565#27566#0" expanded="false" />
+                <element signature="e#27613#27614#0" expanded="false" />
+                <element signature="e#29871#29872#0" expanded="false" />
+                <element signature="e#29926#29927#0" expanded="false" />
+                <element signature="e#30512#30513#0" expanded="false" />
+                <element signature="e#30559#30560#0" expanded="false" />
+                <element signature="e#30598#30599#0" expanded="false" />
+                <element signature="e#30630#30631#0" expanded="false" />
+                <element signature="e#30678#30679#0" expanded="false" />
+                <element signature="e#30714#30715#0" expanded="false" />
+                <element signature="e#30776#30777#0" expanded="false" />
+                <element signature="e#30816#30817#0" expanded="false" />
+                <element signature="e#33924#33925#0" expanded="false" />
+                <element signature="e#33954#33955#0" expanded="false" />
+                <element signature="e#38415#38416#0" expanded="false" />
+                <element signature="e#38430#38431#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -124,19 +203,11 @@
       <file leaf-file-name="IntSet.java" pinned="false" current-in-tab="false">
         <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/IntSet.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="121">
+            <state relative-caret-position="240">
               <caret line="60" column="17" selection-start-line="60" selection-start-column="17" selection-end-line="60" selection-end-column="17" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="IntSortedSet.java" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/IntSortedSet.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="121">
-              <caret line="64" column="17" selection-start-line="64" selection-start-column="17" selection-end-line="64" selection-end-column="17" />
-              <folding />
+              <folding>
+                <element signature="e#0#2558#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -370,15 +441,123 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sbm-big-graphs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sbm-big-graphs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sbm-big-graphs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sbm-big-graphs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="graph" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sbm-big-graphs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sbm-big-graphs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="graph" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ktruss" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sbm-big-graphs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sbm-big-graphs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="graph" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ktruss" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="distributed" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
+      </pane>
+      <pane id="Scratches" />
+      <pane id="Scope">
+        <subPane subId="Problems" />
       </pane>
       <pane id="PackagesPane">
         <subPane />
       </pane>
-      <pane id="Scope">
-        <subPane subId="Problems" />
-      </pane>
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -868,7 +1047,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="25" width="1366" height="718" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -883,7 +1062,6 @@
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24340177" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23680352" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -893,6 +1071,7 @@
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23680352" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3258427" sideWeight="0.49706745" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -986,58 +1165,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss8.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="175" column="39" selection-start-line="174" selection-start-column="20" selection-end-line="175" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/Function.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="128">
-          <caret line="42" column="17" selection-start-line="42" selection-start-column="17" selection-end-line="42" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/Int2IntFunction.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="525">
-          <caret line="80" column="45" selection-start-line="80" selection-start-column="45" selection-end-line="80" selection-end-column="45" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/Int2IntMap.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="75" column="42" selection-start-line="75" selection-start-column="42" selection-end-line="75" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/utils/ArrayUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss7.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3585">
-          <caret line="254" column="65" selection-start-line="254" selection-start-column="32" selection-end-line="254" selection-end-column="65" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/distributed/KTrussSpark.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2580">
-          <caret line="182" column="29" selection-start-line="182" selection-start-column="29" selection-end-line="182" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/parallel/ParallelKTruss2.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
@@ -1225,9 +1352,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="600">
           <caret line="50" column="75" selection-start-line="50" selection-start-column="75" selection-end-line="50" selection-end-column="75" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1252,13 +1376,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="495">
           <caret line="40" column="87" selection-start-line="40" selection-start-column="87" selection-end-line="40" selection-end-column="87" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#8729#8730#0" expanded="false" />
-            <element signature="e#8802#8803#0" expanded="false" />
-            <element signature="e#8859#8860#0" expanded="false" />
-            <element signature="e#8917#8918#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1266,9 +1383,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="600">
           <caret line="49" column="89" selection-start-line="49" selection-start-column="89" selection-end-line="49" selection-end-column="89" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1286,9 +1400,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="600">
           <caret line="55" column="89" selection-start-line="55" selection-start-column="89" selection-end-line="55" selection-end-column="89" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1332,17 +1443,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2175">
           <caret line="162" column="53" selection-start-line="162" selection-start-column="53" selection-end-line="162" selection-end-column="53" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#4286#4287#0" expanded="false" />
-            <element signature="e#4332#4333#0" expanded="false" />
-            <element signature="e#4390#4391#0" expanded="false" />
-            <element signature="e#4456#4457#0" expanded="false" />
-            <element signature="e#9290#9291#0" expanded="false" />
-            <element signature="e#9343#9344#0" expanded="false" />
-            <element signature="e#9400#9401#0" expanded="false" />
-            <element signature="e#9466#9467#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1350,10 +1450,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="198">
           <caret line="152" column="11" selection-start-line="152" selection-start-column="11" selection-end-line="152" selection-end-column="11" />
-          <folding>
-            <element signature="e#4326#4327#0" expanded="false" />
-            <element signature="e#4380#4381#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1361,7 +1457,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="75">
           <caret line="5" column="41" selection-start-line="5" selection-start-column="41" selection-end-line="5" selection-end-column="41" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1369,7 +1464,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="75">
           <caret line="5" column="27" selection-start-line="5" selection-start-column="27" selection-end-line="5" selection-end-column="27" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1377,7 +1471,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="275">
           <caret line="47" column="0" selection-start-line="47" selection-start-column="0" selection-end-line="47" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1385,7 +1478,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="975">
           <caret line="71" column="96" selection-start-line="71" selection-start-column="96" selection-end-line="71" selection-end-column="96" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1393,98 +1485,416 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="75">
           <caret line="5" column="40" selection-start-line="5" selection-start-column="40" selection-end-line="5" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/spark/spark-core_2.11/2.0.0/spark-core_2.11-2.0.0-sources.jar!/org/apache/spark/api/java/JavaPairRDD.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="226">
-          <caret line="64" column="43" selection-start-line="64" selection-start-column="43" selection-end-line="64" selection-end-column="43" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/IntIterators.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
+        <state relative-caret-position="3555">
           <caret line="326" column="16" selection-start-line="326" selection-start-column="16" selection-end-line="326" selection-end-column="16" />
           <folding>
-            <element signature="e#8343#8344#0" expanded="true" />
-            <element signature="e#8390#8391#0" expanded="true" />
+            <element signature="e#0#27467#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+            <element signature="e#2178#2179#0" expanded="false" />
+            <element signature="e#2199#2200#0" expanded="false" />
+            <element signature="e#2232#2233#0" expanded="false" />
+            <element signature="e#2253#2254#0" expanded="false" />
+            <element signature="e#2278#2279#0" expanded="false" />
+            <element signature="e#2321#2322#0" expanded="false" />
+            <element signature="e#2350#2351#0" expanded="false" />
+            <element signature="e#2393#2394#0" expanded="false" />
+            <element signature="e#2420#2421#0" expanded="false" />
+            <element signature="e#2437#2438#0" expanded="false" />
+            <element signature="e#2468#2469#0" expanded="false" />
+            <element signature="e#2486#2487#0" expanded="false" />
+            <element signature="e#2513#2514#0" expanded="false" />
+            <element signature="e#2530#2531#0" expanded="false" />
+            <element signature="e#2558#2559#0" expanded="false" />
+            <element signature="e#2575#2576#0" expanded="false" />
+            <element signature="e#2602#2603#0" expanded="false" />
+            <element signature="e#2632#2633#0" expanded="false" />
+            <element signature="e#2665#2666#0" expanded="false" />
+            <element signature="e#2695#2696#0" expanded="false" />
+            <element signature="e#3210#3211#0" expanded="false" />
+            <element signature="e#3241#3242#0" expanded="false" />
+            <element signature="e#3271#3272#0" expanded="false" />
+            <element signature="e#3296#3297#0" expanded="false" />
+            <element signature="e#3329#3330#0" expanded="false" />
+            <element signature="e#3354#3355#0" expanded="false" />
+            <element signature="e#3632#3633#0" expanded="false" />
+            <element signature="e#3652#3653#0" expanded="false" />
+            <element signature="e#3684#3685#0" expanded="false" />
+            <element signature="e#3708#3709#0" expanded="false" />
+            <element signature="e#4040#4041#0" expanded="false" />
+            <element signature="e#4084#4085#0" expanded="false" />
+            <element signature="e#4478#4479#0" expanded="false" />
+            <element signature="e#4507#4508#0" expanded="false" />
+            <element signature="e#4540#4541#0" expanded="false" />
+            <element signature="e#4564#4565#0" expanded="false" />
+            <element signature="e#5119#5120#0" expanded="false" />
+            <element signature="e#5139#5140#0" expanded="false" />
+            <element signature="e#5171#5172#0" expanded="false" />
+            <element signature="e#5195#5196#0" expanded="false" />
+            <element signature="e#6503#6504#0" expanded="false" />
+            <element signature="e#6558#6559#0" expanded="false" />
+            <element signature="e#9731#9732#0" expanded="false" />
+            <element signature="e#9773#9774#0" expanded="false" />
+            <element signature="e#13652#13653#0" expanded="false" />
+            <element signature="e#13695#13696#0" expanded="false" />
+            <element signature="e#15017#15018#0" expanded="false" />
+            <element signature="e#15057#15058#0" expanded="false" />
+            <element signature="e#15210#15211#0" expanded="false" />
+            <element signature="e#15229#15230#0" expanded="false" />
+            <element signature="e#15259#15260#0" expanded="false" />
+            <element signature="e#15286#15287#0" expanded="false" />
+            <element signature="e#15311#15312#0" expanded="false" />
+            <element signature="e#15330#15331#0" expanded="false" />
+            <element signature="e#15356#15357#0" expanded="false" />
+            <element signature="e#15395#15396#0" expanded="false" />
+            <element signature="e#16460#16461#0" expanded="false" />
+            <element signature="e#16479#16480#0" expanded="false" />
+            <element signature="e#16509#16510#0" expanded="false" />
+            <element signature="e#16536#16537#0" expanded="false" />
+            <element signature="e#16569#16570#0" expanded="false" />
+            <element signature="e#16600#16601#0" expanded="false" />
+            <element signature="e#16627#16628#0" expanded="false" />
+            <element signature="e#16656#16657#0" expanded="false" />
+            <element signature="e#16687#16688#0" expanded="false" />
+            <element signature="e#16720#16721#0" expanded="false" />
+            <element signature="e#16747#16748#0" expanded="false" />
+            <element signature="e#16783#16784#0" expanded="false" />
+            <element signature="e#16810#16811#0" expanded="false" />
+            <element signature="e#16846#16847#0" expanded="false" />
+            <element signature="e#16871#16872#0" expanded="false" />
+            <element signature="e#16890#16891#0" expanded="false" />
+            <element signature="e#16916#16917#0" expanded="false" />
+            <element signature="e#16955#16956#0" expanded="false" />
+            <element signature="e#16984#16985#0" expanded="false" />
+            <element signature="e#17027#17028#0" expanded="false" />
+            <element signature="e#18223#18224#0" expanded="false" />
+            <element signature="e#18248#18249#0" expanded="false" />
+            <element signature="e#18281#18282#0" expanded="false" />
+            <element signature="e#18308#18309#0" expanded="false" />
+            <element signature="e#18557#18558#0" expanded="false" />
+            <element signature="e#18584#18585#0" expanded="false" />
+            <element signature="e#18615#18616#0" expanded="false" />
+            <element signature="e#18646#18647#0" expanded="false" />
+            <element signature="e#19496#19497#0" expanded="false" />
+            <element signature="e#19540#19541#0" expanded="false" />
+            <element signature="e#20018#20019#0" expanded="false" />
+            <element signature="e#20044#20045#0" expanded="false" />
+            <element signature="e#20969#20970#0" expanded="false" />
+            <element signature="e#21005#21006#0" expanded="false" />
+            <element signature="e#22052#22053#0" expanded="false" />
+            <element signature="e#22071#22072#0" expanded="false" />
+            <element signature="e#22101#22102#0" expanded="false" />
+            <element signature="e#22128#22129#0" expanded="false" />
+            <element signature="e#22154#22155#0" expanded="false" />
+            <element signature="e#22181#22182#0" expanded="false" />
+            <element signature="e#22364#22365#0" expanded="false" />
+            <element signature="e#22388#22389#0" expanded="false" />
+            <element signature="e#22685#22686#0" expanded="false" />
+            <element signature="e#22726#22727#0" expanded="false" />
+            <element signature="e#23080#23081#0" expanded="false" />
+            <element signature="e#23107#23108#0" expanded="false" />
+            <element signature="e#23140#23141#0" expanded="false" />
+            <element signature="e#23171#23172#0" expanded="false" />
+            <element signature="e#23196#23197#0" expanded="false" />
+            <element signature="e#23223#23224#0" expanded="false" />
+            <element signature="e#23252#23253#0" expanded="false" />
+            <element signature="e#23283#23284#0" expanded="false" />
+            <element signature="e#23466#23467#0" expanded="false" />
+            <element signature="e#23490#23491#0" expanded="false" />
+            <element signature="e#23676#23677#0" expanded="false" />
+            <element signature="e#23704#23705#0" expanded="false" />
+            <element signature="e#24420#24421#0" expanded="false" />
+            <element signature="e#24439#24440#0" expanded="false" />
+            <element signature="e#24469#24470#0" expanded="false" />
+            <element signature="e#24496#24497#0" expanded="false" />
+            <element signature="e#24529#24530#0" expanded="false" />
+            <element signature="e#24560#24561#0" expanded="false" />
+            <element signature="e#24585#24586#0" expanded="false" />
+            <element signature="e#24612#24613#0" expanded="false" />
+            <element signature="e#24641#24642#0" expanded="false" />
+            <element signature="e#24672#24673#0" expanded="false" />
+            <element signature="e#24699#24700#0" expanded="false" />
+            <element signature="e#24728#24729#0" expanded="false" />
+            <element signature="e#24759#24760#0" expanded="false" />
+            <element signature="e#24792#24793#0" expanded="false" />
+            <element signature="e#24975#24976#0" expanded="false" />
+            <element signature="e#24999#25000#0" expanded="false" />
+            <element signature="e#25185#25186#0" expanded="false" />
+            <element signature="e#25213#25214#0" expanded="false" />
+            <element signature="e#25562#25563#0" expanded="false" />
+            <element signature="e#25607#25608#0" expanded="false" />
+            <element signature="e#25953#25954#0" expanded="false" />
+            <element signature="e#25987#25988#0" expanded="false" />
+            <element signature="e#26013#26014#0" expanded="false" />
+            <element signature="e#26065#26066#0" expanded="false" />
+            <element signature="e#26090#26091#0" expanded="false" />
+            <element signature="e#26125#26126#0" expanded="false" />
+            <element signature="e#26150#26151#0" expanded="false" />
+            <element signature="e#26176#26177#0" expanded="false" />
+            <element signature="e#26209#26210#0" expanded="false" />
+            <element signature="e#26241#26242#0" expanded="false" />
+            <element signature="e#26881#26882#0" expanded="false" />
+            <element signature="e#26915#26916#0" expanded="false" />
+            <element signature="e#26941#26942#0" expanded="false" />
+            <element signature="e#26994#26995#0" expanded="false" />
+            <element signature="e#27019#27020#0" expanded="false" />
+            <element signature="e#27055#27056#0" expanded="false" />
+            <element signature="e#27080#27081#0" expanded="false" />
+            <element signature="e#27106#27107#0" expanded="false" />
+            <element signature="e#27139#27140#0" expanded="false" />
+            <element signature="e#27171#27172#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/AbstractIntCollection.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="140">
+        <state relative-caret-position="345">
           <caret line="70" column="18" selection-start-line="70" selection-start-column="18" selection-end-line="70" selection-end-column="18" />
-          <folding />
+          <folding>
+            <element signature="e#0#8302#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+            <element signature="e#2025#2026#0" expanded="false" />
+            <element signature="e#2052#2053#0" expanded="false" />
+            <element signature="e#2082#2083#0" expanded="false" />
+            <element signature="e#2112#2113#0" expanded="false" />
+            <element signature="e#5147#5148#0" expanded="false" />
+            <element signature="e#5195#5196#0" expanded="false" />
+            <element signature="e#5312#5313#0" expanded="false" />
+            <element signature="e#5336#5337#0" expanded="false" />
+            <element signature="e#5667#5668#0" expanded="false" />
+            <element signature="e#5698#5699#0" expanded="false" />
+            <element signature="e#7908#7909#0" expanded="false" />
+            <element signature="e#7933#7934#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/AbstractIntSet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="121">
+        <state relative-caret-position="165">
           <caret line="55" column="52" selection-start-line="55" selection-start-column="52" selection-end-line="55" selection-end-column="52" />
-          <folding />
+          <folding>
+            <element signature="e#0#2598#0" expanded="false" />
+            <element signature="e#2418#2419#0" expanded="false" />
+            <element signature="e#2438#2439#0" expanded="false" />
+            <element signature="e#2541#2542#0" expanded="false" />
+            <element signature="e#2593#2594#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/AbstractIntSortedSet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="121">
+        <state relative-caret-position="135">
           <caret line="53" column="55" selection-start-line="53" selection-start-column="55" selection-end-line="53" selection-end-column="55" />
-          <folding />
+          <folding>
+            <element signature="e#0#3127#0" expanded="false" />
+            <element signature="e#1889#1890#0" expanded="false" />
+            <element signature="e#1925#1926#0" expanded="false" />
+            <element signature="e#2137#2138#0" expanded="false" />
+            <element signature="e#2175#2176#0" expanded="false" />
+            <element signature="e#2404#2405#0" expanded="false" />
+            <element signature="e#2456#2457#0" expanded="false" />
+            <element signature="e#2643#2644#0" expanded="false" />
+            <element signature="e#2686#2687#0" expanded="false" />
+            <element signature="e#2872#2873#0" expanded="false" />
+            <element signature="e#2914#2915#0" expanded="false" />
+            <element signature="e#3044#3045#0" expanded="false" />
+            <element signature="e#3068#3069#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/IntSortedSet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="121">
+        <state relative-caret-position="285">
           <caret line="64" column="17" selection-start-line="64" selection-start-column="17" selection-end-line="64" selection-end-column="17" />
-          <folding />
+          <folding>
+            <element signature="e#0#6413#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/IntSet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="121">
+        <state relative-caret-position="240">
           <caret line="60" column="17" selection-start-line="60" selection-start-column="17" selection-end-line="60" selection-end-column="17" />
-          <folding />
+          <folding>
+            <element signature="e#0#2558#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/IntAVLTreeSet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="121">
+        <state relative-caret-position="240">
           <caret line="64" column="13" selection-start-line="64" selection-start-column="13" selection-end-line="64" selection-end-column="13" />
           <folding>
-            <element signature="e#7073#7074#0" expanded="true" />
-            <element signature="e#7109#7110#0" expanded="true" />
+            <element signature="e#0#38434#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+            <element signature="e#4076#4077#0" expanded="false" />
+            <element signature="e#4130#4131#0" expanded="false" />
+            <element signature="e#5980#5981#0" expanded="false" />
+            <element signature="e#6022#6023#0" expanded="false" />
+            <element signature="e#10061#10062#0" expanded="false" />
+            <element signature="e#10093#10094#0" expanded="false" />
+            <element signature="e#18353#18354#0" expanded="false" />
+            <element signature="e#18385#18386#0" expanded="false" />
+            <element signature="e#19923#19924#0" expanded="false" />
+            <element signature="e#19976#19977#0" expanded="false" />
+            <element signature="e#20139#20140#0" expanded="false" />
+            <element signature="e#20193#20194#0" expanded="false" />
+            <element signature="e#20349#20350#0" expanded="false" />
+            <element signature="e#20388#20389#0" expanded="false" />
+            <element signature="e#20542#20543#0" expanded="false" />
+            <element signature="e#20581#20582#0" expanded="false" />
+            <element signature="e#22087#22088#0" expanded="false" />
+            <element signature="e#22114#22115#0" expanded="false" />
+            <element signature="e#22389#22390#0" expanded="false" />
+            <element signature="e#22452#22453#0" expanded="false" />
+            <element signature="e#22529#22530#0" expanded="false" />
+            <element signature="e#22592#22593#0" expanded="false" />
+            <element signature="e#23630#23631#0" expanded="false" />
+            <element signature="e#23651#23652#0" expanded="false" />
+            <element signature="e#23681#23682#0" expanded="false" />
+            <element signature="e#23716#23717#0" expanded="false" />
+            <element signature="e#24448#24449#0" expanded="false" />
+            <element signature="e#24467#24468#0" expanded="false" />
+            <element signature="e#24496#24497#0" expanded="false" />
+            <element signature="e#24520#24521#0" expanded="false" />
+            <element signature="e#25689#25690#0" expanded="false" />
+            <element signature="e#25715#25716#0" expanded="false" />
+            <element signature="e#25940#25941#0" expanded="false" />
+            <element signature="e#25968#25969#0" expanded="false" />
+            <element signature="e#26001#26002#0" expanded="false" />
+            <element signature="e#26029#26030#0" expanded="false" />
+            <element signature="e#26052#26053#0" expanded="false" />
+            <element signature="e#26079#26080#0" expanded="false" />
+            <element signature="e#26259#26260#0" expanded="false" />
+            <element signature="e#26290#26291#0" expanded="false" />
+            <element signature="e#26319#26320#0" expanded="false" />
+            <element signature="e#26354#26355#0" expanded="false" />
+            <element signature="e#26381#26382#0" expanded="false" />
+            <element signature="e#26408#26409#0" expanded="false" />
+            <element signature="e#26602#26603#0" expanded="false" />
+            <element signature="e#26623#26624#0" expanded="false" />
+            <element signature="e#26655#26656#0" expanded="false" />
+            <element signature="e#26680#26681#0" expanded="false" />
+            <element signature="e#27121#27122#0" expanded="false" />
+            <element signature="e#27152#27153#0" expanded="false" />
+            <element signature="e#27213#27214#0" expanded="false" />
+            <element signature="e#27248#27249#0" expanded="false" />
+            <element signature="e#27286#27287#0" expanded="false" />
+            <element signature="e#27316#27317#0" expanded="false" />
+            <element signature="e#27362#27363#0" expanded="false" />
+            <element signature="e#27408#27409#0" expanded="false" />
+            <element signature="e#27456#27457#0" expanded="false" />
+            <element signature="e#27504#27505#0" expanded="false" />
+            <element signature="e#27565#27566#0" expanded="false" />
+            <element signature="e#27613#27614#0" expanded="false" />
+            <element signature="e#29871#29872#0" expanded="false" />
+            <element signature="e#29926#29927#0" expanded="false" />
+            <element signature="e#30512#30513#0" expanded="false" />
+            <element signature="e#30559#30560#0" expanded="false" />
+            <element signature="e#30598#30599#0" expanded="false" />
+            <element signature="e#30630#30631#0" expanded="false" />
+            <element signature="e#30678#30679#0" expanded="false" />
+            <element signature="e#30714#30715#0" expanded="false" />
+            <element signature="e#30776#30777#0" expanded="false" />
+            <element signature="e#30816#30817#0" expanded="false" />
+            <element signature="e#33924#33925#0" expanded="false" />
+            <element signature="e#33954#33955#0" expanded="false" />
+            <element signature="e#38415#38416#0" expanded="false" />
+            <element signature="e#38430#38431#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/IntCollection.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="121">
+        <state relative-caret-position="1065">
           <caret line="115" column="10" selection-start-line="115" selection-start-column="10" selection-end-line="115" selection-end-column="10" />
+          <folding>
+            <element signature="e#0#5378#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/spark/spark-core_2.11/2.0.0/spark-core_2.11-2.0.0-sources.jar!/org/apache/spark/Partitioner.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="198">
+          <caret line="77" column="6" selection-start-line="77" selection-start-column="6" selection-end-line="77" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.11.8/scala-library-2.11.8.jar!/scala/Product2.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="6" selection-start-line="1" selection-start-column="6" selection-end-line="1" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.11.8/scala-library-2.11.8.jar!/scala/Tuple2.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="126" selection-start-line="2" selection-start-column="126" selection-end-line="2" selection-end-column="126" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.11.8/scala-library-2.11.8-sources.jar!/scala/Product.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="19" column="6" selection-start-line="19" selection-start-column="6" selection-end-line="19" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.11.8/scala-library-2.11.8-sources.jar!/scala/Product2.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="19" column="111" selection-start-line="19" selection-start-column="111" selection-end-line="19" selection-end-column="111" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.11.8/scala-library-2.11.8-sources.jar!/scala/Function0.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="29" column="6" selection-start-line="29" selection-start-column="6" selection-end-line="29" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.11.8/scala-library-2.11.8-sources.jar!/scala/Tuple2.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="28" column="32" selection-start-line="28" selection-start-column="32" selection-end-line="28" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/spark/spark-core_2.11/2.0.0/spark-core_2.11-2.0.0-sources.jar!/org/apache/spark/api/java/JavaPairRDD.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="198">
+          <caret line="494" column="6" selection-start-line="494" selection-start-column="6" selection-end-line="494" selection-end-column="6" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/distributed/KTrussSparkInvalidVertices.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="161" column="58" selection-start-line="161" selection-start-column="58" selection-end-line="161" selection-end-column="58" />
-          <folding>
-            <element signature="e#11180#11181#0" expanded="true" />
-            <element signature="e#11219#11220#0" expanded="true" />
-            <element signature="e#11262#11263#0" expanded="true" />
-            <element signature="e#11290#11291#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="-342">
+          <caret line="115" column="88" selection-start-line="115" selection-start-column="88" selection-end-line="115" selection-end-column="88" />
+          <folding />
         </state>
       </provider>
     </entry>

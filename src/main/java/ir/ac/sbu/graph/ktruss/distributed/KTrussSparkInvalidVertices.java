@@ -5,6 +5,8 @@ import ir.ac.sbu.graph.clusteringco.FonlUtils;
 import ir.ac.sbu.graph.utils.GraphLoader;
 import ir.ac.sbu.graph.utils.GraphUtils;
 import it.unimi.dsi.fastutil.ints.*;
+import org.apache.spark.HashPartitioner;
+import org.apache.spark.Partitioner;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -63,6 +65,8 @@ public class KTrussSparkInvalidVertices {
         JavaPairRDD<Integer, int[]> candidates = FonlDegTC.generateCandidatesInteger(fonl);
 
         // Generate kv such that key is an edge and value is its triangle vertices.
+        Partitioner partitioner = new HashPartitioner(partition);
+
         JavaPairRDD<Tuple2<Integer, Integer>, Iterable<Integer>> edgeVertices = candidates.cogroup(fonl).flatMapToPair(t -> {
             int[] fVal = t._2._2.iterator().next();
             Arrays.sort(fVal, 1, fVal.length);
@@ -100,7 +104,7 @@ public class KTrussSparkInvalidVertices {
             }
 
             return output.iterator();
-        }).groupByKey()
+        }).groupByKey().partitionBy(partitioner)
 //            .mapValues(values -> {
 //            // TODO use iterator here instead of creating a set and filling it
 //            IntSet set = new IntOpenHashSet();
@@ -109,7 +113,6 @@ public class KTrussSparkInvalidVertices {
 //            }
 //            return set;
 //        })
-            .repartition(partition)
             .persist(StorageLevel.MEMORY_ONLY()); // Use disk too if graph is very large
 
         JavaPairRDD<Tuple2<Integer, Integer>, Iterable<Integer>> prevEdgeVertices = edgeVertices;
@@ -121,7 +124,7 @@ public class KTrussSparkInvalidVertices {
                     count ++;
                 }
                 return new Tuple2<>(count, EMPTY_INT_ARRAY);
-            })
+            }).partitionBy(partitioner)
             .persist(StorageLevel.MEMORY_ONLY());
 
         long tEdgeSup = System.currentTimeMillis();
