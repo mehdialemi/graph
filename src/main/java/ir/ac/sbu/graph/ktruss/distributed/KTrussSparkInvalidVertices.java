@@ -138,6 +138,7 @@ public class KTrussSparkInvalidVertices {
             JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Integer, int[]>> invalids =
                 edgeSup.filter(value -> (value._2._1 - value._2._2.length) < minSup);
 
+            // TODO broad cast invalid if its count is lower than a specified value
             long invalidCount = invalids.count();
 
             long t2 = System.currentTimeMillis();
