@@ -101,24 +101,59 @@ public class KTrussSparkInvalidVertices {
             return set;
         }).repartition(partition).cache();
 
+        long tEdgeVertices = System.currentTimeMillis();
+        System.out.println("Completed edge vertices in " + (tEdgeVertices - tStart) + " ms");
+
+        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevEdgeVertices = edgeVertices;
         JavaPairRDD<Tuple2<Integer, Integer>, int[]> edgeSup = edgeVertices.mapValues(v -> new int[]{v.size()}).cache();
+
+        long tEdgeSup = System.currentTimeMillis();
+        System.out.println("Create edgeSup in " + (tEdgeSup - tEdgeVertices) + " ms");
 
         JavaPairRDD<Tuple2<Integer, Integer>, int[]> prevEdgeSup = edgeSup;
         int iteration = 0;
+        long duration = 0;
+        long sumDuration = 0;
+        int count = 0;
+        boolean reloaded = true;
         while (true) {
+            if (count != 0 && !reloaded && duration > (sumDuration / (float) count) * 0.1) {
+                float avg = sumDuration / (float) count;
+                log("Reloading edge vertices, duration: " + duration + ", avg duration: " + avg + " , count: " + count, -1);
+                edgeVertices = edgeVertices.join(edgeSup).mapValues(joinValues -> {
+                    for (int invalidVertex : joinValues._2) {
+                        joinValues._1.remove(invalidVertex);
+                    }
+                    return joinValues._1;
+                }).repartition(partition).cache();
+
+                reloaded = true;
+                prevEdgeVertices.unpersist();
+            }
+
             long t1 = System.currentTimeMillis();
-            System.out.println("iteration: " + ++iteration);
+            log("iteration: " + ++iteration, -1);
             JavaPairRDD<Tuple2<Integer, Integer>, int[]> invalids = edgeSup.filter(value -> (value._2[0] + 1 - value._2.length) < minSup);
 
-            long count = invalids.count();
+            long invalidCount = invalids.count();
             long t2 = System.currentTimeMillis();
-            System.out.println("invalid count: " + count + ", duration: " + (t2 - t1) + " ms");
-            if (count == 0)
+            duration = t2 - t1;
+            if (reloaded) {
+                reloaded = false;
+                sumDuration = 0;
+                count = 0;
+            } else {
+                sumDuration += duration;
+            }
+
+            log("invalid invalidCount: " + invalidCount, duration);
+            if (invalidCount == 0)
                 break;
 
             // Join invalids with  edgeVertices
             JavaPairRDD<Tuple2<Integer, Integer>, Iterable<Integer>> invalidUpdate =
-                invalids.join(edgeVertices).flatMapToPair(kv -> {
+                invalids.join(edgeVertices) // TODO find a best partition and test the reverse join
+                    .flatMapToPair(kv -> {
 
                     // Remove invalid vertices from those which are not marked as invalid for the current edge.
                     // TODO this remove could be replaced with contains and skip in the following loop
@@ -144,11 +179,12 @@ public class KTrussSparkInvalidVertices {
                     }
 
                     return out.iterator();
-                }).groupByKey();
+                }).groupByKey(); // TODO repartition?
 
             // Join invalid update with edgeSup to update the current edgeSup.
             // By this join the list in the value part would be updated with those invalid vertices for the current edge
-            edgeSup = invalidUpdate.rightOuterJoin(edgeSup).mapValues(joinValue -> {
+            edgeSup = invalidUpdate.rightOuterJoin(edgeSup) // TODO find a best partition
+                .mapValues(joinValue -> {
 
                 // Calculate previous support
                 int initSup = joinValue._2[0];
@@ -180,15 +216,27 @@ public class KTrussSparkInvalidVertices {
                 outVal[0] = initSup;
                 System.arraycopy(invalidVertices.toIntArray(), 0, outVal, 1, outVal.length - 1);
                 return outVal;
-            }).filter(kv -> kv._2 != null).cache();
+            }).filter(kv -> kv._2 != null).cache();  // TODO repartition?
 
             prevEdgeSup.unpersist();
 
             // TODO update edgeVertices if necessary using some condition such as the size of update reaches to a specified thresholds
+            // TODO calculate the best repartition for each steps of the above algorithm using the information of graph sizes
         }
 
         long tEnd = System.currentTimeMillis();
-        System.out.println("count: " + edgeSup.count() + ", duration: " + (tEnd - tStart) + " ms");
+        log("count: " + edgeSup.count(), tStart, tEnd);
         sc.close();
+    }
+
+    private static void log(String msg, long start, long end) {
+        log(msg, (end - start));
+    }
+
+    private static void log(String msg, long duration) {
+        if (duration == -1)
+            System.out.println("KTRUSS " + msg);
+        else
+            System.out.println("KTRUSS " + msg + ", duration: " + duration + " ms");
     }
 }
