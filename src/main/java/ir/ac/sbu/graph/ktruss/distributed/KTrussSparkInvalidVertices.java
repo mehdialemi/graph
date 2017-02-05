@@ -180,7 +180,7 @@ public class KTrussSparkInvalidVertices {
                         }
 
                         return out.iterator();
-                    }).groupByKey(); // TODO repartition?
+                    }).groupByKey().partitionBy(partitioner); // TODO repartition?
 
             // Join invalid update with edgeSup to update the current edgeSup.
             // By this join the list in the value part would be updated with those invalid vertices for the current edge
