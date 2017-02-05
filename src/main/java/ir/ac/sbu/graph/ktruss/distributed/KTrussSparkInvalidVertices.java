@@ -214,7 +214,7 @@ public class KTrussSparkInvalidVertices {
                     // Generate output value such that the value in index zero is init support and
                     // the remaining is related to maintain invalid vertices of the current edge.
                     return new Tuple2<>(initSup, invalidVertices.toIntArray());
-                }).filter(kv -> kv._2 != null).persist(StorageLevel.MEMORY_ONLY());  // TODO repartition?
+                }).filter(kv -> kv._2 != null).partitionBy(partitioner).persist(StorageLevel.MEMORY_ONLY());  // TODO repartition?
 
             // Set blocking true
             prevEdgeSup.unpersist();
