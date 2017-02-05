@@ -9,6 +9,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.util.*;
@@ -23,8 +24,8 @@ import java.util.*;
 public class KTrussSparkInvalidVertices {
 
     public static void main(String[] args) {
-        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
-//        String inputPath = "/home/mehdi/graph-data/cit-Patents.txt";
+//        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
+        String inputPath = "/home/mehdi/graph-data/cit-Patents.txt";
         if (args.length > 0)
             inputPath = args[0];
 
@@ -99,16 +100,17 @@ public class KTrussSparkInvalidVertices {
                 set.add(v);
             }
             return set;
-        }).repartition(partition).cache();
+        }).repartition(partition)
+            .persist(StorageLevel.MEMORY_ONLY()); // Use disk too if graph is very large
 
         long tEdgeVertices = System.currentTimeMillis();
-        System.out.println("Completed edge vertices in " + (tEdgeVertices - tStart) + " ms");
+        log("Completed edge vertices", tStart, tEdgeVertices);
 
         JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevEdgeVertices = edgeVertices;
         JavaPairRDD<Tuple2<Integer, Integer>, int[]> edgeSup = edgeVertices.mapValues(v -> new int[]{v.size()}).cache();
 
         long tEdgeSup = System.currentTimeMillis();
-        System.out.println("Create edgeSup in " + (tEdgeSup - tEdgeVertices) + " ms");
+        log("Create edgeSup ", tEdgeVertices, tEdgeSup);
 
         JavaPairRDD<Tuple2<Integer, Integer>, int[]> prevEdgeSup = edgeSup;
         int iteration = 0;
@@ -117,7 +119,7 @@ public class KTrussSparkInvalidVertices {
         int count = 0;
         boolean reloaded = true;
         while (true) {
-            if (count != 0 && !reloaded && duration > (sumDuration / (float) count) * 0.1) {
+            if (count != 0 && !reloaded && duration > (sumDuration / (float) count)) {
                 float avg = sumDuration / (float) count;
                 log("Reloading edge vertices, duration: " + duration + ", avg duration: " + avg + " , count: " + count, -1);
                 edgeVertices = edgeVertices.join(edgeSup).mapValues(joinValues -> {
@@ -144,6 +146,7 @@ public class KTrussSparkInvalidVertices {
                 count = 0;
             } else {
                 sumDuration += duration;
+                count ++;
             }
 
             log("invalid invalidCount: " + invalidCount, duration);
