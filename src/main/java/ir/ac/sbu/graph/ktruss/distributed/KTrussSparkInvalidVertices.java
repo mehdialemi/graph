@@ -12,7 +12,10 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * This class find k-truss sub-graphs from the big graph stored as edge list in the hdfs (Hadoop File System).
@@ -22,6 +25,8 @@ import java.util.*;
  * 2- Repetitively remove edges which have support lower than the specified value.
  */
 public class KTrussSparkInvalidVertices {
+
+    public static final float MIN_THRESHOLD = 0.1F;
 
     public static void main(String[] args) {
 //        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
@@ -118,9 +123,9 @@ public class KTrussSparkInvalidVertices {
         JavaPairRDD<Tuple2<Integer, Integer>, int[]> prevEdgeSup = edgeSup;
         int iteration = 0;
         long duration = 0;
-        long sumDuration = 0;
-        int count = 0;
-        boolean reloaded = true;
+//        long sumDuration = 0;
+//        int count = 0;
+//        boolean reloaded = true;
         while (true) {
 //            if (count != 0 && !reloaded && duration >= (sumDuration / (float) count)) {
 //                float avg = sumDuration / (float) count;
@@ -138,20 +143,20 @@ public class KTrussSparkInvalidVertices {
 //            }
 
             long t1 = System.currentTimeMillis();
-            log("Iteration: " + ++iteration, -1);
+            log("Iteration: " + ++iteration);
             JavaPairRDD<Tuple2<Integer, Integer>, int[]> invalids = edgeSup.filter(value -> (value._2[0] + 1 - value._2.length) < minSup);
 
             long invalidCount = invalids.count();
             long t2 = System.currentTimeMillis();
             duration = t2 - t1;
-            if (reloaded) {
-                reloaded = false;
-                sumDuration = 0;
-                count = 0;
-            } else {
-                sumDuration += duration;
-                count++;
-            }
+//            if (reloaded) {
+//                reloaded = false;
+//                sumDuration = 0;
+//                count = 0;
+//            } else {
+//                sumDuration += duration;
+//                count++;
+//            }
 
             log("Invalid Count: " + invalidCount, duration);
             if (invalidCount == 0)
@@ -179,6 +184,9 @@ public class KTrussSparkInvalidVertices {
                         int u = kv._1._1;
                         int v = kv._1._2;
                         for (int w : initVertices) {
+//                            if (Arrays.binarySearch(invalidVertices, 1, invalidVertices.length, w) >= 0)
+//                                continue;
+//
                             if (u < w)
                                 out.add(new Tuple2<>(new Tuple2<>(u, w), v));
                             else
@@ -228,11 +236,24 @@ public class KTrussSparkInvalidVertices {
                     outVal[0] = initSup;
                     System.arraycopy(invalidVertices.toIntArray(), 0, outVal, 1, outVal.length - 1);
                     return outVal;
-                }).filter(kv -> kv._2 != null)
-                .persist(StorageLevel.MEMORY_ONLY());  // TODO repartition?
+                }).filter(kv -> kv._2 != null).persist(StorageLevel.MEMORY_ONLY());  // TODO repartition?
 
-            prevEdgeSup.unpersist();
+            // Set blocking true
+            prevEdgeSup.unpersist(true);
 
+            Float sumRatio = edgeSup.map(kv -> (kv._2[0] - kv._2.length) / (float) kv._2[0]).reduce((a, b) -> a + b);
+            long edgeCount = edgeSup.count();
+            float ratio = sumRatio / (float) edgeCount;
+            log("ratio: " + ratio + ", edgeCount: " + edgeCount + ", sumRatio: " + sumRatio);
+            if (ratio < MIN_THRESHOLD) {
+                edgeVertices = edgeVertices.join(edgeSup).mapValues(joinValues -> {
+                    for (int invalidVertex : joinValues._2) {
+                        joinValues._1.remove(invalidVertex);
+                    }
+                    return joinValues._1;
+                }).repartition(partition).persist(StorageLevel.MEMORY_ONLY());
+                prevEdgeVertices.unpersist(true);
+            }
             // TODO update edgeVertices if necessary using some condition such as the size of update reaches to a specified thresholds
             // TODO calculate the best repartition for each steps of the above algorithm using the information of graph sizes
         }
@@ -244,6 +265,10 @@ public class KTrussSparkInvalidVertices {
 
     private static void log(String msg, long start, long end) {
         log(msg, (end - start));
+    }
+
+    private static void log(String msg) {
+        log(msg, -1);
     }
 
     private static void log(String msg, long duration) {
