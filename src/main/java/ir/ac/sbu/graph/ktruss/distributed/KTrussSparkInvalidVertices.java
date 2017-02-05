@@ -27,10 +27,11 @@ import java.util.List;
 public class KTrussSparkInvalidVertices {
 
     public static final float MIN_THRESHOLD = 0.1F;
+    public static final int[] EMPTY_INT_ARRAY = new int[]{};
 
     public static void main(String[] args) {
-//        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
-        String inputPath = "/home/mehdi/graph-data/cit-Patents.txt";
+        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
+//        String inputPath = "/home/mehdi/graph-data/cit-Patents.txt";
         if (args.length > 0)
             inputPath = args[0];
 
@@ -47,7 +48,7 @@ public class KTrussSparkInvalidVertices {
         if (args.length == 0)
             conf.setMaster("local[2]");
         GraphUtils.setAppName(conf, "KTrussSparkInvalidVertices-" + k + "-MultiSteps", partition, inputPath);
-        conf.registerKryoClasses(new Class[]{GraphUtils.VertexDegree.class, int[].class, IntSet.class});
+        conf.registerKryoClasses(new Class[]{GraphUtils.VertexDegree.class, int[].class, Iterable.class});
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
         JavaSparkContext sc = new JavaSparkContext(conf);
 
@@ -62,7 +63,7 @@ public class KTrussSparkInvalidVertices {
         JavaPairRDD<Integer, int[]> candidates = FonlDegTC.generateCandidatesInteger(fonl);
 
         // Generate kv such that key is an edge and value is its triangle vertices.
-        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> edgeVertices = candidates.cogroup(fonl).flatMapToPair(t -> {
+        JavaPairRDD<Tuple2<Integer, Integer>, Iterable<Integer>> edgeVertices = candidates.cogroup(fonl).flatMapToPair(t -> {
             int[] fVal = t._2._2.iterator().next();
             Arrays.sort(fVal, 1, fVal.length);
             int v = t._1;
@@ -99,30 +100,40 @@ public class KTrussSparkInvalidVertices {
             }
 
             return output.iterator();
-        }).groupByKey().mapValues(values -> {
-            IntSet set = new IntOpenHashSet();
-            for (int v : values) {
-                set.add(v);
-            }
-            return set;
-        }).repartition(partition)
+        }).groupByKey()
+//            .mapValues(values -> {
+//            // TODO use iterator here instead of creating a set and filling it
+//            IntSet set = new IntOpenHashSet();
+//            for (int v : values) {
+//                set.add(v);
+//            }
+//            return set;
+//        })
+            .repartition(partition)
             .persist(StorageLevel.MEMORY_ONLY()); // Use disk too if graph is very large
 
-        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevEdgeVertices = edgeVertices;
+        JavaPairRDD<Tuple2<Integer, Integer>, Iterable<Integer>> prevEdgeVertices = edgeVertices;
 
-        JavaPairRDD<Tuple2<Integer, Integer>, int[]> edgeSup = edgeVertices
-            .mapValues(v -> new int[]{v.size()})
+        JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Integer, int[]>> edgeSup = edgeVertices
+            .mapValues(v -> {
+                int count = 0;
+                for (Integer integer : v) {
+                    count ++;
+                }
+                return new Tuple2<>(count, EMPTY_INT_ARRAY);
+            })
             .persist(StorageLevel.MEMORY_ONLY());
 
         long tEdgeSup = System.currentTimeMillis();
         log("Create edgeSup ", tStart, tEdgeSup);
 
-        JavaPairRDD<Tuple2<Integer, Integer>, int[]> prevEdgeSup = edgeSup;
+        JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Integer, int[]>> prevEdgeSup = edgeSup;
         int iteration = 0;
         while (true) {
             long t1 = System.currentTimeMillis();
             log("Iteration: " + ++iteration);
-            JavaPairRDD<Tuple2<Integer, Integer>, int[]> invalids = edgeSup.filter(value -> (value._2[0] + 1 - value._2.length) < minSup);
+            JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Integer, int[]>> invalids =
+                edgeSup.filter(value -> (value._2._1 - value._2._2.length) < minSup);
 
             long invalidCount = invalids.count();
 
@@ -140,24 +151,20 @@ public class KTrussSparkInvalidVertices {
                         if (!kv._2._2.isPresent())
                             return Collections.emptyIterator();
 
-                        IntSet initVertices = kv._2._2.get();
-                        int[] invalidVertices = kv._2._1;
+                        Tuple2<Integer, int[]> invalid = kv._2._1;
+                        int[] invalidVertices = invalid._2;
+                        List<Tuple2<Tuple2<Integer, Integer>, Integer>> out = new ArrayList<>((invalid._1 - invalidVertices.length) * 2);
 
-                        // Remove invalid vertices from those which are not marked as invalid for the current edge.
-                        // TODO this remove could be replaced with contains and skip in the following loop
-                        for (int i = 1; i < invalidVertices.length; i++) {
-                            initVertices.remove(invalidVertices[i]);
-                        }
-
-                        List<Tuple2<Tuple2<Integer, Integer>, Integer>> out = new ArrayList<>(initVertices.size() * 2);
-
-                        // Generate the vertices which should be reported as invalid for the edge of the current triangles.
                         int u = kv._1._1;
                         int v = kv._1._2;
-                        for (int w : initVertices) {
-//                            if (Arrays.binarySearch(invalidVertices, 1, invalidVertices.length, w) >= 0)
-//                                continue;
-//
+
+                        // Generate the vertices which should be reported as invalid for the edge of the current triangles.
+                        for (Integer w : kv._2._2.get()) {
+
+                            // Skip invalids
+                            if (Arrays.binarySearch(invalidVertices, w) >= 0)
+                                continue;
+
                             if (u < w)
                                 out.add(new Tuple2<>(new Tuple2<>(u, w), v));
                             else
@@ -178,8 +185,8 @@ public class KTrussSparkInvalidVertices {
                 .mapValues(joinValue -> {
 
                     // Calculate previous support
-                    int initSup = joinValue._2[0];
-                    int prevSup = initSup + 1 - joinValue._2.length;
+                    int initSup = joinValue._2._1;
+                    int prevSup = initSup - joinValue._2._2.length;
                     if (!joinValue._1.isPresent()) {
                         if (prevSup < minSup) { // Skip if this edge is already detected as invalid
                             return null;
@@ -189,7 +196,8 @@ public class KTrussSparkInvalidVertices {
 
                     // Update the invalid list for the current value.
                     // TODO we can store SortedSet or Set as value
-                    IntSortedSet invalidVertices = new IntAVLTreeSet(joinValue._2, 1, joinValue._2.length - 1);
+                    // TODO create this object just once in the partition and reuse it
+                    IntSortedSet invalidVertices = new IntAVLTreeSet(joinValue._2._2);
                     for (int u : joinValue._1.get()) {
                         invalidVertices.add(u);
                     }
@@ -202,30 +210,37 @@ public class KTrussSparkInvalidVertices {
 
                     // Generate output value such that the value in index zero is init support and
                     // the remaining is related to maintain invalid vertices of the current edge.
-                    // TODO value in the edgeSup could be replaced with a Tuple2(initSup, invalidVertices)
-                    int[] outVal = new int[1 + invalidVertices.size()];
-                    outVal[0] = initSup;
-                    System.arraycopy(invalidVertices.toIntArray(), 0, outVal, 1, outVal.length - 1);
-                    return outVal;
+                    return new Tuple2<>(initSup, invalidVertices.toIntArray());
                 }).filter(kv -> kv._2 != null).persist(StorageLevel.MEMORY_ONLY());  // TODO repartition?
 
             // Set blocking true
-            prevEdgeSup.unpersist(true);
+            prevEdgeSup.unpersist();
 
             // TODO calculate the best repartition for each steps of the above algorithm using the information of graph sizes
-            Float sumRatio = edgeSup.map(kv -> (kv._2[0] - kv._2.length) / (float) kv._2[0]).reduce((a, b) -> a + b);
-            long edgeCount = edgeSup.count();
-            float ratio = sumRatio / (float) edgeCount;
-            log("ratio: " + ratio + ", edgeCount: " + edgeCount + ", sumRatio: " + sumRatio);
-            if (ratio < MIN_THRESHOLD) {
-                edgeVertices = edgeVertices.join(edgeSup).mapValues(joinValues -> {
-                    for (int invalidVertex : joinValues._2) {
-                        joinValues._1.remove(invalidVertex);
-                    }
-                    return joinValues._1;
-                }).repartition(partition).persist(StorageLevel.MEMORY_ONLY());
-                prevEdgeVertices.unpersist(true);
-            }
+//            Float sumRatio = edgeSup.map(kv -> (kv._2._1 - kv._2._2.length) / (float) kv._2._1).reduce((a, b) -> a + b);
+//            long edgeCount = edgeSup.count();
+//            float ratio = sumRatio / (float) edgeCount;
+//            long t3 = System.currentTimeMillis();
+//            log("ratio: " + ratio + ", edgeCount: " + edgeCount + ", sumRatio: " + sumRatio, t1, t3);
+//            if (ratio < MIN_THRESHOLD) {
+//                edgeVertices = edgeVertices.join(edgeSup).mapValues(joinValues -> {
+//                    Tuple2<Integer, int[]> localEdgeSup = joinValues._2;
+//                    int newSup = localEdgeSup._1 - localEdgeSup._2.length;
+//                    if (newSup > MIN_THRESHOLD)
+//                        return joinValues._1;
+//
+//                    List<Integer> list = new ArrayList<>(newSup);
+//
+//                    for (Integer v : joinValues._1) {
+//                        if (Arrays.binarySearch(joinValues._2._2, v) >= 0)
+//                            continue;
+//                        list.add(v);
+//                    }
+//                    return list;
+//
+//                }).repartition(partition).persist(StorageLevel.MEMORY_ONLY());
+//                prevEdgeVertices.unpersist(true);
+//            }
 
         }
 
