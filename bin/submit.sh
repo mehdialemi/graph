@@ -57,13 +57,13 @@ case $task in
 	;;
 	"KT_EVL_ITER") main_class="ir.ac.sbu.graph.ktruss.distributed.EdgeNodesIterByThreshold"
 	;;
-	"KT_EVL_ITER2") main_class="ir.ac.sbu.graph.ktruss.distributed.EdgeNodesIterByConstant"
+	"KT_EVL_ITER2") main_class="ir.ac.sbu.graph.ktruss.distributed.KTrussSparkIntervalByConstant"
 	;;
 	"KT_Cohen") main_class="ir.ac.sbu.graph.ktruss.distributed.Cohen"
 	;;
 	"KT_Pregel") main_class="ir.ac.sbu.graph.ktruss.KTrussPregel"
 	;;
-	"KT_SPARK") main_class="ir.ac.sbu.graph.ktruss.distributed.KTrussSpark"
+	"KT_SPARK") main_class="ir.ac.sbu.graph.ktruss.distributed.KTrussSparkEdgeVertices"
 	;;
 	"KT_TRIANGLE") main_class="ir.ac.sbu.graph.ktruss.distributed.KTrussSparkTriangle"
 	;;

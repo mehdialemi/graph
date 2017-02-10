@@ -4,6 +4,7 @@ import ir.ac.sbu.graph.utils.GraphUtils;
 import ir.ac.sbu.graph.clusteringco.FonlDegTC;
 import ir.ac.sbu.graph.clusteringco.FonlUtils;
 
+import org.apache.spark.Partitioner;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -160,6 +161,12 @@ public class RebuildTriangles {
 
     public static JavaPairRDD<Tuple2<Long, Long>, List<Long>> listEdgeNodes(JavaSparkContext sc, String inputPath,
                                                                             int partition) {
+        return listEdgeNodes(sc, inputPath, partition, null);
+
+    }
+
+    public static JavaPairRDD<Tuple2<Long, Long>, List<Long>> listEdgeNodes(JavaSparkContext sc, String inputPath,
+                                                                            int partition, Partitioner partitioner) {
         JavaPairRDD<Long, long[]> fonl = FonlUtils.loadFonl(sc, inputPath, partition);
 
         // Partition based on degree. To balance workload, it is better to have a partitioning mechanism that
@@ -167,7 +174,7 @@ public class RebuildTriangles {
         // low number of higherIds (high deg)
 
         JavaPairRDD<Long, long[]> candidates = FonlDegTC.generateCandidates(fonl, true);
-        return candidates.cogroup(fonl, partition).flatMapToPair(t -> {
+        JavaPairRDD<Tuple2<Long, Long>, List<Long>> result = candidates.cogroup(fonl, partition).flatMapToPair(t -> {
             Iterator<long[]> iterator = t._2._2.iterator();
             if (!iterator.hasNext())
                 return Collections.emptyIterator();
@@ -219,7 +226,7 @@ public class RebuildTriangles {
                 }
             } while (iterator.hasNext());
 
-            for(Map.Entry<Tuple2<Long, Long>, List<Long>> e : eMap.entrySet()) {
+            for (Map.Entry<Tuple2<Long, Long>, List<Long>> e : eMap.entrySet()) {
                 list.add(new Tuple2<>(e.getKey(), e.getValue().toArray(new Long[0])));
             }
             return list.iterator();
@@ -227,7 +234,10 @@ public class RebuildTriangles {
             List<Long> list = new ArrayList<>();
             t.forEach(node -> list.addAll(Arrays.asList(node)));
             return list;
-        }).repartition(partition).persist(StorageLevel.MEMORY_AND_DISK());
+        });
+        if (partitioner == null)
+            return result.repartition(partition).persist(StorageLevel.MEMORY_AND_DISK());
+        return result.partitionBy(partitioner).persist(StorageLevel.MEMORY_AND_DISK());
     }
 
     static void log(String text) {
