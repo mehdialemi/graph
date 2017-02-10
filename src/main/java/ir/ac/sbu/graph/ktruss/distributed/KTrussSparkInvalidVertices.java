@@ -30,6 +30,7 @@ public class KTrussSparkInvalidVertices {
 
     public static final float MIN_THRESHOLD = 0.1F;
     public static final int[] EMPTY_INT_ARRAY = new int[]{};
+    public static final IntSet EMPTY_INT_SET = new IntOpenHashSet();
 
     public static void main(String[] args) {
         String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
@@ -67,7 +68,7 @@ public class KTrussSparkInvalidVertices {
         // Generate kv such that key is an edge and value is its triangle vertices.
         Partitioner partitioner = new HashPartitioner(partition);
 
-        JavaPairRDD<Tuple2<Integer, Integer>, Iterable<Integer>> edgeVertices = candidates.cogroup(fonl).flatMapToPair(t -> {
+        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> edgeVertices = candidates.cogroup(fonl).flatMapToPair(t -> {
             int[] fVal = t._2._2.iterator().next();
             Arrays.sort(fVal, 1, fVal.length);
             int v = t._1;
@@ -105,38 +106,31 @@ public class KTrussSparkInvalidVertices {
 
             return output.iterator();
         }).groupByKey().partitionBy(partitioner)
-//            .mapValues(values -> {
-//            // TODO use iterator here instead of creating a set and filling it
-//            IntSet set = new IntOpenHashSet();
-//            for (int v : values) {
-//                set.add(v);
-//            }
-//            return set;
-//        })
+            .mapValues(values -> {
+            // TODO use iterator here instead of creating a set and filling it
+            IntSet set = new IntOpenHashSet();
+            for (int v : values) {
+                set.add(v);
+            }
+            return set;
+        })
             .persist(StorageLevel.MEMORY_ONLY()); // Use disk too if graph is very large
 
-        JavaPairRDD<Tuple2<Integer, Integer>, Iterable<Integer>> prevEdgeVertices = edgeVertices;
+        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevEdgeVertices = edgeVertices;
 
-        JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Integer, int[]>> edgeSup = edgeVertices
-            .mapValues(v -> {
-                int count = 0;
-                for (Integer integer : v) {
-                    count ++;
-                }
-                return new Tuple2<>(count, EMPTY_INT_ARRAY);
-            }).partitionBy(partitioner)
+        JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Integer, IntSet>> edgeSup = edgeVertices
+            .mapValues(v -> new Tuple2<>(v.size(), EMPTY_INT_SET)).partitionBy(partitioner)
             .persist(StorageLevel.MEMORY_ONLY());
-
         long tEdgeSup = System.currentTimeMillis();
         log("Create edgeSup ", tStart, tEdgeSup);
 
-        JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Integer, int[]>> prevEdgeSup = edgeSup;
+        JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Integer, IntSet>> prevEdgeSup = edgeSup;
         int iteration = 0;
         while (true) {
             long t1 = System.currentTimeMillis();
             log("Iteration: " + ++iteration);
-            JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Integer, int[]>> invalids =
-                edgeSup.filter(value -> (value._2._1 - value._2._2.length) < minSup);
+            JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Integer, IntSet>> invalids =
+                edgeSup.filter(value -> (value._2._1 - value._2._2.size()) < minSup);
 
             // TODO broad cast invalid if its count is lower than a specified value
             long invalidCount = invalids.count();
@@ -150,25 +144,23 @@ public class KTrussSparkInvalidVertices {
 
             // Join invalids with  edgeVertices
             JavaPairRDD<Tuple2<Integer, Integer>, Iterable<Integer>> invalidUpdate =
-                invalids.leftOuterJoin(edgeVertices) // TODO find a best partition and test the reverse join
+                edgeVertices.join(invalids) // TODO find a best partition and test the reverse join
                     .flatMapToPair(kv -> {
-                        if (!kv._2._2.isPresent())
-                            return Collections.emptyIterator();
 
-                        Tuple2<Integer, int[]> invalid = kv._2._1;
-                        int[] invalidVertices = invalid._2;
-                        List<Tuple2<Tuple2<Integer, Integer>, Integer>> out = new ArrayList<>((invalid._1 - invalidVertices.length) * 2);
+                        Tuple2<Integer, IntSet> invalid = kv._2._2;
+                        IntIterator iterator = invalid._2.iterator();
+                        IntSet original = kv._2._1;
+                        while (iterator.hasNext()) {
+                            original.remove(iterator.nextInt());
+                        }
+
+                        List<Tuple2<Tuple2<Integer, Integer>, Integer>> out = new ArrayList<>(original.size() * 2);
 
                         int u = kv._1._1;
                         int v = kv._1._2;
 
                         // Generate the vertices which should be reported as invalid for the edge of the current triangles.
-                        for (Integer w : kv._2._2.get()) {
-
-                            // Skip invalids
-                            if (Arrays.binarySearch(invalidVertices, w) >= 0)
-                                continue;
-
+                        for (Integer w :original) {
                             if (u < w)
                                 out.add(new Tuple2<>(new Tuple2<>(u, w), v));
                             else
@@ -181,40 +173,41 @@ public class KTrussSparkInvalidVertices {
                         }
 
                         return out.iterator();
-                    }).groupByKey().partitionBy(partitioner); // TODO repartition?
+                    }).groupByKey(); // TODO repartition?
 
             // Join invalid update with edgeSup to update the current edgeSup.
             // By this join the list in the value part would be updated with those invalid vertices for the current edge
-            edgeSup = invalidUpdate.rightOuterJoin(edgeSup) // TODO find a best partition
+            edgeSup = edgeSup.leftOuterJoin(invalidUpdate) // TODO find a best partition
                 .mapValues(joinValue -> {
 
                     // Calculate previous support
-                    int initSup = joinValue._2._1;
-                    int prevSup = initSup - joinValue._2._2.length;
-                    if (!joinValue._1.isPresent()) {
+                    int initSup = joinValue._1._1;
+                    IntSet cInvalids = joinValue._1._2;
+                    int prevSup = initSup - cInvalids.size();
+                    if (!joinValue._2.isPresent()) {
                         if (prevSup < minSup) { // Skip if this edge is already detected as invalid
                             return null;
                         }
-                        return joinValue._2;
+                        return joinValue._1;
                     }
 
+                    IntSet set = new IntOpenHashSet(cInvalids);
                     // Update the invalid list for the current value.
                     // TODO we can store SortedSet or Set as value
                     // TODO create this object just once in the partition and reuse it
-                    IntSortedSet invalidVertices = new IntAVLTreeSet(joinValue._2._2);
-                    for (int u : joinValue._1.get()) {
-                        invalidVertices.add(u);
+                    for (int u : joinValue._2.get()) {
+                        set.add(u);
                     }
 
                     // If new support is zero this means that no additional
                     // invalid update would be produced by the current edge
-                    int newSup = initSup - invalidVertices.size();
+                    int newSup = initSup - set.size();
                     if (newSup == 0)
                         return null;
 
                     // Generate output value such that the value in index zero is init support and
                     // the remaining is related to maintain invalid vertices of the current edge.
-                    return new Tuple2<>(initSup, invalidVertices.toIntArray());
+                    return new Tuple2<>(initSup, set);
                 }).filter(kv -> kv._2 != null).partitionBy(partitioner).persist(StorageLevel.MEMORY_ONLY());  // TODO repartition?
 
             // Set blocking true
