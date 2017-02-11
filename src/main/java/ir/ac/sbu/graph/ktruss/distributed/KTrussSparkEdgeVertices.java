@@ -115,12 +115,12 @@ public class KTrussSparkEdgeVertices {
                 return set;
             }).persist(StorageLevel.MEMORY_ONLY()); // Use disk too if graph is very large
 
-//        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevEdgeVertices = edgeVertices;
 
         int iteration = 0;
         boolean stop = false;
 
         while (!stop) {
+            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevEdgeVertices = edgeVertices;
             iteration++;
             long t1 = System.currentTimeMillis();
             JavaPairRDD<Tuple2<Integer, Integer>, IntSet> invalids = edgeVertices.filter(kv -> kv._2.size() < minSup);
@@ -169,6 +169,8 @@ public class KTrussSparkEdgeVertices {
 
                     return original;
                 }).filter(kv -> kv._2 != null).cache();
+
+            prevEdgeVertices.unpersist();
         }
 
         long duration = System.currentTimeMillis() - start;
