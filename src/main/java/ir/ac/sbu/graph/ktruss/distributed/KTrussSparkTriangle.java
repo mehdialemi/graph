@@ -4,6 +4,8 @@ import ir.ac.sbu.graph.clusteringco.FonlDegTC;
 import ir.ac.sbu.graph.clusteringco.FonlUtils;
 import ir.ac.sbu.graph.utils.GraphLoader;
 import ir.ac.sbu.graph.utils.GraphUtils;
+import org.apache.spark.HashPartitioner;
+import org.apache.spark.Partitioner;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -42,13 +44,17 @@ public class KTrussSparkTriangle {
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
         JavaSparkContext sc = new JavaSparkContext(conf);
 
+        Partitioner partitionerSmall = new HashPartitioner(partition);
+        Partitioner partitionerBig = new HashPartitioner(partition * 10);
+
         JavaRDD<String> input = sc.textFile(inputPath, partition);
 
         JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
 
-        JavaPairRDD<Integer, int[]> fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, partition);
+        JavaPairRDD<Integer, int[]> fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, partitionerSmall);
 
-        JavaPairRDD<Integer, int[]> candidates = FonlDegTC.generateCandidatesInteger(fonl);
+        JavaPairRDD<Integer, int[]> candidates = FonlDegTC.generateCandidatesInteger(fonl).partitionBy(partitionerBig);
+
         JavaPairRDD<Tuple2<Integer, Integer>, int[]> eTriangleMap = candidates.cogroup(fonl).flatMapToPair(t -> {
             Iterator<int[]> cvalues = t._2._2.iterator();
             List<Tuple2<Tuple2<Integer, Integer>, int[]>> list = new ArrayList<>();

@@ -2,6 +2,7 @@ package ir.ac.sbu.graph.clusteringco;
 
 import ir.ac.sbu.graph.utils.GraphLoader;
 import ir.ac.sbu.graph.utils.GraphUtils;
+import org.apache.spark.Partitioner;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -188,8 +189,8 @@ public class FonlUtils implements Serializable {
 //        return fonl;
     }
 
-    public static JavaPairRDD<Integer, int[]> createWith2ReduceDegreeSortInt(JavaPairRDD<Integer, Integer> edges, int partition) {
-        return edges.groupByKey(partition).flatMapToPair(t -> {
+    public static JavaPairRDD<Integer, int[]> createWith2ReduceDegreeSortInt(JavaPairRDD<Integer, Integer> edges, Partitioner partitioner) {
+        return edges.groupByKey(partitioner).flatMapToPair(t -> {
             HashSet<Integer> neighborSet = new HashSet<>();
             for (int neighbor : t._2) {
                 neighborSet.add(neighbor);
@@ -243,7 +244,7 @@ public class FonlUtils implements Serializable {
                 higherDegs[i] = list.get(i - 1).vertex;
 
             return new Tuple2<>(v._1, higherDegs);
-        }).repartition(partition).cache();
+        }).partitionBy(partitioner).cache();
     }
 
     /**

@@ -57,13 +57,16 @@ public class KTrussSparkInvalidVertices {
 
         long tStart = System.currentTimeMillis();
 
+        Partitioner partitionerSmall = new HashPartitioner(partition);
+        Partitioner partitionerBig = new HashPartitioner(partition * 10);
+
         JavaRDD<String> input = sc.textFile(inputPath, partition);
 
         JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
 
-        JavaPairRDD<Integer, int[]> fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, partition);
+        JavaPairRDD<Integer, int[]> fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, partitionerSmall);
 
-        JavaPairRDD<Integer, int[]> candidates = FonlDegTC.generateCandidatesInteger(fonl);
+        JavaPairRDD<Integer, int[]> candidates = FonlDegTC.generateCandidatesInteger(fonl).partitionBy(partitionerBig);
 
         // Generate kv such that key is an edge and value is its triangle vertices.
         Partitioner partitioner = new HashPartitioner(partition);

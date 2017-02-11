@@ -50,14 +50,16 @@ public class KTrussSparkIntervalByConstant {
         JavaSparkContext sc = new JavaSparkContext(conf);
 
         long start = System.currentTimeMillis();
+        Partitioner partitionerSmall = new HashPartitioner(partition);
+        Partitioner partitionerBig = new HashPartitioner(partition * 10);
 
         JavaRDD<String> input = sc.textFile(inputPath, partition);
 
         JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
 
-        JavaPairRDD<Integer, int[]> fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, partition);
+        JavaPairRDD<Integer, int[]> fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, partitionerSmall);
 
-        JavaPairRDD<Integer, int[]> candidates = FonlDegTC.generateCandidatesInteger(fonl);
+        JavaPairRDD<Integer, int[]> candidates = FonlDegTC.generateCandidatesInteger(fonl).partitionBy(partitionerBig);
 
         Partitioner partitioner = new HashPartitioner(partition);
 

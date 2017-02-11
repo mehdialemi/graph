@@ -49,13 +49,14 @@ public class KTrussSparkEdgeVertices {
 
         JavaRDD<String> input = sc.textFile(inputPath, partition);
 
+        Partitioner partitionerSmall = new HashPartitioner(partition);
+        Partitioner partitionerBig = new HashPartitioner(partition * 10);
+
         JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
 
-        JavaPairRDD<Integer, int[]> fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, partition);
+        JavaPairRDD<Integer, int[]> fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, partitionerSmall);
 
-        JavaPairRDD<Integer, int[]> candidates = FonlDegTC.generateCandidatesInteger(fonl);
-
-        Partitioner partitioner = new HashPartitioner(partition);
+        JavaPairRDD<Integer, int[]> candidates = FonlDegTC.generateCandidatesInteger(fonl).partitionBy(partitionerBig);
 
         // Generate kv such that key is an edge and value is its triangle vertices.
         JavaPairRDD<Tuple2<Integer, Integer>, IntSet> edgeVertices = candidates.cogroup(fonl).flatMapToPair(t -> {
@@ -65,37 +66,41 @@ public class KTrussSparkEdgeVertices {
             List<Tuple2<Tuple2<Integer, Integer>, Integer>> output = new ArrayList<>();
             for (int[] cVal : t._2._1) {
                 int u = cVal[0];
-
-                // The intersection determines triangles which u and v are two of their vertices.
-                IntList wList = GraphUtils.sortedIntersectionTest(fVal, 1, cVal, 1);
-                if (wList == null)
-                    continue;
-
-                // Always generate and edge (u, v) such that u < v.
                 Tuple2<Integer, Integer> uv;
                 if (u < v)
                     uv = new Tuple2<>(u, v);
                 else
                     uv = new Tuple2<>(v, u);
 
-                IntListIterator wIter = wList.iterator();
-                while (wIter.hasNext()) {
-                    int w = wIter.nextInt();
-                    output.add(new Tuple2<>(uv, w));
-                    if (u < w)
-                        output.add(new Tuple2<>(new Tuple2<>(u, w), v));
-                    else
-                        output.add(new Tuple2<>(new Tuple2<>(w, u), v));
+                // The intersection determines triangles which u and v are two of their vertices.
+                // Always generate and edge (u, v) such that u < v.
+                int fi = 1;
+                int ci = 1;
+                while (fi < fVal.length && ci < cVal.length) {
+                    if (fVal[fi] < cVal[ci])
+                        fi ++;
+                    else if (fVal[fi] > cVal[ci])
+                        ci ++;
+                    else {
+                        int w = fVal[fi];
+                        output.add(new Tuple2<>(uv, w));
+                        if (u < w)
+                            output.add(new Tuple2<>(new Tuple2<>(u, w), v));
+                        else
+                            output.add(new Tuple2<>(new Tuple2<>(w, u), v));
 
-                    if (v < w)
-                        output.add(new Tuple2<>(new Tuple2<>(v, w), u));
-                    else
-                        output.add(new Tuple2<>(new Tuple2<>(w, v), u));
+                        if (v < w)
+                            output.add(new Tuple2<>(new Tuple2<>(v, w), u));
+                        else
+                            output.add(new Tuple2<>(new Tuple2<>(w, v), u));
+                        fi ++;
+                        ci ++;
+                    }
                 }
             }
 
             return output.iterator();
-        }).groupByKey().partitionBy(partitioner)
+        }).groupByKey(partitionerBig)
             .mapValues(values -> {
                 // TODO use iterator here instead of creating a set and filling it
                 IntSet set = new IntOpenHashSet();
@@ -139,7 +144,7 @@ public class KTrussSparkEdgeVertices {
                         out.add(new Tuple2<>(new Tuple2<>(iEdge._2, w), iEdge._1));
                 }
                 return out.iterator();
-            }).groupByKey().partitionBy(partitioner);
+            }).groupByKey();
 
             edgeVertices = edgeVertices.filter(kv -> kv._2.size() >= minSup).leftOuterJoin(invalidUpdates)
                 .mapValues(values -> {
@@ -158,7 +163,7 @@ public class KTrussSparkEdgeVertices {
                         return null;
 
                     return original;
-                }).filter(kv -> kv._2 != null).partitionBy(partitioner).cache();
+                }).filter(kv -> kv._2 != null).cache();
         }
 
         long duration = System.currentTimeMillis() - start;
