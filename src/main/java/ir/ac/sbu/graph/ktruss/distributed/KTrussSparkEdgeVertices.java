@@ -103,7 +103,12 @@ public class KTrussSparkEdgeVertices {
         }).groupByKey(partitionerBig)
             .mapValues(values -> {
                 // TODO use iterator here instead of creating a set and filling it
-                IntSet set = new IntOpenHashSet();
+                int count = 0;
+                for (int v : values) {
+                    count ++;
+                }
+
+                IntSet set = new IntOpenHashSet(count);
                 for (int v : values) {
                     set.add(v);
                 }
