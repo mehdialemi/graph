@@ -127,11 +127,12 @@ public class KTrussSparkInvalidVertices {
         long tEdgeSup = System.currentTimeMillis();
         log("Create edgeSup ", tStart, tEdgeSup);
 
-        JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Integer, IntSet>> prevEdgeSup = edgeSup;
         int iteration = 0;
         while (true) {
             long t1 = System.currentTimeMillis();
             log("Iteration: " + ++iteration);
+//            JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Integer, IntSet>> prevEdgeSup = edgeSup;
+
             JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Integer, IntSet>> invalids =
                 edgeSup.filter(value -> (value._2._1 - value._2._2.size()) < minSup);
 
@@ -214,7 +215,7 @@ public class KTrussSparkInvalidVertices {
                 }).filter(kv -> kv._2 != null).partitionBy(partitioner).persist(StorageLevel.MEMORY_ONLY());  // TODO repartition?
 
             // Set blocking true
-            prevEdgeSup.unpersist();
+//            prevEdgeSup.unpersist();
 
             // TODO calculate the best repartition for each steps of the above algorithm using the information of graph sizes
 //            Float sumRatio = edgeSup.map(kv -> (kv._2._1 - kv._2._2.length) / (float) kv._2._1).reduce((a, b) -> a + b);

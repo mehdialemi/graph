@@ -50,7 +50,7 @@ public class KTrussSparkEdgeVertices {
         JavaRDD<String> input = sc.textFile(inputPath, partition);
 
         Partitioner partitionerSmall = new HashPartitioner(partition);
-        Partitioner partitionerBig = new HashPartitioner(partition * 10);
+        Partitioner partitionerBig = new HashPartitioner(partition * 3);
 
         JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
 
@@ -120,7 +120,6 @@ public class KTrussSparkEdgeVertices {
         boolean stop = false;
 
         while (!stop) {
-            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevEdgeVertices = edgeVertices;
             iteration++;
             long t1 = System.currentTimeMillis();
             JavaPairRDD<Tuple2<Integer, Integer>, IntSet> invalids = edgeVertices.filter(kv -> kv._2.size() < minSup);
@@ -169,8 +168,6 @@ public class KTrussSparkEdgeVertices {
 
                     return original;
                 }).filter(kv -> kv._2 != null).cache();
-
-            prevEdgeVertices.unpersist();
         }
 
         long duration = System.currentTimeMillis() - start;
