@@ -167,7 +167,7 @@ public class KTrussSparkEdgeVertices {
                         return null;
 
                     return original;
-                }).filter(kv -> kv._2 != null).cache();
+                }).filter(kv -> kv._2 != null).partitionBy(partitionerBig).cache();
         }
 
         long duration = System.currentTimeMillis() - start;
