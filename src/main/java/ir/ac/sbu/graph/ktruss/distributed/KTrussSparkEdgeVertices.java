@@ -150,6 +150,7 @@ public class KTrussSparkEdgeVertices {
                 return out.iterator();
             }).groupByKey();
 
+            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevEdgeVertices = edgeVertices;
             edgeVertices = edgeVertices.filter(kv -> kv._2.size() >= minSup).leftOuterJoin(invalidUpdates)
                 .mapValues(values -> {
                     Optional<Iterable<Integer>> invalidUpdate = values._2;
@@ -167,7 +168,8 @@ public class KTrussSparkEdgeVertices {
                         return null;
 
                     return original;
-                }).filter(kv -> kv._2 != null).repartition(partition);
+                }).filter(kv -> kv._2 != null).repartition(partition).cache();
+            prevEdgeVertices.unpersist();
         }
 
         long duration = System.currentTimeMillis() - start;
