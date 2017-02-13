@@ -4,23 +4,25 @@ import ir.ac.sbu.graph.clusteringco.FonlDegTC;
 import ir.ac.sbu.graph.clusteringco.FonlUtils;
 import ir.ac.sbu.graph.utils.GraphLoader;
 import ir.ac.sbu.graph.utils.GraphUtils;
-import it.unimi.dsi.fastutil.ints.IntList;
-import it.unimi.dsi.fastutil.ints.IntListIterator;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.HashPartitioner;
 import org.apache.spark.Partitioner;
+import org.apache.spark.RangePartitioner;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.Optional;
+import org.apache.spark.api.java.function.Function2;
+import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
-public class KTrussSparkEdgeVertices {
+public class KTrussSparkPartitionBySup {
 
     public static void main(String[] args) {
         String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
@@ -40,12 +42,10 @@ public class KTrussSparkEdgeVertices {
         SparkConf conf = new SparkConf();
         if (args.length == 0)
             conf.setMaster("local[2]");
-        GraphUtils.setAppName(conf, "KTruss-EdgeVertexList-" + k + "-MultiSteps", partition, inputPath);
-        conf.registerKryoClasses(new Class[]{GraphUtils.VertexDegree.class, long[].class, List.class});
+        GraphUtils.setAppName(conf, "KTrussSparkPartitionBySup-" + k + "-MultiSteps", partition, inputPath);
+        conf.registerKryoClasses(new Class[]{int[].class, List.class, IntSet.class, IntOpenHashSet.class});
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
         JavaSparkContext sc = new JavaSparkContext(conf);
-
-        long start = System.currentTimeMillis();
 
         JavaRDD<String> input = sc.textFile(inputPath, partition);
 
@@ -100,7 +100,7 @@ public class KTrussSparkEdgeVertices {
             }
 
             return output.iterator();
-        }).groupByKey(partitionerBig)
+        }).groupByKey()
             .mapValues(values -> {
                 // TODO use iterator here instead of creating a set and filling it
                 int count = 0;
@@ -113,67 +113,46 @@ public class KTrussSparkEdgeVertices {
                     set.add(v);
                 }
                 return set;
-            }).persist(StorageLevel.MEMORY_ONLY()); // Use disk too if graph is very large
+            });
 
-
-        int iteration = 0;
-        boolean stop = false;
-
-        while (!stop) {
-            iteration++;
-            long t1 = System.currentTimeMillis();
-            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> invalids = edgeVertices.filter(kv -> kv._2.size() < minSup);
-            long invalidEdgeCount = invalids.count();
-            if (invalidEdgeCount == 0) {
-                break;
+        JavaPairRDD<Integer, Tuple2<Tuple2<Integer, Integer>, IntSet>> supEdgeVertices =
+            edgeVertices.mapToPair(f -> new Tuple2<>(f._2.size(), new Tuple2<>(f._1, f._2)));
+        List<Tuple2<Integer, Integer>> supCount = supEdgeVertices.groupByKey().mapValues(t -> {
+            int count = 0;
+            for (Tuple2<Tuple2<Integer, Integer>, IntSet> x : t) {
+                count++;
             }
-            long t2 = System.currentTimeMillis();
-            String msg = "iteration: " + iteration + ", invalid edge count: " + invalidEdgeCount;
-            logDuration(msg, t2 - t1);
+            return count;
+        }).collect();
 
-            JavaPairRDD<Tuple2<Integer, Integer>, Iterable<Integer>> invalidUpdates = invalids.flatMapToPair(kv -> {
-                IntSet original = kv._2;
-                List<Tuple2<Tuple2<Integer, Integer>, Integer>> out = new ArrayList<>(original.size() * 2);
-                Tuple2<Integer, Integer> iEdge = kv._1;
-
-                for (Integer w : kv._2) {
-                    if (w < iEdge._1)
-                        out.add(new Tuple2<>(new Tuple2<>(w, iEdge._1), iEdge._2));
-                    else
-                        out.add(new Tuple2<>(new Tuple2<>(iEdge._1, w), iEdge._2));
-
-                    if (w < iEdge._2)
-                        out.add(new Tuple2<>(new Tuple2<>(w, iEdge._2), iEdge._1));
-                    else
-                        out.add(new Tuple2<>(new Tuple2<>(iEdge._2, w), iEdge._1));
-                }
-                return out.iterator();
-            }).groupByKey();
-
-            edgeVertices = edgeVertices.filter(kv -> kv._2.size() >= minSup).leftOuterJoin(invalidUpdates)
-                .mapValues(values -> {
-                    Optional<Iterable<Integer>> invalidUpdate = values._2;
-                    IntSet original = values._1;
-
-                    if (!invalidUpdate.isPresent()) {
-                        return original;
-                    }
-
-                    for (Integer v : invalidUpdate.get()) {
-                        original.remove(v.intValue());
-                    }
-
-                    if (original.size() == 0)
-                        return null;
-
-                    return original;
-                }).filter(kv -> kv._2 != null).repartition(partition);
+        Map<Integer, Tuple2<Integer, Integer>> map = new HashMap<>(supCount.size());
+        int start = 0;
+        int partitionsPerSup = 1000;
+        for (Tuple2<Integer, Integer> sup : supCount) {
+            int end = start + partitionsPerSup;
+            map.put(sup._1, new Tuple2<>(start, end));
+            start = end;
         }
 
-        long duration = System.currentTimeMillis() - start;
-        long edgeCount = edgeVertices.count();
+        final Broadcast<Integer> totalPartitions = sc.broadcast(start);
+        final Broadcast<Map<Integer, Tuple2<Integer, Integer>>> mapBroadcast = sc.broadcast(map);
 
-        logDuration("KTruss Edge Count: " + edgeCount, duration);
+        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> partitionedEdgeVertices = supEdgeVertices.partitionBy(new Partitioner() {
+
+            @Override
+            public int numPartitions() {
+                return totalPartitions.getValue();
+            }
+
+            @Override
+            public int getPartition(Object key) {
+                int k = (int) key;
+                Tuple2<Integer, Integer> range = mapBroadcast.getValue().get(k);
+                return ThreadLocalRandom.current().nextInt(range._1, range._2);
+            }
+        }).mapToPair(kv -> kv._2).cache();
+
+
         sc.close();
     }
 
