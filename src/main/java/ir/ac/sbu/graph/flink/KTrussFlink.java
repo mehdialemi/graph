@@ -7,26 +7,31 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.operators.*;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.types.IntValue;
 import org.apache.flink.util.Collector;
 
 import java.util.*;
 
-public class WordCount {
+public class KTrussFlink {
 
     public static void main(String[] args) throws Exception {
         final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
         //        String inputPath = "/home/mehdi/graph-data/cit-Patents.txt";
 
-        final int minSup = 2;
+        if (args.length > 0)
+            inputPath = args[0];
+
+        int k = 4; // k-truss
+        if (args.length > 2)
+            k = Integer.parseInt(args[1]);
+        final int minSup = k - 2;
+
         long startTime = System.currentTimeMillis();
         DataSource<Tuple2<Integer, Integer>> edges = env.readCsvFile(inputPath)
             .fieldDelimiter("\t")
