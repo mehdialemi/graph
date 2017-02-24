@@ -35,10 +35,6 @@ public class KTrussFlink2 {
         if (args.length > 0)
             inputPath = args[0];
 
-        ExecutionConfig config = env.getConfig();
-        config.enableObjectReuse();
-
-
         long startTime = System.currentTimeMillis();
         FlatMapOperator<Tuple2<Integer, Integer>, Tuple2<Integer, Integer>> edges = env.readCsvFile(inputPath)
             .fieldDelimiter("\t").ignoreComments("#")
