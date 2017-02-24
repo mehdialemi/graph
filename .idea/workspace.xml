@@ -7,7 +7,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b3c5635-bbd2-4b37-81d7-99d23148a07e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ktruss/ktruss-spark-update-list.sh" afterPath="$PROJECT_DIR$/bin/ktruss/ktruss-spark-update-list.sh" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/distributed/KTrussSparkUpdateList.java" afterPath="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/distributed/KTrussSparkUpdateList.java" />
     </list>
     <ignored path="graph-processing.iws" />
@@ -34,21 +33,9 @@
       <file leaf-file-name="KTrussSparkEdgeVertices.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/distributed/KTrussSparkEdgeVertices.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-808">
-              <caret line="52" column="72" selection-start-line="51" selection-start-column="8" selection-end-line="52" selection-end-column="72" />
+            <state relative-caret-position="377">
+              <caret line="152" column="45" selection-start-line="152" selection-start-column="45" selection-end-line="152" selection-end-column="45" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="KTrussFlink2.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/flink/KTrussFlink2.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="225">
-              <caret line="36" column="6" selection-start-line="23" selection-start-column="3" selection-end-line="36" selection-end-column="6" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -95,11 +82,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="KTrussSparkUpdateList.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="KTrussSparkUpdateList.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/distributed/KTrussSparkUpdateList.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="133" column="17" selection-start-line="133" selection-start-column="17" selection-end-line="133" selection-end-column="17" />
+            <state relative-caret-position="320">
+              <caret line="138" column="12" selection-start-line="138" selection-start-column="12" selection-end-line="138" selection-end-column="12" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -107,7 +94,17 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ktruss-spark-update-list.sh" pinned="false" current-in-tab="true">
+      <file leaf-file-name="JavaPairRDD.scala" pinned="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/org/apache/spark/spark-core_2.11/2.0.0/spark-core_2.11-2.0.0-sources.jar!/org/apache/spark/api/java/JavaPairRDD.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="140">
+              <caret line="77" column="6" selection-start-line="77" selection-start-column="6" selection-end-line="77" selection-end-column="6" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ktruss-spark-update-list.sh" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/bin/ktruss/ktruss-spark-update-list.sh">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="45">
@@ -210,8 +207,8 @@
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/flink/KTrussFlink2.java" />
         <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/flink/KTrussFlink.java" />
         <option value="$PROJECT_DIR$/bin/submit.sh" />
-        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/distributed/KTrussSparkUpdateList.java" />
         <option value="$PROJECT_DIR$/bin/ktruss/ktruss-spark-update-list.sh" />
+        <option value="$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/distributed/KTrussSparkUpdateList.java" />
       </list>
     </option>
   </component>
@@ -1147,13 +1144,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$MAVEN_REPOSITORY$/it/unimi/dsi/fastutil/7.0.13/fastutil-7.0.13-sources.jar!/it/unimi/dsi/fastutil/ints/IntOpenHashSet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="755" column="0" selection-start-line="755" selection-start-column="0" selection-end-line="755" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/bin/run_experiments.sh">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1537,29 +1527,37 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/bin/ktruss/ktruss-spark-update-list.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="21" selection-start-line="3" selection-start-column="21" selection-end-line="3" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/distributed/KTrussSparkEdgeVertices.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-808">
-          <caret line="52" column="72" selection-start-line="51" selection-start-column="8" selection-end-line="52" selection-end-column="72" />
+        <state relative-caret-position="377">
+          <caret line="152" column="45" selection-start-line="152" selection-start-column="45" selection-end-line="152" selection-end-column="45" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/spark/spark-core_2.11/2.0.0/spark-core_2.11-2.0.0-sources.jar!/org/apache/spark/api/java/JavaPairRDD.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="140">
+          <caret line="77" column="6" selection-start-line="77" selection-start-column="6" selection-end-line="77" selection-end-column="6" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ir/ac/sbu/graph/ktruss/distributed/KTrussSparkUpdateList.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="133" column="17" selection-start-line="133" selection-start-column="17" selection-end-line="133" selection-end-column="17" />
+        <state relative-caret-position="320">
+          <caret line="138" column="12" selection-start-line="138" selection-start-column="12" selection-end-line="138" selection-end-column="12" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/bin/ktruss/ktruss-spark-update-list.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="21" selection-start-line="3" selection-start-column="21" selection-end-line="3" selection-end-column="21" />
-          <folding />
         </state>
       </provider>
     </entry>

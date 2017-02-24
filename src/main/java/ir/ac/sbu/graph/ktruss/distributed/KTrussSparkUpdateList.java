@@ -103,7 +103,8 @@ public class KTrussSparkUpdateList {
                 return set;
             }).persist(StorageLevel.MEMORY_ONLY()); // Use disk too if graph is very large
 
-        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> invalids = edgeVertices.filter(t -> t._2.size() < minSup).cache();
+        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> invalids = edgeVertices.filter(t -> t._2.size() < minSup)
+            .repartition(partition).cache();
 
         JavaPairRDD<Tuple2<Integer, Integer>, Integer> updates =
             sc.parallelize(new ArrayList<Tuple2<Tuple2<Integer, Integer>, Integer>>()).mapToPair(t -> new Tuple2<>(t._1, t._2));
@@ -133,9 +134,7 @@ public class KTrussSparkUpdateList {
                         list.add(new Tuple2<>(new Tuple2<>(w, v), u));
                 }
                 return list.iterator();
-            }).partitionBy(partitioner).cache();
-
-            invalids.unpersist();
+            }).cache();
 
             updates = updates.union(invUpdate);
 
@@ -151,6 +150,8 @@ public class KTrussSparkUpdateList {
                 return Collections.emptyIterator();
             }).partitionBy(partitionerBig);
 
+            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevInvalids = invalids;
+
             invalids = edgeVertices.join(allInvUpdates).flatMapToPair(t -> {
                 for (int i : t._2._2) {
                     t._2._1.remove(i);
@@ -164,7 +165,8 @@ public class KTrussSparkUpdateList {
                 }
 
                 return Collections.emptyIterator();
-            }).cache();
+            }).repartition(partition).cache();
+            prevInvalids.unpersist(false);
         }
 
         long count = edgeVertices.cogroup(updates).mapValues(t -> {
