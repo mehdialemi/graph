@@ -43,6 +43,8 @@ public class KTrussSparkUpdateList {
 
         long tStart = System.currentTimeMillis();
 
+        Partitioner partitionerSmall = new HashPartitioner(partition);
+        Partitioner partitionerBig = new HashPartitioner(partition * 3);
         Partitioner partitioner = new HashPartitioner(partition);
         JavaRDD<String> input = sc.textFile(inputPath, partition);
 
@@ -50,7 +52,7 @@ public class KTrussSparkUpdateList {
 
         JavaPairRDD<Integer, int[]> fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, partitioner);
 
-        JavaPairRDD<Integer, int[]> candidates = FonlDegTC.generateCandidatesInteger(fonl).partitionBy(partitioner);
+        JavaPairRDD<Integer, int[]> candidates = FonlDegTC.generateCandidatesInteger(fonl).partitionBy(partitionerBig);
 
         // Generate kv such that key is an edge and value is its triangle vertices.
 
@@ -91,7 +93,7 @@ public class KTrussSparkUpdateList {
             }
 
             return output.iterator();
-        }).groupByKey()
+        }).groupByKey(partitionerBig)
             .mapValues(values -> {
                 // TODO use iterator here instead of creating a set and filling it
                 IntSet set = new IntOpenHashSet();
@@ -99,9 +101,9 @@ public class KTrussSparkUpdateList {
                     set.add(v);
                 }
                 return set;
-            }).partitionBy(partitioner).persist(StorageLevel.MEMORY_ONLY()); // Use disk too if graph is very large
+            }).persist(StorageLevel.MEMORY_ONLY()); // Use disk too if graph is very large
 
-        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> invalids = edgeVertices.filter(t -> t._2.size() < minSup);
+        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> invalids = edgeVertices.filter(t -> t._2.size() < minSup).cache();
 
         JavaPairRDD<Tuple2<Integer, Integer>, Integer> updates =
             sc.parallelize(new ArrayList<Tuple2<Tuple2<Integer, Integer>, Integer>>()).mapToPair(t -> new Tuple2<>(t._1, t._2));
@@ -133,6 +135,8 @@ public class KTrussSparkUpdateList {
                 return list.iterator();
             }).partitionBy(partitioner).cache();
 
+            invalids.unpersist();
+
             updates = updates.union(invUpdate);
 
             JavaPairRDD<Tuple2<Integer, Integer>, int[]> allInvUpdates = updates.cogroup(invUpdate).flatMapToPair(t -> {
@@ -145,7 +149,7 @@ public class KTrussSparkUpdateList {
                 }
 
                 return Collections.emptyIterator();
-            }).partitionBy(partitioner);
+            }).partitionBy(partitionerBig);
 
             invalids = edgeVertices.join(allInvUpdates).flatMapToPair(t -> {
                 for (int i : t._2._2) {
@@ -160,7 +164,7 @@ public class KTrussSparkUpdateList {
                 }
 
                 return Collections.emptyIterator();
-            });
+            }).cache();
         }
 
         long count = edgeVertices.cogroup(updates).mapValues(t -> {
