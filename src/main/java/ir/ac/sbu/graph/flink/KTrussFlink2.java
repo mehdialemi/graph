@@ -35,6 +35,10 @@ public class KTrussFlink2 {
         if (args.length > 0)
             inputPath = args[0];
 
+        env.getConfig().enableForceKryo();
+        env.getConfig().enableObjectReuse();
+        env.getConfig().registerPojoType(int[].class);
+
         long startTime = System.currentTimeMillis();
         FlatMapOperator<Tuple2<Integer, Integer>, Tuple2<Integer, Integer>> edges = env.readCsvFile(inputPath)
             .fieldDelimiter("\t").ignoreComments("#")
@@ -57,6 +61,9 @@ public class KTrussFlink2 {
                         v = value.f0;
                         set.add(value.f1);
                     }
+
+                    if (set.size() == 0)
+                        return;
 
                     for (Integer i : set) {
                         collector.collect(new Tuple3<>(i, v, set.size()));
