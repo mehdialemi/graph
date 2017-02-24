@@ -234,42 +234,28 @@ public class KTrussFlink {
                 public void coGroup(Iterable<Tuple2<Tuple2<Integer, Integer>, Integer>> inv,
                                     Iterable<Tuple2<Tuple2<Integer, Integer>, int[]>> prev,
                                     Collector<Tuple2<Tuple2<Integer, Integer>, int[]>> collector) throws Exception {
-                    Iterator<Tuple2<Tuple2<Integer, Integer>, int[]>> fi = prev.iterator();
-                    if (!fi.hasNext())
+                    Iterator<Tuple2<Tuple2<Integer, Integer>, int[]>> prevIteration = prev.iterator();
+                    if (!prevIteration.hasNext())
                         return;
 
-                    Tuple2<Tuple2<Integer, Integer>, int[]> fkv = fi.next();
-                    if (fkv.f1.length < minSup)
+                    Tuple2<Tuple2<Integer, Integer>, int[]> prevKV = prevIteration.next();
+                    if (prevKV.f1.length < minSup)
                         return;
 
-                    IntSet set = new IntOpenHashSet();
+                    IntSet set = new IntOpenHashSet(prevKV.f1);
                     for (Tuple2<Tuple2<Integer, Integer>, Integer> s : inv) {
-                        set.add(s.f1);
+                        set.remove(s.f1);
                     }
 
                     if (set.size() == 0) {
-                        collector.collect(fkv);
                         return;
                     }
 
-                    int validLen = fkv.f1.length - set.size();
-                    if (validLen == 0)
-                        return;
-
-                    int[] out = new int[validLen];
-                    int i = 0;
-                    for (int valid : fkv.f1) {
-                        if (set.contains(valid))
-                            continue;
-                        out[i ++] = valid;
-                    }
-
-                    collector.collect(new Tuple2<>(fkv.f0, out));
+                    collector.collect(new Tuple2<>(prevKV.f0, set.toIntArray()));
                 }
             });
 
         DataSet<Tuple2<Tuple2<Integer, Integer>, int[]>> result = iteration.closeWith(newEdgeVertices, invUpdates);
-
 
         System.out.println("Result: " + result.distinct().count());
         long endTime = System.currentTimeMillis();

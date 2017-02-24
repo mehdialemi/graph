@@ -71,6 +71,8 @@ case $task in
 	;;
 	"KT_INV_VERTICES") main_class="ir.ac.sbu.graph.ktruss.distributed.KTrussSparkInvalidVertices"
 	;;
+	"KT_SPARK_UPDATE") main_class="ir.ac.sbu.graph.ktruss.distributed.KTrussSparkUpdateList"
+	;;
 	*)	echo "please determine your task in the argument
 	[GCC_Hob|GCC_Deg|LCC_Deg|TC_Deg|GCC_Id|LCC_Id|GCC_GraphX|LCC_GraphX|TC_GraphX|GCC_NodeIter|TC_NodeIter"
 		exit 1
