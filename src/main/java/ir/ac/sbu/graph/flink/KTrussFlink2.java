@@ -24,6 +24,7 @@ public class KTrussFlink2 {
 
     public static final TypeHint<Tuple3<Integer, Integer, Integer>> TUPLE_3_TYPE_HINT = new TypeHint<Tuple3<Integer, Integer, Integer>>() {
     };
+
     public static final TypeHint<Tuple2<Integer, int[]>> TUPLE_2_INT_ARRAY_TYPE_HINT = new TypeHint<Tuple2<Integer, int[]>>() {
     };
 
@@ -34,16 +35,8 @@ public class KTrussFlink2 {
         if (args.length > 0)
             inputPath = args[0];
 
-        int k = 4; // k-truss
-        if (args.length > 2)
-            k = Integer.parseInt(args[1]);
-//        final int minSup = k - 2;
-
         ExecutionConfig config = env.getConfig();
         config.enableObjectReuse();
-//        config.enableForceKryo();
-//        config.registerKryoType(int[].class);
-//        config.registerPojoType(int[].class);
 
 
         long startTime = System.currentTimeMillis();
