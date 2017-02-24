@@ -244,6 +244,7 @@ public class KTrussFlink2 {
                 .with((Tuple2<Tuple2<Integer, Integer>, int[]> first,
                        Tuple2<Tuple2<Integer, Integer>, int[]> second,
                        Collector<Tuple2<Tuple2<Integer, Integer>, Tuple2<int[], int[]>>> collector) -> {
+
                     collector.collect(new Tuple2<>(first.f0, new Tuple2<>(first.f1, second.f1)));
                 }).returns(TYPE_TUPLE2_2INT_ARRAY);
 
