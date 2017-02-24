@@ -36,12 +36,13 @@ public class KTrussFlink2 {
         int k = 4; // k-truss
         if (args.length > 2)
             k = Integer.parseInt(args[1]);
-        final int minSup = k - 2;
+//        final int minSup = k - 2;
 
         ExecutionConfig config = env.getConfig();
-        config.enableObjectReuse();
+//        config.enableObjectReuse();
         config.enableForceKryo();
         config.registerKryoType(int[].class);
+//        config.registerPojoType(int[].class);
 
 
         long startTime = System.currentTimeMillis();
@@ -75,10 +76,13 @@ public class KTrussFlink2 {
                 .groupBy(0)
                 .combineGroup(new RichGroupCombineFunction<Tuple3<Integer, Integer, Integer>, Tuple2<Integer, int[]>>() {
 
+                    final List<Tuple3<Integer, Integer, Integer>> list = new ArrayList<>();
+
                     @Override
                     public void combine(Iterable<Tuple3<Integer, Integer, Integer>> values, Collector<Tuple2<Integer, int[]>> collector)
                         throws Exception {
-                        List<Tuple3<Integer, Integer, Integer>> list = new ArrayList<>();
+                        list.clear();
+
                         for (Tuple3<Integer, Integer, Integer> value : values) {
                             list.add(value);
                         }
