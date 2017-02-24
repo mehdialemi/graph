@@ -16,8 +16,6 @@ import scala.Tuple2;
 
 import java.util.*;
 
-import static com.sun.org.apache.xml.internal.security.keys.keyresolver.KeyResolver.iterator;
-
 public class KTrussSparkUpdateList {
 
     public static void main(String[] args) {
