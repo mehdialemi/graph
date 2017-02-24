@@ -4,11 +4,14 @@ package ir.ac.sbu.graph.flink;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.flink.api.common.ExecutionConfig;
+import org.apache.flink.api.common.functions.GroupCombineFunction;
+import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.RichGroupCombineFunction;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.operators.FlatMapOperator;
 import org.apache.flink.api.java.operators.GroupCombineOperator;
+import org.apache.flink.api.java.operators.GroupReduceOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
@@ -54,12 +57,11 @@ public class KTrussFlink2 {
                 collector.collect(t.swap());
             }).returns(TUPLE_2_TYPE_HINT);
 
-        GroupCombineOperator<Tuple3<Integer, Integer, Integer>, Tuple2<Integer, int[]>> fonls =
-            edges.groupBy(0).combineGroup(new RichGroupCombineFunction<Tuple2<Integer, Integer>, Tuple3<Integer, Integer, Integer>>() {
+        GroupReduceOperator<Tuple3<Integer, Integer, Integer>, Tuple2<Integer, int[]>> fonls =
+            edges.groupBy(0).reduceGroup(new GroupReduceFunction<Tuple2<Integer, Integer>, Tuple3 < Integer, Integer, Integer >>() {
                 final IntSet set = new IntOpenHashSet();
-
                 @Override
-                public void combine(Iterable<Tuple2<Integer, Integer>> values, Collector<Tuple3<Integer, Integer, Integer>> collector)
+                public void reduce(Iterable<Tuple2<Integer, Integer>> values, Collector<Tuple3 < Integer, Integer, Integer >> collector)
                     throws Exception {
                     set.clear();
                     int v = -1;
@@ -73,45 +75,42 @@ public class KTrussFlink2 {
                     }
                 }
             }).returns(TUPLE_3_TYPE_HINT)
-                .groupBy(0)
-                .combineGroup(new RichGroupCombineFunction<Tuple3<Integer, Integer, Integer>, Tuple2<Integer, int[]>>() {
+                .groupBy(0).reduceGroup(new GroupReduceFunction<Tuple3<Integer,Integer,Integer>, Tuple2<Integer, int[]>>() {
+                final List<Tuple3<Integer, Integer, Integer>> list = new ArrayList<>();
+                @Override
+                public void reduce(Iterable<Tuple3<Integer, Integer, Integer>> values, Collector<Tuple2<Integer, int[]>> collector)
+                    throws Exception {
+                    list.clear();
 
-                    final List<Tuple3<Integer, Integer, Integer>> list = new ArrayList<>();
-
-                    @Override
-                    public void combine(Iterable<Tuple3<Integer, Integer, Integer>> values, Collector<Tuple2<Integer, int[]>> collector)
-                        throws Exception {
-                        list.clear();
-
-                        for (Tuple3<Integer, Integer, Integer> value : values) {
-                            list.add(value);
-                        }
-
-                        if (list.size() == 0)
-                            return;
-
-                        int v = list.get(0).f0;
-                        int deg = list.size();
-
-                        for (int i = 0; i < list.size(); i++) {
-                            Tuple3<Integer, Integer, Integer> tuple = list.get(i);
-                            if (tuple.f2 > deg || (tuple.f2 == deg && tuple.f1 > tuple.f0))
-                                continue;
-
-                            list.remove(i);
-                            i--;
-                        }
-
-                        Collections.sort(list, (a, b) -> a.f2 != b.f2 ? a.f2 - b.f2 : a.f1 - b.f1);
-
-                        int[] higherDegs = new int[list.size() + 1];
-                        higherDegs[0] = deg;
-                        for (int i = 1; i < higherDegs.length; i++)
-                            higherDegs[i] = list.get(i - 1).f1;
-
-                        collector.collect(new Tuple2<>(v, higherDegs));
+                    for (Tuple3<Integer, Integer, Integer> value : values) {
+                        list.add(value);
                     }
-                }).returns(new TypeHint<Tuple2<Integer, int[]>>() {});
+
+                    if (list.size() == 0)
+                        return;
+
+                    int v = list.get(0).f0;
+                    int deg = list.size();
+
+                    for (int i = 0; i < list.size(); i++) {
+                        Tuple3<Integer, Integer, Integer> tuple = list.get(i);
+                        if (tuple.f2 > deg || (tuple.f2 == deg && tuple.f1 > tuple.f0))
+                            continue;
+
+                        list.remove(i);
+                        i--;
+                    }
+
+                    Collections.sort(list, (a, b) -> a.f2 != b.f2 ? a.f2 - b.f2 : a.f1 - b.f1);
+
+                    int[] higherDegs = new int[list.size() + 1];
+                    higherDegs[0] = deg;
+                    for (int i = 1; i < higherDegs.length; i++)
+                        higherDegs[i] = list.get(i - 1).f1;
+
+                    collector.collect(new Tuple2<>(v, higherDegs));
+                }
+            }).returns(new TypeHint<Tuple2<Integer, int[]>>() {});
 
         long count = fonls.count();
         long endTime = System.currentTimeMillis();
