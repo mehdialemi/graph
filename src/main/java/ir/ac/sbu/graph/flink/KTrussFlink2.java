@@ -24,6 +24,8 @@ public class KTrussFlink2 {
 
     public static final TypeHint<Tuple3<Integer, Integer, Integer>> TUPLE_3_TYPE_HINT = new TypeHint<Tuple3<Integer, Integer, Integer>>() {
     };
+    public static final TypeHint<Tuple2<Integer, int[]>> TUPLE_2_INT_ARRAY_TYPE_HINT = new TypeHint<Tuple2<Integer, int[]>>() {
+    };
 
     public static void main(String[] args) throws Exception {
         final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
@@ -54,10 +56,11 @@ public class KTrussFlink2 {
             }).returns(TUPLE_2_TYPE_HINT);
 
         GroupReduceOperator<Tuple3<Integer, Integer, Integer>, Tuple2<Integer, int[]>> fonls =
-            edges.groupBy(0).reduceGroup(new GroupReduceFunction<Tuple2<Integer, Integer>, Tuple3 < Integer, Integer, Integer >>() {
+            edges.groupBy(0).reduceGroup(new GroupReduceFunction<Tuple2<Integer, Integer>, Tuple3<Integer, Integer, Integer>>() {
                 final IntSet set = new IntOpenHashSet();
+
                 @Override
-                public void reduce(Iterable<Tuple2<Integer, Integer>> values, Collector<Tuple3 < Integer, Integer, Integer >> collector)
+                public void reduce(Iterable<Tuple2<Integer, Integer>> values, Collector<Tuple3<Integer, Integer, Integer>> collector)
                     throws Exception {
                     set.clear();
                     int v = -1;
@@ -71,8 +74,9 @@ public class KTrussFlink2 {
                     }
                 }
             }).returns(TUPLE_3_TYPE_HINT)
-                .groupBy(0).reduceGroup(new GroupReduceFunction<Tuple3<Integer,Integer,Integer>, Tuple2<Integer, int[]>>() {
+                .groupBy(0).reduceGroup(new GroupReduceFunction<Tuple3<Integer, Integer, Integer>, Tuple2<Integer, int[]>>() {
                 final List<Tuple3<Integer, Integer, Integer>> list = new ArrayList<>();
+
                 @Override
                 public void reduce(Iterable<Tuple3<Integer, Integer, Integer>> values, Collector<Tuple2<Integer, int[]>> collector)
                     throws Exception {
@@ -106,7 +110,7 @@ public class KTrussFlink2 {
 
                     collector.collect(new Tuple2<>(v, higherDegs));
                 }
-            }).returns(new TypeHint<Tuple2<Integer, int[]>>() {});
+            }).returns(TUPLE_2_INT_ARRAY_TYPE_HINT);
 
         long count = fonls.count();
         long endTime = System.currentTimeMillis();
