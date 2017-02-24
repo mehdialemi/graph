@@ -4,17 +4,13 @@ package ir.ac.sbu.graph.flink;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.flink.api.common.ExecutionConfig;
-import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.api.common.functions.RichGroupCombineFunction;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.operators.FlatMapOperator;
-import org.apache.flink.api.java.operators.GroupCombineOperator;
 import org.apache.flink.api.java.operators.GroupReduceOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 
 import java.util.ArrayList;
@@ -42,9 +38,9 @@ public class KTrussFlink2 {
 //        final int minSup = k - 2;
 
         ExecutionConfig config = env.getConfig();
-//        config.enableObjectReuse();
-        config.enableForceKryo();
-        config.registerKryoType(int[].class);
+        config.enableObjectReuse();
+//        config.enableForceKryo();
+//        config.registerKryoType(int[].class);
 //        config.registerPojoType(int[].class);
 
 
