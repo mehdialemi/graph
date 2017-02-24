@@ -10,9 +10,9 @@ import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.typeinfo.TypeHint;
+import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.operators.FlatMapOperator;
-import org.apache.flink.api.java.operators.GroupReduceOperator;
+import org.apache.flink.api.java.operators.*;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
@@ -29,6 +29,12 @@ public class KTrussFlink2 {
 
     public static final TypeHint<Tuple2<Integer, int[]>> TUPLE_2_INT_ARRAY_TYPE_HINT = new TypeHint<Tuple2<Integer, int[]>>() {
     };
+    public static final TypeHint<Tuple2<Tuple2<Integer, Integer>, int[]>> TYPE_TUPLE2_INT_ARRAY = new TypeHint<Tuple2<Tuple2<Integer, Integer>, int[]>>() {
+    };
+    public static final TypeHint<Tuple2<Tuple2<Integer, Integer>, Integer>> TYPE_TUPLE2_INT = new TypeHint<Tuple2<Tuple2<Integer, Integer>, Integer>>() {
+    };
+    public static final TypeHint<Tuple2<Tuple2<Integer, Integer>, Tuple2<int[], int[]>>> TYPE_TUPLE2_2INT_ARRAY = new TypeHint<Tuple2<Tuple2<Integer, Integer>, Tuple2<int[], int[]>>>() {
+    };
 
     public static void main(String[] args) throws Exception {
         final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
@@ -36,6 +42,11 @@ public class KTrussFlink2 {
 
         if (args.length > 0)
             inputPath = args[0];
+
+        int k = 4; // k-truss
+        if (args.length > 1)
+            k = Integer.parseInt(args[1]);
+        final int minSup = k - 2;
 
         env.getConfig().enableForceKryo();
 //        env.getConfig().enableObjectReuse();
@@ -168,21 +179,136 @@ public class KTrussFlink2 {
                         }
                     }
                 }).returns(TUPLE_3_TYPE_HINT).groupBy(0, 1).reduceGroup((Iterable<Tuple3<Integer, Integer, Integer>> values,
-                                       Collector<Tuple2<Tuple2<Integer, Integer>, int[]>> collector) -> {
-                        IntList list = new IntArrayList();
+                                                                         Collector<Tuple2<Tuple2<Integer, Integer>, int[]>> collector) -> {
+                IntList list = new IntArrayList();
 
-                        Tuple2<Integer, Integer> key = null;
-                        for (Tuple3<Integer, Integer, Integer> i : values) {
-                            if (key == null) {
-                                key = new Tuple2<>(i.f0, i.f1);
-                            }
-                            list.add(i.f2.intValue());
+                Tuple2<Integer, Integer> key = null;
+                for (Tuple3<Integer, Integer, Integer> i : values) {
+                    if (key == null) {
+                        key = new Tuple2<>(i.f0, i.f1);
+                    }
+                    list.add(i.f2.intValue());
+                }
+                collector.collect(new Tuple2<>(key, list.toIntArray()));
+            }).returns(TYPE_TUPLE2_INT_ARRAY);
+
+        FilterOperator<Tuple2<Tuple2<Integer, Integer>, int[]>> initialWorkingSet = edgeVertices.filter(t -> t.f1.length < minSup);
+
+        List<Tuple2<Tuple2<Integer, Integer>, int[]>> emptyList = new ArrayList<>();
+        emptyList.add(new Tuple2<>(new Tuple2<>(-1, -1), new int[]{}));
+
+        DataSource<Tuple2<Tuple2<Integer, Integer>, int[]>> empty = env.fromCollection(emptyList);
+
+        DeltaIteration<Tuple2<Tuple2<Integer, Integer>, int[]>, Tuple2<Tuple2<Integer, Integer>, int[]>> iteration =
+            empty.iterateDelta(initialWorkingSet, 100, 0);
+
+        GroupReduceOperator<Tuple2<Tuple2<Integer, Integer>, Integer>, Tuple2<Tuple2<Integer, Integer>, int[]>> invUpdates =
+            iteration.getWorkset().filter(t -> t.f1.length < minSup)
+                .flatMap((Tuple2<Tuple2<Integer, Integer>, int[]> kv,
+                          Collector<Tuple2<Tuple2<Integer, Integer>, Integer>> collector) -> {
+                    int u = kv.f0.f0;
+                    int v = kv.f0.f1;
+                    for (int i = 0; i < kv.f1.length; i++) {
+                        int w = kv.f1[i];
+                        if (w < u)
+                            collector.collect(new Tuple2<>(new Tuple2<>(w, u), v));
+                        else
+                            collector.collect(new Tuple2<>(new Tuple2<>(u, w), v));
+
+                        if (w < v)
+                            collector.collect(new Tuple2<>(new Tuple2<>(w, v), u));
+                        else
+                            collector.collect(new Tuple2<>(new Tuple2<>(v, w), u));
+                    }
+                }).returns(TYPE_TUPLE2_INT)
+                .groupBy(0).reduceGroup((Iterable<Tuple2<Tuple2<Integer, Integer>, Integer>> values,
+                                         Collector<Tuple2<Tuple2<Integer, Integer>, int[]>> collector) -> {
+                IntList list = new IntArrayList();
+                Tuple2<Integer, Integer> key = null;
+                for (Tuple2<Tuple2<Integer, Integer>, Integer> value : values) {
+                    if (key == null) key = value.f0;
+                    list.add(value.f1.intValue());
+                }
+
+                if (key == null)
+                    return;
+
+                collector.collect(new Tuple2<>(key, list.toIntArray()));
+            }).returns(TYPE_TUPLE2_INT_ARRAY);
+
+        JoinOperator<Tuple2<Tuple2<Integer, Integer>, int[]>, Tuple2<Tuple2<Integer, Integer>, int[]>,
+            Tuple2<Tuple2<Integer, Integer>, Tuple2<int[], int[]>>> updateList =
+            edgeVertices.joinWithTiny(invUpdates)
+                .where(0)
+                .equalTo(0)
+                .with((Tuple2<Tuple2<Integer, Integer>, int[]> first,
+                       Tuple2<Tuple2<Integer, Integer>, int[]> second,
+                       Collector<Tuple2<Tuple2<Integer, Integer>, Tuple2<int[], int[]>>> collector) -> {
+                    collector.collect(new Tuple2<>(first.f0, new Tuple2<>(first.f1, second.f1)));
+                }).returns(TYPE_TUPLE2_2INT_ARRAY);
+
+        CoGroupOperator<Tuple2<Tuple2<Integer, Integer>, int[]>, Tuple2<Tuple2<Integer, Integer>, Tuple2<int[], int[]>>,
+            Tuple2<Tuple2<Integer, Integer>, int[]>> newWorkingSet =
+            iteration.getSolutionSet()
+                .coGroup(updateList)
+                .where(0)
+                .equalTo(0)
+                .with((Iterable<Tuple2<Tuple2<Integer, Integer>, int[]>> solution,
+                       Iterable<Tuple2<Tuple2<Integer, Integer>, Tuple2<int[], int[]>>> newWorkSet,
+                       Collector<Tuple2<Tuple2<Integer, Integer>, int[]>> collector) -> {
+                    Iterator<Tuple2<Tuple2<Integer, Integer>, Tuple2<int[], int[]>>> itNewWorkSet = newWorkSet.iterator();
+                    if (!itNewWorkSet.hasNext())
+                        return;
+                    Tuple2<Tuple2<Integer, Integer>, Tuple2<int[], int[]>> s = itNewWorkSet.next();
+
+                    IntSet set = new IntOpenHashSet(s.f1.f0);
+                    for (Tuple2<Tuple2<Integer, Integer>, int[]> invs : solution) {
+                        for (int i : invs.f1) {
+                            set.remove(i);
                         }
-                        collector.collect(new Tuple2<>(key, list.toIntArray()));
-                }).returns(new TypeHint<Tuple2<Tuple2<Integer, Integer>, int[]>>() {});
+                    }
 
-        long count = edgeVertices.count();
+                    for (int i : s.f1.f1) {
+                        set.remove(i);
+                    }
+
+                    if (set.size() == 0)
+                        return;
+
+                    if (set.size() >= minSup)
+                        return;
+
+                    collector.collect(new Tuple2<>(s.f0, set.toIntArray()));
+                }).returns(TYPE_TUPLE2_INT_ARRAY);
+
+        DataSet<Tuple2<Tuple2<Integer, Integer>, int[]>> result = iteration.closeWith(invUpdates, newWorkingSet);
+
+        CoGroupOperator<Tuple2<Tuple2<Integer, Integer>, int[]>, Tuple2<Tuple2<Integer, Integer>, int[]>,
+            Tuple2<Integer, Integer>> remained =
+            edgeVertices.coGroup(result).where(0).equalTo(0).with((Iterable<Tuple2<Tuple2<Integer, Integer>, int[]>> first,
+                                                                   Iterable<Tuple2<Tuple2<Integer, Integer>, int[]>> second,
+                                                                   Collector<Tuple2<Integer, Integer>> collector) -> {
+
+                Iterator<Tuple2<Tuple2<Integer, Integer>, int[]>> iterator = first.iterator();
+                if (!iterator.hasNext())
+                    return;
+
+                Tuple2<Tuple2<Integer, Integer>, int[]> origin = iterator.next();
+                IntSet set = new IntOpenHashSet(origin.f1);
+                for (Tuple2<Tuple2<Integer, Integer>, int[]> t : second) {
+                    for (int i : t.f1) {
+                        set.remove(i);
+                    }
+                }
+                if (set.size() < minSup)
+                    return;
+
+                collector.collect(origin.f0);
+            }).returns(new TypeHint<Tuple2<Integer, Integer>>() {
+            });
+
+        long count = remained.count();
         long endTime = System.currentTimeMillis();
-        System.out.println("edgeVertices count: " + count + ", duration: " + (endTime - startTime));
+        System.out.println("result count: " + count + ", duration: " + (endTime - startTime));
     }
 }
