@@ -1,6 +1,8 @@
 package ir.ac.sbu.graph.flink;
 
 
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.flink.api.common.ExecutionConfig;
@@ -72,12 +74,12 @@ public class KTrussFlink2 {
             }).returns(TUPLE_3_TYPE_HINT)
                 .groupBy(0).reduceGroup(new GroupReduceFunction<Tuple3<Integer, Integer, Integer>, Tuple2<Integer, int[]>>() {
                 final List<Tuple3<Integer, Integer, Integer>> list = new ArrayList<>();
-
+                final List<Tuple3<Integer, Integer, Integer>> holds = new ArrayList<>();
                 @Override
                 public void reduce(Iterable<Tuple3<Integer, Integer, Integer>> values, Collector<Tuple2<Integer, int[]>> collector)
                     throws Exception {
-                    list.clear();
 
+                    list.clear();
                     for (Tuple3<Integer, Integer, Integer> value : values) {
                         list.add(value);
                     }
@@ -87,22 +89,21 @@ public class KTrussFlink2 {
 
                     int v = list.get(0).f0;
                     int deg = list.size();
+                    holds.clear();
 
                     for (int i = 0; i < list.size(); i++) {
                         Tuple3<Integer, Integer, Integer> tuple = list.get(i);
                         if (tuple.f2 > deg || (tuple.f2 == deg && tuple.f1 > tuple.f0))
                             continue;
-
-                        list.remove(i);
-                        i--;
+                        holds.add(tuple);
                     }
 
-                    Collections.sort(list, (a, b) -> a.f2 != b.f2 ? a.f2 - b.f2 : a.f1 - b.f1);
+                    Collections.sort(holds, (a, b) -> a.f2 != b.f2 ? a.f2 - b.f2 : a.f1 - b.f1);
 
-                    int[] higherDegs = new int[list.size() + 1];
+                    int[] higherDegs = new int[holds.size() + 1];
                     higherDegs[0] = deg;
                     for (int i = 1; i < higherDegs.length; i++)
-                        higherDegs[i] = list.get(i - 1).f1;
+                        higherDegs[i] = holds.get(i - 1).f1;
 
                     collector.collect(new Tuple2<>(v, higherDegs));
                 }
