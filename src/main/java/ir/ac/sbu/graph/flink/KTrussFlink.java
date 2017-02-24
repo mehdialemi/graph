@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
@@ -20,6 +21,7 @@ import java.util.*;
 public class KTrussFlink {
 
     public static void main(String[] args) throws Exception {
+        
         final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
         //        String inputPath = "/home/mehdi/graph-data/cit-Patents.txt";
@@ -199,6 +201,10 @@ public class KTrussFlink {
                     }
                 });
 
+        long edgeVerticesCount = edgeVertices.count();
+        System.out.println("Compute triangle vertices, count: " + edgeVerticesCount);
+
+
         IterativeDataSet<Tuple2<Tuple2<Integer, Integer>, int[]>> iteration = edgeVertices.iterate(100);
 
         FlatMapOperator<Tuple2<Tuple2<Integer, Integer>, int[]>, Tuple2<Tuple2<Integer, Integer>, Integer>> invUpdates =
@@ -273,6 +279,7 @@ public class KTrussFlink {
             });
 
         DataSet<Tuple2<Tuple2<Integer, Integer>, int[]>> result = iteration.closeWith(update, invUpdates);
+
 
         System.out.println("Result: " + result.distinct().count());
         long endTime = System.currentTimeMillis();
