@@ -34,7 +34,7 @@ public class KTrussFlink {
 
         long startTime = System.currentTimeMillis();
         DataSource<Tuple2<Integer, Integer>> edges = env.readCsvFile(inputPath)
-            .fieldDelimiter("\t")
+            .fieldDelimiter("\t").ignoreComments("#")
             .types(Integer.class, Integer.class);
 
         GroupReduceOperator<Tuple3<Integer, Integer, Integer>, Tuple2<Integer, int[]>> fonls = edges
