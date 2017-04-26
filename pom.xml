@@ -30,7 +30,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <compilerId>jdt</compilerId>
-        <spark.version>2.0.0</spark.version>
+        <spark.version>2.1.0</spark.version>
         <flink.version>1.2.0</flink.version>
         <scala.version>2.11</scala.version>
         <scala.complete.version>${scala.version}.8</scala.complete.version>
