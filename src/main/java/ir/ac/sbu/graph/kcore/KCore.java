@@ -150,6 +150,8 @@ public class KCore {
         JavaPairRDD<Integer, Integer> degInfo = runDegInfo(neighbors, k, partitioner);
         log("Vertex count: " + degInfo.count());
 
+        sc.close();
+
     }
 
     public static JavaPairRDD<Integer, int[]> neighborList(Partitioner partitioner, JavaPairRDD<Integer, Integer> edges) {
