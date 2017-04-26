@@ -136,6 +136,7 @@ public class KCore {
         if (args.length == 0)
             conf.setMaster("local[2]");
 
+        log("Input: " + inputPath);
         GraphUtils.setAppName(conf, "KCore-" + k, partition, inputPath);
         conf.registerKryoClasses(new Class[]{GraphUtils.VertexDegree.class, int[].class, Iterable.class});
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
@@ -144,7 +145,7 @@ public class KCore {
         JavaRDD<String> input = sc.textFile(inputPath, partition);
         JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
         JavaPairRDD<Integer, int[]> neighbors = neighborList(new HashPartitioner(partition), edges);
-        
+
         Partitioner partitioner = new HashPartitioner(partition);
 //        neighbors = runNeighborList(neighbors, k, partitioner);
         JavaPairRDD<Integer, Integer> degInfo = runDegInfo(neighbors, k, partitioner);
