@@ -144,7 +144,7 @@ public class KCore {
         JavaRDD<String> input = sc.textFile(inputPath, partition);
         JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
         JavaPairRDD<Integer, int[]> neighbors = neighborList(new HashPartitioner(partition), edges);
-        long vCount = neighbors.count();
+        
         Partitioner partitioner = new HashPartitioner(partition);
 //        neighbors = runNeighborList(neighbors, k, partitioner);
         JavaPairRDD<Integer, Integer> degInfo = runDegInfo(neighbors, k, partitioner);
