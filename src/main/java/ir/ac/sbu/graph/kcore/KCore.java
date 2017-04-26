@@ -142,7 +142,7 @@ public class KCore {
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
         JavaSparkContext sc = new JavaSparkContext(conf);
 
-        JavaRDD<String> input = sc.textFile(inputPath, partition);
+        JavaRDD<String> input = sc.textFile(inputPath);
         JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
         JavaPairRDD<Integer, int[]> neighbors = neighborList(new HashPartitioner(partition), edges);
 
