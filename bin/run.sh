@@ -47,6 +47,7 @@ do
 done < $conf_file
 
 input_file=${config[inputs]}
+echo "Input file name: $input_file"
 
 # Read input graphs
 while read -r line
