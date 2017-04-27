@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-INPUT_PREFIX="hdfs://graph-data"
+
 
 typeset -A config
 config=(
@@ -46,6 +46,7 @@ do
     echo "$conf_name = $conf_value"
 done < $conf_file
 
+input_prefix="hdfs://${config[master]}/graph-data"
 input_file=${config[inputs]}
 echo "Input file name: $input_file"
 
@@ -55,7 +56,7 @@ do
     graph_info="$line"
     info=($graph_info)
     graph_name=${info[0]}
-    graph_path="$INPUT_PREFIX/$graph_name"
+    graph_path="$input_prefix/$graph_name"
     partitionNum=${info[1]}
 
     # Create log dir
