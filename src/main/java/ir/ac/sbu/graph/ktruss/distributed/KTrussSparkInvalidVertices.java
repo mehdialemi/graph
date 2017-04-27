@@ -50,7 +50,7 @@ public class KTrussSparkInvalidVertices {
         SparkConf conf = new SparkConf();
         if (args.length == 0)
             conf.setMaster("local[2]");
-        GraphUtils.setAppName(conf, "KTrussSparkInvalidVertices-" + k + "-MultiSteps", partition, inputPath);
+        GraphUtils.setAppName(conf, "KTrussSparkEdgeSup-" + k + "-MultiSteps", partition, inputPath);
         conf.registerKryoClasses(new Class[]{GraphUtils.VertexDegree.class, int[].class, Iterable.class});
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
         JavaSparkContext sc = new JavaSparkContext(conf);

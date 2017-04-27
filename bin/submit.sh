@@ -69,7 +69,7 @@ case $task in
 	;;
 	"KT_TRIANGLE_COMP") main_class="ir.ac.sbu.graph.ktruss.distributed.KTrussSparkTriangleSet"
 	;;
-	"KT_INV_VERTICES") main_class="ir.ac.sbu.graph.ktruss.distributed.KTrussSparkInvalidVertices"
+	"KT_INV_VERTICES") main_class="ir.ac.sbu.graph.ktruss.distributed.KTrussSparkEdgeSup"
 	;;
 	"KC_NL") main_class="ir.ac.sbu.graph.kcore.KCoreNeighborList"
     ;;

@@ -1,6 +1,7 @@
 package ir.ac.sbu.graph.ktruss.spark;
 
 import ir.ac.sbu.graph.utils.GraphUtils;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.Optional;
@@ -80,7 +81,8 @@ public class KTrussSparkTriangleVertices extends KTruss {
 
     public static void main(String[] args) {
         KTrussConf conf = new KTrussConf(args, KTrussSparkTriangleVertices.class.getSimpleName(),
-            GraphUtils.VertexDegree.class, long[].class, List.class);
+            GraphUtils.VertexDegree.class, long[].class, List.class, IntSet.class, IntOpenHashSet.class);
+
         KTrussSparkTriangleVertices kTruss = new KTrussSparkTriangleVertices(conf);
 
         JavaPairRDD<Integer, Integer> edges = kTruss.loadEdges();
