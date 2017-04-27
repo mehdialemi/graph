@@ -18,8 +18,9 @@ public class KTrussSparkEdgeVertices extends KTruss {
         super(conf);
     }
 
-    public JavaPairRDD<Tuple2<Integer, Integer>, IntSet> start() {
-        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tVertices = triangleVertices();
+    public JavaPairRDD<Tuple2<Integer, Integer>, IntSet> start(JavaPairRDD<Integer, Integer> edges) {
+
+        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tVertices = triangleVertices(edges);
         final int minSup = conf.k - 2;
 
         int iteration = 0;
@@ -83,9 +84,10 @@ public class KTrussSparkEdgeVertices extends KTruss {
             GraphUtils.VertexDegree.class, long[].class, List.class);
         KTrussSparkEdgeVertices kTruss = new KTrussSparkEdgeVertices(conf);
 
+        JavaPairRDD<Integer, Integer> edges = kTruss.loadEdges();
 
         long start = System.currentTimeMillis();
-        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tVertices = kTruss.start();
+        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tVertices = kTruss.start(edges);
         long edgeCount = tVertices.count();
         long duration = System.currentTimeMillis() - start;
         kTruss.close();
