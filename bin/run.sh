@@ -68,7 +68,7 @@ do
     echo "log file: $log_file"
 
     # Build argument
-    jar_argument="$main_class $graph_path $partitionNum $other_args"
+    jar_argument="$graph_path $partitionNum $other_args"
     echo "jar argument: $jar_argument"
 
     command="${config[spark_home]}/bin/spark-submit --class $main_class --total-executor-cores ${config[cores]} --master spark://${config[master]}:7077 ${config[jar]} $jar_argument"
