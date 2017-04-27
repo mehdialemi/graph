@@ -71,6 +71,6 @@ do
     echo $command
     SECONDS=0
 
-#    $command
+    $command > $log_file
 
 done < $input_file
