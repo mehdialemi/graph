@@ -77,7 +77,7 @@ do
     echo $command
 
     SECONDS=0
-#    $command > $log_file
+    $command > $log_file
     echo "Duration = $SECONDS"
 
 done < $input_file
