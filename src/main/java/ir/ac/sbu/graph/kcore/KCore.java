@@ -44,6 +44,6 @@ public class KCore {
                 set.add(v.intValue());
             }
             return new Tuple2<>(t._1, set.toIntArray());
-        }).partitionBy(partitioner).cache();
+        }).cache();
     }
 }

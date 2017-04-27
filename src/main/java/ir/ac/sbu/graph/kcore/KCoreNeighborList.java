@@ -4,6 +4,7 @@ import static ir.ac.sbu.graph.utils.Log.log;
 
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import org.apache.spark.Partitioner;
 import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
 
@@ -25,6 +26,7 @@ public class KCoreNeighborList extends KCore {
 
         long t1, t2;
         final int k = conf.k;
+        final Partitioner partitioner = this.partitioner;
         while (true) {
             t1 = System.currentTimeMillis();
             JavaPairRDD<Integer, Integer> update = neighborList.filter(nl -> nl._2.length < k && nl._2.length > 0)
