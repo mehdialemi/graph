@@ -30,7 +30,6 @@ public class KCoreDegInfo extends KCore {
             t1 = System.currentTimeMillis();
             // Get invalid vertices and partition by the partitioner used to partition neighbors
             JavaPairRDD<Integer, Integer> invalids = degInfo.filter(v -> v._2 < k)
-                .repartition(conf.partitionNum)
                 .cache();
 
             long count = invalids.count();
@@ -49,11 +48,10 @@ public class KCoreDegInfo extends KCore {
                         out.add(new Tuple2<>(allNeighbor, 1));
                     }
                     return out.iterator();
-                })
-                .reduceByKey((a, b) -> a + b);  // aggregate all subtract info per vertex
+                }).reduceByKey((a, b) -> a + b);  // aggregate all subtract info per vertex
 
             // Update vInfo to remove invalid vertices and subtract the degree of other remaining vertices using the vSubtract map
-            degInfo = degInfo.cogroup(vSubtract).flatMapToPair(t -> {
+            degInfo = degInfo.cogroup(vSubtract, partitioner).flatMapToPair(t -> {
                 Iterator<Integer> degIterator = t._2._1.iterator();
                 if (!degIterator.hasNext())
                     return Collections.emptyIterator();
@@ -70,7 +68,7 @@ public class KCoreDegInfo extends KCore {
                     return Collections.emptyIterator();
 
                 return Collections.singleton(new Tuple2<>(t._1, currentDeg)).iterator();
-            }).repartition(conf.partitionNum);
+            });
         }
 
         return degInfo;
