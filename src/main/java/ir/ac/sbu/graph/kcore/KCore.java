@@ -1,6 +1,7 @@
 package ir.ac.sbu.graph.kcore;
 
 import ir.ac.sbu.graph.utils.GraphLoader;
+import ir.ac.sbu.graph.utils.Log;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -19,6 +20,7 @@ public class KCore {
     public KCore(KCoreConf conf) {
         this.conf = conf;
         sc = new JavaSparkContext(conf.sparkConf);
+        Log.setName(conf.name);
     }
 
     public void close() {

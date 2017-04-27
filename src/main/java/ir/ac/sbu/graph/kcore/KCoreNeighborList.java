@@ -2,9 +2,9 @@ package ir.ac.sbu.graph.kcore;
 
 import static ir.ac.sbu.graph.utils.Log.log;
 
+import ir.ac.sbu.graph.utils.Log;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import org.apache.spark.Partitioner;
 import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
 
@@ -20,8 +20,11 @@ public class KCoreNeighborList extends KCore {
     }
 
     public JavaPairRDD<Integer, int[]> start(JavaPairRDD<Integer, Integer> edges) {
-        long t1, t2;
+        long tNeighborList = System.currentTimeMillis();
         JavaPairRDD<Integer, int[]> neighborList = createNeighborList(edges);
+        log("Neighbor list created", tNeighborList, System.currentTimeMillis());
+
+        long t1, t2;
         final int k = conf.k;
         while (true) {
             t1 = System.currentTimeMillis();
@@ -36,7 +39,7 @@ public class KCoreNeighborList extends KCore {
 
             long count = update.count();
             t2 = System.currentTimeMillis();
-            log("K-core, current invalid count: " + count, t1, t2);
+            log("K-core, current update count: " + count, t1, t2);
             if (count == 0)
                 break;
 
@@ -62,12 +65,12 @@ public class KCoreNeighborList extends KCore {
 
         long tload = System.currentTimeMillis();
         JavaPairRDD<Integer, Integer> edges = kCore.loadEdges();
-        log("Load edges ", tload, System.currentTimeMillis());
+        log("Edges are loaded", tload, System.currentTimeMillis());
 
         long t1 = System.currentTimeMillis();
         JavaPairRDD<Integer, int[]> neighbors = kCore.start(edges);
 
-        log("Vertex count: " + neighbors.count(), t1, System.currentTimeMillis());
+        log("KCore vertex count: " + neighbors.count(), t1, System.currentTimeMillis());
 
         kCore.close();
     }

@@ -2,10 +2,13 @@ package ir.ac.sbu.graph.kcore;
 
 import static ir.ac.sbu.graph.utils.Log.log;
 
+import ir.ac.sbu.graph.utils.Log;
 import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -16,14 +19,19 @@ public class KCoreDegInfo extends KCore {
     }
 
     public JavaPairRDD<Integer, Integer> start(JavaPairRDD<Integer, Integer> edges) {
+        long tNeighborList = System.currentTimeMillis();
         JavaPairRDD<Integer, int[]> neighborList = createNeighborList(edges);
-        JavaPairRDD<Integer, Integer> degInfo = neighborList.mapValues(v -> v.length).cache();
+        log("Neighbor list created", tNeighborList, System.currentTimeMillis());
+
+        JavaPairRDD<Integer, Integer> degInfo = neighborList.mapValues(v -> v.length);
         long t1, t2;
         final int k = conf.k;
         while (true) {
             t1 = System.currentTimeMillis();
             // Get invalid vertices and partition by the partitioner used to partition neighbors
-            JavaPairRDD<Integer, Integer> invalids = degInfo.filter(v -> v._2 < k);
+            JavaPairRDD<Integer, Integer> invalids = degInfo.filter(v -> v._2 < k)
+                .repartition(conf.partitionNum)
+                .cache();
 
             long count = invalids.count();
             t2 = System.currentTimeMillis();
@@ -42,17 +50,29 @@ public class KCoreDegInfo extends KCore {
                     }
                     return out.iterator();
                 })
-                .reduceByKey((a, b) -> a + b)  // aggregate all subtract info per vertex
-                .repartition(conf.partitionNum).cache();
+                .reduceByKey((a, b) -> a + b);  // aggregate all subtract info per vertex
 
             // Update vInfo to remove invalid vertices and subtract the degree of other remaining vertices using the vSubtract map
-            degInfo = degInfo
-                .leftOuterJoin(vSubtract)
-                .filter(t -> t._2._1 >= k)
-                .mapValues(t -> t._2.isPresent() ? t._1 - t._2.get() : t._1).filter(v -> v._2 > 0)
-                .repartition(conf.partitionNum)
-                .cache();
+            degInfo = degInfo.cogroup(vSubtract).flatMapToPair(t -> {
+                Iterator<Integer> degIterator = t._2._1.iterator();
+                if (!degIterator.hasNext())
+                    return Collections.emptyIterator();
+
+                int currentDeg = degIterator.next();
+                if (currentDeg < k)
+                    return Collections.emptyIterator();
+
+                for (Integer sub : t._2._2) {
+                    currentDeg -= sub;
+                }
+
+                if (currentDeg <= 0)
+                    return Collections.emptyIterator();
+
+                return Collections.singleton(new Tuple2<>(t._1, currentDeg)).iterator();
+            }).repartition(conf.partitionNum);
         }
+
         return degInfo;
     }
 
@@ -62,12 +82,12 @@ public class KCoreDegInfo extends KCore {
 
         long tload = System.currentTimeMillis();
         JavaPairRDD<Integer, Integer> edges = kCore.loadEdges();
-        log("Load edges ", tload, System.currentTimeMillis());
+        log("Edges are loaded", tload, System.currentTimeMillis());
 
-        long t1 = System.currentTimeMillis();
+        long tStart = System.currentTimeMillis();
         JavaPairRDD<Integer, Integer> neighbors = kCore.start(edges);
 
-        log("Vertex count: " + neighbors.count(), t1, System.currentTimeMillis());
+        log("KCore vertex count: " + neighbors.count(), tStart, System.currentTimeMillis());
 
         kCore.close();
     }

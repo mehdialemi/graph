@@ -5,6 +5,12 @@ package ir.ac.sbu.graph.utils;
  */
 public class Log {
 
+    private static String name = "";
+
+    public static void setName(String name) {
+        Log.name = name;
+    }
+
     public static void log(String msg, long start, long end) {
         log(msg, (end - start));
     }
@@ -15,8 +21,8 @@ public class Log {
 
     public static void log(String msg, long duration) {
         if (duration == -1)
-            System.out.println("KCoreNeighborList " + msg);
+            System.out.println(name + msg);
         else
-            System.out.println("KCoreNeighborList " + msg + ", duration: " + duration + " ms");
+            System.out.println(name + msg + ", duration: " + duration + " ms");
     }
 }

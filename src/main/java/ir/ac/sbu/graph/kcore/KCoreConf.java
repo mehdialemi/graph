@@ -10,15 +10,17 @@ import java.io.File;
  */
 public class KCoreConf {
 
-    final String inputPath;
-    final int partitionNum;
-    final int k;
+    final protected String inputPath;
+    final protected int partitionNum;
+    final protected int k;
+    final protected String name;
     final SparkConf sparkConf;
 
     public KCoreConf(String[] args, String name, Class... classes) {
         inputPath = args.length > 0 ? args[0] : "/home/mehdi/graph-data/com-amazon.ungraph.txt";
         partitionNum = args.length > 1 ? Integer.parseInt(args[1]) : 10;
         k = args.length > 2 ? Integer.parseInt(args[2]) : 4;
+        this.name = name;
 
         sparkConf = new SparkConf();
         if (args.length == 0)
