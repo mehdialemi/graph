@@ -3,6 +3,8 @@ package ir.ac.sbu.graph.ktruss.spark;
 import ir.ac.sbu.graph.clusteringco.FonlDegTC;
 import ir.ac.sbu.graph.clusteringco.FonlUtils;
 import ir.ac.sbu.graph.utils.GraphLoader;
+import ir.ac.sbu.graph.utils.Log;
+
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.HashPartitioner;
@@ -33,6 +35,7 @@ public class KTruss {
         sc = new JavaSparkContext(this.conf.sparkConf);
         partitioner = new HashPartitioner(conf.partitionNum);
         partitioner2 = new HashPartitioner(conf.partitionNum * 3);
+        Log.setName(conf.name);
     }
 
     public void close() {
@@ -47,6 +50,7 @@ public class KTruss {
 
     protected JavaPairRDD<Tuple2<Integer, Integer>, IntSet> triangleVertices(JavaPairRDD<Integer, Integer> edges) {
         JavaPairRDD<Integer, int[]> candidates = createCandidates(edges);
+
         // Generate kv such that key is an edge and value is its triangle vertices.
         return candidates.cogroup(fonl).flatMapToPair(t -> {
             int[] fVal = t._2._2.iterator().next();
@@ -89,7 +93,7 @@ public class KTruss {
             }
 
             return output.iterator();
-        }).groupByKey(partitioner2)
+        }).groupByKey(partitioner)
             .mapValues(values -> {
                 IntSet set = new IntOpenHashSet();
                 for (int v : values) {
@@ -98,7 +102,6 @@ public class KTruss {
                 return set;
             }).persist(StorageLevel.MEMORY_ONLY()); // Use disk too if graph is very large
     }
-
 
     protected JavaPairRDD<Integer, int[]> createCandidates(JavaPairRDD<Integer, Integer> edges) {
         fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, partitioner);

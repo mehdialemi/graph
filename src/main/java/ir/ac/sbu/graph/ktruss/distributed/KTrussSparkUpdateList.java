@@ -36,7 +36,7 @@ public class KTrussSparkUpdateList {
         SparkConf conf = new SparkConf();
         if (args.length == 0)
             conf.setMaster("local[2]");
-        GraphUtils.setAppName(conf, "KTrussSparkUpdateList-" + k + "-MultiSteps", partition, inputPath);
+        GraphUtils.setAppName(conf, "KTrussInvalidUpdates-" + k + "-MultiSteps", partition, inputPath);
         conf.registerKryoClasses(new Class[]{GraphUtils.VertexDegree.class, int[].class, Iterable.class, IntSet.class, IntOpenHashSet.class});
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
         JavaSparkContext sc = new JavaSparkContext(conf);

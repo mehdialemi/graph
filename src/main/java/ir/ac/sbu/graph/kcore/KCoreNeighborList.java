@@ -35,7 +35,7 @@ public class KCoreNeighborList extends KCore {
                         out.add(new Tuple2<>(v, nl._1));
                     }
                     return out.iterator();
-                }).repartition(conf.partitionNum).cache();
+                }).partitionBy(partitioner).cache();
 
             long count = update.count();
             t2 = System.currentTimeMillis();

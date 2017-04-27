@@ -10,8 +10,10 @@ public class KTrussConf {
     int partitionNum;
     int k;
     SparkConf sparkConf;
+    String name;
 
     public KTrussConf(String[] args, String name, Class... classes) {
+        this.name = name;
         inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
         if (args.length > 0)
             inputPath = args[0];

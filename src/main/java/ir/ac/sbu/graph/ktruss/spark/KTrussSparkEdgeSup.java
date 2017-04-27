@@ -1,19 +1,12 @@
 package ir.ac.sbu.graph.ktruss.spark;
 
-import ir.ac.sbu.graph.clusteringco.FonlDegTC;
-import ir.ac.sbu.graph.clusteringco.FonlUtils;
-import ir.ac.sbu.graph.utils.GraphLoader;
 import ir.ac.sbu.graph.utils.GraphUtils;
 import it.unimi.dsi.fastutil.ints.*;
-import org.apache.spark.HashPartitioner;
-import org.apache.spark.Partitioner;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -32,7 +25,7 @@ public class KTrussSparkEdgeSup extends KTruss {
     }
 
 
-    public JavaPairRDD<Tuple2<Integer, Integer>, IntSet> start(JavaPairRDD<Integer, Integer> edges) {
+    public long start(JavaPairRDD<Integer, Integer> edges) {
         JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tVertices = triangleVertices(edges);
 
         JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Integer, IntSet>> edgeSup = tVertices
@@ -130,7 +123,7 @@ public class KTrussSparkEdgeSup extends KTruss {
 
 
         }
-        return tVertices;
+        return edgeSup.count();
     }
 
     public static void main(String[] args) {
@@ -142,8 +135,8 @@ public class KTrussSparkEdgeSup extends KTruss {
         JavaPairRDD<Integer, Integer> edges = kTruss.loadEdges();
 
         long start = System.currentTimeMillis();
-        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tVertices = kTruss.start(edges);
-        log("KTruss edge count:" + tVertices.count(), start, System.currentTimeMillis());
+        long count = kTruss.start(edges);
+        log("KTruss edge count:" + count, start, System.currentTimeMillis());
 
         kTruss.close();
     }

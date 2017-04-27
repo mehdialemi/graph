@@ -73,7 +73,7 @@ case $task in
 	;;
 	"KC_NL") main_class="ir.ac.sbu.graph.kcore.KCoreNeighborList"
     ;;
-	"KT_SPARK_UPDATE") main_class="ir.ac.sbu.graph.ktruss.distributed.KTrussSparkUpdateList"
+	"KT_SPARK_UPDATE") main_class="ir.ac.sbu.graph.ktruss.distributed.KTrussInvalidUpdates"
 	;;
 	*)	echo "please determine your task in the argument
 	[GCC_Hob|GCC_Deg|LCC_Deg|TC_Deg|GCC_Id|LCC_Id|GCC_GraphX|LCC_GraphX|TC_GraphX|GCC_NodeIter|TC_NodeIter"
