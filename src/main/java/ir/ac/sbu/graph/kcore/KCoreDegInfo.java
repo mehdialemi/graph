@@ -10,9 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/**
- *
- */
 public class KCoreDegInfo extends KCore {
 
     public KCoreDegInfo(KCoreConf kCoreConf) {
@@ -64,8 +61,8 @@ public class KCoreDegInfo extends KCore {
 
     public static void main(String[] args) {
         KCoreConf kCoreConf = new KCoreConf(args, KCoreNeighborList.class.getName(), int[].class);
-        KCoreNeighborList kCore = new KCoreNeighborList(kCoreConf);
-        JavaPairRDD<Integer, int[]> neighbors = kCore.start();
+        KCoreDegInfo kCore = new KCoreDegInfo(kCoreConf);
+        JavaPairRDD<Integer, Integer> neighbors = kCore.start();
         log("Vertex count: " + neighbors.count());
         kCore.close();
     }

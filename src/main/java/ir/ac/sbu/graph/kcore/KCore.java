@@ -21,8 +21,12 @@ public class KCore {
         sc = new JavaSparkContext(kCoreConf.sparkConf);
     }
 
+    public void close() {
+        sc.close();
+    }
+
     protected JavaPairRDD<Integer, int[]> createNeighborList() {
-        JavaRDD<String> input = sc.textFile(kCoreConf.inputPath);
+        JavaRDD<String> input = sc.textFile(kCoreConf.inputPath, kCoreConf.partitionNum);
         JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
         return edges.groupByKey(kCoreConf.getPartitioner()).mapToPair(t -> {
             IntSet set = new IntOpenHashSet();

@@ -57,10 +57,6 @@ public class KCoreNeighborList extends KCore {
         return neighborList.filter(t -> t._2.length != 0);
     }
 
-    public void close() {
-        sc.close();
-    }
-
     public static void main(String[] args) {
         KCoreConf kCoreConf = new KCoreConf(args, KCoreNeighborList.class.getSimpleName(), int[].class);
         KCoreNeighborList kCore = new KCoreNeighborList(kCoreConf);

@@ -75,9 +75,9 @@ do
 
     command="${config[spark_home]}/bin/spark-submit --class $main_class --total-executor-cores ${config[cores]} --master spark://${config[master]}:7077 ${config[jar]} $jar_argument"
     echo $command
-    SECONDS=0
 
-    $command > $log_file
+    SECONDS=0
+#    $command > $log_file
     echo "Duration = $SECONDS"
 
 done < $input_file
