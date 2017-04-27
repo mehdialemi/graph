@@ -60,7 +60,8 @@ do
     # Create log dir
     log_dir="logs/$class_name/$graph_name"
     file_name=`date +%s`
-    log_file="$log_dir/$file_name"
+    log_file="$log_dir/$file_name.log"
+    touch $log_file
     echo "log file: $log_file"
 
     # Build argument
