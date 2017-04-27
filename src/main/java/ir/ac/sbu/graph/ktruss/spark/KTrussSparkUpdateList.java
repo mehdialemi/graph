@@ -16,13 +16,13 @@ public class KTrussSparkUpdateList extends KTruss{
         super(conf);
     }
 
-    public long start() {
+    public long start(JavaPairRDD<Integer, Integer> edges) {
 
-        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tVertices = triangleVertices();
+        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tVertices = triangleVertices(edges);
         final int minSup = conf.k - 2;
 
         JavaPairRDD<Tuple2<Integer, Integer>, IntSet> invalids = tVertices.filter(t -> t._2.size() < minSup)
-            .repartition(partitionNum2).cache();
+            .partitionBy(partitioner2).cache();
 
         JavaPairRDD<Tuple2<Integer, Integer>, Integer> updates =
             sc.parallelize(new ArrayList<Tuple2<Tuple2<Integer, Integer>, Integer>>()).mapToPair(t -> new Tuple2<>(t._1, t._2));
@@ -52,9 +52,7 @@ public class KTrussSparkUpdateList extends KTruss{
                         list.add(new Tuple2<>(new Tuple2<>(w, v), u));
                 }
                 return list.iterator();
-            }).cache();
-
-            updates = updates.union(invUpdate);
+            }).partitionBy(partitioner2).cache();
 
             JavaPairRDD<Tuple2<Integer, Integer>, int[]> allInvUpdates = updates.cogroup(invUpdate).flatMapToPair(t -> {
                 if (t._2._2.iterator().hasNext()) {
@@ -66,7 +64,7 @@ public class KTrussSparkUpdateList extends KTruss{
                 }
 
                 return Collections.emptyIterator();
-            }).partitionBy(partitioner2);
+            }).partitionBy(partitioner2).cache();
 
             JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevInvalids = invalids;
 
@@ -83,7 +81,7 @@ public class KTrussSparkUpdateList extends KTruss{
                 }
 
                 return Collections.emptyIterator();
-            }).repartition(partitionNum2).cache();
+            }).partitionBy(partitioner2).cache();
             prevInvalids.unpersist(false);
         }
 
@@ -96,19 +94,23 @@ public class KTrussSparkUpdateList extends KTruss{
                 return 0;
             return 1;
         }).filter(t -> t._2 != 0).count();
-
-
     }
 
     public static void main(String[] args) {
-        KTrussConf conf = new KTrussConf(args, KTrussSparkEdgeVertices.class.getSimpleName(),
+        KTrussConf conf = new KTrussConf(args, KTrussSparkTriangleVertices.class.getSimpleName(),
             GraphUtils.VertexDegree.class, long[].class, List.class);
         KTrussSparkUpdateList kTruss = new KTrussSparkUpdateList(conf);
 
+        long tload = System.currentTimeMillis();
+        JavaPairRDD<Integer, Integer> edges = kTruss.loadEdges();
+        log("Load edges ", tload, System.currentTimeMillis());
+
         long start = System.currentTimeMillis();
-        long edgeCount = kTruss.start();
+        long edgeCount = kTruss.start(edges);
         long duration = System.currentTimeMillis() - start;
+
         kTruss.close();
+
         log("KTruss Edge Count: " + edgeCount, duration);
     }
 }

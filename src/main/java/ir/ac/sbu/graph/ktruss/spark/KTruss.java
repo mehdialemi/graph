@@ -26,13 +26,11 @@ public class KTruss {
     protected final JavaSparkContext sc;
     protected final Partitioner partitioner;
     protected final Partitioner partitioner2;
-    protected final int partitionNum2;
     protected JavaPairRDD<Integer, int[]> fonl;
 
     public KTruss(KTrussConf conf) {
         this.conf = conf;
         sc = new JavaSparkContext(this.conf.sparkConf);
-        partitionNum2 = conf.partitionNum;
         partitioner = new HashPartitioner(conf.partitionNum);
         partitioner2 = new HashPartitioner(conf.partitionNum * 3);
     }
@@ -41,8 +39,14 @@ public class KTruss {
         sc.close();
     }
 
-    protected JavaPairRDD<Tuple2<Integer, Integer>, IntSet> triangleVertices() {
-        JavaPairRDD<Integer, int[]> candidates = createCandidates();
+    public JavaPairRDD<Integer, Integer> loadEdges() {
+        JavaRDD<String> input = sc.textFile(conf.inputPath, conf.partitionNum);
+        JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
+        return edges.cache();
+    }
+
+    protected JavaPairRDD<Tuple2<Integer, Integer>, IntSet> triangleVertices(JavaPairRDD<Integer, Integer> edges) {
+        JavaPairRDD<Integer, int[]> candidates = createCandidates(edges);
         // Generate kv such that key is an edge and value is its triangle vertices.
         return candidates.cogroup(fonl).flatMapToPair(t -> {
             int[] fVal = t._2._2.iterator().next();
@@ -95,9 +99,8 @@ public class KTruss {
             }).persist(StorageLevel.MEMORY_ONLY()); // Use disk too if graph is very large
     }
 
-    protected JavaPairRDD<Integer, int[]> createCandidates() {
-        JavaRDD<String> input = sc.textFile(conf.inputPath, conf.partitionNum);
-        JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
+
+    protected JavaPairRDD<Integer, int[]> createCandidates(JavaPairRDD<Integer, Integer> edges) {
         fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, partitioner);
         return FonlDegTC.generateCandidatesInteger(fonl).partitionBy(partitioner2);
     }

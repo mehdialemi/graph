@@ -7,14 +7,13 @@ import org.apache.spark.api.java.Optional;
 import scala.Tuple2;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static ir.ac.sbu.graph.utils.Log.log;
 
-public class KTrussSparkEdgeVertices extends KTruss {
+public class KTrussSparkTriangleVertices extends KTruss {
 
-    public KTrussSparkEdgeVertices(KTrussConf conf) {
+    public KTrussSparkTriangleVertices(KTrussConf conf) {
         super(conf);
     }
 
@@ -80,9 +79,9 @@ public class KTrussSparkEdgeVertices extends KTruss {
     }
 
     public static void main(String[] args) {
-        KTrussConf conf = new KTrussConf(args, KTrussSparkEdgeVertices.class.getSimpleName(),
+        KTrussConf conf = new KTrussConf(args, KTrussSparkTriangleVertices.class.getSimpleName(),
             GraphUtils.VertexDegree.class, long[].class, List.class);
-        KTrussSparkEdgeVertices kTruss = new KTrussSparkEdgeVertices(conf);
+        KTrussSparkTriangleVertices kTruss = new KTrussSparkTriangleVertices(conf);
 
         JavaPairRDD<Integer, Integer> edges = kTruss.loadEdges();
 

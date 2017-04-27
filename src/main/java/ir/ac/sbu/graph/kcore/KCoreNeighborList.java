@@ -19,11 +19,10 @@ public class KCoreNeighborList extends KCore {
         super(kCoreConf);
     }
 
-    public JavaPairRDD<Integer, int[]> start() {
+    public JavaPairRDD<Integer, int[]> start(JavaPairRDD<Integer, Integer> edges) {
         long t1, t2;
-        JavaPairRDD<Integer, int[]> neighborList = createNeighborList();
-        final int k = kCoreConf.k;
-        final Partitioner partitioner = kCoreConf.getPartitioner();
+        JavaPairRDD<Integer, int[]> neighborList = createNeighborList(edges);
+        final int k = conf.k;
         while (true) {
             t1 = System.currentTimeMillis();
             JavaPairRDD<Integer, Integer> update = neighborList.filter(nl -> nl._2.length < k && nl._2.length > 0)
@@ -33,7 +32,7 @@ public class KCoreNeighborList extends KCore {
                         out.add(new Tuple2<>(v, nl._1));
                     }
                     return out.iterator();
-                }).partitionBy(partitioner).cache();
+                }).repartition(conf.partitionNum).cache();
 
             long count = update.count();
             t2 = System.currentTimeMillis();
@@ -60,8 +59,16 @@ public class KCoreNeighborList extends KCore {
     public static void main(String[] args) {
         KCoreConf kCoreConf = new KCoreConf(args, KCoreNeighborList.class.getSimpleName(), int[].class);
         KCoreNeighborList kCore = new KCoreNeighborList(kCoreConf);
-        JavaPairRDD<Integer, int[]> neighbors = kCore.start();
-        log("Vertex count: " + neighbors.count());
+
+        long tload = System.currentTimeMillis();
+        JavaPairRDD<Integer, Integer> edges = kCore.loadEdges();
+        log("Load edges ", tload, System.currentTimeMillis());
+
+        long t1 = System.currentTimeMillis();
+        JavaPairRDD<Integer, int[]> neighbors = kCore.start(edges);
+
+        log("Vertex count: " + neighbors.count(), t1, System.currentTimeMillis());
+
         kCore.close();
     }
 }
