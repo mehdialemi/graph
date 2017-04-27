@@ -10,9 +10,19 @@
 
     <repositories>
         <repository>
+            <id>default1</id>
+            <name>Maven Default</name>
+            <url>http://repo1.maven.org/maven2/</url>
+        </repository>
+        <repository>
+            <id>default1</id>
+            <name>Maven Default</name>
+            <url>http://repo2.maven.org/maven2/</url>
+        </repository>
+        <repository>
             <id>scala-tools.org</id>
             <name>Scala-tools Maven2 Repository</name>
-            <url>http://scala-tools.org/repo-releases</url>
+            <url>https://mvnrepository.com/artifact/org.scala-tools</url>
         </repository>
     </repositories>
     <pluginRepositories>
@@ -92,7 +102,7 @@
             <plugin>
                 <groupId>org.scala-tools</groupId>
                 <artifactId>maven-scala-plugin</artifactId>
-                <version>2.15.2</version>
+                <version>LATEST</version>
                 <executions>
                     <execution>
                         <goals>
@@ -107,7 +117,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.5.3</version>
+                <version>2.6</version>
                 <configuration>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>

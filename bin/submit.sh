@@ -71,7 +71,7 @@ case $task in
 	;;
 	"KT_INV_VERTICES") main_class="ir.ac.sbu.graph.ktruss.distributed.KTrussSparkInvalidVertices"
 	;;
-	"KC_NL") main_class="ir.ac.sbu.graph.kcore.KCore"
+	"KC_NL") main_class="ir.ac.sbu.graph.kcore.KCoreNeighborList"
     ;;
 	"KT_SPARK_UPDATE") main_class="ir.ac.sbu.graph.ktruss.distributed.KTrussSparkUpdateList"
 	;;
