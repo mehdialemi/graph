@@ -63,7 +63,6 @@ do
 
     file_name=`date +%s`
     log_file="$log_dir/$file_name.log"
-    touch $log_file
     echo "log file: $log_file"
 
     # Build argument
