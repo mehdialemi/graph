@@ -61,7 +61,7 @@ do
 
     # Create log dir
     log_dir="logs/$class_name/$graph_name"
-    dirCmd="mkdir -p  $logDir"
+    dirCmd="mkdir -p  $log_dir"
     echo "executing command $dirCmd"
     $dirCmd
 
