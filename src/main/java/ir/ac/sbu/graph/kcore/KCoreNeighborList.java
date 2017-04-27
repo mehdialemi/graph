@@ -2,7 +2,6 @@ package ir.ac.sbu.graph.kcore;
 
 import static ir.ac.sbu.graph.utils.Log.log;
 
-import ir.ac.sbu.graph.utils.Log;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.api.java.JavaPairRDD;
