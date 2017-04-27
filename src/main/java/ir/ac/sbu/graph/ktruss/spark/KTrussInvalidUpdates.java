@@ -1,6 +1,7 @@
 package ir.ac.sbu.graph.ktruss.spark;
 
 import ir.ac.sbu.graph.utils.GraphUtils;
+import it.unimi.dsi.fastutil.ints.IntIterator;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -13,6 +14,7 @@ import static ir.ac.sbu.graph.utils.Log.log;
 public class KTrussInvalidUpdates extends KTruss {
 
     public static final IntSet EMPTY_SET = new IntOpenHashSet();
+    public static final Integer INV_VERTEX = Integer.MIN_VALUE;
 
     public KTrussInvalidUpdates(KTrussConf conf) {
         super(conf);
@@ -39,12 +41,13 @@ public class KTrussInvalidUpdates extends KTruss {
 
             JavaPairRDD<Tuple2<Integer, Integer>, Integer> currentInvUpdate = currentInvalids.flatMapToPair(t -> {
                 List<Tuple2<Tuple2<Integer, Integer>, Integer>> list = new ArrayList<>();
-                list.add(new Tuple2<>(t._1, -1));
+                list.add(new Tuple2<>(t._1, INV_VERTEX));
                 int u = t._1._1;
                 int v = t._1._2;
-                Iterator<Integer> iterator = t._2.iterator();
-                while (iterator.hasNext()) {
-                    int w = iterator.next();
+
+                IntIterator iter = t._2.iterator();
+                while (iter.hasNext()) {
+                    int w = iter.nextInt();
                     if (u < w)
                         list.add(new Tuple2<>(new Tuple2<>(u, w), v));
                     else
@@ -68,34 +71,30 @@ public class KTrussInvalidUpdates extends KTruss {
                         return value;
                     set = value._2;
                 } else {
-                    set = EMPTY_SET;
+                    set = new IntOpenHashSet();
+                    value = new Tuple2<>(false, set);
                 }
-                value = new Tuple2<>(false, set);
-                for (int v : t._2) {
-                    if (v == -1)
-                        return new Tuple2<>(true, set);
-                    set.add(v);
-                }
-                return value;
 
-            }).partitionBy(partitioner2);
+                for (Integer v : t._2) {
+                    if (INV_VERTEX.equals(v))
+                        return new Tuple2<>(true, EMPTY_SET);
+                    set.add(v.intValue());
+                }
+
+                return value;
+            }).partitionBy(partitioner2).cache();
 
             currentInvalids = tVertices.join(invUpdates).flatMapToPair(t -> {
                 Tuple2<Boolean, IntSet> allInvalids = t._2._2;
-                IntSet current = t._2._1;
+                IntSet tSet = t._2._1;
 
-                if (current.size() < minSup || allInvalids._1)
+                if (allInvalids._1)
                     return Collections.emptyIterator();
 
-                for (int i : allInvalids._2) {
-                    current.remove(i);
-                }
+                tSet.removeAll(allInvalids._2);
 
-                if (current.size() == 0)
-                    return Collections.emptyIterator();
-
-                if (current.size() < minSup) {
-                    return Arrays.asList(new Tuple2<>(t._1, current)).iterator();
+                if (tSet.size() < minSup) {
+                    return Arrays.asList(new Tuple2<>(t._1, tSet)).iterator();
                 }
 
                 return Collections.emptyIterator();

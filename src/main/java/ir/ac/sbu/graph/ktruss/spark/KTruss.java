@@ -93,7 +93,7 @@ public class KTruss {
             }
 
             return output.iterator();
-        }).groupByKey(partitioner)
+        }).groupByKey(partitioner2)
             .mapValues(values -> {
                 IntSet set = new IntOpenHashSet();
                 for (int v : values) {
