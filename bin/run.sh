@@ -59,8 +59,9 @@ do
 
     # Create log dir
     log_dir="logs/$class_name/$graph_name"
-    echo $log_dir
-    mkdir -p  $logDir
+    dirCmd="mkdir -p  $logDir"
+    echo "executing command $dirCmd"
+    $dirCmd
 
     file_name=`date +%s`
     log_file="$log_dir/$file_name.log"
