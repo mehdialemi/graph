@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-
-
 typeset -A config
 config=(
     [jar]="$PWD/target/subgraph-mining-1.0-jar-with-dependencies.jar"

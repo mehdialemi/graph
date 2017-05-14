@@ -9,6 +9,8 @@ import scala.Tuple2;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ir.ac.sbu.graph.utils.Log.log;
+
 /**
  * This class find k-truss sub-graphs from the big graph stored as edge list in the hdfs (Hadoop File System).
  * This program is written by spark framework and would be run on the spark cluster. To extract k-truss sub-graphs,
@@ -139,20 +141,5 @@ public class KTrussSparkEdgeSup extends KTruss {
         log("KTruss edge count:" + count, start, System.currentTimeMillis());
 
         kTruss.close();
-    }
-
-    private static void log(String msg, long start, long end) {
-        log(msg, (end - start));
-    }
-
-    private static void log(String msg) {
-        log(msg, -1);
-    }
-
-    private static void log(String msg, long duration) {
-        if (duration == -1)
-            System.out.println("KTRUSS " + msg);
-        else
-            System.out.println("KTRUSS " + msg + ", duration: " + duration + " ms");
     }
 }
