@@ -55,7 +55,7 @@ public class KTrussSparkTriangleVertices extends KTruss {
                         out.add(new Tuple2<>(new Tuple2<>(iEdge._2, w), iEdge._1));
                 }
                 return out.iterator();
-            }).groupByKey();
+            }).groupByKey().repartition(conf.partitionNum);
 
             tVertices = tVertices.filter(kv -> kv._2.size() >= minSup).leftOuterJoin(invalidUpdates)
                 .mapValues(values -> {
