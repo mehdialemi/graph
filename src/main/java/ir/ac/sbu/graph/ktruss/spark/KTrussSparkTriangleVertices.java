@@ -29,7 +29,7 @@ public class KTrussSparkTriangleVertices extends KTruss {
         while (!stop) {
             iteration++;
             long t1 = System.currentTimeMillis();
-            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> invalids = tVertices.filter(kv -> kv._2.size() < minSup);
+            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> invalids = tVertices.filter(kv -> kv._2.size() < minSup).cache();
             long invalidEdgeCount = invalids.count();
             if (invalidEdgeCount == 0) {
                 break;
