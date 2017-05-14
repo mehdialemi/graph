@@ -48,7 +48,7 @@ public class KTruss {
         return edges.cache();
     }
 
-    protected JavaPairRDD<Tuple2<Integer, Integer>, IntSet> triangleVertices(JavaPairRDD<Integer, Integer> edges) {
+    protected JavaPairRDD<Tuple2<Integer, Integer>, IntSet> createTriangleVertexSet(JavaPairRDD<Integer, Integer> edges) {
         JavaPairRDD<Integer, int[]> candidates = createCandidates(edges);
 
         // Generate kv such that key is an edge and value is its triangle vertices.

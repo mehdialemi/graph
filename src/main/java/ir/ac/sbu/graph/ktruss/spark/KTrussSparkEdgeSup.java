@@ -28,39 +28,53 @@ public class KTrussSparkEdgeSup extends KTruss {
 
 
     public long start(JavaPairRDD<Integer, Integer> edges) {
-        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tVertices = triangleVertices(edges);
 
-        JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Integer, IntSet>> edgeSup = tVertices
-            .mapValues(v -> new Tuple2<>(v.size(), EMPTY_INT_SET)).partitionBy(partitioner)
-            .persist(StorageLevel.MEMORY_ONLY());
         final int minSup = conf.k - 2;
+
+        // Get triangle vertex set for each edge
+        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tvSets = createTriangleVertexSet(edges);
+
+        // Construct edgeSup such that the key is an edge and the value contains two elements.
+        // The first element is the original support of edge and the value is the invalid triangle vertices
+        // of the current edge. Here tvSets is immutable and edgeSup is updated in each iteration.
+        JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Integer, IntSet>> edgeSup = tvSets
+            .mapValues(v -> new Tuple2<>(v.size(), EMPTY_INT_SET)).partitionBy(partitioner2)
+            .persist(StorageLevel.MEMORY_ONLY());
 
         int iteration = 0;
         while (true) {
             long t1 = System.currentTimeMillis();
             log("Iteration: " + ++iteration);
 
+            // Find invalid edges by subtracting the current invalid triangle vertices from the
+            // original edge support and compare it with the predefined minSup
             JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Integer, IntSet>> invalids =
-                edgeSup.filter(value -> (value._2._1 - value._2._2.size()) < minSup);
+                edgeSup.filter(value ->
+                    (value._2._1 - value._2._2.size()) < minSup && (value._2._1 - value._2._2.size()) != 0);
 
             // TODO broad cast invalid if its count is lower than a specified value
-            long invalidCount = invalids.count();
+            long invalidEdgeCount = invalids.count();
 
             long t2 = System.currentTimeMillis();
             long duration = t2 - t1;
-            log("Invalid count: " + invalidCount, duration);
+            log("Invalid count: " + invalidEdgeCount, duration);
 
-            if (invalidCount == 0)
+            // If no invalid edge is found then the program terminates
+            if (invalidEdgeCount == 0)
                 break;
 
-            // Join invalids with  tVertices
-            JavaPairRDD<Tuple2<Integer, Integer>, Iterable<Integer>> invalidUpdate =
-                tVertices.join(invalids) // TODO find a best partition and test the reverse join
+            // If we have invalid edges then their triangles are invalid. To find other edges of the invalid
+            // triangle, we should join the current invalid edges with the tvSets. By this condition,
+            // we are able to determine invalid vertices which should be removed from the triangle
+            // vertex set of the valid edges.
+            JavaPairRDD<Tuple2<Integer, Integer>, Iterable<Integer>> invUpdates =
+                tvSets.join(invalids) // TODO find a best partition and test the reverse join
                     .flatMapToPair(kv -> {
 
+                        IntSet original = kv._2._1;
                         Tuple2<Integer, IntSet> invalid = kv._2._2;
                         IntIterator iterator = invalid._2.iterator();
-                        IntSet original = kv._2._1;
+
                         while (iterator.hasNext()) {
                             original.remove(iterator.nextInt());
                         }
@@ -70,7 +84,9 @@ public class KTrussSparkEdgeSup extends KTruss {
                         int u = kv._1._1;
                         int v = kv._1._2;
 
-                        // Generate the vertices which should be reported as invalid for the edge of the current triangles.
+                        // Determine the other edges of the current invalid triangle.
+                        // Generate the invalid vertices which should be eliminated from the triangle vertex set of the
+                        // target edge
                         for (Integer w : original) {
                             if (u < w)
                                 out.add(new Tuple2<>(new Tuple2<>(u, w), v));
@@ -84,11 +100,11 @@ public class KTrussSparkEdgeSup extends KTruss {
                         }
 
                         return out.iterator();
-                    }).groupByKey(); // TODO repartition?
+                    }).groupByKey(partitioner2); // TODO repartition?
 
             // Join invalid update with edgeSup to update the current edgeSup.
             // By this join the list in the value part would be updated with those invalid vertices for the current edge
-            edgeSup = edgeSup.leftOuterJoin(invalidUpdate) // TODO find a best partition
+            edgeSup = edgeSup.leftOuterJoin(invUpdates) // TODO find a best partition
                 .mapValues(joinValue -> {
 
                     // Calculate previous support
@@ -119,7 +135,7 @@ public class KTrussSparkEdgeSup extends KTruss {
                     // Generate output value such that the value in index zero is init support and
                     // the remaining is related to maintain invalid vertices of the current edge.
                     return new Tuple2<>(initSup, set);
-                }).filter(kv -> kv._2 != null).partitionBy(partitioner).persist(StorageLevel.MEMORY_ONLY());  // TODO repartition?
+                }).filter(kv -> kv._2 != null).partitionBy(partitioner2).cache();  // TODO repartition?
 
             // TODO calculate the best repartition for each steps of the above algorithm using the information of graph sizes
 

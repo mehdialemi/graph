@@ -20,7 +20,8 @@ public class KTrussSparkTriangleVertices extends KTruss {
 
     public JavaPairRDD<Tuple2<Integer, Integer>, IntSet> start(JavaPairRDD<Integer, Integer> edges) {
 
-        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tVertices = triangleVertices(edges);
+        // Get triangle vertex set for each edge
+        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tvSets = createTriangleVertexSet(edges);
         final int minSup = conf.k - 2;
 
         int iteration = 0;
@@ -29,8 +30,11 @@ public class KTrussSparkTriangleVertices extends KTruss {
         while (!stop) {
             iteration++;
             long t1 = System.currentTimeMillis();
-            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> invalids = tVertices.filter(kv -> kv._2.size() < minSup).cache();
+            // Detect invalid edges by comparing the size of triangle vertex set
+            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> invalids = tvSets.filter(kv -> kv._2.size() < minSup).cache();
             long invalidEdgeCount = invalids.count();
+
+            // If no invalid edge is found then the program terminates
             if (invalidEdgeCount == 0) {
                 break;
             }
@@ -38,7 +42,10 @@ public class KTrussSparkTriangleVertices extends KTruss {
             String msg = "iteration: " + iteration + ", invalid edge count: " + invalidEdgeCount;
             log(msg, t2 - t1);
 
-            JavaPairRDD<Tuple2<Integer, Integer>, Iterable<Integer>> invalidUpdates = invalids.flatMapToPair(kv -> {
+            // The edges in the key part of invalids key-values should be removed. So, we detect other
+            // edges of their involved triangle from their triangle vertex set. Here, we determine the
+            // vertices which should be removed from the triangle vertex set related to the other edges.
+            JavaPairRDD<Tuple2<Integer, Integer>, Iterable<Integer>> invUpdates = invalids.flatMapToPair(kv -> {
                 IntSet original = kv._2;
                 List<Tuple2<Tuple2<Integer, Integer>, Integer>> out = new ArrayList<>(original.size() * 2);
                 Tuple2<Integer, Integer> iEdge = kv._1;
@@ -55,28 +62,33 @@ public class KTrussSparkTriangleVertices extends KTruss {
                         out.add(new Tuple2<>(new Tuple2<>(iEdge._2, w), iEdge._1));
                 }
                 return out.iterator();
-            }).groupByKey().repartition(conf.partitionNum);
+            }).groupByKey(partitioner2);
 
-            tVertices = tVertices.filter(kv -> kv._2.size() >= minSup).leftOuterJoin(invalidUpdates)
+            // Remove the invalid vertices from the triangle vertex set of each remaining (valid) edge.
+            tvSets = tvSets.filter(kv -> kv._2.size() >= minSup).leftOuterJoin(invUpdates)
                 .mapValues(values -> {
                     Optional<Iterable<Integer>> invalidUpdate = values._2;
                     IntSet original = values._1;
 
+                    // If no invalid vertex is present for the current edge then return the original value.
                     if (!invalidUpdate.isPresent()) {
                         return original;
                     }
 
+                    // Remove all invalid vertices from the original triangle vertex set.
                     for (Integer v : invalidUpdate.get()) {
                         original.remove(v.intValue());
                     }
 
+                    // When the triangle vertex set has no other element then the current edge should also
+                    // be eliminated from the current tvSets.
                     if (original.size() == 0)
                         return null;
 
                     return original;
-                }).filter(kv -> kv._2 != null).repartition(conf.partitionNum).cache();
+                }).filter(kv -> kv._2 != null).partitionBy(partitioner2).cache();
         }
-        return tVertices;
+        return tvSets;
     }
 
     public static void main(String[] args) {

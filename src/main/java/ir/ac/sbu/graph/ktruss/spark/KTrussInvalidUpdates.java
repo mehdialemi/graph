@@ -14,6 +14,7 @@ import static ir.ac.sbu.graph.utils.Log.log;
 public class KTrussInvalidUpdates extends KTruss {
 
     public static final IntSet EMPTY_SET = new IntOpenHashSet();
+    public static final Tuple2<Boolean, IntSet> INVALID_UPDATE_VALUE = new Tuple2<>(true, EMPTY_SET);
     public static final Integer INV_VERTEX = Integer.MIN_VALUE;
 
     public KTrussInvalidUpdates(KTrussConf conf) {
@@ -22,24 +23,34 @@ public class KTrussInvalidUpdates extends KTruss {
 
     public long start(JavaPairRDD<Integer, Integer> edges) {
 
-        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tVertices = triangleVertices(edges);
         final int minSup = conf.k - 2;
 
-        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> currentInvalids = tVertices.filter(t -> t._2.size() < minSup)
+        // Get triangle vertex set for each edge
+        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tvSets = createTriangleVertexSet(edges);
+
+        // Find invalid edges which have support less than minSup
+        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> invalids = tvSets.filter(t -> t._2.size() < minSup)
             .partitionBy(partitioner2).cache();
 
-        JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Boolean, IntSet>> invUpdates =
-            sc.parallelize(new ArrayList<Tuple2<Tuple2<Integer, Integer>, Tuple2<Boolean, IntSet>>>()).mapToPair(t -> new Tuple2<>(t._1, t._2));
+        // This RDD is going to store all update information regarding invalid vertices of the edges' triangle vertex set.
+        // The key specifies an edge and the value is two parts: 1. A boolean to determine if the current edge is invalid. 2: The invalid
+        // vertex set of the current edge (key)
+        JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Boolean, IntSet>> tvInvSets =
+            sc.parallelize(new ArrayList<Tuple2<Tuple2<Integer, Integer>, Tuple2<Boolean, IntSet>>>())
+                .mapToPair(t -> new Tuple2<>(t._1, t._2));
 
         int iteration = 0;
         while (true) {
-            long invCount = currentInvalids.count();
+            long invCount = invalids.count();
             if (invCount == 0)
                 break;
 
-            log("iteration: " + ++iteration + ", currentInvalids: " + invCount);
+            log("iteration: " + ++iteration + ", invalids: " + invCount);
 
-            JavaPairRDD<Tuple2<Integer, Integer>, Integer> currentInvUpdate = currentInvalids.flatMapToPair(t -> {
+            // The edges in the key part of invalids key-values should be removed. So, we detect other
+            // edges of their involved triangle from their triangle vertex set. Here, we determine the
+            // vertices which should be removed from the triangle vertex set related to the other edges.
+            JavaPairRDD<Tuple2<Integer, Integer>, Integer> invUpdates = invalids.flatMapToPair(t -> {
                 List<Tuple2<Tuple2<Integer, Integer>, Integer>> list = new ArrayList<>();
                 list.add(new Tuple2<>(t._1, INV_VERTEX));
                 int u = t._1._1;
@@ -61,47 +72,59 @@ public class KTrussInvalidUpdates extends KTruss {
                 return list.iterator();
             }).partitionBy(partitioner2).cache();
 
-            invUpdates = invUpdates.cogroup(currentInvUpdate).mapValues(t -> {
-                Iterator<Tuple2<Boolean, IntSet>> preUpdates = t._1.iterator();
-                Tuple2<Boolean, IntSet> value;
-                IntSet set;
-                if (preUpdates.hasNext()) {
-                    value = preUpdates.next();
-                    if (value._1)
+            // Update tvInvSets
+            tvInvSets = tvInvSets.cogroup(invUpdates).mapValues(t -> {
+
+                Iterator<Tuple2<Boolean, IntSet>> prevInvValue = t._1.iterator();
+                Tuple2<Boolean, IntSet> value;  // The value to store the current invalid update status
+                IntSet tvInvSet;  // The final tvInvSet of invalid vertices
+
+                // If the current edge has a previously added invalid triangle vertices
+                if (prevInvValue.hasNext()) {
+                    value = prevInvValue.next();
+
+                    if (value._1)  // When the current edge is invalid, we should return immediately.
                         return value;
-                    set = value._2;
-                } else {
-                    set = new IntOpenHashSet();
-                    value = new Tuple2<>(false, set);
+
+                    tvInvSet = value._2;  // Get the previous invalid vertex tvInvSet
+                } else {  // The first invalid triangle vertex report for the current edge. So, initialize the value part.
+                    tvInvSet = new IntOpenHashSet();
+                    value = new Tuple2<>(false, tvInvSet);
                 }
 
+                // Iterate over all invalid vertices and add them to the tvInvSet which is in the return value.
                 for (Integer v : t._2) {
+                    // The INV_VERTEX determine if the current edge was determined invalid in the previous iteration. If so, construct
+                    // an invalid value for the current edge.
                     if (INV_VERTEX.equals(v))
-                        return new Tuple2<>(true, EMPTY_SET);
-                    set.add(v.intValue());
+                        return INVALID_UPDATE_VALUE;
+                    tvInvSet.add(v.intValue());
                 }
 
                 return value;
-            }).partitionBy(partitioner2).cache();
+            }).partitionBy(partitioner2).cache();  // Partition by the same partitioner used in tvSets
 
-            currentInvalids = tVertices.join(invUpdates).flatMapToPair(t -> {
-                Tuple2<Boolean, IntSet> allInvalids = t._2._2;
-                IntSet tSet = t._2._1;
+            // Find invalid edges using all invalid update information and the original triangle vertex sets.
+            invalids = tvSets.join(tvInvSets).flatMapToPair(t -> {
+                Tuple2<Boolean, IntSet> tvInvSet = t._2._2;
+                IntSet tvSet = t._2._1;
 
-                if (allInvalids._1)
+                // When the current edge is invalid we have nothing to do with it.
+                if (tvInvSet._1)
                     return Collections.emptyIterator();
 
-                tSet.removeAll(allInvalids._2);
+                // Remove all invalid vertices from the current triangle vertex set
+                tvSet.removeAll(tvInvSet._2);
 
-                if (tSet.size() < minSup) {
-                    return Arrays.asList(new Tuple2<>(t._1, tSet)).iterator();
+                if (tvSet.size() < minSup) {
+                    return Arrays.asList(new Tuple2<>(t._1, tvSet)).iterator();
                 }
 
                 return Collections.emptyIterator();
             }).partitionBy(partitioner2).cache();
         }
 
-        return tVertices.subtractByKey(invUpdates.filter(t -> t._2._1)).count();
+        return tvSets.subtractByKey(tvInvSets.filter(t -> t._2._1)).count();
     }
 
     public static void main(String[] args) {
