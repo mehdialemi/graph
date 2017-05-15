@@ -45,7 +45,7 @@ public class KTruss {
     public JavaPairRDD<Integer, Integer> loadEdges() {
         JavaRDD<String> input = sc.textFile(conf.inputPath, conf.partitionNum);
         JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
-        return edges.cache();
+        return edges.partitionBy(partitioner).cache();
     }
 
     protected JavaPairRDD<Tuple2<Integer, Integer>, IntSet> createTriangleVertexSet(JavaPairRDD<Integer, Integer> edges) {

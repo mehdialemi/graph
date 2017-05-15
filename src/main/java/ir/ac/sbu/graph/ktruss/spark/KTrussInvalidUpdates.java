@@ -128,7 +128,7 @@ public class KTrussInvalidUpdates extends KTruss {
     }
 
     public static void main(String[] args) {
-        KTrussConf conf = new KTrussConf(args, KTrussSparkTriangleVertices.class.getSimpleName(),
+        KTrussConf conf = new KTrussConf(args, KTrussInvalidUpdates.class.getSimpleName(),
             GraphUtils.VertexDegree.class, long[].class, List.class);
         KTrussInvalidUpdates kTruss = new KTrussInvalidUpdates(conf);
 

@@ -145,7 +145,7 @@ public class KTrussSparkEdgeSup extends KTruss {
     }
 
     public static void main(String[] args) {
-        KTrussConf conf = new KTrussConf(args, KTrussSparkTriangleVertices.class.getSimpleName(),
+        KTrussConf conf = new KTrussConf(args, KTrussSparkEdgeSup.class.getSimpleName(),
             GraphUtils.VertexDegree.class, long[].class, List.class);
 
         KTrussSparkEdgeSup kTruss = new KTrussSparkEdgeSup(conf);
