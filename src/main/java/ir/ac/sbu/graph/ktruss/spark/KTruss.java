@@ -100,7 +100,7 @@ public class KTruss {
                     set.add(v);
                 }
                 return set;
-            }).cache(); // Use disk too if graph is very large
+            }).persist(StorageLevel.MEMORY_AND_DISK()); // Use disk too if graph is very large
     }
 
     protected JavaPairRDD<Integer, int[]> createCandidates(JavaPairRDD<Integer, Integer> edges) {
