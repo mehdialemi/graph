@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.util.*;
@@ -26,7 +27,8 @@ public class KTrussInvalidUpdates extends KTruss {
         final int minSup = conf.k - 2;
 
         // Get triangle vertex set for each edge
-        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tvSets = createTriangleVertexSet(edges);
+        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tvSets = createTriangleVertexSet(edges)
+            .persist(StorageLevel.MEMORY_AND_DISK());
 
         // Find invalid edges which have support less than minSup
         JavaPairRDD<Tuple2<Integer, Integer>, IntSet> invalids = tvSets.filter(t -> t._2.size() < minSup)

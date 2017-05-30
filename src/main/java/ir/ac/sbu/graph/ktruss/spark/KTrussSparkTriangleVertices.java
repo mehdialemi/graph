@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.Optional;
+import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.util.ArrayList;
@@ -21,7 +22,8 @@ public class KTrussSparkTriangleVertices extends KTruss {
     public JavaPairRDD<Tuple2<Integer, Integer>, IntSet> start(JavaPairRDD<Integer, Integer> edges) {
 
         // Get triangle vertex set for each edge
-        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tvSets = createTriangleVertexSet(edges);
+        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tvSets = createTriangleVertexSet(edges)
+            .persist(StorageLevel.MEMORY_AND_DISK());
         final int minSup = conf.k - 2;
 
         int iteration = 0;
@@ -86,7 +88,7 @@ public class KTrussSparkTriangleVertices extends KTruss {
                         return null;
 
                     return original;
-                }).filter(kv -> kv._2 != null).partitionBy(partitioner2).cache();
+                }).filter(kv -> kv._2 != null).persist(StorageLevel.MEMORY_AND_DISK());
         }
         return tvSets;
     }

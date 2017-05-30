@@ -32,7 +32,8 @@ public class KTrussSparkEdgeSup extends KTruss {
         final int minSup = conf.k - 2;
 
         // Get triangle vertex set for each edge
-        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tvSets = createTriangleVertexSet(edges);
+        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tvSets = createTriangleVertexSet(edges)
+            .persist(StorageLevel.MEMORY_AND_DISK());
 
         // Construct edgeSup such that the key is an edge and the value contains two elements.
         // The first element is the original support of edge and the value is the invalid triangle vertices
