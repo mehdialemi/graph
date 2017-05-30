@@ -32,7 +32,7 @@ public class KTrussInvalidUpdates extends KTruss {
 
         // Find invalid edges which have support less than minSup
         JavaPairRDD<Tuple2<Integer, Integer>, IntSet> invalids = tvSets.filter(t -> t._2.size() < minSup)
-            .partitionBy(partitioner2).cache();
+            .partitionBy(partitioner2).persist(StorageLevel.MEMORY_AND_DISK());
 
         // This RDD is going to store all update information regarding invalid vertices of the edges' triangle vertex set.
         // The key specifies an edge and the value is two parts: 1. A boolean to determine if the current edge is invalid. 2: The invalid
@@ -43,11 +43,12 @@ public class KTrussInvalidUpdates extends KTruss {
 
         int iteration = 0;
         while (true) {
+            long t1 = System.currentTimeMillis();
             long invCount = invalids.count();
             if (invCount == 0)
                 break;
-
-            log("iteration: " + ++iteration + ", invalids: " + invCount);
+            long t2 = System.currentTimeMillis();
+            log("iteration: " + ++iteration + ", invalids: " + invCount, t1, t2);
 
             // The edges in the key part of invalids key-values should be removed. So, we detect other
             // edges of their involved triangle from their triangle vertex set. Here, we determine the
@@ -123,7 +124,7 @@ public class KTrussInvalidUpdates extends KTruss {
                 }
 
                 return Collections.emptyIterator();
-            }).partitionBy(partitioner2).cache();
+            });
         }
 
         return tvSets.subtractByKey(tvInvSets.filter(t -> t._2._1)).count();
