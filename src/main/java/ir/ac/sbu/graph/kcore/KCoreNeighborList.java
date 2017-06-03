@@ -9,6 +9,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -49,10 +50,16 @@ public class KCoreNeighborList extends KCore {
                 if (allNeighbors.length < k) {
                     return EMPTY_ARRAY;
                 }
+                Iterator<Integer> updateIterator = value._2.iterator();
+                if (!updateIterator.hasNext())
+                    return allNeighbors;
+
                 IntSet set = new IntOpenHashSet(allNeighbors);
-                for (Integer v : value._2) {
-                    set.remove(v.intValue());
-                }
+                do {
+                    int v = updateIterator.next();
+                    set.remove(v);
+                } while (updateIterator.hasNext());
+
                 return set.toIntArray();
             }).cache();
         }

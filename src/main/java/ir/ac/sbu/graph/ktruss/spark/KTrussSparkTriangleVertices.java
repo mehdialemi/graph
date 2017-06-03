@@ -30,10 +30,13 @@ public class KTrussSparkTriangleVertices extends KTruss {
         boolean stop = false;
 
         while (!stop) {
+            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevTvSets = tvSets;
             iteration++;
             long t1 = System.currentTimeMillis();
+
             // Detect invalid edges by comparing the size of triangle vertex set
             JavaPairRDD<Tuple2<Integer, Integer>, IntSet> invalids = tvSets.filter(kv -> kv._2.size() < minSup).cache();
+            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevInvalids = invalids;
             long invalidEdgeCount = invalids.count();
 
             // If no invalid edge is found then the program terminates
@@ -89,6 +92,8 @@ public class KTrussSparkTriangleVertices extends KTruss {
 
                     return original;
                 }).filter(kv -> kv._2 != null).persist(StorageLevel.MEMORY_AND_DISK());
+            prevTvSets.unpersist(true);
+            prevInvalids.unpersist(true);
         }
         return tvSets;
     }

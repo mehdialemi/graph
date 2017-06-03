@@ -104,7 +104,7 @@ public class KTruss {
     }
 
     protected JavaPairRDD<Integer, int[]> createCandidates(JavaPairRDD<Integer, Integer> edges) {
-        fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, partitioner);
+        fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, partitioner2);
         return FonlDegTC.generateCandidatesInteger(fonl).partitionBy(partitioner2);
     }
 }
