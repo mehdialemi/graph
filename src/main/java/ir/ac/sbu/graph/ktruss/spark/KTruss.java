@@ -12,7 +12,6 @@ import org.apache.spark.Partitioner;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.util.ArrayList;
@@ -44,8 +43,7 @@ public class KTruss {
 
     public JavaPairRDD<Integer, Integer> loadEdges() {
         JavaRDD<String> input = sc.textFile(conf.inputPath, conf.partitionNum);
-        JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
-        return edges.partitionBy(partitioner).cache();
+        return GraphLoader.loadEdgesInt(input);
     }
 
     protected JavaPairRDD<Tuple2<Integer, Integer>, IntSet> createTriangleVertexSet(JavaPairRDD<Integer, Integer> edges) {
@@ -104,7 +102,7 @@ public class KTruss {
     }
 
     protected JavaPairRDD<Integer, int[]> createCandidates(JavaPairRDD<Integer, Integer> edges) {
-        fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, partitioner2);
+        fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, partitioner, partitioner2);
         return FonlDegTC.generateCandidatesInteger(fonl).partitionBy(partitioner2);
     }
 }

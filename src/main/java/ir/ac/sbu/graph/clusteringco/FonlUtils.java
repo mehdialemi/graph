@@ -190,6 +190,10 @@ public class FonlUtils implements Serializable {
     }
 
     public static JavaPairRDD<Integer, int[]> createWith2ReduceDegreeSortInt(JavaPairRDD<Integer, Integer> edges, Partitioner partitioner) {
+        return createWith2ReduceDegreeSortInt(edges, partitioner, partitioner);
+    }
+
+    public static JavaPairRDD<Integer, int[]> createWith2ReduceDegreeSortInt(JavaPairRDD<Integer, Integer> edges, Partitioner partitioner, Partitioner partitioner2) {
         return edges.groupByKey(partitioner).flatMapToPair(t -> {
             HashSet<Integer> neighborSet = new HashSet<>();
             for (int neighbor : t._2) {
@@ -244,7 +248,7 @@ public class FonlUtils implements Serializable {
                 higherDegs[i] = list.get(i - 1).vertex;
 
             return new Tuple2<>(v._1, higherDegs);
-        }).partitionBy(partitioner).cache();
+        }).partitionBy(partitioner2).cache();
     }
 
     /**
