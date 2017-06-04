@@ -32,7 +32,7 @@ public class KTrussSparkTriangleVertices extends KTruss {
         boolean stop = false;
 
         while (!stop) {
-//            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevTvSets = tvSets;
+            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevTvSets = tvSets;
             iteration++;
             long t1 = System.currentTimeMillis();
 
@@ -95,8 +95,8 @@ public class KTrussSparkTriangleVertices extends KTruss {
                     return original;
                 }).filter(kv -> kv._2 != null)
                 .persist(StorageLevel.MEMORY_ONLY());
-//            prevTvSets.unpersist();
-//            prevInvalids.unpersist();
+            prevTvSets.unpersist();
+            prevInvalids.unpersist();
         }
         return tvSets;
     }
