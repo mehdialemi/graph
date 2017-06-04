@@ -97,7 +97,7 @@ public class KTrussSpark extends KTruss {
                 }
 
                 return set;
-            }).persist(StorageLevel.MEMORY_ONLY()); // Use disk too if graph is very large
+            }).persist(StorageLevel.MEMORY_AND_DISK()); // Use disk too if graph is very large
 
         final int minSup = conf.k - 2;
 
@@ -111,7 +111,6 @@ public class KTrussSpark extends KTruss {
 
             // Detect invalid edges by comparing the size of triangle vertex set
             JavaPairRDD<Tuple2<Integer, Integer>, int[]> invalids = tvSets.filter(kv -> kv._2[0] < minSup).cache();
-            JavaPairRDD<Tuple2<Integer, Integer>, int[]> prevInvalids = invalids;
             long invalidCount = invalids.count();
 
             // If no invalid edge is found then the program terminates
@@ -186,9 +185,7 @@ public class KTrussSpark extends KTruss {
 
                     return set;
                 }).filter(kv -> kv._2 != null)
-                .persist(StorageLevel.MEMORY_ONLY());
-//            prevTvSets.unpersist();
-//            prevInvalids.unpersist();
+                .persist(StorageLevel.MEMORY_AND_DISK());
         }
         return tvSets;
     }
