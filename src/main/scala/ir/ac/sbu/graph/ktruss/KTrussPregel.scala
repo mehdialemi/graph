@@ -2,6 +2,7 @@ package ir.ac.sbu.graph.ktruss
 
 import ir.ac.sbu.graph.utils.GraphUtils
 import org.apache.spark.graphx._
+import org.apache.spark.storage.StorageLevel
 import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.mutable.{ListBuffer, Map}
@@ -71,7 +72,7 @@ object KTrussPregel {
             iteration = iteration + 1
             val t1 = System.currentTimeMillis()
             println("iteration: " + iteration)
-            graph.persist()
+            graph.persist(StorageLevel.MEMORY_AND_DISK)
             val oldEdgeCount = graph.edges.count()
             // =======================================================
             // phase 1: Send message about completing the third edges.

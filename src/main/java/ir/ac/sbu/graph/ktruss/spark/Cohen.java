@@ -72,7 +72,7 @@ public class Cohen extends KTruss {
                         throw new RuntimeException("Invalid degree, edge = " + edge + ", degs = " + degs);
 
                     return new Tuple2<>(edge, new Tuple2<>(d1, d2));
-                }).persist(StorageLevel.DISK_ONLY_2());
+                }).persist(StorageLevel.MEMORY_AND_DISK());
 
             // 2: Construct open triads
             JavaPairRDD<Tuple2<Integer, Integer>, Tuple2<Integer, Integer>[]> openTriads = edgeDegs.mapToPair(e ->
@@ -125,7 +125,7 @@ public class Cohen extends KTruss {
                     }
 
                     return output.iterator();
-                }).partitionBy(partitioner2).persist(StorageLevel.DISK_ONLY_2());
+                }).partitionBy(partitioner2).persist(StorageLevel.MEMORY_AND_DISK());
 
             // 3: Join open triads with edges to find triangles
             JavaRDD<Tuple2<Integer, Integer>[]> triangles = openTriads.join(edgeDegs).map(value -> {
@@ -158,7 +158,7 @@ public class Cohen extends KTruss {
                 if (t._2 >= minSup)
                     return new Tuple2<>(t._1, true);
                 return new Tuple2<>(t._1, false);
-            }).cache();
+            }).persist(StorageLevel.MEMORY_AND_DISK());
 
             boolean allTrue = newEdges.map(t -> t._2).reduce((a, b) -> a && b);
 
@@ -167,7 +167,8 @@ public class Cohen extends KTruss {
 
             log("iteration: " + iteration, t1, System.currentTimeMillis());
 
-            edgeList = newEdges.filter(t -> t._2).map(t -> t._1).repartition(conf.partitionNum).cache();
+            edgeList = newEdges.filter(t -> t._2).map(t -> t._1)
+                .repartition(conf.partitionNum).persist(StorageLevel.MEMORY_AND_DISK());
         }
 
         return edgeList.count();
