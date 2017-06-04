@@ -63,7 +63,7 @@ object KTrussPregel {
         val empty = sc.makeRDD(Array[(Long, Integer)]())
 
         // Create ir.ac.sbu.graph with edge direction from lower degree to higher degree node and edge attribute.
-        var graph = Graph(empty, newEdges)
+        var graph = Graph(empty, newEdges).persist()
 
         // In a loop we find triangles and then remove edges lower than specified sup
         var stop = false
@@ -72,7 +72,6 @@ object KTrussPregel {
             iteration = iteration + 1
             val t1 = System.currentTimeMillis()
             println("iteration: " + iteration)
-            graph.persist(StorageLevel.MEMORY_AND_DISK)
             val oldEdgeCount = graph.edges.count()
             // =======================================================
             // phase 1: Send message about completing the third edges.
@@ -114,6 +113,7 @@ object KTrussPregel {
             val edgeUpdated = edgeCount.mapTriplets(t => t.srcAttr.getOrElse(t.dstId, 0)).subgraph(e => e.attr >=
               support, (vid, v) => true)
             graph = edgeUpdated.mapVertices((vId, v) => 0)
+            graph = graph.persist()
             // =======================================================
             // phase 3: Collate messages for each edge
             // =======================================================
