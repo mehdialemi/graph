@@ -127,5 +127,7 @@ object KTrussPregel {
 
         println("KTRUSS final edge count: " + graph.edges.count() + ", duration: " + (System.currentTimeMillis
         () - start) / 1000)
+
+        sc.stop()
     }
 }
