@@ -2,7 +2,6 @@ package ir.ac.sbu.graph.ktruss
 
 import ir.ac.sbu.graph.utils.GraphUtils
 import org.apache.spark.graphx._
-import org.apache.spark.storage.StorageLevel
 import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.mutable.{ListBuffer, Map}
@@ -113,7 +112,7 @@ object KTrussPregel {
             val edgeUpdated = edgeCount.mapTriplets(t => t.srcAttr.getOrElse(t.dstId, 0)).subgraph(e => e.attr >=
               support, (vid, v) => true)
             graph = edgeUpdated.mapVertices((vId, v) => 0)
-            graph = graph.persist()
+            graph.persist()
             // =======================================================
             // phase 3: Collate messages for each edge
             // =======================================================
