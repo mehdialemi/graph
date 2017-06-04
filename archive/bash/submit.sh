@@ -63,7 +63,7 @@ case $task in
 	;;
 	"KT_Pregel") main_class="ir.ac.sbu.graph.ktruss.KTrussPregel"
 	;;
-	"KT_SPARK") main_class="ir.ac.sbu.graph.ktruss.distributed.KTrussSparkTriangleVertices"
+	"KT_SPARK") main_class="ir.ac.sbu.graph.ktruss.distributed.KTrussSparkTriangleSet"
 	;;
 	"KT_TRIANGLE") main_class="ir.ac.sbu.graph.ktruss.distributed.KTrussSparkTriangle"
 	;;

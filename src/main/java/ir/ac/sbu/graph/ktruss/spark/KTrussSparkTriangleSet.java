@@ -13,9 +13,9 @@ import java.util.List;
 
 import static ir.ac.sbu.graph.utils.Log.log;
 
-public class KTrussSparkTriangleVertices extends KTruss {
+public class KTrussSparkTriangleSet extends KTruss {
 
-    public KTrussSparkTriangleVertices(KTrussConf conf) {
+    public KTrussSparkTriangleSet(KTrussConf conf) {
         super(conf);
     }
 
@@ -23,8 +23,7 @@ public class KTrussSparkTriangleVertices extends KTruss {
 
         // Get triangle vertex set for each edge
         JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tvSets = createTriangleVertexSet(edges)
-            .persist(StorageLevel.MEMORY_ONLY());
-//            .persist(StorageLevel.MEMORY_AND_DISK());
+            .persist(StorageLevel.MEMORY_AND_DISK());
 
         final int minSup = conf.k - 2;
 
@@ -32,7 +31,7 @@ public class KTrussSparkTriangleVertices extends KTruss {
         boolean stop = false;
 
         while (!stop) {
-            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevTvSets = tvSets;
+//            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevTvSets = tvSets;
             iteration++;
             long t1 = System.currentTimeMillis();
 
@@ -95,17 +94,17 @@ public class KTrussSparkTriangleVertices extends KTruss {
                     return original;
                 }).filter(kv -> kv._2 != null)
                 .persist(StorageLevel.MEMORY_ONLY());
-            prevTvSets.unpersist();
-            prevInvalids.unpersist();
+//            prevTvSets.unpersist();
+//            prevInvalids.unpersist();
         }
         return tvSets;
     }
 
     public static void main(String[] args) {
-        KTrussConf conf = new KTrussConf(args, KTrussSparkTriangleVertices.class.getSimpleName(),
+        KTrussConf conf = new KTrussConf(args, KTrussSparkTriangleSet.class.getSimpleName(),
             GraphUtils.VertexDegree.class, long[].class, List.class, IntSet.class, IntOpenHashSet.class);
 
-        KTrussSparkTriangleVertices kTruss = new KTrussSparkTriangleVertices(conf);
+        KTrussSparkTriangleSet kTruss = new KTrussSparkTriangleSet(conf);
 
         JavaPairRDD<Integer, Integer> edges = kTruss.loadEdges();
 
