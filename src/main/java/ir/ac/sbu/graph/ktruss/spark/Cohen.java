@@ -23,6 +23,7 @@ public class Cohen extends KTruss {
 
         int iteration = 0;
         while (true) {
+            long t1 = System.currentTimeMillis();
             log("Iteration: " + ++iteration);
 
             // ************************* Generate Triangles *************************
@@ -160,9 +161,11 @@ public class Cohen extends KTruss {
             }).cache();
 
             boolean allTrue = newEdges.map(t -> t._2).reduce((a, b) -> a && b);
-            log("Reduction: " + allTrue);
+
             if (allTrue)
                 break;
+
+            log("iteration: " + iteration, t1, System.currentTimeMillis());
 
             edgeList = newEdges.filter(t -> t._2).map(t -> t._1).repartition(conf.partitionNum).cache();
         }

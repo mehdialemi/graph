@@ -18,7 +18,7 @@ object KTrussPregel {
 
 
     def main(args: Array[String]): Unit = {
-        var inputPath = "/home/mehdi/ir.ac.sbu.graph-data/com-amazon.ungraph.txt"
+        var inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt"
         if (args != null && args.length > 0)
             inputPath = args(0);
 
@@ -34,7 +34,8 @@ object KTrussPregel {
         val conf = new SparkConf()
         if (args == null || args.length == 0)
             conf.setMaster("local[2]")
-        GraphUtils.setAppName(conf, "KTruss-Pregel-" + k, partition, inputPath);
+        conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+        GraphUtils.setAppName(conf, "KTruss-Pregel-" + k, partition, inputPath)
 
         val sc = SparkContext.getOrCreate(conf)
 
@@ -65,9 +66,10 @@ object KTrussPregel {
 
         // In a loop we find triangles and then remove edges lower than specified sup
         var stop = false
-        var iteration  = 0
+        var iteration = 0
         while (!stop) {
             iteration = iteration + 1
+            val t1 = System.currentTimeMillis()
             println("iteration: " + iteration)
             graph.persist()
             val oldEdgeCount = graph.edges.count()
@@ -96,7 +98,7 @@ object KTrussPregel {
             // Then check that if receiving neighborIds have a common with its neighbors.
             // If there was any common neighbors then it report back telling the sender the completing nodes to make
             // a triangle through it.
-            val triangleMsg = graphWithOutlinks.vertices.join(message).flatMap{ case (vid, (n, msg)) =>
+            val triangleMsg = graphWithOutlinks.vertices.join(message).flatMap { case (vid, (n, msg)) =>
                 msg.map(ids => (ids._1, vid -> n.intersect(ids._2).length)).filter(t => t._2._2 > 0)
             }.groupByKey()
 
@@ -116,13 +118,14 @@ object KTrussPregel {
             // =======================================================
             val newEdgeCount = graph.edges.count()
 
-            println("KTRUSS New Edge Count: " + newEdgeCount)
+            println("KTRUSS) iteration: " + iteration + ", edge count: " + newEdgeCount + ", duration: " +
+              (System.currentTimeMillis() - t1) + " ms")
 
             if (newEdgeCount == 0 || newEdgeCount == oldEdgeCount)
                 stop = true
         }
 
-        println("KTRUSS final ir.ac.sbu.graph edge count: " + graph.edges.count() + ", duration: " + (System.currentTimeMillis
+        println("KTRUSS final edge count: " + graph.edges.count() + ", duration: " + (System.currentTimeMillis
         () - start) / 1000)
     }
 }

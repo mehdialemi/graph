@@ -23,14 +23,16 @@ public class KTrussSparkTriangleVertices extends KTruss {
 
         // Get triangle vertex set for each edge
         JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tvSets = createTriangleVertexSet(edges)
-            .persist(StorageLevel.MEMORY_AND_DISK());
+            .persist(StorageLevel.MEMORY_ONLY());
+//            .persist(StorageLevel.MEMORY_AND_DISK());
+
         final int minSup = conf.k - 2;
 
         int iteration = 0;
         boolean stop = false;
 
         while (!stop) {
-            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevTvSets = tvSets;
+//            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevTvSets = tvSets;
             iteration++;
             long t1 = System.currentTimeMillis();
 
@@ -91,9 +93,10 @@ public class KTrussSparkTriangleVertices extends KTruss {
                         return null;
 
                     return original;
-                }).filter(kv -> kv._2 != null).persist(StorageLevel.MEMORY_AND_DISK());
-            prevTvSets.unpersist(true);
-            prevInvalids.unpersist(true);
+                }).filter(kv -> kv._2 != null)
+                .persist(StorageLevel.MEMORY_ONLY());
+//            prevTvSets.unpersist();
+//            prevInvalids.unpersist();
         }
         return tvSets;
     }
