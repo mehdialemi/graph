@@ -2,6 +2,7 @@ package ir.ac.sbu.graph.ktruss
 
 import ir.ac.sbu.graph.utils.GraphUtils
 import org.apache.spark.graphx._
+import org.apache.spark.storage.StorageLevel
 import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.mutable.{ListBuffer, Map}
@@ -59,10 +60,11 @@ object KTrussPregel {
                 Edge(et.dstId, et.srcId, 0)
         }
 
-        val empty = sc.makeRDD(Array[(Long, Integer)]())
+        val empty = sc.makeRDD(Array[(Long, Int)]())
 
         // Create ir.ac.sbu.graph with edge direction from lower degree to higher degree node and edge attribute.
-        var graph = Graph(empty, newEdges)
+        var graph = Graph(empty, newEdges, defaultVertexAttr = 0,
+            edgeStorageLevel = StorageLevel.MEMORY_AND_DISK, vertexStorageLevel = StorageLevel.MEMORY_AND_DISK)
 
         // In a loop we find triangles and then remove edges lower than specified sup
         var stop = false
@@ -71,7 +73,9 @@ object KTrussPregel {
             iteration = iteration + 1
             val t1 = System.currentTimeMillis()
             println("iteration: " + iteration)
-            graph.persist()
+
+//            graph.partitionBy(PartitionStrategy.CanonicalRandomVertexCut).persist(StorageLevel.MEMORY_AND_DISK)
+
             val oldEdgeCount = graph.edges.count()
             // =======================================================
             // phase 1: Send message about completing the third edges.
@@ -112,21 +116,28 @@ object KTrussPregel {
 
             val edgeUpdated = edgeCount.mapTriplets(t => t.srcAttr.getOrElse(t.dstId, 0)).subgraph(e => e.attr >=
               support, (vid, v) => true)
-            graph = edgeUpdated.mapVertices((vId, v) => 0)
+
+            val newGraph = edgeUpdated.mapVertices((vId, v) => 0)
+              .partitionBy(PartitionStrategy.CanonicalRandomVertexCut)
+              .persist(StorageLevel.MEMORY_AND_DISK)
+
             // =======================================================
             // phase 3: Collate messages for each edge
             // =======================================================
-            val newEdgeCount = graph.edges.count()
+            val newEdgeCount = newGraph.edges.count()
 
             println("KTRUSS) iteration: " + iteration + ", edge count: " + newEdgeCount + ", duration: " +
               (System.currentTimeMillis() - t1) + " ms")
 
             if (newEdgeCount == 0 || newEdgeCount == oldEdgeCount)
                 stop = true
+
+            graph.unpersist()
+            graph = newGraph;
         }
 
         println("KTRUSS final edge count: " + graph.edges.count() + ", duration: " + (System.currentTimeMillis
-        () - start) / 1000)
+        () - start) / 1000 + "s")
 
         sc.stop()
     }

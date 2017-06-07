@@ -138,9 +138,6 @@ public class Cohen extends KTruss {
 
             log("Triangle size: " + triangles.count());
 
-            openTriads.unpersist();
-            edgeDegs.unpersist();
-
             // ******************************  Prune edges with support less than minSup ***************************************
             // Extract triangles' edges
             JavaPairRDD<Tuple2<Integer, Integer>, Integer> edgeCount = triangles
@@ -160,6 +157,9 @@ public class Cohen extends KTruss {
                 return new Tuple2<>(t._1, false);
             }).persist(StorageLevel.MEMORY_AND_DISK());
 
+            openTriads.unpersist();
+            edgeDegs.unpersist();
+
             boolean allTrue = newEdges.map(t -> t._2).reduce((a, b) -> a && b);
 
             if (allTrue)
@@ -169,6 +169,7 @@ public class Cohen extends KTruss {
 
             edgeList = newEdges.filter(t -> t._2).map(t -> t._1)
                 .repartition(conf.partitionNum).persist(StorageLevel.MEMORY_AND_DISK());
+            newEdges.unpersist();
         }
 
         return edgeList.count();
