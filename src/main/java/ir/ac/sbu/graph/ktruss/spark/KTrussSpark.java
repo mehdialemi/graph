@@ -30,7 +30,7 @@ public class KTrussSpark extends KTruss {
         JavaPairRDD<Integer, int[]> candidates = createCandidates(edges);
 
         // Generate kv such that key is an edge and value is its triangle vertices.
-        JavaPairRDD<Tuple2<Integer, Integer>, int[]> tvSets = candidates.cogroup(fonl.partitionBy(partitioner)).flatMapToPair(t -> {
+        JavaPairRDD<Tuple2<Integer, Integer>, int[]> tvSets = candidates.cogroup(fonl).flatMapToPair(t -> {
             int[] fVal = t._2._2.iterator().next();
             Arrays.sort(fVal, 1, fVal.length);
             int v = t._1;
