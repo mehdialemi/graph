@@ -12,6 +12,7 @@ import org.apache.spark.Partitioner;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public class KTruss {
         JavaPairRDD<Integer, int[]> candidates = createCandidates(edges);
 
         // Generate kv such that key is an edge and value is its triangle vertices.
-        return candidates.cogroup(fonl).flatMapToPair(t -> {
+        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tvSet = candidates.cogroup(fonl).flatMapToPair(t -> {
             int[] fVal = t._2._2.iterator().next();
             Arrays.sort(fVal, 1, fVal.length);
             int v = t._1;
@@ -69,9 +70,9 @@ public class KTruss {
                 int ci = 1;
                 while (fi < fVal.length && ci < cVal.length) {
                     if (fVal[fi] < cVal[ci])
-                        fi ++;
+                        fi++;
                     else if (fVal[fi] > cVal[ci])
-                        ci ++;
+                        ci++;
                     else {
                         int w = fVal[fi];
                         output.add(new Tuple2<>(uv, w));
@@ -84,8 +85,8 @@ public class KTruss {
                             output.add(new Tuple2<>(new Tuple2<>(v, w), u));
                         else
                             output.add(new Tuple2<>(new Tuple2<>(w, v), u));
-                        fi ++;
-                        ci ++;
+                        fi++;
+                        ci++;
                     }
                 }
             }
@@ -98,11 +99,14 @@ public class KTruss {
                     set.add(v);
                 }
                 return set;
-            }); // Use disk too if graph is very large
+            }).persist(StorageLevel.MEMORY_AND_DISK()); // Use disk too if graph is very large
+
+        candidates.unpersist();
+        return tvSet;
     }
 
     protected JavaPairRDD<Integer, int[]> createCandidates(JavaPairRDD<Integer, Integer> edges) {
-        fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, partitioner);
-        return FonlDegTC.generateCandidatesInteger(fonl).partitionBy(partitioner2);
+        fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, partitioner, partitioner2);
+        return FonlDegTC.generateCandidatesInteger(fonl).partitionBy(partitioner2).persist(StorageLevel.MEMORY_AND_DISK());
     }
 }

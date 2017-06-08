@@ -22,8 +22,7 @@ public class KTrussSparkTriangleSet extends KTruss {
     public JavaPairRDD<Tuple2<Integer, Integer>, IntSet> start(JavaPairRDD<Integer, Integer> edges) {
 
         // Get triangle vertex set for each edge
-        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tvSets = createTriangleVertexSet(edges)
-            .persist(StorageLevel.MEMORY_AND_DISK());
+        JavaPairRDD<Tuple2<Integer, Integer>, IntSet> tvSets = createTriangleVertexSet(edges);
 
         final int minSup = conf.k - 2;
 

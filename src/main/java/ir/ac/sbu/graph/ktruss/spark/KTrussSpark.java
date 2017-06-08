@@ -99,6 +99,8 @@ public class KTrussSpark extends KTruss {
                 return set;
             }).persist(StorageLevel.MEMORY_AND_DISK()); // Use disk too if graph is very large
 
+        candidates.unpersist();
+        
         final int minSup = conf.k - 2;
 
         int iteration = 0;
