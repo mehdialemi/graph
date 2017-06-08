@@ -102,7 +102,7 @@ public class KTrussSparkTriangleSet extends KTruss {
 
     public static void main(String[] args) {
         KTrussConf conf = new KTrussConf(args, KTrussSparkTriangleSet.class.getSimpleName(),
-            GraphUtils.VertexDegreeInt.class, long[].class, List.class, IntSet.class, IntOpenHashSet.class);
+            GraphUtils.VertexDegreeInt.class, int[].class, List.class, IntSet.class, IntOpenHashSet.class);
 
         KTrussSparkTriangleSet kTruss = new KTrussSparkTriangleSet(conf);
 
