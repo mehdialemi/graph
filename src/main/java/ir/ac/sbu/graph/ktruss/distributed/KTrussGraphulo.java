@@ -5,6 +5,7 @@ import ir.ac.sbu.graph.utils.Log;
 import org.apache.accumulo.core.client.*;
 import org.apache.accumulo.core.client.security.tokens.AuthenticationToken;
 import org.apache.accumulo.core.client.security.tokens.NullToken;
+import org.apache.accumulo.core.client.security.tokens.PasswordToken;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
@@ -108,10 +109,15 @@ public class KTrussGraphulo {
         String username = args[3];
 
         if (args.length < 5)
-            Log.log("Enter tableName to create");
-        String tableName = args[4];
+            Log.log("Enter password");
+        String password = args[4];
 
-        KTrussGraphulo kTrussGraphulo = new KTrussGraphulo(instanceName, zk, username, new NullToken());
+        if (args.length < 6)
+            Log.log("Enter table name to create");
+        String tableName = args[5];
+
+
+        KTrussGraphulo kTrussGraphulo = new KTrussGraphulo(instanceName, zk, username, new PasswordToken(password));
         kTrussGraphulo.setup();
 
         switch (args[0].toUpperCase()) {
