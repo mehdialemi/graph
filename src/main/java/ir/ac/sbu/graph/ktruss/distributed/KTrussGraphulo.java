@@ -4,7 +4,6 @@ import edu.mit.ll.graphulo.Graphulo;
 import ir.ac.sbu.graph.utils.Log;
 import org.apache.accumulo.core.client.*;
 import org.apache.accumulo.core.client.security.tokens.AuthenticationToken;
-import org.apache.accumulo.core.client.security.tokens.NullToken;
 import org.apache.accumulo.core.client.security.tokens.PasswordToken;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Mutation;
