@@ -45,7 +45,8 @@ public class KTrussGraphulo {
     public void run(String tableName, int k) {
         String newTable = tableName + "" + System.currentTimeMillis();
         long ts = System.currentTimeMillis();
-        long nnz = graphulo.kTrussAdj(tableName, newTable, k, null, true, Authorizations.EMPTY, "");
+        long nnz = graphulo.kTrussAdj_Smart(tableName, newTable, k, null,
+                true, Authorizations.EMPTY, "", Integer.MAX_VALUE,null);
         Log.log("nnz: " + nnz, ts, System.currentTimeMillis());
     }
 
