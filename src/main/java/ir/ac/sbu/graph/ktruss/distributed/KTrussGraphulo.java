@@ -122,9 +122,9 @@ public class KTrussGraphulo {
 
         switch (args[0].toUpperCase()) {
             case "FILL":
-                if (args.length < 6)
+                if (args.length < 7)
                     Log.log("Enter fileName to fill in tables");
-                String fileName = args[5];
+                String fileName = args[6];
 
                 kTrussGraphulo.fillTable(tableName, fileName);
 
