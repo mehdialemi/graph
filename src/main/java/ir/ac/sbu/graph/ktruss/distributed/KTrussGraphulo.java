@@ -157,16 +157,11 @@ public class KTrussGraphulo {
 
             String[] edge = line.split("\\s+");
             long e1 = Long.parseLong(edge[0]);
-            long e2 = Long.parseLong(edge[1]);
 
             if (e1 < min)
                 min = e1;
-            if (e2 < min)
-                min = e2;
             if (e1 > max)
                 max = e1;
-            if (e2 > max)
-                max = e2;
         }
 
         SortedSet<Text> set = new TreeSet<>();
