@@ -15,11 +15,13 @@ import org.apache.hadoop.io.Text;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  *
  */
 public class KTrussGraphulo {
+    public static final int NUM_SERVERS = 10;
     private String instanceName;
     private String zkServers;
     private String username;
@@ -41,10 +43,10 @@ public class KTrussGraphulo {
         graphulo = new Graphulo(connector, token);
     }
 
-    public void run(String tableName) {
+    public void run(String tableName, int k) {
         String newTable = tableName + "" + System.currentTimeMillis();
         long ts = System.currentTimeMillis();
-        long nnz = graphulo.kTrussAdj_Client(tableName, newTable, 3, null, Authorizations.EMPTY, "", true, Integer.MAX_VALUE);
+        long nnz = graphulo.kTrussAdj_Client(tableName, newTable, k, null, Authorizations.EMPTY, "", true, Integer.MAX_VALUE);
         Log.log("nnz: " + nnz, ts, System.currentTimeMillis());
     }
 
@@ -126,11 +128,56 @@ public class KTrussGraphulo {
                     Log.log("Enter fileName to fill in tables");
                 String fileName = args[6];
 
-                kTrussGraphulo.fillTable(tableName, fileName);
+                kTrussGraphulo.fillTable(tableName, fileName, createSplits(fileName));
 
                 break;
             case "RUN":
-                kTrussGraphulo.run(tableName);
+                int k = 4;
+                if (args.length < 7)
+                    Log.log("Enter fileName to fill in tables");
+                else
+                    k = Integer.parseInt(args[6]);
+                kTrussGraphulo.run(tableName, k);
         }
+    }
+
+    private static SortedSet<Text> createSplits(String fileName) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(new File(fileName)));
+        long min = Long.MAX_VALUE;
+        long max = Long.MIN_VALUE;
+
+        while (true) {
+            String line = br.readLine();
+            if (line == null) {
+                break;
+            }
+            if (line.startsWith("#")) {
+                continue;
+            }
+
+            String[] edge = line.split("\\s+");
+            long e1 = Long.parseLong(edge[0]);
+            long e2 = Long.parseLong(edge[1]);
+
+            if (e1 < min)
+                min = e1;
+            if (e2 < min)
+                min = e2;
+            if (e1 > max)
+                max = e1;
+            if (e2 > max)
+                max = e2;
+        }
+
+        SortedSet<Text> set = new TreeSet<>();
+        long delta = max - min;
+        long step = delta / (NUM_SERVERS - 1);
+        long current = min;
+        for (int i = 0; i < NUM_SERVERS - 1; i++) {
+            long split = current + step;
+            set.add(new Text(split + ""));
+        }
+
+        return set;
     }
 }
