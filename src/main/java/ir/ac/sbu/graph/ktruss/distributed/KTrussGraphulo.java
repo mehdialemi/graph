@@ -169,6 +169,7 @@ public class KTrussGraphulo {
         long current = min;
         for (int i = 0; i < NUM_SERVERS - 1; i++) {
             long split = current + step;
+            System.out.println("split:" + split);
             set.add(new Text(split + ""));
         }
 
