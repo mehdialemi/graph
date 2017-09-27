@@ -38,6 +38,10 @@ public class KTruss {
         Log.setName(conf.name);
     }
 
+    public JavaSparkContext getSc() {
+        return sc;
+    }
+
     public void close() {
         sc.close();
     }

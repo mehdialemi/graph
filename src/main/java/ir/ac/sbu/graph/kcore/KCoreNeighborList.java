@@ -2,6 +2,7 @@ package ir.ac.sbu.graph.kcore;
 
 import static ir.ac.sbu.graph.utils.Log.log;
 
+import ir.ac.sbu.graph.monitor.MonitorTimerTask;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.Partitioner;
@@ -11,6 +12,7 @@ import scala.Tuple2;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Timer;
 
 
 public class KCoreNeighborList extends KCore {
@@ -71,6 +73,9 @@ public class KCoreNeighborList extends KCore {
         KCoreConf kCoreConf = new KCoreConf(args, KCoreNeighborList.class.getSimpleName(), int[].class);
         KCoreNeighborList kCore = new KCoreNeighborList(kCoreConf);
 
+        Timer timer = new Timer(true);
+        timer.schedule(new MonitorTimerTask(kCore.getSc()), MonitorTimerTask.LOG_DURATION);
+
         long tload = System.currentTimeMillis();
         JavaPairRDD<Integer, Integer> edges = kCore.loadEdges();
         log("Edges are loaded", tload, System.currentTimeMillis());
@@ -81,5 +86,8 @@ public class KCoreNeighborList extends KCore {
         log("KCore vertex count: " + neighbors.count(), t1, System.currentTimeMillis());
 
         kCore.close();
+        timer.cancel();
     }
+
+
 }

@@ -27,6 +27,10 @@ public class KCore {
         partitioner = new HashPartitioner(conf.partitionNum);
     }
 
+    public JavaSparkContext getSc() {
+        return sc;
+    }
+
     public void close() {
         sc.close();
     }

@@ -1,5 +1,6 @@
 package ir.ac.sbu.graph.ktruss.spark;
 
+import ir.ac.sbu.graph.monitor.MonitorTimerTask;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -7,9 +8,7 @@ import org.apache.spark.api.java.Optional;
 import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static ir.ac.sbu.graph.utils.Log.log;
 
@@ -20,6 +19,7 @@ public class KTrussSpark extends KTruss {
     private static final Byte U_UVW = (byte) 2;
     public static final int META_LEN = 4;
     public static final int INVALID = -1;
+
 
     public KTrussSpark(KTrussConf conf) {
         super(conf);
@@ -196,6 +196,8 @@ public class KTrussSpark extends KTruss {
         KTrussConf conf = new KTrussConf(args, KTrussSpark.class.getSimpleName(), int[].class);
 
         KTrussSpark kTruss = new KTrussSpark(conf);
+        Timer timer = new Timer(true);
+        timer.schedule(new MonitorTimerTask(kTruss.getSc()), MonitorTimerTask.LOG_DURATION);
 
         JavaPairRDD<Integer, Integer> edges = kTruss.loadEdges();
 
@@ -204,6 +206,7 @@ public class KTrussSpark extends KTruss {
         long edgeCount = tVertices.count();
         long duration = System.currentTimeMillis() - start;
         kTruss.close();
+        timer.cancel();
         log("KTruss Edge Count: " + edgeCount, duration);
     }
 
