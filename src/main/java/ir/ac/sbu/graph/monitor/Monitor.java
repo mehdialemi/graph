@@ -3,6 +3,7 @@ package ir.ac.sbu.graph.monitor;
 import ir.ac.sbu.graph.utils.Log;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.storage.StorageLevel;
 
 import java.util.TimerTask;
 
@@ -28,9 +29,13 @@ public class Monitor extends TimerTask {
     }
 
     private static void logMemory(String header, JavaSparkContext sc) {
-        for (int jobIds : sc.statusTracker().getActiveJobIds()) {
-
-        }
+//        sc.env().blockManager().blockInfoManager().entries().foreach(block -> {
+//            block._2().size();
+//            StorageLevel level = block._2().level();
+//            if (level == StorageLevel.MEMORY_ONLY()) {
+//
+//            }
+//        });
         long bytes = sc.env().blockManager().memoryStore().currentUnrollMemory();
         Log.logWithTS(header + " STORAGE_MEMORY", FileUtils.byteCountToDisplaySize(bytes));
     }

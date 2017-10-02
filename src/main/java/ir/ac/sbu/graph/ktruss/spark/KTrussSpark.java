@@ -1,11 +1,8 @@
 package ir.ac.sbu.graph.ktruss.spark;
 
-import ir.ac.sbu.graph.monitor.Monitor;
 import ir.ac.sbu.graph.utils.GraphUtils;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.Optional;
 import org.apache.spark.storage.StorageLevel;
@@ -13,7 +10,9 @@ import org.apache.spark.util.collection.CompactBuffer;
 import scala.Tuple2;
 import scala.reflect.ManifestFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static ir.ac.sbu.graph.utils.Log.log;
 
@@ -204,6 +203,7 @@ public class KTrussSpark extends KTruss {
         KTrussConf conf = new KTrussConf(args, KTrussSpark.class.getSimpleName(),
                 GraphUtils.VertexDegreeInt.class,  GraphUtils.VertexDegree.class,
                 CompactBuffer.class, CompactBuffer[].class, ManifestFactory.class,
+                ManifestFactory.Any().runtimeClass(), ManifestFactory.AnyRef().runtimeClass(),
                 Tuple2.class, int[].class);
 
         KTrussSpark kTruss = new KTrussSpark(conf);
