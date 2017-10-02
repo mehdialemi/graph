@@ -11,6 +11,7 @@ import java.util.TimerTask;
  */
 public class Monitor extends TimerTask {
 
+
     public static final long LOG_DURATION = 5000;
     private JavaSparkContext sc;
 

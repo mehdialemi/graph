@@ -46,12 +46,16 @@ public class KCore {
     }
 
     protected JavaPairRDD<Integer, int[]> createNeighborList(JavaPairRDD<Integer, Integer> edges) {
-        return edges.groupByKey(partitioner).mapToPair(t -> {
+        JavaPairRDD<Integer, int[]> cache = edges.groupByKey(partitioner).mapToPair(t -> {
             IntSet set = new IntOpenHashSet();
             for (Integer v : t._2) {
                 set.add(v.intValue());
             }
             return new Tuple2<>(t._1, set.toIntArray());
         }).cache();
+
+        Monitor.logMemory("CREATE_NEIGHBORS", sc);
+
+        return cache;
     }
 }
