@@ -27,7 +27,7 @@ public class Monitor extends TimerTask {
         logMemory("TIMER",sc);
     }
 
-    public static void logMemory(String header, JavaSparkContext sc) {
+    private static void logMemory(String header, JavaSparkContext sc) {
         for (int jobIds : sc.statusTracker().getActiveJobIds()) {
 
         }
