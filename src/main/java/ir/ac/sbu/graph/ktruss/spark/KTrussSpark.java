@@ -119,7 +119,6 @@ public class KTrussSpark extends KTruss {
             // Detect invalid edges by comparing the size of triangle vertex set
             JavaPairRDD<Tuple2<Integer, Integer>, int[]> invalids = tvSets.filter(kv -> kv._2[0] < minSup).cache();
             long invalidCount = invalids.count();
-            Monitor.logMemory("INVAID[" + iteration +"]", sc);
 
             // If no invalid edge is found then the program terminates
             if (invalidCount == 0) {
@@ -128,6 +127,7 @@ public class KTrussSpark extends KTruss {
             long t2 = System.currentTimeMillis();
             String msg = "iteration: " + iteration + ", invalid edge count: " + invalidCount;
             log(msg, t2 - t1);
+            Monitor.logMemory("ITERATION[" + iteration +"]", sc);
 
             // The edges in the key part of invalids key-values should be removed. So, we detect other
             // edges of their involved triangle from their triangle vertex set. Here, we determine the
@@ -194,7 +194,6 @@ public class KTrussSpark extends KTruss {
                     return set;
                 }).filter(kv -> kv._2 != null)
                 .persist(StorageLevel.MEMORY_AND_DISK());
-            Monitor.logMemory("TVSET["+ iteration + "]", sc);
         }
         return tvSets;
     }
