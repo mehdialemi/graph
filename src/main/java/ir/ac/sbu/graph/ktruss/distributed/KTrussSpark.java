@@ -39,7 +39,7 @@ public class KTrussSpark {
         if (args.length == 0)
             conf.setMaster("local[2]");
         GraphUtils.setAppName(conf, "KTruss-EdgeVertexList-" + k + "-MultiSteps", partition, inputPath);
-        conf.registerKryoClasses(new Class[]{GraphUtils.VertexDegree.class, long[].class, List.class});
+        conf.registerKryoClasses(new Class[]{GraphUtils.VertexDegreeInt.class, long[].class, List.class});
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
         JavaSparkContext sc = new JavaSparkContext(conf);
 
