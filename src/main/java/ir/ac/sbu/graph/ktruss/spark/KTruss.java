@@ -2,10 +2,8 @@ package ir.ac.sbu.graph.ktruss.spark;
 
 import ir.ac.sbu.graph.clusteringco.FonlDegTC;
 import ir.ac.sbu.graph.clusteringco.FonlUtils;
-import ir.ac.sbu.graph.monitor.Monitor;
 import ir.ac.sbu.graph.utils.GraphLoader;
 import ir.ac.sbu.graph.utils.Log;
-
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.HashPartitioner;
@@ -51,7 +49,7 @@ public class KTruss {
         JavaRDD<String> input = sc.textFile(conf.inputPath);
         JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
         JavaPairRDD<Integer, Integer> cache = edges.repartition(conf.partitionNum).cache();
-        Monitor.logMemory("LOAD_EDGES", sc);
+//        Monitor.logMemory("LOAD_EDGES", sc);
         return cache;
     }
 
@@ -115,9 +113,9 @@ public class KTruss {
 
     protected JavaPairRDD<Integer, int[]> createCandidates(JavaPairRDD<Integer, Integer> edges) {
         fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, partitioner, partitioner2);
-        Monitor.logMemory("FONL", sc);
+//        Monitor.logMemory("FONL", sc);
         JavaPairRDD<Integer, int[]> candidates = FonlDegTC.generateCandidatesInteger(fonl).partitionBy(partitioner2).persist(StorageLevel.MEMORY_AND_DISK());
-        Monitor.logMemory("CANDIDATES", sc);
+//        Monitor.logMemory("CANDIDATES", sc);
         return candidates;
     }
 }

@@ -41,7 +41,7 @@ public class KCore {
         JavaRDD<String> input = sc.textFile(conf.inputPath);
         JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
         JavaPairRDD<Integer, Integer> cache = edges.repartition(conf.partitionNum).cache();
-        Monitor.logMemory("LOAD_EDGES", sc);
+//        Monitor.logMemory("LOAD_EDGES", sc);
         return cache;
     }
 
@@ -54,7 +54,7 @@ public class KCore {
             return new Tuple2<>(t._1, set.toIntArray());
         }).cache();
 
-        Monitor.logMemory("CREATE_NEIGHBORS", sc);
+//        Monitor.logMemory("CREATE_NEIGHBORS", sc);
 
         return cache;
     }
