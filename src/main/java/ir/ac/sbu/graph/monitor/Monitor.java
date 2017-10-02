@@ -28,7 +28,10 @@ public class Monitor extends TimerTask {
     }
 
     public static void logMemory(String header, JavaSparkContext sc) {
-        long bytes = sc.env().memoryManager().storageMemoryUsed();
+        for (int jobIds : sc.statusTracker().getActiveJobIds()) {
+
+        }
+        long bytes = sc.env().blockManager().memoryStore().currentUnrollMemory();
         Log.logWithTS(header + " STORAGE_MEMORY", FileUtils.byteCountToDisplaySize(bytes));
     }
 }

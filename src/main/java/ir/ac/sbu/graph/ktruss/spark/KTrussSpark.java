@@ -11,6 +11,7 @@ import org.apache.spark.api.java.Optional;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.util.collection.CompactBuffer;
 import scala.Tuple2;
+import scala.reflect.ManifestFactory;
 
 import java.util.*;
 
@@ -202,7 +203,8 @@ public class KTrussSpark extends KTruss {
     public static void main(String[] args) {
         KTrussConf conf = new KTrussConf(args, KTrussSpark.class.getSimpleName(),
                 GraphUtils.VertexDegreeInt.class,  GraphUtils.VertexDegree.class,
-                CompactBuffer.class, CompactBuffer[].class, Tuple2.class, int[].class);
+                CompactBuffer.class, CompactBuffer[].class, ManifestFactory.class,
+                Tuple2.class, int[].class);
 
         KTrussSpark kTruss = new KTrussSpark(conf);
         Timer timer = new Timer(true);
