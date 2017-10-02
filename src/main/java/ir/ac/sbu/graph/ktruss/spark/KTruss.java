@@ -115,6 +115,9 @@ public class KTruss {
 
     protected JavaPairRDD<Integer, int[]> createCandidates(JavaPairRDD<Integer, Integer> edges) {
         fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, partitioner, partitioner2);
-        return FonlDegTC.generateCandidatesInteger(fonl).partitionBy(partitioner2).persist(StorageLevel.MEMORY_AND_DISK());
+        Monitor.logMemory("FONL", sc);
+        JavaPairRDD<Integer, int[]> candidates = FonlDegTC.generateCandidatesInteger(fonl).partitionBy(partitioner2).persist(StorageLevel.MEMORY_AND_DISK());
+        Monitor.logMemory("CANDIDATES", sc);
+        return candidates;
     }
 }
