@@ -2,7 +2,7 @@ package ir.ac.sbu.graph.kcore;
 
 import static ir.ac.sbu.graph.utils.Log.log;
 
-import ir.ac.sbu.graph.monitor.MonitorTimerTask;
+import ir.ac.sbu.graph.monitor.Monitor;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.Partitioner;
@@ -74,8 +74,8 @@ public class KCoreNeighborList extends KCore {
         KCoreNeighborList kCore = new KCoreNeighborList(kCoreConf);
 
         Timer timer = new Timer(true);
-        timer.schedule(new MonitorTimerTask(kCore.getSc()),
-                MonitorTimerTask.LOG_DURATION, MonitorTimerTask.LOG_DURATION);
+        timer.schedule(new Monitor(kCore.getSc()),
+                Monitor.LOG_DURATION, Monitor.LOG_DURATION);
 
         long tload = System.currentTimeMillis();
         JavaPairRDD<Integer, Integer> edges = kCore.loadEdges();

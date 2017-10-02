@@ -9,12 +9,12 @@ import java.util.TimerTask;
 /**
  * TimerTask to log monitor
  */
-public class MonitorTimerTask extends TimerTask {
+public class Monitor extends TimerTask {
 
     public static final long LOG_DURATION = 5000;
     private JavaSparkContext sc;
 
-    public MonitorTimerTask(JavaSparkContext sc) {
+    public Monitor(JavaSparkContext sc) {
         this.sc = sc;
     }
 
@@ -23,9 +23,13 @@ public class MonitorTimerTask extends TimerTask {
         if (sc.env().isStopped())
             return;
 
+        logMemory("TIMER",sc);
+    }
+
+    public static void logMemory(String header, JavaSparkContext sc) {
         long executionMemoryUsed = sc.env().memoryManager().executionMemoryUsed();
-        Log.logWithTS("EXECUTION MEMORY", "" + SizeUtils.humanReadable(executionMemoryUsed));
+        Log.logWithTS(header + " EXECUTION_MEMORY", "" + SizeUtils.humanReadable(executionMemoryUsed));
         long storageMemoryUsed = sc.env().memoryManager().storageMemoryUsed();
-        Log.logWithTS("STORAGE MEMORY", "" + SizeUtils.humanReadable(storageMemoryUsed));
+        Log.logWithTS(header + " STORAGE_MEMORY", "" + SizeUtils.humanReadable(storageMemoryUsed));
     }
 }

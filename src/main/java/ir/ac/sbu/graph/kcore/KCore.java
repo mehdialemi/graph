@@ -1,10 +1,12 @@
 package ir.ac.sbu.graph.kcore;
 
+import ir.ac.sbu.graph.monitor.Monitor;
 import ir.ac.sbu.graph.utils.GraphLoader;
 import ir.ac.sbu.graph.utils.Log;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.HashPartitioner;
+import org.apache.spark.JobExecutionStatus;
 import org.apache.spark.Partitioner;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -38,7 +40,9 @@ public class KCore {
     public JavaPairRDD<Integer, Integer> loadEdges() {
         JavaRDD<String> input = sc.textFile(conf.inputPath);
         JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
-        return edges.repartition(conf.partitionNum).cache();
+        JavaPairRDD<Integer, Integer> cache = edges.repartition(conf.partitionNum).cache();
+        Monitor.logMemory("LOAD_EDGES", sc);
+        return cache;
     }
 
     protected JavaPairRDD<Integer, int[]> createNeighborList(JavaPairRDD<Integer, Integer> edges) {

@@ -1,6 +1,6 @@
 package ir.ac.sbu.graph.ktruss.spark;
 
-import ir.ac.sbu.graph.monitor.MonitorTimerTask;
+import ir.ac.sbu.graph.monitor.Monitor;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -197,8 +197,8 @@ public class KTrussSpark extends KTruss {
 
         KTrussSpark kTruss = new KTrussSpark(conf);
         Timer timer = new Timer(true);
-        timer.schedule(new MonitorTimerTask(kTruss.getSc()),
-                MonitorTimerTask.LOG_DURATION, MonitorTimerTask.LOG_DURATION);
+        timer.schedule(new Monitor(kTruss.getSc()),
+                Monitor.LOG_DURATION, Monitor.LOG_DURATION);
 
         JavaPairRDD<Integer, Integer> edges = kTruss.loadEdges();
 
