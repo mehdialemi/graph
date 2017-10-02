@@ -201,7 +201,8 @@ public class KTrussSpark extends KTruss {
 
     public static void main(String[] args) {
         KTrussConf conf = new KTrussConf(args, KTrussSpark.class.getSimpleName(),
-                GraphUtils.VertexDegreeInt.class,  GraphUtils.VertexDegree.class, int[].class);
+                GraphUtils.VertexDegreeInt.class,  GraphUtils.VertexDegree.class,
+                Tuple2.class, int[].class);
 
         KTrussSpark kTruss = new KTrussSpark(conf);
         Timer timer = new Timer(true);
