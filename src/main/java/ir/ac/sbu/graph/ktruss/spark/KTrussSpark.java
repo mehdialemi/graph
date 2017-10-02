@@ -196,8 +196,6 @@ public class KTrussSpark extends KTruss {
     }
 
     public static void main(String[] args) {
-        Logger.getLogger("org.apache.spar").setLevel(Level.INFO);
-
         KTrussConf conf = new KTrussConf(args, KTrussSpark.class.getSimpleName(),
                 GraphUtils.VertexDegreeInt.class, int[].class);
 
