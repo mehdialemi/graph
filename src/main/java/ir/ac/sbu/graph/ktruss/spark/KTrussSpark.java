@@ -203,7 +203,9 @@ public class KTrussSpark extends KTruss {
         KTrussConf conf = new KTrussConf(args, KTrussSpark.class.getSimpleName(),
                 GraphUtils.VertexDegreeInt.class,  GraphUtils.VertexDegree.class,
                 CompactBuffer.class, CompactBuffer[].class, ManifestFactory.class,
-                ManifestFactory.Any().runtimeClass(), ManifestFactory.AnyRef().runtimeClass(),
+                ManifestFactory.Any().getClass(), ManifestFactory.AnyRef().getClass(),
+                ManifestFactory.AnyVal().getClass(), ManifestFactory.Any().runtimeClass(),
+                ManifestFactory.AnyRef().runtimeClass(), ManifestFactory.AnyVal().runtimeClass(),
                 Tuple2.class, int[].class);
 
         KTrussSpark kTruss = new KTrussSpark(conf);

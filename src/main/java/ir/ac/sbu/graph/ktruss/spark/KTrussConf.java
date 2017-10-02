@@ -2,6 +2,7 @@ package ir.ac.sbu.graph.ktruss.spark;
 
 import ir.ac.sbu.graph.utils.Log;
 import org.apache.spark.SparkConf;
+import org.apache.spark.serializer.KryoSerializer;
 
 import java.io.File;
 
@@ -27,12 +28,14 @@ public class KTrussConf {
             k = Integer.parseInt(args[2]);
 
         sparkConf = new SparkConf();
-        if (args.length == 0)
+        if (args.length == 0) {
             sparkConf.setMaster("local[2]");
+        }
         sparkConf.setAppName(name + "-" + partitionNum + "-" + new File(inputPath).getName());
         sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
         sparkConf.set("spark.kryo.registrationRequired","true");
         sparkConf.registerKryoClasses(classes);
+
         Log.log("Input: " + inputPath + ", partitionNum: " + partitionNum + ", k: " + k);
     }
 }
