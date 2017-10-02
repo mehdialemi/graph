@@ -1,8 +1,11 @@
 package ir.ac.sbu.graph.ktruss.spark;
 
 import ir.ac.sbu.graph.monitor.Monitor;
+import ir.ac.sbu.graph.utils.GraphUtils;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.Optional;
 import org.apache.spark.storage.StorageLevel;
@@ -193,7 +196,10 @@ public class KTrussSpark extends KTruss {
     }
 
     public static void main(String[] args) {
-        KTrussConf conf = new KTrussConf(args, KTrussSpark.class.getSimpleName(), int[].class);
+        Logger.getLogger("org.apache.spar").setLevel(Level.INFO);
+
+        KTrussConf conf = new KTrussConf(args, KTrussSpark.class.getSimpleName(),
+                GraphUtils.VertexDegreeInt.class, int[].class);
 
         KTrussSpark kTruss = new KTrussSpark(conf);
         Timer timer = new Timer(true);

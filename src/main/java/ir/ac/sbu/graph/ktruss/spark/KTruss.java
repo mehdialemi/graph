@@ -2,6 +2,7 @@ package ir.ac.sbu.graph.ktruss.spark;
 
 import ir.ac.sbu.graph.clusteringco.FonlDegTC;
 import ir.ac.sbu.graph.clusteringco.FonlUtils;
+import ir.ac.sbu.graph.monitor.Monitor;
 import ir.ac.sbu.graph.utils.GraphLoader;
 import ir.ac.sbu.graph.utils.Log;
 
@@ -47,8 +48,11 @@ public class KTruss {
     }
 
     public JavaPairRDD<Integer, Integer> loadEdges() {
-        JavaRDD<String> input = sc.textFile(conf.inputPath, conf.partitionNum);
-        return GraphLoader.loadEdgesInt(input);
+        JavaRDD<String> input = sc.textFile(conf.inputPath);
+        JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
+        JavaPairRDD<Integer, Integer> cache = edges.repartition(conf.partitionNum).cache();
+        Monitor.logMemory("LOAD_EDGES", sc);
+        return cache;
     }
 
     protected JavaPairRDD<Tuple2<Integer, Integer>, IntSet> createTriangleVertexSet(JavaPairRDD<Integer, Integer> edges) {

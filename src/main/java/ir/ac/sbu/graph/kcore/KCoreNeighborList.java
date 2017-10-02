@@ -1,22 +1,20 @@
 package ir.ac.sbu.graph.kcore;
 
-import static ir.ac.sbu.graph.utils.Log.log;
-
 import ir.ac.sbu.graph.monitor.Monitor;
-import ir.ac.sbu.graph.utils.Log;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.Partitioner;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
+
+import static ir.ac.sbu.graph.utils.Log.log;
 
 
 public class KCoreNeighborList extends KCore {
@@ -75,10 +73,6 @@ public class KCoreNeighborList extends KCore {
 
     public static void main(String[] args) {
         Logger.getLogger("org.apache.spar").setLevel(Level.INFO);
-        Logger.getLogger("AbstractLifeCycle").setLevel(Level.INFO);
-        Logger.getLogger("Slf4JLogger").setLevel(Level.INFO);
-        Logger.getLogger("NativeCodeLoader").setLevel(Level.INFO);
-        Logger.getLogger("ServletHandler").setLevel(Level.INFO);
 
         KCoreConf kCoreConf = new KCoreConf(args, KCoreNeighborList.class.getSimpleName(), int[].class);
         KCoreNeighborList kCore = new KCoreNeighborList(kCoreConf);
@@ -99,6 +93,4 @@ public class KCoreNeighborList extends KCore {
         kCore.close();
         timer.cancel();
     }
-
-
 }
