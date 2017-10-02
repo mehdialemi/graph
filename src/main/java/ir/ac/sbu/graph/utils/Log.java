@@ -18,7 +18,7 @@ public class Log {
     }
 
     public static void logWithTS(String header, String msg) {
-        log( header + ", " + new Date() + ": " + msg);
+        log( header + " (" + new Date() + ") " + msg);
     }
 
     public static void log(String msg) {

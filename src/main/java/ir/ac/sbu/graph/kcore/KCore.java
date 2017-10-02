@@ -36,7 +36,7 @@ public class KCore {
     }
 
     public JavaPairRDD<Integer, Integer> loadEdges() {
-        JavaRDD<String> input = sc.textFile(conf.inputPath, conf.partitionNum);
+        JavaRDD<String> input = sc.textFile(conf.inputPath);
         JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
         return edges.repartition(conf.partitionNum).cache();
     }

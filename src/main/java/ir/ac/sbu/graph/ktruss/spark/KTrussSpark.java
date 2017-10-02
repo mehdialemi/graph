@@ -197,7 +197,8 @@ public class KTrussSpark extends KTruss {
 
         KTrussSpark kTruss = new KTrussSpark(conf);
         Timer timer = new Timer(true);
-        timer.schedule(new MonitorTimerTask(kTruss.getSc()), MonitorTimerTask.LOG_DURATION);
+        timer.schedule(new MonitorTimerTask(kTruss.getSc()),
+                MonitorTimerTask.LOG_DURATION, MonitorTimerTask.LOG_DURATION);
 
         JavaPairRDD<Integer, Integer> edges = kTruss.loadEdges();
 
@@ -209,5 +210,4 @@ public class KTrussSpark extends KTruss {
         timer.cancel();
         log("KTruss Edge Count: " + edgeCount, duration);
     }
-
 }

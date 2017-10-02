@@ -1,6 +1,7 @@
 package ir.ac.sbu.graph.monitor;
 
 import ir.ac.sbu.graph.utils.Log;
+import ir.ac.sbu.graph.utils.SizeUtils;
 import org.apache.spark.api.java.JavaSparkContext;
 
 import java.util.TimerTask;
@@ -22,7 +23,9 @@ public class MonitorTimerTask extends TimerTask {
         if (sc.env().isStopped())
             return;
 
-        Log.logWithTS("EXECUTION MEMORY", "" + sc.env().memoryManager().executionMemoryUsed());
-        Log.logWithTS("STORAGE MEMORY", "" + sc.env().memoryManager().storageMemoryUsed());
+        long executionMemoryUsed = sc.env().memoryManager().executionMemoryUsed();
+        Log.logWithTS("EXECUTION MEMORY", "" + SizeUtils.humanReadable(executionMemoryUsed));
+        long storageMemoryUsed = sc.env().memoryManager().storageMemoryUsed();
+        Log.logWithTS("STORAGE MEMORY", "" + SizeUtils.humanReadable(storageMemoryUsed));
     }
 }

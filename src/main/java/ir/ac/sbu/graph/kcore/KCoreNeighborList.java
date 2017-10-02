@@ -74,7 +74,8 @@ public class KCoreNeighborList extends KCore {
         KCoreNeighborList kCore = new KCoreNeighborList(kCoreConf);
 
         Timer timer = new Timer(true);
-        timer.schedule(new MonitorTimerTask(kCore.getSc()), MonitorTimerTask.LOG_DURATION);
+        timer.schedule(new MonitorTimerTask(kCore.getSc()),
+                MonitorTimerTask.LOG_DURATION, MonitorTimerTask.LOG_DURATION);
 
         long tload = System.currentTimeMillis();
         JavaPairRDD<Integer, Integer> edges = kCore.loadEdges();
