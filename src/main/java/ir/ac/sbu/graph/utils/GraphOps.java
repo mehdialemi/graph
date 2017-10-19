@@ -4,11 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import ir.ac.sbu.graph.ktruss.old.FdValue;
-import ir.ac.sbu.graph.ktruss.old.Fdonl.VertexDegree;
-import ir.ac.sbu.graph.ktruss.old.Triangle;
-import ir.ac.sbu.graph.ktruss.old.TriangleListGenerator.CandidateState;
-
+import ir.ac.sbu.graph.clusteringco.Triangle;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -35,7 +31,7 @@ public class GraphOps {
      * @param conf serializer configuration will be added to this configuration
      */
     private static void registerSerilizer(SparkConf conf) {
-        conf.registerKryoClasses(new Class[] { FdValue.class, VertexDegree.class, Triangle.class, CandidateState.class, long[].class });
+        conf.registerKryoClasses(new Class[] { GraphUtils.VertexDegree.class, Triangle.class, GraphUtils.CandidateState.class, long[].class });
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
     }
 
