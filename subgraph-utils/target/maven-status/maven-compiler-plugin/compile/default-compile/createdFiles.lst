@@ -1,8 +1,0 @@
-ir/ac/sbu/biggraph/utils/GraphUtils$CandidateState.class
-ir/ac/sbu/biggraph/utils/GraphUtils$VertexDegree.class
-ir/ac/sbu/biggraph/utils/Log.class
-ir/ac/sbu/biggraph/utils/Edge.class
-ir/ac/sbu/biggraph/utils/GraphLoader.class
-ir/ac/sbu/biggraph/utils/GraphUtils.class
-ir/ac/sbu/biggraph/utils/GraphUtils$VertexDegreeInteger.class
-ir/ac/sbu/biggraph/utils/GraphUtils$VertexDegreeInt.class
