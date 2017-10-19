@@ -37,7 +37,7 @@ public class KTrussConf {
 
 
         sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-        sparkConf.set("spark.kryo.registrationRequired","true");
+//        sparkConf.set("spark.kryo.registrationRequired","true");
         sparkConf.registerKryoClasses(classes);
 
         Log.log("Input: " + inputPath + ", partitionNum: " + partitionNum + ", k: " + k);
