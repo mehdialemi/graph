@@ -1,6 +1,7 @@
 package ir.ac.sbu.graph.ktruss.spark;
 
 import ir.ac.sbu.graph.utils.GraphUtils;
+import ir.ac.sbu.graph.utils.IntGraphUtils;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.storage.StorageLevel;
@@ -53,7 +54,7 @@ public class Cohen extends KTruss {
                     }
 
                     return output.iterator();
-                }).groupByKey(partitioner2).mapToPair(kv -> {
+                }).groupByKey(biggerPartitioner).mapToPair(kv -> {
 
                     Tuple2<Integer, Integer> edge = kv._1;
                     Iterable<Tuple2<Integer, Integer>> degs = kv._2;
@@ -125,7 +126,7 @@ public class Cohen extends KTruss {
                     }
 
                     return output.iterator();
-                }).partitionBy(partitioner2).persist(StorageLevel.MEMORY_AND_DISK());
+                }).partitionBy(biggerPartitioner).persist(StorageLevel.MEMORY_AND_DISK());
 
             // 3: Join open triads with edges to find triangles
             JavaRDD<Tuple2<Integer, Integer>[]> triangles = openTriads.join(edgeDegs).map(value -> {
@@ -181,7 +182,9 @@ public class Cohen extends KTruss {
         Cohen cohen = new Cohen(conf);
 
         long tload = System.currentTimeMillis();
-        JavaPairRDD<Integer, Integer> edges = cohen.loadEdges();
+
+        JavaPairRDD<Integer, Integer> edges = IntGraphUtils.loadEdges(cohen.sc, conf.inputPath, conf.partitionNum);
+
         JavaRDD<Tuple2<Integer, Integer>> edgeList = edges.groupByKey(conf.partitionNum).flatMap(t -> {
             HashSet<Integer> neighborSet = new HashSet<>();
             for (int neighbor : t._2) {

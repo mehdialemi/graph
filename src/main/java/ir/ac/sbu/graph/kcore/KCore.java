@@ -37,25 +37,4 @@ public class KCore {
         sc.close();
     }
 
-    public JavaPairRDD<Integer, Integer> loadEdges() {
-        JavaRDD<String> input = sc.textFile(conf.inputPath);
-        JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
-        JavaPairRDD<Integer, Integer> cache = edges.repartition(conf.partitionNum).cache();
-//        Monitor.logMemory("LOAD_EDGES", sc);
-        return cache;
-    }
-
-    protected JavaPairRDD<Integer, int[]> createNeighborList(JavaPairRDD<Integer, Integer> edges) {
-        JavaPairRDD<Integer, int[]> cache = edges.groupByKey(partitioner).mapToPair(t -> {
-            IntSet set = new IntOpenHashSet();
-            for (Integer v : t._2) {
-                set.add(v.intValue());
-            }
-            return new Tuple2<>(t._1, set.toIntArray());
-        }).cache();
-
-//        Monitor.logMemory("CREATE_NEIGHBORS", sc);
-
-        return cache;
-    }
 }

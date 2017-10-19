@@ -105,7 +105,7 @@ public class KTrussInvalidUpdates extends KTruss {
                 }
 
                 return value;
-            }).partitionBy(partitioner2).cache();  // Partition by the same partitioner used in tvSets
+            }).partitionBy(partitioner2).cache();  // Partition by the same mediumPartitioner used in tvSets
 
             // Find invalid edges using all invalid update information and the original triangle vertex sets.
             invalids = tvSets.join(tvInvSets).flatMapToPair(t -> {

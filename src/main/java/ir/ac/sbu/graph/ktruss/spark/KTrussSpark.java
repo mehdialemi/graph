@@ -1,8 +1,10 @@
 package ir.ac.sbu.graph.ktruss.spark;
 
 import ir.ac.sbu.graph.utils.GraphUtils;
+import ir.ac.sbu.graph.utils.IntGraphUtils;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import org.apache.spark.HashPartitioner;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.Optional;
 import org.apache.spark.storage.StorageLevel;
@@ -20,20 +22,20 @@ public class KTrussSpark extends KTruss {
     public static final int META_LEN = 4;
     public static final int INVALID = -1;
 
-
     public KTrussSpark(KTrussConf conf) {
         super(conf);
     }
 
-    public JavaPairRDD<Tuple2<Integer, Integer>, int[]> start(JavaPairRDD<Integer, Integer> edges) {
+    public JavaPairRDD<Tuple2<Integer, Integer>, int[]> start(JavaPairRDD<Integer, int[]> neighborList) {
 
-        JavaPairRDD<Integer, int[]> candidates = createCandidates(edges);
+        JavaPairRDD<Integer, int[]> candidates = createCandidates(neighborList);
 
         // Generate kv such that key is an edge and value is its triangle vertices.
         JavaPairRDD<Tuple2<Integer, Integer>, int[]> tvSets = candidates.cogroup(fonl).flatMapToPair(t -> {
             int[] fVal = t._2._2.iterator().next();
             Arrays.sort(fVal, 1, fVal.length);
             int v = t._1;
+
             List<Tuple2<Tuple2<Integer, Integer>, Tuple2<Integer, Byte>>> output = new ArrayList<>();
             for (int[] cVal : t._2._1) {
                 int u = cVal[0];
@@ -64,7 +66,7 @@ public class KTrussSpark extends KTruss {
             }
 
             return output.iterator();
-        }).groupByKey(partitioner2)
+        }).groupByKey(biggerPartitioner)
             .mapValues(values -> {
                 List<Tuple2<Integer, Byte>> list = new ArrayList<>();
                 int sw = 0, sv = 0, su = 0;
@@ -100,6 +102,9 @@ public class KTrussSpark extends KTruss {
             }).persist(StorageLevel.MEMORY_AND_DISK()); // Use disk too if graph is very large
 
 
+        candidates.unpersist();
+        fonl.unpersist();
+
         final int minSup = conf.k - 2;
 
         int iteration = 0;
@@ -109,7 +114,6 @@ public class KTrussSpark extends KTruss {
         prevTvSets.add(tvSets);
 
         while (!stop) {
-//            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevTvSets = tvSets;
             iteration++;
             long t1 = System.currentTimeMillis();
 
@@ -119,12 +123,7 @@ public class KTrussSpark extends KTruss {
 
             if (prevTvSets.size() > 1)
                 prevTvSets.remove().unpersist();
-
-            if (iteration == 1) {
-                candidates.unpersist();
-                fonl.unpersist();
-            }
-
+            
             // If no invalid edge is found then the program terminates
             if (invalidCount == 0) {
                 break;
@@ -133,7 +132,6 @@ public class KTrussSpark extends KTruss {
             long t2 = System.currentTimeMillis();
             String msg = "iteration: " + iteration + ", invalid edge count: " + invalidCount;
             log(msg, t2 - t1);
-//            Monitor.logMemory("ITERATION[" + iteration +"]", sc);
 
             // The edges in the key part of invalids key-values should be removed. So, we detect other
             // edges of their involved triangle from their triangle vertex set. Here, we determine the
@@ -165,7 +163,7 @@ public class KTrussSpark extends KTruss {
                 }
 
                 return out.iterator();
-            }).groupByKey(partitioner2);
+            }).groupByKey(biggerPartitioner);
 
             // Remove the invalid vertices from the triangle vertex set of each remaining (valid) edge.
             tvSets = tvSets.filter(kv -> kv._2[0] >= minSup).leftOuterJoin(invUpdates)
@@ -207,15 +205,18 @@ public class KTrussSpark extends KTruss {
     }
 
     public static void main(String[] args) {
-        KTrussConf conf = new KTrussConf(args, KTrussSpark.class.getSimpleName(),
-                GraphUtils.VertexDegreeInt.class);
+        KTrussConf conf = new KTrussConf(args, KTrussSpark.class.getSimpleName());
 
         KTrussSpark kTruss = new KTrussSpark(conf);
 
-        JavaPairRDD<Integer, Integer> edges = kTruss.loadEdges();
+        JavaPairRDD<Integer, Integer> edges = IntGraphUtils.loadEdges(kTruss.sc,
+                conf.inputPath, conf.partitionNum);
+
+        JavaPairRDD<Integer, int[]> neighborList = IntGraphUtils.createNeighborList(
+                new HashPartitioner(conf.partitionNum), edges);
 
         long start = System.currentTimeMillis();
-        JavaPairRDD<Tuple2<Integer, Integer>, int[]> tVertices = kTruss.start(edges);
+        JavaPairRDD<Tuple2<Integer, Integer>, int[]> tVertices = kTruss.start(neighborList);
         long edgeCount = tVertices.count();
         long duration = System.currentTimeMillis() - start;
         kTruss.close();

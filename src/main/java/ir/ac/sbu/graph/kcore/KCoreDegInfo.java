@@ -2,6 +2,7 @@ package ir.ac.sbu.graph.kcore;
 
 import static ir.ac.sbu.graph.utils.Log.log;
 
+import ir.ac.sbu.graph.utils.IntGraphUtils;
 import ir.ac.sbu.graph.utils.Log;
 import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
@@ -20,7 +21,9 @@ public class KCoreDegInfo extends KCore {
 
     public JavaPairRDD<Integer, Integer> start(JavaPairRDD<Integer, Integer> edges) {
         long tNeighborList = System.currentTimeMillis();
-        JavaPairRDD<Integer, int[]> neighborList = createNeighborList(edges);
+
+        JavaPairRDD<Integer, int[]> neighborList = IntGraphUtils.createNeighborList(partitioner, edges);
+
         log("Neighbor list created", tNeighborList, System.currentTimeMillis());
 
         JavaPairRDD<Integer, Integer> degInfo = neighborList.mapValues(v -> v.length);
@@ -28,7 +31,7 @@ public class KCoreDegInfo extends KCore {
         final int k = conf.k;
         while (true) {
             t1 = System.currentTimeMillis();
-            // Get invalid vertices and partition by the partitioner used to partition neighbors
+            // Get invalid vertices and partition by the mediumPartitioner used to partition neighbors
             JavaPairRDD<Integer, Integer> invalids = degInfo.filter(v -> v._2 < k)
                 .cache();
 
@@ -79,7 +82,10 @@ public class KCoreDegInfo extends KCore {
         KCoreDegInfo kCore = new KCoreDegInfo(kCoreConf);
 
         long tload = System.currentTimeMillis();
-        JavaPairRDD<Integer, Integer> edges = kCore.loadEdges();
+
+        JavaPairRDD<Integer, Integer> edges = IntGraphUtils.loadEdges(kCore.sc, kCoreConf.inputPath,
+                kCoreConf.partitionNum);
+
         log("Edges are loaded", tload, System.currentTimeMillis());
 
         long tStart = System.currentTimeMillis();

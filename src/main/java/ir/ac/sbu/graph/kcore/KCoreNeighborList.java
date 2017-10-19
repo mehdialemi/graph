@@ -1,5 +1,6 @@
 package ir.ac.sbu.graph.kcore;
 
+import ir.ac.sbu.graph.utils.IntGraphUtils;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.log4j.Level;
@@ -24,7 +25,9 @@ public class KCoreNeighborList extends KCore {
 
     public JavaPairRDD<Integer, int[]> start(JavaPairRDD<Integer, Integer> edges) {
         long tNeighborList = System.currentTimeMillis();
-        JavaPairRDD<Integer, int[]> neighborList = createNeighborList(edges);
+
+        JavaPairRDD<Integer, int[]> neighborList = IntGraphUtils.createNeighborList(this.partitioner, edges);
+
         log("Neighbor list created", tNeighborList, System.currentTimeMillis());
 
         long t1, t2;
@@ -76,7 +79,9 @@ public class KCoreNeighborList extends KCore {
         KCoreNeighborList kCore = new KCoreNeighborList(kCoreConf);
 
         long tload = System.currentTimeMillis();
-        JavaPairRDD<Integer, Integer> edges = kCore.loadEdges();
+        JavaPairRDD<Integer, Integer> edges = IntGraphUtils.loadEdges(kCore.getSc(),
+                kCoreConf.inputPath, kCoreConf.partitionNum);
+
         log("Edges are loaded", tload, System.currentTimeMillis());
 
         long t1 = System.currentTimeMillis();
