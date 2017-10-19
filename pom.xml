@@ -6,7 +6,14 @@
 
     <groupId>ir.ac.sbu</groupId>
     <artifactId>subgraph-mining</artifactId>
+    <packaging>pom</packaging>
     <version>1.0</version>
+    <modules>
+        <module>graphulotest</module>
+        <module>subgraph-search</module>
+        <module>subgraph-core</module>
+        <module>subgraph-utils</module>
+    </modules>
 
     <repositories>
         <repository>

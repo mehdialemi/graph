@@ -8,9 +8,7 @@ import org.apache.spark.api.java.Optional;
 import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static ir.ac.sbu.graph.utils.Log.log;
 
@@ -110,6 +108,9 @@ public class KTrussSpark extends KTruss {
         int iteration = 0;
         boolean stop = false;
 
+        Queue<JavaPairRDD<Tuple2<Integer, Integer>, int[]>> prevTvSets = new LinkedList<>();
+        prevTvSets.add(tvSets);
+
         while (!stop) {
 //            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevTvSets = tvSets;
             iteration++;
@@ -119,10 +120,19 @@ public class KTrussSpark extends KTruss {
             JavaPairRDD<Tuple2<Integer, Integer>, int[]> invalids = tvSets.filter(kv -> kv._2[0] < minSup).cache();
             long invalidCount = invalids.count();
 
+            if (prevTvSets.size() > 2)
+                prevTvSets.remove().unpersist();
+
+            if (iteration == 1) {
+                candidates.unpersist();
+                fonl.unpersist();
+            }
+
             // If no invalid edge is found then the program terminates
             if (invalidCount == 0) {
                 break;
             }
+
             long t2 = System.currentTimeMillis();
             String msg = "iteration: " + iteration + ", invalid edge count: " + invalidCount;
             log(msg, t2 - t1);
@@ -193,6 +203,8 @@ public class KTrussSpark extends KTruss {
                     return set;
                 }).filter(kv -> kv._2 != null)
                 .persist(StorageLevel.MEMORY_AND_DISK());
+
+            prevTvSets.add(tvSets);
         }
         return tvSets;
     }
