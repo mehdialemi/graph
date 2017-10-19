@@ -40,6 +40,6 @@ public class KTrussConf {
         sparkConf.registerKryoClasses(classes);
 
         Log.log("Input: " + inputPath + ", partitionNum: " + partitionNum + ", k: " + k);
-        Log.log("Spark conf: " + sparkConf.toString());
+        Log.log("Spark conf: " + sparkConf.toDebugString());
     }
 }
