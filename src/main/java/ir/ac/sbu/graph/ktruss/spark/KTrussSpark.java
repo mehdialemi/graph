@@ -99,18 +99,28 @@ public class KTrussSpark extends KTruss {
                 return set;
             }).persist(StorageLevel.MEMORY_AND_DISK()); // Use disk too if graph is very large
 
+
+        candidates.unpersist();
+
         final int minSup = conf.k - 2;
 
         int iteration = 0;
         boolean stop = false;
 
+        Queue<JavaPairRDD<Tuple2<Integer, Integer>, int[]>> prevTvSets = new LinkedList<>();
+        prevTvSets.add(tvSets);
+
         while (!stop) {
+//            JavaPairRDD<Tuple2<Integer, Integer>, IntSet> prevTvSets = tvSets;
             iteration++;
             long t1 = System.currentTimeMillis();
 
             // Detect invalid edges by comparing the size of triangle vertex set
             JavaPairRDD<Tuple2<Integer, Integer>, int[]> invalids = tvSets.filter(kv -> kv._2[0] < minSup).cache();
             long invalidCount = invalids.count();
+
+            if (prevTvSets.size() > 2)
+                prevTvSets.remove().unpersist();
 
             if (iteration == 1) {
                 candidates.unpersist();
@@ -125,6 +135,7 @@ public class KTrussSpark extends KTruss {
             long t2 = System.currentTimeMillis();
             String msg = "iteration: " + iteration + ", invalid edge count: " + invalidCount;
             log(msg, t2 - t1);
+//            Monitor.logMemory("ITERATION[" + iteration +"]", sc);
 
             // The edges in the key part of invalids key-values should be removed. So, we detect other
             // edges of their involved triangle from their triangle vertex set. Here, we determine the
@@ -191,6 +202,8 @@ public class KTrussSpark extends KTruss {
                     return set;
                 }).filter(kv -> kv._2 != null)
                 .persist(StorageLevel.MEMORY_AND_DISK());
+
+            prevTvSets.add(tvSets);
         }
         return tvSets;
     }
