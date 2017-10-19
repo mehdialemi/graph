@@ -6,9 +6,8 @@
 
     <groupId>ir.ac.sbu</groupId>
     <artifactId>subgraph-mining</artifactId>
-    <packaging>pom</packaging>
     <version>1.0</version>
-    
+
     <repositories>
         <repository>
             <id>scala-tools.org</id>
