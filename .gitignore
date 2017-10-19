@@ -8,4 +8,5 @@ logs/*
 /target
 hs_err*
 src/main/sbm.iml
-subgraph-mining.iml
+
+/subgraph-utils/target/
