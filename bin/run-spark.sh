@@ -5,7 +5,7 @@ config=(
     [jar]="$PWD/target/subgraph-mining-1.0-jar-with-dependencies.jar"
     [master]="alemi-1"
     [cores]="10"
-    [spark_home]="/home/$USER/spark-2.1"
+    [spark_home]="$SPARK_HOME"
     [inputs]="$PWD/bin/inputs"
 )
 
