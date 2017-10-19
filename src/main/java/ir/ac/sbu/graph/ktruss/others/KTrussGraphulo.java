@@ -77,6 +77,17 @@ public class KTrussGraphulo {
                 continue;
             }
             String[] edge = line.split("\\s+");
+            try {
+                Long.parseLong(edge[0]);
+            } catch (Exception e) {
+                edge = line.split(",");
+                try {
+                    Long.parseLong(edge[0]);
+                } catch (Exception e1) {
+                    Log.log("invalid input: " + line);
+                }
+            }
+
             key = new Key(edge[0], "", edge[1]);
             m = new Mutation(key.getRowData().toArray());
             m.put(key.getColumnFamilyData().toArray(), key.getColumnQualifierData().toArray(),
