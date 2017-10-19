@@ -119,7 +119,7 @@ public class KTrussSpark extends KTruss {
             JavaPairRDD<Tuple2<Integer, Integer>, int[]> invalids = tvSets.filter(kv -> kv._2[0] < minSup).cache();
             long invalidCount = invalids.count();
 
-            if (prevTvSets.size() > 2)
+            if (prevTvSets.size() > 1)
                 prevTvSets.remove().unpersist();
 
             if (iteration == 1) {
