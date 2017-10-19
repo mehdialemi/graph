@@ -248,7 +248,7 @@ public class FonlUtils implements Serializable {
                 higherDegs[i] = list.get(i - 1).vertex;
 
             return new Tuple2<>(v._1, higherDegs);
-        }).partitionBy(partitioner2).persist(StorageLevel.DISK_ONLY_2());
+        }).partitionBy(partitioner2).persist(StorageLevel.MEMORY_AND_DISK_2());
     }
 
     /**

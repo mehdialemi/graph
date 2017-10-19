@@ -212,16 +212,8 @@ public class KTrussSpark extends KTruss {
     public static void main(String[] args) {
         KTrussConf conf = new KTrussConf(args, KTrussSpark.class.getSimpleName(),
                 GraphUtils.VertexDegreeInt.class);
-//                GraphUtils.VertexDegreeInt.class,  GraphUtils.VertexDegree.class,
-//                CompactBuffer.class, CompactBuffer[].class, ManifestFactory.class,
-//                ManifestFactory.Any().getClass(), ManifestFactory.AnyRef().getClass(),
-//                ManifestFactory.AnyVal().getClass(), ManifestFactory.Any().runtimeClass(),
-//                ManifestFactory.AnyRef().runtimeClass(), ManifestFactory.AnyVal().runtimeClass(),
 
         KTrussSpark kTruss = new KTrussSpark(conf);
-//        Timer timer = new Timer(true);
-//        timer.schedule(new Monitor(kTruss.getSc()),
-//                Monitor.LOG_DURATION, Monitor.LOG_DURATION);
 
         JavaPairRDD<Integer, Integer> edges = kTruss.loadEdges();
 
@@ -230,7 +222,6 @@ public class KTrussSpark extends KTruss {
         long edgeCount = tVertices.count();
         long duration = System.currentTimeMillis() - start;
         kTruss.close();
-//        timer.cancel();
         log("KTruss Edge Count: " + edgeCount, duration);
     }
 }
