@@ -6,9 +6,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.Optional;
 import org.apache.spark.storage.StorageLevel;
-import org.apache.spark.util.collection.CompactBuffer;
 import scala.Tuple2;
-import scala.reflect.ManifestFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
