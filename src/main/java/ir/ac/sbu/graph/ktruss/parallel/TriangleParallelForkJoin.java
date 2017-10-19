@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.ktruss.multicore;
+package ir.ac.sbu.graph.ktruss.parallel;
 
 import ir.ac.sbu.graph.Edge;
 import ir.ac.sbu.graph.ktruss.parallel.Utils;

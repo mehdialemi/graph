@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.ktruss.distributed;
+package ir.ac.sbu.graph.ktruss.others;
 
 import ir.ac.sbu.graph.clusteringco.FonlDegTC;
 import ir.ac.sbu.graph.clusteringco.FonlUtils;
