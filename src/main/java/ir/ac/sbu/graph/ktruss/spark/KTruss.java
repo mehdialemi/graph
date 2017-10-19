@@ -31,7 +31,7 @@ public class KTruss {
 
     public KTruss(KTrussConf conf) {
         this.conf = conf;
-        sc = new JavaSparkContext(this.conf.sparkConf);
+        sc = new JavaSparkContext(conf.sparkConf);
         partitioner = new HashPartitioner(conf.partitionNum);
         partitioner2 = new HashPartitioner(conf.partitionNum * 3);
         Log.setName(conf.name);
