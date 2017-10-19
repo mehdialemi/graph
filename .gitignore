@@ -10,3 +10,6 @@ hs_err*
 src/main/sbm.iml
 
 /subgraph-utils/target/
+/subgraph-core/target/
+/subgraph-search/target/
+/graphulotest/target/
