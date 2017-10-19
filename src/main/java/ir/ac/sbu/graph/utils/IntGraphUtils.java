@@ -19,11 +19,9 @@ import java.util.List;
  */
 public class IntGraphUtils {
 
-    public static JavaPairRDD<Integer, Integer> loadEdges(JavaSparkContext sc, String inputPath,
-                                                   int partitionNum) {
+    public static JavaPairRDD<Integer, Integer> loadEdges(JavaSparkContext sc, String inputPath) {
         JavaRDD<String> input = sc.textFile(inputPath);
-        JavaPairRDD<Integer, Integer> edges = GraphLoader.loadEdgesInt(input);
-        return edges.repartition(partitionNum).cache();
+        return GraphLoader.loadEdgesInt(input);
     }
 
     public static JavaPairRDD<Integer, int[]> createNeighborList(Partitioner partitioner, JavaPairRDD<Integer, Integer> edges) {

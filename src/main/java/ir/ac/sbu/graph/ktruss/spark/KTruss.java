@@ -37,9 +37,9 @@ public class KTruss {
         sc.close();
     }
 
-    protected JavaPairRDD<Integer, int[]> createCandidates(JavaPairRDD<Integer, int[]> neighborList) {
+    protected JavaPairRDD<Integer, int[]> createCandidates(JavaPairRDD<Integer, Integer> edges) {
 
-        fonl = IntGraphUtils.createFonl(neighborList, mediumPartitioner, biggerPartitioner);
+        fonl = FonlUtils.createWith2ReduceDegreeSortInt(edges, mediumPartitioner, biggerPartitioner);
 
         JavaPairRDD<Integer, int[]> candidates = FonlDegTC.generateCandidatesInteger(fonl)
                 .partitionBy(biggerPartitioner).persist(StorageLevel.MEMORY_AND_DISK());

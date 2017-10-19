@@ -79,8 +79,7 @@ public class KCoreNeighborList extends KCore {
         KCoreNeighborList kCore = new KCoreNeighborList(kCoreConf);
 
         long tload = System.currentTimeMillis();
-        JavaPairRDD<Integer, Integer> edges = IntGraphUtils.loadEdges(kCore.getSc(),
-                kCoreConf.inputPath, kCoreConf.partitionNum);
+        JavaPairRDD<Integer, Integer> edges = IntGraphUtils.loadEdges(kCore.getSc(), kCoreConf.inputPath);
 
         log("Edges are loaded", tload, System.currentTimeMillis());
 

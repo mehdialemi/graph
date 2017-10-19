@@ -183,7 +183,7 @@ public class Cohen extends KTruss {
 
         long tload = System.currentTimeMillis();
 
-        JavaPairRDD<Integer, Integer> edges = IntGraphUtils.loadEdges(cohen.sc, conf.inputPath, conf.partitionNum);
+        JavaPairRDD<Integer, Integer> edges = IntGraphUtils.loadEdges(cohen.sc, conf.inputPath);
 
         JavaRDD<Tuple2<Integer, Integer>> edgeList = edges.groupByKey(conf.partitionNum).flatMap(t -> {
             HashSet<Integer> neighborSet = new HashSet<>();

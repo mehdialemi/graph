@@ -26,9 +26,9 @@ public class KTrussSpark extends KTruss {
         super(conf);
     }
 
-    public JavaPairRDD<Tuple2<Integer, Integer>, int[]> start(JavaPairRDD<Integer, int[]> neighborList) {
+    public JavaPairRDD<Tuple2<Integer, Integer>, int[]> start(JavaPairRDD<Integer, Integer> edges) {
 
-        JavaPairRDD<Integer, int[]> candidates = createCandidates(neighborList);
+        JavaPairRDD<Integer, int[]> candidates = createCandidates(edges);
 
         // Generate kv such that key is an edge and value is its triangle vertices.
         JavaPairRDD<Tuple2<Integer, Integer>, int[]> tvSets = candidates.cogroup(fonl).flatMapToPair(t -> {
@@ -123,7 +123,7 @@ public class KTrussSpark extends KTruss {
 
             if (prevTvSets.size() > 1)
                 prevTvSets.remove().unpersist();
-            
+
             // If no invalid edge is found then the program terminates
             if (invalidCount == 0) {
                 break;
@@ -209,14 +209,13 @@ public class KTrussSpark extends KTruss {
 
         KTrussSpark kTruss = new KTrussSpark(conf);
 
-        JavaPairRDD<Integer, Integer> edges = IntGraphUtils.loadEdges(kTruss.sc,
-                conf.inputPath, conf.partitionNum);
-
-        JavaPairRDD<Integer, int[]> neighborList = IntGraphUtils.createNeighborList(
-                new HashPartitioner(conf.partitionNum), edges);
+        JavaPairRDD<Integer, Integer> edges = IntGraphUtils.loadEdges(kTruss.sc, conf.inputPath);
+//
+//        JavaPairRDD<Integer, int[]> neighborList = IntGraphUtils.createNeighborList(
+//                new HashPartitioner(conf.partitionNum), edges);
 
         long start = System.currentTimeMillis();
-        JavaPairRDD<Tuple2<Integer, Integer>, int[]> tVertices = kTruss.start(neighborList);
+        JavaPairRDD<Tuple2<Integer, Integer>, int[]> tVertices = kTruss.start(edges);
         long edgeCount = tVertices.count();
         long duration = System.currentTimeMillis() - start;
         kTruss.close();
