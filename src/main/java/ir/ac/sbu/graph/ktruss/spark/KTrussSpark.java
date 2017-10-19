@@ -199,7 +199,7 @@ public class KTrussSpark extends KTruss {
 
     public static void main(String[] args) {
         KTrussConf conf = new KTrussConf(args, KTrussSpark.class.getSimpleName(),
-                int[].class, GraphUtils.VertexDegreeInt.class);
+                GraphUtils.VertexDegreeInt.class);
 //                GraphUtils.VertexDegreeInt.class,  GraphUtils.VertexDegree.class,
 //                CompactBuffer.class, CompactBuffer[].class, ManifestFactory.class,
 //                ManifestFactory.Any().getClass(), ManifestFactory.AnyRef().getClass(),
