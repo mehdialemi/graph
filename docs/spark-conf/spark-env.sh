@@ -22,6 +22,8 @@
 # Options read when launching programs locally with
 # ./bin/run-example or ./bin/spark-submit
 # - HADOOP_CONF_DIR, to point Spark towards Hadoop configuration files
+HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+
 # - SPARK_LOCAL_IP, to set the IP address Spark binds to on this node
 # - SPARK_PUBLIC_DNS, to set the public dns name of the driver program
 # - SPARK_CLASSPATH, default classpath entries to append
@@ -31,8 +33,8 @@
 # - SPARK_PUBLIC_DNS, to set the public DNS name of the driver program
 # - SPARK_CLASSPATH, default classpath entries to appen
 # - SPARK_LOCAL_DIRS, storage directories to use on this node for shuffle and RDD data
-#SPARK_LOCAL_DIRS="/mnt/ssd1/spark-data,/mnt/ssd2/spark-data,/mnt/ssd3/spark-data,/mnt/sdb,/mnt/sdc,/mnt/sdd"
-SPARK_LOCAL_DIRS="/mnt/ssd1/spark-data,/mnt/ssd2/spark-data,/mnt/ssd3/spark-data"
+SPARK_LOCAL_DIRS="/mnt/sde,/mnt/sdf"
+#SPARK_LOCAL_DIRS="/mnt/ssd1/spark-data,/mnt/ssd2/spark-data,/mnt/ssd3/spark-data"
 # - MESOS_NATIVE_JAVA_LIBRARY, to point to your libmesos.so if you use Mesos
 
 # Options read in YARN client mode
@@ -41,7 +43,7 @@ SPARK_LOCAL_DIRS="/mnt/ssd1/spark-data,/mnt/ssd2/spark-data,/mnt/ssd3/spark-data
 SPARK_EXECUTOR_INSTANCES=5
 SPARK_EXECUTOR_CORES=4
 SPARK_EXECUTOR_MEMORY=20G
-SPARK_DRIVER_MEMORY=7G
+SPARK_DRIVER_MEMORY=5G
 # - SPARK_EXECUTOR_CORES, Number of cores for the executors (Default: 1).
 # - SPARK_EXECUTOR_MEMORY, Memory per Executor (e.g. 1000M, 2G) (Default: 1G)
 # - SPARK_DRIVER_MEMORY, Memory for Driver (e.g. 1000M, 2G) (Default: 1G)
@@ -51,21 +53,21 @@ SPARK_DRIVER_MEMORY=7G
 # - SPARK_YARN_DIST_ARCHIVES, Comma separated list of archives to be distributed with the job.
 
 # Options for the daemons used in the standalone deploy mode
-SPARK_MASTER_IP=malemi-2
+SPARK_MASTER_IP=alemi-1
 # - SPARK_MASTER_IP, to bind the master to a different IP address or hostname
 # - SPARK_MASTER_PORT / SPARK_MASTER_WEBUI_PORT, to use non-default ports for the master
 # - SPARK_MASTER_OPTS, to set config properties only for the master (e.g. "-Dx=y")
-SPARK_MASTER_OPTS="-Dspark.worker.timeout=120 -Dspark.worker.cleanup.enabled=true"
+SPARK_MASTER_OPTS="-Dspark.worker.timeout=300 -Dspark.worker.cleanup.enabled=true"
 # - SPARK_WORKER_CORES, to set the number of cores to use on this machine
 SPARK_WORKER_CORES=24
 SPARK_WORKER_MEMORY=100G
 # - SPARK_WORKER_MEMORY, to set how much total memory workers have to give executors (e.g. 1000m, 2g)
 # - SPARK_WORKER_PORT / SPARK_WORKER_WEBUI_PORT, to use non-default ports for the worker
 SPARK_WORKER_INSTANCES=1
-SPARK_WORKER_DIR="/mnt/ssd1/spark-data,/mnt/ssd2/spark-data,/mnt/ssd3/spark-data"
+SPARK_WORKER_DIR="/mnt/sdb/spark-worker,/mnt/sdc/spark-worker"
 # - SPARK_WORKER_OPTS, to set config properties only for the worker (e.g. "-Dx=y")
 # - SPARK_DAEMON_MEMORY, to allocate to the master, worker and history server themselves (default: 1g).
-SPARK_HISTORY_OPTS="-Dspark.history.provider=org.apache.spark.deploy.history.FsHistoryProvider -Dspark.history.fs.logDirectory=hdfs://malemi-2/history -Dspark.history.retainedApplications=300"
+SPARK_HISTORY_OPTS="-Dspark.history.fs.logDirectory=hdfs://alemi-1/shared/spark-logs"
 # - SPARK_HISTORY_OPTS, to set config properties only for the history server (e.g. "-Dx=y")
 # - SPARK_SHUFFLE_OPTS, to set config properties only for the external shuffle service (e.g. "-Dx=y")
 # - SPARK_DAEMON_JAVA_OPTS, to set config properties for all daemons (e.g. "-Dx=y")
