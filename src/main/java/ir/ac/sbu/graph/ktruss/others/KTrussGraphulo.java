@@ -13,6 +13,7 @@ import org.apache.hadoop.io.Text;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -20,7 +21,6 @@ import java.util.TreeSet;
  *
  */
 public class KTrussGraphulo {
-    public static final int NUM_SERVERS = 10;
     private String instanceName;
     private String zkServers;
     private String username;
@@ -48,10 +48,6 @@ public class KTrussGraphulo {
         long nnz = graphulo.kTrussAdj_Smart(tableName, newTable, k, null,
                 true, Authorizations.EMPTY, "", Integer.MAX_VALUE,null);
         Log.log("nnz: " + nnz, ts, System.currentTimeMillis());
-    }
-
-    public void fillTable(String tableName, String fileName) throws Exception {
-        fillTable(tableName, fileName, null);
     }
 
     public void fillTable(String tableName, String fileName, SortedSet<Text> splits) throws Exception {
@@ -142,37 +138,31 @@ public class KTrussGraphulo {
     }
 
     private static SortedSet<Text> createSplits(String fileName) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(new File(fileName)));
-        long min = Long.MAX_VALUE;
-        long max = Long.MIN_VALUE;
 
+        File file = new File(fileName);
+        long size = file.length();
+        long batchSizeBytes = size / 1000;
+
+        BufferedReader br = new BufferedReader(new FileReader(file));
+
+        SortedSet<Text> set = new TreeSet<>();
+        long countBytes = 0;
         while (true) {
             String line = br.readLine();
-            if (line == null) {
-                break;
-            }
-            if (line.startsWith("#")) {
-                continue;
-            }
+
+            if (line == null) break;
+
+            if (line.startsWith("#")) continue;
 
             String[] edge = line.split("\\s+");
             long e1 = Long.parseLong(edge[0]);
+            countBytes += line.getBytes().length;
 
-            if (e1 < min)
-                min = e1;
-            if (e1 > max)
-                max = e1;
-        }
-
-        SortedSet<Text> set = new TreeSet<>();
-        long delta = max - min;
-        long step = delta / (NUM_SERVERS - 1);
-        long current = min;
-        for (int i = 0; i < NUM_SERVERS - 1; i++) {
-            long split = current + step;
-            current = split;
-            System.out.println("split:" + split);
-            set.add(new Text(split + ""));
+            if (countBytes > batchSizeBytes) {
+                countBytes = 0;
+                set.add(new Text(e1 + ""));
+                System.out.println("split:" + e1);
+            }
         }
 
         return set;
