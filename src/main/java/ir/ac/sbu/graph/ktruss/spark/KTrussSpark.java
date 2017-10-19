@@ -201,12 +201,12 @@ public class KTrussSpark extends KTruss {
 
     public static void main(String[] args) {
         KTrussConf conf = new KTrussConf(args, KTrussSpark.class.getSimpleName(),
-                GraphUtils.VertexDegreeInt.class,  GraphUtils.VertexDegree.class,
-                CompactBuffer.class, CompactBuffer[].class, ManifestFactory.class,
-                ManifestFactory.Any().getClass(), ManifestFactory.AnyRef().getClass(),
-                ManifestFactory.AnyVal().getClass(), ManifestFactory.Any().runtimeClass(),
-                ManifestFactory.AnyRef().runtimeClass(), ManifestFactory.AnyVal().runtimeClass(),
-                Tuple2.class, int[].class);
+                int[].class, GraphUtils.VertexDegreeInt.class);
+//                GraphUtils.VertexDegreeInt.class,  GraphUtils.VertexDegree.class,
+//                CompactBuffer.class, CompactBuffer[].class, ManifestFactory.class,
+//                ManifestFactory.Any().getClass(), ManifestFactory.AnyRef().getClass(),
+//                ManifestFactory.AnyVal().getClass(), ManifestFactory.Any().runtimeClass(),
+//                ManifestFactory.AnyRef().runtimeClass(), ManifestFactory.AnyVal().runtimeClass(),
 
         KTrussSpark kTruss = new KTrussSpark(conf);
 //        Timer timer = new Timer(true);
