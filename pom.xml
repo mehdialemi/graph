@@ -59,11 +59,11 @@
         <!--</dependency>-->
         <!-- https://mvnrepository.com/artifact/org.apache.tinkerpop/spark-gremlin -->
         <!-- https://mvnrepository.com/artifact/com.twitter/chill_2.9.2 -->
-        <dependency>
-            <groupId>com.twitter</groupId>
-            <artifactId>chill_2.9.2</artifactId>
-            <version>0.2.3</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.twitter</groupId>-->
+            <!--<artifactId>chill_2.9.2</artifactId>-->
+            <!--<version>0.2.3</version>-->
+        <!--</dependency>-->
 
         <!--<dependency>-->
             <!--<groupId>org.apache.tinkerpop</groupId>-->
