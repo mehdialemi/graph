@@ -43,11 +43,12 @@ public class KTrussGraphulo {
     }
 
     public void run(String tableName, int k) {
-        String newTable = tableName + "" + System.currentTimeMillis();
+        String newTable = tableName + "-output";
         long ts = System.currentTimeMillis();
-        long nnz = graphulo.kTrussAdj(tableName, newTable,k,null,true,Authorizations.EMPTY,"");
+//        long nnz = graphulo.kTrussAdj(tableName, newTable,k,null,true,Authorizations.EMPTY,"");
 //        long nnz = graphulo.kTrussAdj(tableName, newTable, k, null,
 //                true, Authorizations.EMPTY, "", Integer.MAX_VALUE,null);
+        long nnz = graphulo.kTrussAdj_Fused(tableName, newTable , k, null, true, Authorizations.EMPTY, "");
         Log.log("nnz: " + nnz, ts, System.currentTimeMillis());
     }
 
