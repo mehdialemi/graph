@@ -63,21 +63,19 @@ public class AnalyzeResultsRestClient {
                     continue;
 
                 pwOverall.println("numJobs: " + jobs.length);
-                pwOverall.println("duration");
-                pwOverall.println("inputBytes");
-                pwOverall.println("shuffleReadBytes");
-                pwOverall.println("shuffleReadRecords");
-                pwOverall.println("shuffleWriteBytes");
-                pwOverall.println("shuffleWriteRecords");
-                pwOverall.println("memoryBytesSpilled");
-                pwOverall.println("diskBytesSpilled");
-
-                pwOverall.close();
 
 
                 PrintWriter pwJobs = new PrintWriter(new File(dir + "/jobs.txt"));
                 PrintWriter pwJobsJson = new PrintWriter(new File(dir + "/jobs-json.txt"));
                 PrintWriter pwStagesJson = new PrintWriter(new File(dir + "/stages-json.txt"));
+
+                long inputBytesMax = 0;
+                long shuffleReadBytesMax = 0;
+                long shuffleReadRecordsMax = 0;
+                long shuffleWriteBytesMax = 0;
+                long shuffleWriteRecordsMax = 0;
+                long memoryBytesSpilledMax = 0;
+                long diskBytesSpilledMax = 0;
 
                 for (Job job : jobs) {
 
@@ -142,6 +140,27 @@ public class AnalyzeResultsRestClient {
                             shuffleReadRecords + "," + shuffleWriteBytes + "," + shuffleWriteRecords + "," +
                             memoryBytesSpilled + "," + diskBytesSpilled);
 
+                    if (inputBytes > inputBytesMax)
+                        inputBytesMax = inputBytes;
+
+                    if (shuffleReadBytes > shuffleReadBytesMax)
+                        shuffleReadBytesMax = shuffleReadBytes;
+
+                    if (shuffleReadRecords > shuffleReadRecordsMax)
+                        shuffleReadRecordsMax = shuffleReadRecords;
+
+                    if (shuffleWriteBytes > shuffleWriteBytesMax)
+                        shuffleWriteBytesMax = shuffleWriteBytes;
+
+                    if (shuffleWriteRecords > shuffleWriteRecordsMax)
+                        shuffleReadRecordsMax = shuffleWriteRecords;
+
+                    if (memoryBytesSpilled > memoryBytesSpilledMax)
+                        memoryBytesSpilledMax = memoryBytesSpilled;
+
+                    if (diskBytesSpilled > diskBytesSpilledMax)
+                        diskBytesSpilledMax = diskBytesSpilled;
+
                     pwJobsJson.println(gson.toJson(job));
                     pwJobsJson.println();
                     pwJobsJson.println();
@@ -150,6 +169,14 @@ public class AnalyzeResultsRestClient {
                     pwJobsJson.println();
 
                 }
+
+                pwOverall.println("inputBytes: " + inputBytesMax);
+                pwOverall.println("shuffleReadBytes: " + shuffleReadBytesMax);
+                pwOverall.println("shuffleReadRecords: " + shuffleReadRecordsMax);
+                pwOverall.println("shuffleWriteBytes: " + shuffleWriteBytesMax);
+                pwOverall.println("shuffleWriteRecords: " + shuffleWriteRecordsMax);
+                pwOverall.println("memoryBytesSpilled: " + memoryBytesSpilledMax);
+                pwOverall.println("diskBytesSpilled: " + diskBytesSpilledMax);
 
                 pwJobs.close();
                 pwJobsJson.close();
@@ -160,6 +187,8 @@ public class AnalyzeResultsRestClient {
                 System.out.println("skip " + application.getName() + "-" + application.getId());
                 continue;
             }
+
+
         }
 
         client.close();
