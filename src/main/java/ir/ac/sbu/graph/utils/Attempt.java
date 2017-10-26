@@ -31,17 +31,17 @@ private String endTime;
 @JsonProperty("lastUpdated")
 private String lastUpdated;
 @JsonProperty("duration")
-private Integer duration;
+private Long duration;
 @JsonProperty("sparkUser")
 private String sparkUser;
 @JsonProperty("completed")
 private Boolean completed;
 @JsonProperty("startTimeEpoch")
-private Integer startTimeEpoch;
+private Long startTimeEpoch;
 @JsonProperty("endTimeEpoch")
-private Integer endTimeEpoch;
+private Long endTimeEpoch;
 @JsonProperty("lastUpdatedEpoch")
-private Integer lastUpdatedEpoch;
+private Long lastUpdatedEpoch;
 @JsonIgnore
 private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -76,12 +76,12 @@ this.lastUpdated = lastUpdated;
 }
 
 @JsonProperty("duration")
-public Integer getDuration() {
+public Long getDuration() {
 return duration;
 }
 
 @JsonProperty("duration")
-public void setDuration(Integer duration) {
+public void setDuration(Long duration) {
 this.duration = duration;
 }
 
@@ -106,32 +106,32 @@ this.completed = completed;
 }
 
 @JsonProperty("startTimeEpoch")
-public Integer getStartTimeEpoch() {
+public Long getStartTimeEpoch() {
 return startTimeEpoch;
 }
 
 @JsonProperty("startTimeEpoch")
-public void setStartTimeEpoch(Integer startTimeEpoch) {
+public void setStartTimeEpoch(Long startTimeEpoch) {
 this.startTimeEpoch = startTimeEpoch;
 }
 
 @JsonProperty("endTimeEpoch")
-public Integer getEndTimeEpoch() {
+public Long getEndTimeEpoch() {
 return endTimeEpoch;
 }
 
 @JsonProperty("endTimeEpoch")
-public void setEndTimeEpoch(Integer endTimeEpoch) {
+public void setEndTimeEpoch(Long endTimeEpoch) {
 this.endTimeEpoch = endTimeEpoch;
 }
 
 @JsonProperty("lastUpdatedEpoch")
-public Integer getLastUpdatedEpoch() {
+public Long getLastUpdatedEpoch() {
 return lastUpdatedEpoch;
 }
 
 @JsonProperty("lastUpdatedEpoch")
-public void setLastUpdatedEpoch(Integer lastUpdatedEpoch) {
+public void setLastUpdatedEpoch(Long lastUpdatedEpoch) {
 this.lastUpdatedEpoch = lastUpdatedEpoch;
 }
 
