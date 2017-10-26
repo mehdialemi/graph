@@ -83,6 +83,10 @@ public class AnalyzeResultsRestClient {
                     System.out.println("url stage: " + urlStage);
                     response = client.execute(new HttpGet(urlStage));
                     json = EntityUtils.toString(response.getEntity());
+
+                    if (json.startsWith("unknown stage"))
+                        continue;
+                    
                     System.out.println(json);
                     Stage stage = gson.fromJson(json, Stage.class);
 
