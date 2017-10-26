@@ -52,7 +52,12 @@ public class AnalyzeResultsRestClient {
             String appUrl = url + "applications/" + application.getId();
             response = client.execute(new HttpGet(appUrl + "/jobs"));
             json = EntityUtils.toString(response.getEntity());
-            Job[] jobs = gson.fromJson(json, Job[].class);
+            Job[] jobs;
+            try {
+                jobs = gson.fromJson(json, Job[].class);
+            } catch (Exception e) {
+                jobs = new Job[] {gson.fromJson(json, Job.class)};
+            }
             if (jobs == null)
                 continue;
 
@@ -93,7 +98,12 @@ public class AnalyzeResultsRestClient {
                     if (json.startsWith("unknown stage"))
                         continue;
 
-                    Stage[] stages = gson.fromJson(json, Stage[].class);
+                    Stage[] stages;
+                    try {
+                        stages = gson.fromJson(json, Stage[].class);
+                    } catch (Exception e) {
+                        stages = new Stage[] {gson.fromJson(json, Stage.class)};
+                    }
                     if (stages == null || stages.length == 0)
                         continue;
 
@@ -120,7 +130,7 @@ public class AnalyzeResultsRestClient {
                     if (stage.getDiskBytesSpilled() > diskBytesSpilled)
                         diskBytesSpilled = stage.getDiskBytesSpilled();
 
-                    pwStagesJson .println(gson.toJson(stage));
+                    pwStagesJson.println(gson.toJson(stage));
                     pwStagesJson.println();
                     pwStagesJson.println();
                     pwStagesJson.println("************************");
