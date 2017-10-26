@@ -87,11 +87,10 @@ public class AnalyzeResultsRestClient {
                     if (json.startsWith("unknown stage"))
                         continue;
 
-                    System.out.println(json);
                     Stage[] stages = gson.fromJson(json, Stage[].class);
                     if (stages == null || stages.length == 0)
                         continue;
-                    
+
                     Stage stage = stages[0];
 
                     if (stage.getInputBytes() > inputBytes)
@@ -135,10 +134,13 @@ public class AnalyzeResultsRestClient {
                 pwJobsJson.println();
 
             }
+
+            pwJobs.close();
+            pwJobsJson.close();
+            pwStagesJson.close();
+            pwOverall.close();
         }
 
         client.close();
     }
-
-
 }
