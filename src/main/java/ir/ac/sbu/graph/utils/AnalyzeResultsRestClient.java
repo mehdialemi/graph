@@ -52,6 +52,7 @@ public class AnalyzeResultsRestClient {
             String urlJobs = applicationUrl + "/" + application.getId() + "/jobs";
             response = client.execute(new HttpGet(urlJobs));
             json = EntityUtils.toString(response.getEntity());
+            System.out.println(json);
             Job[] jobs = gson.fromJson(json, Job[].class);
             if (jobs == null)
                 continue;
