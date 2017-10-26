@@ -86,9 +86,13 @@ public class AnalyzeResultsRestClient {
 
                     if (json.startsWith("unknown stage"))
                         continue;
-                    
+
                     System.out.println(json);
-                    Stage stage = gson.fromJson(json, Stage.class);
+                    Stage[] stages = gson.fromJson(json, Stage[].class);
+                    if (stages == null || stages.length == 0)
+                        continue;
+                    
+                    Stage stage = stages[0];
 
                     if (stage.getInputBytes() > inputBytes)
                         inputBytes = stage.getInputBytes();
