@@ -49,8 +49,8 @@ public class AnalyzeResultsRestClient {
             pwOverall.println("endTime: " + application.getAttempts().get(0).getEndTime());
             pwOverall.println("duration: " + application.getAttempts().get(0).getDuration());
 
-            String urlJobs = url + "applications/" + application.getId() + "/jobs";
-            response = client.execute(new HttpGet(urlJobs));
+            String jobUrl = url + "applications/" + application.getId();
+            response = client.execute(new HttpGet(jobUrl + "/jobs"));
             json = EntityUtils.toString(response.getEntity());
             Job[] jobs = gson.fromJson(json, Job[].class);
             if (jobs == null)
@@ -79,7 +79,7 @@ public class AnalyzeResultsRestClient {
                 long diskBytesSpilled = 0;
 
                 for (Integer stageId : job.getStageIds()) {
-                    String urlStage = applicationUrl + "/" + application.getId() + "/stages/" + stageId;
+                    String urlStage = jobUrl + "/stages/" + stageId;
                     response = client.execute(new HttpGet(urlStage));
                     json = EntityUtils.toString(response.getEntity());
                     Stage stage = gson.fromJson(json, Stage.class);
