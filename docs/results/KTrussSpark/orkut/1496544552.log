@@ -1,0 +1,22 @@
+/home/i/spark-2.1/bin/spark-submit --class ir.ac.sbu.graph.ktruss.spark.KTrussSpark --total-executor-cores 120 --master spark://alemi-1:7077 /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar hdfs://alemi-1/graph-data/orkut 240 4
+[SBM] Input: hdfs://alemi-1/graph-data/orkut, partitionNum: 240, k: 4
+[KTrussSpark] iteration: 1, invalid edge count: 11523968, duration: 175766 ms
+[KTrussSpark] iteration: 2, invalid edge count: 1794826, duration: 7524 ms
+[KTrussSpark] iteration: 3, invalid edge count: 470803, duration: 5788 ms
+[KTrussSpark] iteration: 4, invalid edge count: 152538, duration: 5666 ms
+[KTrussSpark] iteration: 5, invalid edge count: 55486, duration: 5228 ms
+[KTrussSpark] iteration: 6, invalid edge count: 21640, duration: 5046 ms
+[KTrussSpark] iteration: 7, invalid edge count: 8903, duration: 5624 ms
+[KTrussSpark] iteration: 8, invalid edge count: 3946, duration: 4784 ms
+[KTrussSpark] iteration: 9, invalid edge count: 1657, duration: 5011 ms
+[KTrussSpark] iteration: 10, invalid edge count: 723, duration: 5449 ms
+[KTrussSpark] iteration: 11, invalid edge count: 344, duration: 4877 ms
+[KTrussSpark] iteration: 12, invalid edge count: 163, duration: 5282 ms
+[KTrussSpark] iteration: 13, invalid edge count: 76, duration: 5377 ms
+[KTrussSpark] iteration: 14, invalid edge count: 40, duration: 5355 ms
+[KTrussSpark] iteration: 15, invalid edge count: 15, duration: 5199 ms
+[KTrussSpark] iteration: 16, invalid edge count: 7, duration: 5589 ms
+[KTrussSpark] iteration: 17, invalid edge count: 3, duration: 5785 ms
+[KTrussSpark] iteration: 18, invalid edge count: 2, duration: 6705 ms
+[KTrussSpark] iteration: 19, invalid edge count: 1, duration: 5777 ms
+[KTrussSpark] KTruss Edge Count: 86221786, duration: 284580 ms

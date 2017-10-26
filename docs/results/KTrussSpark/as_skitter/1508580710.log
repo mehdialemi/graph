@@ -1,0 +1,54 @@
+/home/i/spark-2.2/bin/spark-submit --class ir.ac.sbu.graph.ktruss.spark.KTrussSpark --total-executor-cores 120 --master spark://alemi-1:7077 /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar hdfs://alemi-1/graph-data/as_skitter 4
+[SBM] Input: hdfs://alemi-1/graph-data/as_skitter, partitionNum: 4, k: 4
+[SBM] Spark conf: spark.app.name=KTrussSpark-4-as_skitter
+spark.cores.max=120
+spark.driver.maxResultSize=1g
+spark.driver.memory=2g
+spark.dynamicAllocation.enabled=true
+spark.dynamicAllocation.maxExecutors=50
+spark.dynamicAllocation.minExecutors=20
+spark.eventLog.dir=hdfs://alemi-1/shared/spark-logs
+spark.eventLog.enabled=true
+spark.executor.cores=4
+spark.executor.extraJavaOptions=-XX:+UseG1GC -XX:-ResizePLAB -XX:+PrintFlagsFinal -XX:+PrintReferenceGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintAdaptiveSizePolicy -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:+PrintFlagsFinal -XX:+UseCompressedOops -verbose:gc -XX:InitiatingHeapOccupancyPercent=20
+spark.executor.memory=20G
+spark.history.fs.logDirectory=hdfs://alemi-1/shared/spark-logs
+spark.io.compression.codec=lz4
+spark.io.compression.lz4.blockSize=32k
+spark.jars=file:/home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+spark.kryo.classesToRegister=
+spark.kryo.unsafe=true
+spark.kryoserializer.buffer=256k
+spark.kryoserializer.buffer.max=256m
+spark.local.dir=/mnt/sde/spark-data,/mnt/sdf/spark-data
+spark.master=spark://alemi-1:7077
+spark.rdd.compress=false
+spark.reducer.maxSizeInFlight=32m
+spark.rpc.netty.dispatcher.numThreads=3
+spark.serializer=org.apache.spark.serializer.KryoSerializer
+spark.shuffle.compress=true
+spark.shuffle.file.buffer=32k
+spark.shuffle.io.numConnectionsPerPeer=3
+spark.shuffle.io.preferDirectBufs=false
+spark.shuffle.service.enabled=true
+spark.submit.deployMode=client
+spark.worker.cleanup.enabled=true
+[KTrussSpark] iteration: 1, invalid edge count: 2082052, duration: 64331 ms
+[KTrussSpark] iteration: 2, invalid edge count: 268775, duration: 4867 ms
+[KTrussSpark] iteration: 3, invalid edge count: 46410, duration: 2606 ms
+[KTrussSpark] iteration: 4, invalid edge count: 10369, duration: 2258 ms
+[KTrussSpark] iteration: 5, invalid edge count: 3172, duration: 2044 ms
+[KTrussSpark] iteration: 6, invalid edge count: 1090, duration: 1733 ms
+[KTrussSpark] iteration: 7, invalid edge count: 375, duration: 1934 ms
+[KTrussSpark] iteration: 8, invalid edge count: 152, duration: 1846 ms
+[KTrussSpark] iteration: 9, invalid edge count: 64, duration: 1838 ms
+[KTrussSpark] iteration: 10, invalid edge count: 31, duration: 1795 ms
+[KTrussSpark] iteration: 11, invalid edge count: 17, duration: 1890 ms
+[KTrussSpark] iteration: 12, invalid edge count: 6, duration: 1773 ms
+[KTrussSpark] iteration: 13, invalid edge count: 3, duration: 1667 ms
+[KTrussSpark] iteration: 14, invalid edge count: 2, duration: 1723 ms
+[KTrussSpark] iteration: 15, invalid edge count: 2, duration: 1831 ms
+[KTrussSpark] iteration: 16, invalid edge count: 3, duration: 1712 ms
+[KTrussSpark] iteration: 17, invalid edge count: 3, duration: 1691 ms
+[KTrussSpark] iteration: 18, invalid edge count: 2, duration: 1586 ms
+[KTrussSpark] KTruss Edge Count: 6074093, duration: 101234 ms

@@ -1,0 +1,52 @@
+/home/i/spark-2.1/bin/spark-submit --class ir.ac.sbu.graph.ktruss.spark.KTrussSpark --total-executor-cores 200 --master spark://alemi-1:7077 /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar hdfs://alemi-1/graph-data/soc-LiveJournal 300 4
+[SBM] Input: hdfs://alemi-1/graph-data/soc-LiveJournal, partitionNum: 300, k: 4
+02 Oct 2017 08:54:51,567 WARN - NativeCodeLoader.<clinit>(62) -  Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+02 Oct 2017 08:54:51,665 WARN - Logging$class.logWarning(66) -  In Spark 1.0 and later spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone and LOCAL_DIRS in YARN).
+02 Oct 2017 08:54:51,675 WARN - Logging$class.logWarning(66) -  
+SPARK_WORKER_INSTANCES was detected (set to '1').
+This is deprecated in Spark 1.0+.
+
+Please instead use:
+ - ./spark-submit with --num-executors to specify the number of executors
+ - Or set SPARK_EXECUTOR_INSTANCES
+ - spark.executor.instances to configure the number of instances in the spark config.
+        
+02 Oct 2017 08:54:51,845 DEBUG - Slf4JLogger.debug(71) -  Using SLF4J as the default logging framework
+02 Oct 2017 08:54:51,848 DEBUG - Slf4JLogger.debug(71) -  java.nio.Buffer.address: available
+02 Oct 2017 08:54:51,849 DEBUG - Slf4JLogger.debug(71) -  sun.misc.Unsafe.theUnsafe: available
+02 Oct 2017 08:54:51,850 DEBUG - Slf4JLogger.debug(71) -  sun.misc.Unsafe.copyMemory: available
+02 Oct 2017 08:54:51,851 DEBUG - Slf4JLogger.debug(71) -  direct buffer constructor: available
+02 Oct 2017 08:54:51,853 DEBUG - Slf4JLogger.debug(76) -  java.nio.Bits.unaligned: available, true
+02 Oct 2017 08:54:51,853 DEBUG - Slf4JLogger.debug(76) -  java.nio.DirectByteBuffer.<init>(long, int): available
+02 Oct 2017 08:54:51,854 DEBUG - Slf4JLogger.debug(76) -  java.nio.ByteBuffer.cleaner(): available
+02 Oct 2017 08:54:51,856 DEBUG - Slf4JLogger.debug(76) -  Java version: 8
+02 Oct 2017 08:54:51,856 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.noUnsafe: false
+02 Oct 2017 08:54:51,856 DEBUG - Slf4JLogger.debug(76) -  sun.misc.Unsafe: available
+02 Oct 2017 08:54:51,856 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.noJavassist: false
+02 Oct 2017 08:54:51,930 DEBUG - Slf4JLogger.debug(71) -  Javassist: available
+02 Oct 2017 08:54:51,932 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.tmpdir: /tmp (java.io.tmpdir)
+02 Oct 2017 08:54:51,932 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.bitMode: 64 (sun.arch.data.model)
+02 Oct 2017 08:54:51,932 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.noPreferDirect: false
+02 Oct 2017 08:54:51,932 DEBUG - Slf4JLogger.debug(76) -  io.netty.maxDirectMemory: 0 bytes
+02 Oct 2017 08:54:51,935 DEBUG - Slf4JLogger.debug(76) -  Generated: io.netty.util.internal.__matchers__.org.apache.spark.network.protocol.MessageMatcher
+02 Oct 2017 08:54:51,939 DEBUG - Slf4JLogger.debug(76) -  Generated: io.netty.util.internal.__matchers__.io.netty.buffer.ByteBufMatcher
+02 Oct 2017 08:54:51,948 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.eventLoopThreads: 48
+02 Oct 2017 08:54:51,965 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.noKeySetOptimization: false
+02 Oct 2017 08:54:51,965 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.selectorAutoRebuildThreshold: 512
+02 Oct 2017 08:54:51,968 DEBUG - Slf4JLogger.debug(71) -  org.jctools-core.MpscChunkedArrayQueue: available
+02 Oct 2017 08:54:51,984 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.allocator.numHeapArenas: 48
+02 Oct 2017 08:54:51,984 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.allocator.numDirectArenas: 48
+02 Oct 2017 08:54:51,984 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.allocator.pageSize: 8192
+02 Oct 2017 08:54:51,984 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.allocator.maxOrder: 11
+02 Oct 2017 08:54:51,984 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.allocator.chunkSize: 16777216
+02 Oct 2017 08:54:51,984 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.allocator.tinyCacheSize: 512
+02 Oct 2017 08:54:51,984 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.allocator.smallCacheSize: 256
+02 Oct 2017 08:54:51,984 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.allocator.normalCacheSize: 64
+02 Oct 2017 08:54:51,985 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.allocator.maxCachedBufferCapacity: 32768
+02 Oct 2017 08:54:51,985 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.allocator.cacheTrimInterval: 8192
+02 Oct 2017 08:54:52,026 DEBUG - Slf4JLogger.debug(71) -  -Dio.netty.initialSeedUniquifier: 0x717413ca03c1dbbf (took 0 ms)
+02 Oct 2017 08:54:52,043 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.allocator.type: unpooled
+02 Oct 2017 08:54:52,043 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.threadLocalDirectBufferSize: 65536
+02 Oct 2017 08:54:52,043 DEBUG - Slf4JLogger.debug(76) -  -Dio.netty.maxThreadLocalCharBufferSize: 16384
+02 Oct 2017 08:54:52,045 DEBUG - Slf4JLogger.debug(86) -  Loopback interface: lo (lo, 0:0:0:0:0:0:0:1%lo)
+02 Oct 2017 08:54:52,046 DEBUG - Slf4JLogger.debug(81) -  /proc/sys/net/core/somaxconn: 128

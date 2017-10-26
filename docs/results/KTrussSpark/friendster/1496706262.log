@@ -1,0 +1,34 @@
+/home/i/spark-2.1/bin/spark-submit --class ir.ac.sbu.graph.ktruss.spark.KTrussSpark --total-executor-cores 120 --master spark://alemi-1:7077 /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar hdfs://alemi-1/graph-data/friendster 700 4
+[SBM] Input: hdfs://alemi-1/graph-data/friendster, partitionNum: 700, k: 4
+[KTrussSpark] iteration: 1, invalid edge count: 314825403, duration: 1404278 ms
+[KTrussSpark] iteration: 2, invalid edge count: 60390012, duration: 153958 ms
+[KTrussSpark] iteration: 3, invalid edge count: 18503837, duration: 102291 ms
+[KTrussSpark] iteration: 4, invalid edge count: 7150797, duration: 131231 ms
+[KTrussSpark] iteration: 5, invalid edge count: 3169369, duration: 124116 ms
+[KTrussSpark] iteration: 6, invalid edge count: 1530921, duration: 118300 ms
+[KTrussSpark] iteration: 7, invalid edge count: 784547, duration: 120643 ms
+[KTrussSpark] iteration: 8, invalid edge count: 421490, duration: 111474 ms
+[KTrussSpark] iteration: 9, invalid edge count: 232090, duration: 108704 ms
+[KTrussSpark] iteration: 10, invalid edge count: 131202, duration: 109887 ms
+[KTrussSpark] iteration: 11, invalid edge count: 75709, duration: 106782 ms
+[KTrussSpark] iteration: 12, invalid edge count: 44448, duration: 105459 ms
+[KTrussSpark] iteration: 13, invalid edge count: 26463, duration: 107438 ms
+[KTrussSpark] iteration: 14, invalid edge count: 15834, duration: 104607 ms
+[KTrussSpark] iteration: 15, invalid edge count: 9598, duration: 107735 ms
+[KTrussSpark] iteration: 16, invalid edge count: 5741, duration: 104258 ms
+[KTrussSpark] iteration: 17, invalid edge count: 3509, duration: 105203 ms
+[KTrussSpark] iteration: 18, invalid edge count: 2126, duration: 106998 ms
+[KTrussSpark] iteration: 19, invalid edge count: 1283, duration: 103660 ms
+[KTrussSpark] iteration: 20, invalid edge count: 801, duration: 103824 ms
+[KTrussSpark] iteration: 21, invalid edge count: 462, duration: 106021 ms
+[KTrussSpark] iteration: 22, invalid edge count: 272, duration: 104149 ms
+[KTrussSpark] iteration: 23, invalid edge count: 170, duration: 102774 ms
+[KTrussSpark] iteration: 24, invalid edge count: 115, duration: 101728 ms
+[KTrussSpark] iteration: 25, invalid edge count: 73, duration: 103781 ms
+[KTrussSpark] iteration: 26, invalid edge count: 35, duration: 100450 ms
+[KTrussSpark] iteration: 27, invalid edge count: 24, duration: 105056 ms
+[KTrussSpark] iteration: 28, invalid edge count: 14, duration: 102644 ms
+[KTrussSpark] iteration: 29, invalid edge count: 4, duration: 101170 ms
+[KTrussSpark] iteration: 30, invalid edge count: 2, duration: 103948 ms
+[KTrussSpark] iteration: 31, invalid edge count: 1, duration: 102224 ms
+[KTrussSpark] KTruss Edge Count: 1010791155, duration: 4782754 ms

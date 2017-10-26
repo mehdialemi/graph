@@ -1,0 +1,103 @@
+/home/i/spark-2.2/bin/spark-submit --class ir.ac.sbu.graph.ktruss.spark.KTrussSpark --total-executor-cores 120 --master spark://alemi-1:7077 /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar hdfs://alemi-1/graph-data/it_2004 300 8
+[SBM] Input: hdfs://alemi-1/graph-data/it_2004, partitionNum: 300, k: 8
+[SBM] Spark conf: spark.app.name=KTrussSpark-300-it_2004
+spark.cores.max=120
+spark.driver.maxResultSize=1g
+spark.driver.memory=2g
+spark.dynamicAllocation.enabled=true
+spark.dynamicAllocation.maxExecutors=50
+spark.dynamicAllocation.minExecutors=20
+spark.eventLog.dir=hdfs://alemi-1/shared/spark-logs
+spark.eventLog.enabled=true
+spark.executor.cores=4
+spark.executor.extraJavaOptions=-XX:+UseG1GC -XX:-ResizePLAB -XX:+PrintFlagsFinal -XX:+PrintReferenceGC -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintAdaptiveSizePolicy -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:+PrintFlagsFinal -XX:+UseCompressedOops -verbose:gc -XX:InitiatingHeapOccupancyPercent=20
+spark.executor.memory=20G
+spark.history.fs.logDirectory=hdfs://alemi-1/shared/spark-logs
+spark.io.compression.codec=lz4
+spark.io.compression.lz4.blockSize=32k
+spark.jars=file:/home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
+spark.kryo.classesToRegister=
+spark.kryo.unsafe=true
+spark.kryoserializer.buffer=256k
+spark.kryoserializer.buffer.max=256m
+spark.local.dir=/mnt/sde/spark-data,/mnt/sdf/spark-data
+spark.master=spark://alemi-1:7077
+spark.rdd.compress=false
+spark.reducer.maxSizeInFlight=32m
+spark.rpc.netty.dispatcher.numThreads=3
+spark.serializer=org.apache.spark.serializer.KryoSerializer
+spark.shuffle.compress=true
+spark.shuffle.file.buffer=32k
+spark.shuffle.io.numConnectionsPerPeer=3
+spark.shuffle.io.preferDirectBufs=false
+spark.shuffle.service.enabled=true
+spark.submit.deployMode=client
+spark.worker.cleanup.enabled=true
+[KTrussSpark] iteration: 1, invalid edge count: 3925555, duration: 932634 ms
+[KTrussSpark] iteration: 2, invalid edge count: 496106, duration: 7223 ms
+[KTrussSpark] iteration: 3, invalid edge count: 72461, duration: 4446 ms
+[KTrussSpark] iteration: 4, invalid edge count: 14339, duration: 3704 ms
+[KTrussSpark] iteration: 5, invalid edge count: 4244, duration: 3884 ms
+[KTrussSpark] iteration: 6, invalid edge count: 1810, duration: 3323 ms
+[KTrussSpark] iteration: 7, invalid edge count: 1090, duration: 3370 ms
+[KTrussSpark] iteration: 8, invalid edge count: 763, duration: 3375 ms
+[KTrussSpark] iteration: 9, invalid edge count: 495, duration: 3280 ms
+[KTrussSpark] iteration: 10, invalid edge count: 381, duration: 3298 ms
+[KTrussSpark] iteration: 11, invalid edge count: 272, duration: 3431 ms
+[KTrussSpark] iteration: 12, invalid edge count: 203, duration: 3457 ms
+[KTrussSpark] iteration: 13, invalid edge count: 183, duration: 3606 ms
+[KTrussSpark] iteration: 14, invalid edge count: 143, duration: 3525 ms
+[KTrussSpark] iteration: 15, invalid edge count: 107, duration: 3450 ms
+[KTrussSpark] iteration: 16, invalid edge count: 89, duration: 3413 ms
+[KTrussSpark] iteration: 17, invalid edge count: 69, duration: 3577 ms
+[KTrussSpark] iteration: 18, invalid edge count: 58, duration: 3655 ms
+[KTrussSpark] iteration: 19, invalid edge count: 54, duration: 3582 ms
+[KTrussSpark] iteration: 20, invalid edge count: 36, duration: 3415 ms
+[KTrussSpark] iteration: 21, invalid edge count: 28, duration: 3515 ms
+[KTrussSpark] iteration: 22, invalid edge count: 25, duration: 3555 ms
+[KTrussSpark] iteration: 23, invalid edge count: 21, duration: 3494 ms
+[KTrussSpark] iteration: 24, invalid edge count: 22, duration: 3632 ms
+[KTrussSpark] iteration: 25, invalid edge count: 21, duration: 3628 ms
+[KTrussSpark] iteration: 26, invalid edge count: 22, duration: 3568 ms
+[KTrussSpark] iteration: 27, invalid edge count: 21, duration: 3609 ms
+[KTrussSpark] iteration: 28, invalid edge count: 20, duration: 3740 ms
+[KTrussSpark] iteration: 29, invalid edge count: 9, duration: 3724 ms
+[KTrussSpark] iteration: 30, invalid edge count: 4, duration: 3719 ms
+[KTrussSpark] iteration: 31, invalid edge count: 4, duration: 3614 ms
+[KTrussSpark] iteration: 32, invalid edge count: 4, duration: 3566 ms
+[KTrussSpark] iteration: 33, invalid edge count: 4, duration: 3670 ms
+[KTrussSpark] iteration: 34, invalid edge count: 4, duration: 3813 ms
+[KTrussSpark] iteration: 35, invalid edge count: 4, duration: 3814 ms
+[KTrussSpark] iteration: 36, invalid edge count: 4, duration: 3740 ms
+[KTrussSpark] iteration: 37, invalid edge count: 2, duration: 3665 ms
+[KTrussSpark] iteration: 38, invalid edge count: 2, duration: 3746 ms
+[KTrussSpark] iteration: 39, invalid edge count: 2, duration: 3750 ms
+[KTrussSpark] iteration: 40, invalid edge count: 2, duration: 3820 ms
+[KTrussSpark] iteration: 41, invalid edge count: 2, duration: 3817 ms
+[KTrussSpark] iteration: 42, invalid edge count: 2, duration: 3739 ms
+[KTrussSpark] iteration: 43, invalid edge count: 2, duration: 3867 ms
+[KTrussSpark] iteration: 44, invalid edge count: 2, duration: 3990 ms
+[KTrussSpark] iteration: 45, invalid edge count: 2, duration: 3954 ms
+[KTrussSpark] iteration: 46, invalid edge count: 2, duration: 3939 ms
+[KTrussSpark] iteration: 47, invalid edge count: 2, duration: 3961 ms
+[KTrussSpark] iteration: 48, invalid edge count: 2, duration: 3943 ms
+[KTrussSpark] iteration: 49, invalid edge count: 2, duration: 3945 ms
+[KTrussSpark] iteration: 50, invalid edge count: 2, duration: 4120 ms
+[KTrussSpark] iteration: 51, invalid edge count: 2, duration: 4043 ms
+[KTrussSpark] iteration: 52, invalid edge count: 2, duration: 4006 ms
+[KTrussSpark] iteration: 53, invalid edge count: 2, duration: 3981 ms
+[KTrussSpark] iteration: 54, invalid edge count: 2, duration: 4182 ms
+[KTrussSpark] iteration: 55, invalid edge count: 2, duration: 3977 ms
+[KTrussSpark] iteration: 56, invalid edge count: 2, duration: 4170 ms
+[KTrussSpark] iteration: 57, invalid edge count: 2, duration: 4132 ms
+[KTrussSpark] iteration: 58, invalid edge count: 2, duration: 4457 ms
+[KTrussSpark] iteration: 59, invalid edge count: 2, duration: 4001 ms
+[KTrussSpark] iteration: 60, invalid edge count: 2, duration: 4162 ms
+[KTrussSpark] iteration: 61, invalid edge count: 2, duration: 4153 ms
+[KTrussSpark] iteration: 62, invalid edge count: 2, duration: 4129 ms
+[KTrussSpark] iteration: 63, invalid edge count: 2, duration: 4168 ms
+[KTrussSpark] iteration: 64, invalid edge count: 2, duration: 4162 ms
+[KTrussSpark] iteration: 65, invalid edge count: 2, duration: 4216 ms
+[KTrussSpark] iteration: 66, invalid edge count: 2, duration: 4256 ms
+[KTrussSpark] iteration: 67, invalid edge count: 2, duration: 4280 ms
+[KTrussSpark] iteration: 68, invalid edge count: 2, duration: 58530 ms
