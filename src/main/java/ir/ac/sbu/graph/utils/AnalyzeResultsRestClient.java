@@ -16,11 +16,16 @@ public class AnalyzeResultsRestClient {
     public static void main(String[] args) throws IOException {
         CloseableHttpClient client = HttpClients.createDefault();
         String hostname = args[0];
+
+        int limit = 100;
+        if (args.length > 1)
+            limit = Integer.parseInt(args[1]);
+
         String logDir = "/tmp/analyze";
-        if (args.length > 1)    logDir = args[1];
+        if (args.length > 2)    logDir = args[2];
 
         String url = "http://" + hostname + ":18080/api/v1/";
-        String applicationUrl = url + "applications";
+        String applicationUrl = url + "applications?limit=" + limit;
         HttpGet get = new HttpGet(applicationUrl);
         CloseableHttpResponse response = client.execute(get);
         String json = EntityUtils.toString(response.getEntity());
