@@ -1,0 +1,6 @@
+{"jobId":0,"name":"count at KTrussSpark.java:122","submissionTime":"2017-10-25T15:16:53.777GMT","completionTime":"2017-10-25T18:56:51.933GMT","stageIds":[0,1,5,2,3,4],"status":"FAILED","numTasks":8279,"numActiveTasks":119,"numCompletedTasks":5498,"numSkippedTasks":2100,"numFailedTasks":92,"numActiveStages":0,"numCompletedStages":4,"numSkippedStages":1,"numFailedStages":1,"additionalProperties":{}}
+
+
+************************
+
+

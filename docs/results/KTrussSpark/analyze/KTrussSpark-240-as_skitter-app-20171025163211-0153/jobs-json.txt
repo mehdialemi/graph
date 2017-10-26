@@ -1,0 +1,24 @@
+{"jobId":3,"name":"count at KTrussSpark.java:122","submissionTime":"2017-10-25T13:04:31.272GMT","completionTime":"2017-10-25T13:04:42.492GMT","stageIds":[27,24,21,28,25,22,29,26,23],"status":"SUCCEEDED","numTasks":4803,"numActiveTasks":0,"numCompletedTasks":1440,"numSkippedTasks":3363,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":7,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":2,"name":"count at KTrussSpark.java:122","submissionTime":"2017-10-25T13:04:15.920GMT","completionTime":"2017-10-25T13:04:30.958GMT","stageIds":[15,19,16,13,20,17,18,14],"status":"SUCCEEDED","numTasks":4083,"numActiveTasks":0,"numCompletedTasks":1440,"numSkippedTasks":2643,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":6,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":1,"name":"count at KTrussSpark.java:122","submissionTime":"2017-10-25T13:03:50.145GMT","completionTime":"2017-10-25T13:04:15.745GMT","stageIds":[12,9,6,10,7,11,8],"status":"SUCCEEDED","numTasks":3363,"numActiveTasks":0,"numCompletedTasks":1440,"numSkippedTasks":1923,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":5,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":0,"name":"count at KTrussSpark.java:122","submissionTime":"2017-10-25T13:02:13.294GMT","completionTime":"2017-10-25T13:03:50.002GMT","stageIds":[0,1,5,2,3,4],"status":"SUCCEEDED","numTasks":2643,"numActiveTasks":0,"numCompletedTasks":2643,"numSkippedTasks":0,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":6,"numSkippedStages":0,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+

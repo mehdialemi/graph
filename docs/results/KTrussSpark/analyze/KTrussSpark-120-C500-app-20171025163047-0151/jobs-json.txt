@@ -1,0 +1,12 @@
+{"jobId":1,"name":"count at KTrussSpark.java:219","submissionTime":"2017-10-25T13:01:27.966GMT","completionTime":"2017-10-25T13:01:28.205GMT","stageIds":[9,6,10,7,11,8],"status":"SUCCEEDED","numTasks":1322,"numActiveTasks":0,"numCompletedTasks":360,"numSkippedTasks":962,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":1,"numSkippedStages":5,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":0,"name":"count at KTrussSpark.java:122","submissionTime":"2017-10-25T13:00:49.702GMT","completionTime":"2017-10-25T13:01:27.909GMT","stageIds":[0,1,5,2,3,4],"status":"SUCCEEDED","numTasks":1322,"numActiveTasks":0,"numCompletedTasks":1322,"numSkippedTasks":0,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":6,"numSkippedStages":0,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+

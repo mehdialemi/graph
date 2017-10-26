@@ -1,0 +1,6 @@
+{"status":"FAILED","stageId":0,"attemptId":0,"numActiveTasks":0,"numCompleteTasks":0,"numFailedTasks":7,"executorRunTime":9230,"executorCpuTime":0,"submissionTime":"2017-10-25T13:07:50.417GMT","firstTaskLaunchedTime":"2017-10-25T13:07:51.205GMT","completionTime":"2017-10-25T13:08:02.029GMT","inputBytes":458752,"inputRecords":27,"outputBytes":0,"outputRecords":0,"shuffleReadBytes":0,"shuffleReadRecords":0,"shuffleWriteBytes":0,"shuffleWriteRecords":0,"memoryBytesSpilled":0,"diskBytesSpilled":0,"name":"flatMapToPair at GraphLoader.java:75","schedulingPool":"default","accumulatorUpdates":[{"id":2,"name":"internal.metrics.executorRunTime","value":"9230","additionalProperties":{}},{"id":20,"name":"internal.metrics.input.bytesRead","value":"458752","additionalProperties":{}},{"id":5,"name":"internal.metrics.jvmGCTime","value":"225","additionalProperties":{}},{"id":19,"name":"internal.metrics.shuffle.write.writeTime","value":"16727929","additionalProperties":{}},{"id":21,"name":"internal.metrics.input.recordsRead","value":"27","additionalProperties":{}}],"additionalProperties":{}}
+
+
+************************
+
+
