@@ -33,7 +33,7 @@ public class AnalyzeResultsRestClient {
             String directory = logDir + "/" + application.getName() + "-" + application.getId();
             System.out.println("dir: " + directory);
             File dir = new File(directory);
-            boolean successful = dir.mkdir();
+            boolean successful = dir.mkdirs();
             if (!successful)
                 System.err.println("unable to create directory " + dir);
 
