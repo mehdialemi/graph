@@ -57,15 +57,21 @@ public class AnalyzeResultsRestClient {
                 continue;
 
             pwOverall.println("numJobs: " + jobs.length);
+            pwOverall.println("duration");
+            pwOverall.println("inputBytes");
+            pwOverall.println("shuffleReadBytes");
+            pwOverall.println("shuffleReadRecords");
+            pwOverall.println("shuffleWriteBytes");
+            pwOverall.println("shuffleWriteRecords");
+            pwOverall.println("memoryBytesSpilled");
+            pwOverall.println("diskBytesSpilled");
+
             pwOverall.close();
 
 
             PrintWriter pwJobs = new PrintWriter(new File(dir + "/jobs.txt"));
             PrintWriter pwJobsJson = new PrintWriter(new File(dir + "/jobs-json.txt"));
             PrintWriter pwStagesJson = new PrintWriter(new File(dir + "/stages-json.txt"));
-
-            pwJobs.println("duration    inputBytes  shuffleReadBytes    shuffleReadRecords " +
-                            "shuffleWriteBytes shuffleWriteRecords  memoryBytesSpilled  diskBytesSpilled");
 
             for (Job job : jobs) {
 
@@ -122,9 +128,9 @@ public class AnalyzeResultsRestClient {
                     pwStagesJson.println();
                 }
 
-                pwJobs.println(duration + " " + inputBytes + " " + shuffleReadBytes + " " +
-                        shuffleReadRecords + " " + shuffleWriteBytes + " " + shuffleWriteRecords + " " +
-                        memoryBytesSpilled + " " + diskBytesSpilled);
+                pwJobs.println(duration + "," + inputBytes + "," + shuffleReadBytes + "," +
+                        shuffleReadRecords + "," + shuffleWriteBytes + "," + shuffleWriteRecords + "," +
+                        memoryBytesSpilled + "," + diskBytesSpilled);
 
                 pwJobsJson.println(gson.toJson(job));
                 pwJobsJson.println();
