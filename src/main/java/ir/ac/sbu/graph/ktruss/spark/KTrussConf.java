@@ -31,7 +31,7 @@ public class KTrussConf {
         if (args.length == 0) {
             sparkConf.setMaster("local[2]");
         }
-        sparkConf.setAppName(name + "-" + partitionNum + "-" + new File(inputPath).getName());
+        sparkConf.setAppName(name + "-" + partitionNum + "-" + k + "-" + new File(inputPath).getName());
 //        sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 
         sparkConf.registerKryoClasses(classes);
