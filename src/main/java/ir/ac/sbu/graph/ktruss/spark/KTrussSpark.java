@@ -199,6 +199,7 @@ public class KTrussSpark extends KTruss {
                 }).filter(kv -> kv._2 != null)
                 .persist(StorageLevel.MEMORY_AND_DISK());
 
+            invalids.unpersist();
             prevTvSets.add(tvSets);
         }
         return tvSets;

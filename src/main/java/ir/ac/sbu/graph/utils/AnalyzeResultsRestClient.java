@@ -36,7 +36,7 @@ public class AnalyzeResultsRestClient {
         for (Application application : applications) {
 
             try {
-                String directory = logDir + "/" + application.getName() + "-" + application.getId();
+                String directory = logDir + "/" + application.getName()+ "-" + application.getId();
                 System.out.println("dir: " + directory);
                 File dir = new File(directory);
                 boolean successful = dir.mkdirs();
