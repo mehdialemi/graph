@@ -24,6 +24,6 @@ public class Edge {
 
     @Override
     public int hashCode() {
-        return v1 + v2;
+        return v1;
     }
 }

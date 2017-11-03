@@ -33,8 +33,8 @@ public class Triangle extends SparkApp {
             if (deg == 0)
                 return Collections.emptyIterator();
 
-            GraphUtils.VertexDegreeInt vd = new GraphUtils.VertexDegreeInt(t._1, deg);
-            List<Tuple2<Integer, GraphUtils.VertexDegreeInt>> degreeList = new ArrayList<>(deg);
+            VertexDeg vd = new VertexDeg(t._1, deg);
+            List<Tuple2<Integer, VertexDeg>> degreeList = new ArrayList<>(deg);
 
             // Add degree information of the current vertex to its neighbor
             for (int neighbor : t._2) {
@@ -48,12 +48,12 @@ public class Triangle extends SparkApp {
             if (v._2 == null)
                 return new Tuple2<>(v._1, new int[]{0});
 
-            for (GraphUtils.VertexDegreeInt vd : v._2) {
+            for (VertexDeg vd : v._2) {
                 degree++;
             }
 
-            List<GraphUtils.VertexDegreeInt> list = new ArrayList<>();
-            for (GraphUtils.VertexDegreeInt vd : v._2)
+            List<VertexDeg> list = new ArrayList<>();
+            for (VertexDeg vd : v._2)
                 if (vd.degree > degree || (vd.degree == degree && vd.vertex > v._1))
                     list.add(vd);
 
