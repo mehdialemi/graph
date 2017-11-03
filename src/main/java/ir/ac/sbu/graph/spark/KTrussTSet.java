@@ -31,7 +31,7 @@ public class KTrussTSet extends SparkApp {
         super(neighborList);
         this.neighborList = neighborList;
         this.k = kConf.getK();
-        this.partitionNum = kConf.getPartitionNum() * 10;
+        this.partitionNum = kConf.getPartitionNum() * 5;
         this.kConf = kConf;
     }
 

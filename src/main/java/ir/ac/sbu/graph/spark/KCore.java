@@ -1,7 +1,6 @@
 package ir.ac.sbu.graph.spark;
 
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.ints.*;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -40,50 +39,53 @@ public class KCore extends NeighborList {
         final int k = kConf.getK();
         for (int iter = 0 ; iter < kConf.getMaxIter(); iter ++ ) {
             long t1 = System.currentTimeMillis();
-            JavaPairRDD<Integer, Integer> update = neighbors
-                    .filter(nl -> nl._2.length < k && nl._2.length > 0)
+            JavaPairRDD<Integer, Iterable<Integer>> invUpdate = neighbors
+                    .filter(nl -> nl._2.length < k)
                     .flatMapToPair(nl -> {
                         List<Tuple2<Integer, Integer>> out = new ArrayList<>(nl._2.length);
                         for (int v : nl._2) {
                             out.add(new Tuple2<>(v, nl._1));
                         }
                         return out.iterator();
-                    }).repartition(conf.getPartitionNum());
+                    }).groupByKey().repartition(conf.getPartitionNum());
 
-            long count = update.count();
+            long count = invUpdate.count();
             long t2 = System.currentTimeMillis();
-            log("K-core, current update count: " + count, t1, t2);
+            log("K-core, current invUpdate count: " + count, t1, t2);
             if (count == 0)
                 break;
 
             if (neighborQueue.size() > 1)
                 neighborQueue.remove().unpersist();
 
-            neighbors = neighbors.cogroup(update).mapValues(value -> {
-                int[] allNeighbors = value._1().iterator().next();
-                if (allNeighbors.length < k) {
-                    return EMPTY_ARRAY;
-                }
-                Iterator<Integer> updateIterator = value._2.iterator();
-                if (!updateIterator.hasNext())
-                    return allNeighbors;
+            neighbors = neighbors.filter(nl -> nl._2.length >= k)
+                    .leftOuterJoin(invUpdate)
+                    .mapValues(value -> {
+                        if (!value._2.isPresent())
+                            return value._1;
 
-                IntSet set = new IntOpenHashSet(allNeighbors);
-                do {
-                    int v = updateIterator.next();
-                    set.remove(v);
-                } while (updateIterator.hasNext());
+                        IntSet invSet = new IntOpenHashSet();
+                        for (int inv : value._2.get()) {
+                            invSet.add(inv);
+                        }
 
-                return set.toIntArray();
+                        IntList nSet = new IntArrayList();
+                        for (int v : value._1) {
+                            if (invSet.contains(v))
+                                continue;
+                            nSet.add(v);
+                        }
+
+                        return nSet.toIntArray();
             }).cache();
 
             neighborQueue.add(neighbors);
         }
 
         if (neighborQueue.size() > 1)
-            neighborQueue.remove();
+            neighborQueue.remove().unpersist();
 
-        return neighbors.filter(t -> t._2.length != 0).cache();
+        return neighbors;
     }
 
     public static void main(String[] args) {
