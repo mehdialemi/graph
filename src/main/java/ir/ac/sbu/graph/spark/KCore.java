@@ -59,7 +59,6 @@ public class KCore extends NeighborList {
             if (neighborQueue.size() > 1)
                 neighborQueue.remove().unpersist();
 
-
             neighbors = neighbors.cogroup(update).mapValues(value -> {
                 int[] allNeighbors = value._1().iterator().next();
                 if (allNeighbors.length < k) {
@@ -77,9 +76,14 @@ public class KCore extends NeighborList {
 
                 return set.toIntArray();
             }).cache();
+
+            neighborQueue.add(neighbors);
         }
 
-        return neighbors.filter(t -> t._2.length != 0);
+        if (neighborQueue.size() > 1)
+            neighborQueue.remove();
+
+        return neighbors.filter(t -> t._2.length != 0).cache();
     }
 
     public static void main(String[] args) {
