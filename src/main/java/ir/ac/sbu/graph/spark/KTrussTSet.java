@@ -24,14 +24,14 @@ public class KTrussTSet extends SparkApp {
 
     private final NeighborList neighborList;
     private final int k;
-    private final int partition;
+    private final int partitionNum;
     private KConf kConf;
 
     public KTrussTSet(NeighborList neighborList, KConf kConf) {
         super(neighborList);
         this.neighborList = neighborList;
         this.k = kConf.getK();
-        this.partition = kConf.getPartitionNum() * 3;
+        this.partitionNum = kConf.getPartitionNum() * 3;
         this.kConf = kConf;
     }
 
@@ -40,10 +40,9 @@ public class KTrussTSet extends SparkApp {
         NeighborList kCore = new KCore(neighborList, kConf.create(k - 1, 1));
 
         Triangle triangle = new Triangle(kCore);
-        JavaPairRDD<Integer, int[]> fonl = triangle.createFonl();
+        JavaPairRDD<Integer, int[]> fonl = triangle.createFonl(partitionNum);
         JavaPairRDD<Integer, int[]> candidates = triangle.generateCandidates(fonl)
-                .repartition(partition)
-                .persist(StorageLevel.DISK_ONLY());
+                .persist(StorageLevel.MEMORY_AND_DISK());
 
         JavaPairRDD<Tuple2<Integer, Integer>, int[]> tSet = createTSet(fonl, candidates);
 
@@ -107,7 +106,7 @@ public class KTrussTSet extends SparkApp {
                 }
 
                 return out.iterator();
-            }).groupByKey(partition);
+            }).groupByKey(partitionNum);
 
             // Remove the invalid vertices from the triangle vertex set of each remaining (valid) edge.
             tSet = tSet.filter(kv -> kv._2[0] >= minSup).leftOuterJoin(invUpdates)
@@ -188,7 +187,7 @@ public class KTrussTSet extends SparkApp {
             }
 
             return output.iterator();
-        }).groupByKey(partition)
+        }).groupByKey(partitionNum)
                 .mapValues(values -> {
                     List<Tuple2<Integer, Byte>> list = new ArrayList<>();
                     int sw = 0, sv = 0, su = 0;
