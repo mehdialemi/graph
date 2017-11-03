@@ -43,7 +43,7 @@ public class KTrussTSet extends SparkApp {
         JavaPairRDD<Integer, int[]> fonl = triangle.createFonl();
         JavaPairRDD<Integer, int[]> candidates = triangle.generateCandidates(fonl)
                 .repartition(partition)
-                .persist(StorageLevel.MEMORY_AND_DISK());
+                .persist(StorageLevel.DISK_ONLY());
 
         JavaPairRDD<Tuple2<Integer, Integer>, int[]> tSet = createTSet(fonl, candidates);
 
@@ -59,7 +59,7 @@ public class KTrussTSet extends SparkApp {
                 candidates.unpersist();
                 fonl.unpersist();
             }
-            
+
             // Detect invalid edges by comparing the size of triangle vertex set
             JavaPairRDD<Tuple2<Integer, Integer>, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup).cache();
             long invalidCount = invalids.count();
