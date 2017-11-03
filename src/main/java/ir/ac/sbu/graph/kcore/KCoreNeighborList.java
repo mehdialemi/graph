@@ -35,7 +35,8 @@ public class KCoreNeighborList extends KCore {
         final Partitioner partitioner = this.partitioner;
         while (true) {
             t1 = System.currentTimeMillis();
-            JavaPairRDD<Integer, Integer> update = neighborList.filter(nl -> nl._2.length < k && nl._2.length > 0)
+            JavaPairRDD<Integer, Integer> update = neighborList
+                    .filter(nl -> nl._2.length < k && nl._2.length > 0)
                 .flatMapToPair(nl -> {
                     List<Tuple2<Integer, Integer>> out = new ArrayList<>(nl._2.length);
                     for (int v : nl._2) {

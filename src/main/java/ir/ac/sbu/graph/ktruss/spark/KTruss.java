@@ -46,4 +46,6 @@ public class KTruss {
 
         return candidates;
     }
+
+
 }
