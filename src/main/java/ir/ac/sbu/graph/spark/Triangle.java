@@ -42,7 +42,7 @@ public class Triangle extends SparkApp {
             }
 
             return degreeList.iterator();
-        }).groupByKey().mapToPair(v -> {
+        }).groupByKey(partitionNum).mapToPair(v -> {
             int degree = 0;
             // Iterate over higherIds to calculate degree of the current vertex
             if (v._2 == null)
@@ -75,7 +75,7 @@ public class Triangle extends SparkApp {
                 higherDegs[i] = list.get(i - 1).vertex;
 
             return new Tuple2<>(v._1, higherDegs);
-        }).repartition(partitionNum).persist(StorageLevel.MEMORY_AND_DISK_2());
+        }).persist(StorageLevel.MEMORY_AND_DISK_2());
     }
 
     public JavaPairRDD<Integer, int[]> generateCandidates(JavaPairRDD<Integer, int[]> fonl) {

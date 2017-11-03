@@ -47,7 +47,7 @@ public class KCore extends NeighborList {
                             out.add(new Tuple2<>(v, nl._1));
                         }
                         return out.iterator();
-                    }).groupByKey().repartition(conf.getPartitionNum());
+                    }).groupByKey(conf.getPartitionNum());
 
             long count = invUpdate.count();
             long t2 = System.currentTimeMillis();
