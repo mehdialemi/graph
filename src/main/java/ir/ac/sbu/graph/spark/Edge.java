@@ -13,4 +13,17 @@ public class Edge {
         this.v1 = v1;
         this.v2 = v2;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return super.equals(obj);
+        Edge edge = (Edge) obj;
+        return this.v1 == edge.v1 && this.v2 == edge.v2;
+    }
+
+    @Override
+    public int hashCode() {
+        return v1 + v2;
+    }
 }
