@@ -33,7 +33,8 @@ public class SparkAppConf {
 
         sparkConf.setAppName(appName);
         sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-        sparkConf.registerKryoClasses(new Class[] {int[].class, VertexDeg.class});
+        sparkConf.registerKryoClasses(new Class[] {int[].class, VertexDeg.class,
+                Edge.class, VertexByte.class});
 
         sc = new JavaSparkContext(sparkConf);
         Log.log(appName);

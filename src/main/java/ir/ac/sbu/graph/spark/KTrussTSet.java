@@ -16,9 +16,9 @@ import static ir.ac.sbu.graph.utils.Log.log;
  * 2: Iteratively, prune invalid edges which have not enough support
  */
 public class KTrussTSet extends SparkApp {
-    private static final Byte W_UVW = (byte) 0;
-    private static final Byte V_UVW = (byte) 1;
-    private static final Byte U_UVW = (byte) 2;
+    private static final byte W_UVW = (byte) 0;
+    private static final byte V_UVW = (byte) 1;
+    private static final byte U_UVW = (byte) 2;
     public static final int META_LEN = 4;
     public static final int INVALID = -1;
 
@@ -31,23 +31,24 @@ public class KTrussTSet extends SparkApp {
         super(neighborList);
         this.neighborList = neighborList;
         this.k = kConf.getK();
-        this.partitionNum = kConf.getPartitionNum() * 3;
+        this.partitionNum = kConf.getPartitionNum() * 10;
         this.kConf = kConf;
     }
 
-    public JavaPairRDD<Tuple2<Integer, Integer>, int[]> generate() {
+    public JavaPairRDD<Edge, int[]> generate() {
 
         NeighborList kCore = new KCore(neighborList, kConf.create(k - 1, 1));
 
         Triangle triangle = new Triangle(kCore);
-        JavaPairRDD<Integer, int[]> fonl = triangle.createFonl(partitionNum);
+        JavaPairRDD<Integer, int[]> fonl = triangle.createFonl();
         JavaPairRDD<Integer, int[]> candidates = triangle.generateCandidates(fonl)
-                .persist(StorageLevel.DISK_ONLY());
+                .repartition(partitionNum)
+                .persist(StorageLevel.MEMORY_AND_DISK());
 
-        JavaPairRDD<Tuple2<Integer, Integer>, int[]> tSet = createTSet(fonl, candidates);
+        JavaPairRDD<Edge, int[]> tSet = createTSet(fonl.repartition(partitionNum), candidates);
 
         final int minSup = k - 2;
-        Queue<JavaPairRDD<Tuple2<Integer, Integer>, int[]>> tSetQueue = new LinkedList<>();
+        Queue<JavaPairRDD<Edge, int[]>> tSetQueue = new LinkedList<>();
         tSetQueue.add(tSet);
 
         for (int iter = 0; iter < kConf.getMaxIter(); iter ++) {
@@ -60,7 +61,7 @@ public class KTrussTSet extends SparkApp {
             }
 
             // Detect invalid edges by comparing the size of triangle vertex set
-            JavaPairRDD<Tuple2<Integer, Integer>, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup).cache();
+            JavaPairRDD<Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup).cache();
             long invalidCount = invalids.count();
 
             // If no invalid edge is found then the program terminates
@@ -79,30 +80,30 @@ public class KTrussTSet extends SparkApp {
             // The edges in the key part of invalids key-values should be removed. So, we detect other
             // edges of their involved triangle from their triangle vertex set. Here, we determine the
             // vertices which should be removed from the triangle vertex set related to the other edges.
-            JavaPairRDD<Tuple2<Integer, Integer>, Iterable<Integer>> invUpdates = invalids.flatMapToPair(kv -> {
+            JavaPairRDD<Edge, Iterable<Integer>> invUpdates = invalids.flatMapToPair(kv -> {
                 int i = META_LEN;
 
-                Tuple2<Integer, Integer> e = kv._1;
-                List<Tuple2<Tuple2<Integer, Integer>, Integer>> out = new ArrayList<>((kv._2.length - 3) * 2);
+                Edge e = kv._1;
+                List<Tuple2<Edge, Integer>> out = new ArrayList<>((kv._2.length - 3) * 2);
                 for (; i < kv._2[1]; i++) {
                     if (kv._2[i] == INVALID)
                         continue;
-                    out.add(new Tuple2<>(new Tuple2<>(e._1, kv._2[i]), e._2));
-                    out.add(new Tuple2<>(new Tuple2<>(e._2, kv._2[i]), e._1));
+                    out.add(new Tuple2<>(new Edge(e.v1, kv._2[i]), e.v2));
+                    out.add(new Tuple2<>(new Edge(e.v2, kv._2[i]), e.v1));
                 }
 
                 for (; i < kv._2[2]; i++) {
                     if (kv._2[i] == INVALID)
                         continue;
-                    out.add(new Tuple2<>(new Tuple2<>(e._1, kv._2[i]), e._2));
-                    out.add(new Tuple2<>(new Tuple2<>(kv._2[i], e._2), e._1));
+                    out.add(new Tuple2<>(new Edge(e.v1, kv._2[i]), e.v2));
+                    out.add(new Tuple2<>(new Edge(kv._2[i], e.v2), e.v1));
                 }
 
                 for (; i < kv._2[3]; i++) {
                     if (kv._2[i] == INVALID)
                         continue;
-                    out.add(new Tuple2<>(new Tuple2<>(kv._2[i], e._1), e._2));
-                    out.add(new Tuple2<>(new Tuple2<>(kv._2[i], e._2), e._1));
+                    out.add(new Tuple2<>(new Edge(kv._2[i], e.v1), e.v2));
+                    out.add(new Tuple2<>(new Edge(kv._2[i], e.v2), e.v1));
                 }
 
                 return out.iterator();
@@ -149,18 +150,18 @@ public class KTrussTSet extends SparkApp {
         return tSet;
     }
 
-    private JavaPairRDD<Tuple2<Integer, Integer>, int[]> createTSet(JavaPairRDD<Integer, int[]> fonl, JavaPairRDD<Integer, int[]> candidates) {
+    private JavaPairRDD<Edge, int[]> createTSet(JavaPairRDD<Integer, int[]> fonl, JavaPairRDD<Integer, int[]> candidates) {
 
         // Generate kv such that key is an edge and value is its triangle vertices.
-        JavaPairRDD<Tuple2<Integer, Integer>, int[]> tSet = candidates.cogroup(fonl).flatMapToPair(t -> {
+        JavaPairRDD<Edge, int[]> tSet = candidates.cogroup(fonl).flatMapToPair(t -> {
             int[] fVal = t._2._2.iterator().next();
             Arrays.sort(fVal, 1, fVal.length);
             int v = t._1;
 
-            List<Tuple2<Tuple2<Integer, Integer>, Tuple2<Integer, Byte>>> output = new ArrayList<>();
+            List<Tuple2<Edge, VertexByte>> output = new ArrayList<>();
             for (int[] cVal : t._2._1) {
                 int u = cVal[0];
-                Tuple2<Integer, Integer> uv = new Tuple2<>(u, v);
+                Edge uv = new Edge(u, v);
 
                 // The intersection determines triangles which u and v are two of their vertices.
                 // Always generate and edge (u, v) such that u < v.
@@ -173,12 +174,12 @@ public class KTrussTSet extends SparkApp {
                         ci++;
                     else {
                         int w = fVal[fi];
-                        Tuple2<Integer, Integer> uw = new Tuple2<>(u, w);
-                        Tuple2<Integer, Integer> vw = new Tuple2<>(v, w);
+                        Edge uw = new Edge(u, w);
+                        Edge vw = new Edge(v, w);
 
-                        output.add(new Tuple2<>(uv, new Tuple2<>(w, W_UVW)));
-                        output.add(new Tuple2<>(uw, new Tuple2<>(v, V_UVW)));
-                        output.add(new Tuple2<>(vw, new Tuple2<>(u, U_UVW)));
+                        output.add(new Tuple2<>(uv, new VertexByte(w, W_UVW)));
+                        output.add(new Tuple2<>(uw, new VertexByte(v, V_UVW)));
+                        output.add(new Tuple2<>(vw, new VertexByte(u, U_UVW)));
 
                         fi++;
                         ci++;
@@ -189,13 +190,13 @@ public class KTrussTSet extends SparkApp {
             return output.iterator();
         }).groupByKey(partitionNum)
                 .mapValues(values -> {
-                    List<Tuple2<Integer, Byte>> list = new ArrayList<>();
+                    List<VertexByte> list = new ArrayList<>();
                     int sw = 0, sv = 0, su = 0;
-                    for (Tuple2<Integer, Byte> value : values) {
+                    for (VertexByte value : values) {
                         list.add(value);
-                        if (value._2.equals(W_UVW))
+                        if (value.b == W_UVW)
                             sw++;
-                        else if (value._2.equals(V_UVW))
+                        else if (value.b  == V_UVW)
                             sv++;
                         else
                             su++;
@@ -210,17 +211,17 @@ public class KTrussTSet extends SparkApp {
                     set[2] = offsetV + sv;  // exclusive max offset of v
                     set[3] = offsetU + su;  // exclusive max offset of u
 
-                    for (Tuple2<Integer, Byte> v : list) {
-                        if (v._2.equals(W_UVW))
-                            set[offsetW++] = v._1;
-                        else if (v._2.equals(V_UVW))
-                            set[offsetV++] = v._1;
+                    for (VertexByte vb : list) {
+                        if (vb.b == W_UVW)
+                            set[offsetW++] = vb.v;
+                        else if (vb.b == V_UVW)
+                            set[offsetV++] = vb.v;
                         else
-                            set[offsetU++] = v._1;
+                            set[offsetU++] = vb.v;
                     }
 
                     return set;
-                }).persist(StorageLevel.MEMORY_AND_DISK()); // Use disk too if graph is very large
+                }).persist(StorageLevel.DISK_ONLY()); // Use disk too if graph is very large
 
         return tSet;
     }
@@ -232,7 +233,7 @@ public class KTrussTSet extends SparkApp {
         NeighborList neighborList = new NeighborList(edgeLoader);
 
         KTrussTSet kTrussTSet = new KTrussTSet(neighborList, kConf);
-        JavaPairRDD<Tuple2<Integer, Integer>, int[]> subgraph = kTrussTSet.generate();
+        JavaPairRDD<Edge, int[]> subgraph = kTrussTSet.generate();
         log("KTruss edge count: " + subgraph.count(), t1, System.currentTimeMillis());
 
         kTrussTSet.close();
