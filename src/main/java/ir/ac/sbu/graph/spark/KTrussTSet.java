@@ -62,13 +62,14 @@ public class KTrussTSet extends SparkApp {
             JavaPairRDD<Tuple2<Integer, Integer>, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup).cache();
             long invalidCount = invalids.count();
 
-            if (tSetQueue.size() > 1)
-                tSetQueue.remove().unpersist();
-
             // If no invalid edge is found then the program terminates
             if (invalidCount == 0) {
                 break;
             }
+
+            if (tSetQueue.size() > 1)
+                tSetQueue.remove().unpersist();
+
 
             long t2 = System.currentTimeMillis();
             String msg = "iteration: " + (iter + 1) + ", invalid edge count: " + invalidCount;

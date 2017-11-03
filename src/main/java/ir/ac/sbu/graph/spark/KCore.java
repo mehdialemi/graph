@@ -7,9 +7,7 @@ import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import static ir.ac.sbu.graph.utils.Log.log;
 
@@ -36,6 +34,9 @@ public class KCore extends NeighborList {
             return neighbors;
         }
 
+        Queue<JavaPairRDD<Integer, int[]>> neighborQueue = new LinkedList<>();
+        neighborQueue.add(neighbors);
+
         final int k = kConf.getK();
         for (int iter = 0 ; iter < kConf.getMaxIter(); iter ++ ) {
             long t1 = System.currentTimeMillis();
@@ -54,6 +55,10 @@ public class KCore extends NeighborList {
             log("K-core, current update count: " + count, t1, t2);
             if (count == 0)
                 break;
+
+            if (neighborQueue.size() > 1)
+                neighborQueue.remove().unpersist();
+
 
             neighbors = neighbors.cogroup(update).mapValues(value -> {
                 int[] allNeighbors = value._1().iterator().next();
