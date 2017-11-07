@@ -39,7 +39,7 @@ public class KTrussTSet extends SparkApp {
 
     public JavaPairRDD<Edge, int[]> generate() {
 
-        NeighborList kCore = new KCore(neighborList, ktConf);
+        KCore kCore = new KCore(neighborList, ktConf);
 
         Triangle triangle = new Triangle(kCore);
         JavaPairRDD<Integer, int[]> fonl = triangle.createFonl(partitionNum);
@@ -58,6 +58,7 @@ public class KTrussTSet extends SparkApp {
 
             if (iter == 1) {
                 candidates.unpersist();
+                kCore.unpersist();
                 fonl.unpersist();
             }
 

@@ -14,15 +14,22 @@ import static ir.ac.sbu.graph.utils.Log.log;
  * Create k-core sub-graph
  */
 public class KCore extends NeighborList {
-    public static final int[] EMPTY_ARRAY = new int[]{};
 
     private final NeighborList neighborList;
-    private KCoreConf kConf;
+    private final KCoreConf kConf;
+    private final Queue<JavaPairRDD<Integer, int[]>> neighborQueue;
 
     public KCore(NeighborList neighborList, KCoreConf kConf) {
         super(neighborList);
         this.neighborList = neighborList;
         this.kConf = kConf;
+        neighborQueue = new LinkedList<>();
+    }
+
+    public void unpersist() {
+        for (JavaPairRDD<Integer, int[]> rdd : neighborQueue) {
+            rdd.unpersist();
+        }
     }
 
     @Override
@@ -33,7 +40,6 @@ public class KCore extends NeighborList {
             return neighbors;
         }
 
-        Queue<JavaPairRDD<Integer, int[]>> neighborQueue = new LinkedList<>();
         neighborQueue.add(neighbors);
 
         final int k = kConf.getKc();
