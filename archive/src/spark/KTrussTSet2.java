@@ -20,12 +20,12 @@ public class KTrussTSet2 extends SparkApp {
     private final NeighborList neighborList;
     private final int k;
     private final int partitionNum;
-    private KConf kConf;
+    private KCoreConf kConf;
 
-    public KTrussTSet2(NeighborList neighborList, KConf kConf) {
+    public KTrussTSet2(NeighborList neighborList, KCoreConf kConf) {
         super(neighborList);
         this.neighborList = neighborList;
-        this.k = kConf.getK();
+        this.k = kConf.getKc();
         this.partitionNum = kConf.getPartitionNum() * 5;
         this.kConf = kConf;
     }
@@ -45,7 +45,7 @@ public class KTrussTSet2 extends SparkApp {
         Queue<JavaPairRDD<Edge, int[]>> tSetQueue = new LinkedList<>();
         tSetQueue.add(tSet);
 
-        for (int iter = 0; iter < kConf.getMaxIter(); iter ++) {
+        for (int iter = 0; iter < kConf.getKcMaxIter(); iter ++) {
 
             long t1 = System.currentTimeMillis();
 
@@ -195,7 +195,7 @@ public class KTrussTSet2 extends SparkApp {
 
     public static void main(String[] args) {
         long t1 = System.currentTimeMillis();
-        KConf kConf = new KConf(new ArgumentReader(args), "KTruss2");
+        KCoreConf kConf = new KCoreConf(new ArgumentReader(args), "KTruss2");
         EdgeLoader edgeLoader = new EdgeLoader(kConf);
         NeighborList neighborList = new NeighborList(edgeLoader);
 

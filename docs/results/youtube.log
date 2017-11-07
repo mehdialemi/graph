@@ -2,7 +2,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2093 ms
-start ktruss with k = 3, threads = 12, method = 6 input: /home/i/graph-data/youtube
+start ktruss with kc = 3, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 282 ms
 tc duration: 642 ms
 iteration 1, invalid size: 0 time: 21 ms
@@ -16,7 +16,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 1929 ms
-start ktruss with k = 4, threads = 12, method = 6 input: /home/i/graph-data/youtube
+start ktruss with kc = 4, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 343 ms
 tc duration: 553 ms
 iteration 1, invalid size: 466980 time: 68 ms
@@ -50,7 +50,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 1967 ms
-start ktruss with k = 5, threads = 12, method = 6 input: /home/i/graph-data/youtube
+start ktruss with kc = 5, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 401 ms
 tc duration: 879 ms
 iteration 1, invalid size: 704820 time: 53 ms
@@ -92,7 +92,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2073 ms
-start ktruss with k = 6, threads = 12, method = 6 input: /home/i/graph-data/youtube
+start ktruss with kc = 6, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 288 ms
 tc duration: 536 ms
 iteration 1, invalid size: 849489 time: 113 ms
@@ -144,7 +144,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2086 ms
-start ktruss with k = 7, threads = 12, method = 6 input: /home/i/graph-data/youtube
+start ktruss with kc = 7, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 293 ms
 tc duration: 639 ms
 iteration 1, invalid size: 945905 time: 89 ms
@@ -196,7 +196,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2056 ms
-start ktruss with k = 8, threads = 12, method = 6 input: /home/i/graph-data/youtube
+start ktruss with kc = 8, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 282 ms
 tc duration: 778 ms
 iteration 1, invalid size: 1016523 time: 77 ms
@@ -246,7 +246,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2019 ms
-start ktruss with k = 9, threads = 12, method = 6 input: /home/i/graph-data/youtube
+start ktruss with kc = 9, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 293 ms
 tc duration: 686 ms
 iteration 1, invalid size: 1069922 time: 91 ms
@@ -310,7 +310,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2075 ms
-start ktruss with k = 10, threads = 12, method = 6 input: /home/i/graph-data/youtube
+start ktruss with kc = 10, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 278 ms
 tc duration: 654 ms
 iteration 1, invalid size: 1111522 time: 127 ms
@@ -394,7 +394,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2045 ms
-start ktruss with k = 11, threads = 12, method = 6 input: /home/i/graph-data/youtube
+start ktruss with kc = 11, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 280 ms
 tc duration: 745 ms
 iteration 1, invalid size: 1145315 time: 65 ms
@@ -452,7 +452,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2076 ms
-start ktruss with k = 12, threads = 12, method = 6 input: /home/i/graph-data/youtube
+start ktruss with kc = 12, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 224 ms
 tc duration: 635 ms
 iteration 1, invalid size: 1172674 time: 134 ms
@@ -524,7 +524,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2018 ms
-start ktruss with k = 13, threads = 12, method = 6 input: /home/i/graph-data/youtube
+start ktruss with kc = 13, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 292 ms
 tc duration: 732 ms
 iteration 1, invalid size: 1195995 time: 60 ms
@@ -598,7 +598,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2055 ms
-start ktruss with k = 14, threads = 12, method = 6 input: /home/i/graph-data/youtube
+start ktruss with kc = 14, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 287 ms
 tc duration: 896 ms
 iteration 1, invalid size: 1215375 time: 49 ms
@@ -664,7 +664,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2044 ms
-start ktruss with k = 15, threads = 12, method = 6 input: /home/i/graph-data/youtube
+start ktruss with kc = 15, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 263 ms
 tc duration: 571 ms
 iteration 1, invalid size: 1232087 time: 120 ms
@@ -734,7 +734,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2168 ms
-start ktruss with k = 16, threads = 12, method = 6 input: /home/i/graph-data/youtube
+start ktruss with kc = 16, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 427 ms
 tc duration: 528 ms
 iteration 1, invalid size: 1246690 time: 75 ms
@@ -850,7 +850,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2066 ms
-start ktruss with k = 17, threads = 12, method = 6 input: /home/i/graph-data/youtube
+start ktruss with kc = 17, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 260 ms
 tc duration: 826 ms
 iteration 1, invalid size: 1259437 time: 101 ms
@@ -916,7 +916,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 1947 ms
-start ktruss with k = 18, threads = 12, method = 6 input: /home/i/graph-data/youtube
+start ktruss with kc = 18, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 408 ms
 tc duration: 621 ms
 iteration 1, invalid size: 1270640 time: 133 ms
@@ -966,7 +966,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2083 ms
-start ktruss with k = 19, threads = 12, method = 6 input: /home/i/graph-data/youtube
+start ktruss with kc = 19, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 275 ms
 tc duration: 588 ms
 iteration 1, invalid size: 1280498 time: 91 ms
@@ -1068,7 +1068,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 1936 ms
-start ktruss with k = 20, threads = 12, method = 6 input: /home/i/graph-data/youtube
+start ktruss with kc = 20, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 296 ms
 tc duration: 640 ms
 iteration 1, invalid size: 1289178 time: 57 ms

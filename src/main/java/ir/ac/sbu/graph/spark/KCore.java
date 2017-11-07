@@ -17,9 +17,9 @@ public class KCore extends NeighborList {
     public static final int[] EMPTY_ARRAY = new int[]{};
 
     private final NeighborList neighborList;
-    private KConf kConf;
+    private KCoreConf kConf;
 
-    public KCore(NeighborList neighborList, KConf kConf) {
+    public KCore(NeighborList neighborList, KCoreConf kConf) {
         super(neighborList);
         this.neighborList = neighborList;
         this.kConf = kConf;
@@ -29,15 +29,15 @@ public class KCore extends NeighborList {
     public JavaPairRDD<Integer, int[]> create() {
 
         JavaPairRDD<Integer, int[]> neighbors = neighborList.create();
-        if (kConf.getMaxIter() < 1) {
+        if (kConf.getKcMaxIter() < 1) {
             return neighbors;
         }
 
         Queue<JavaPairRDD<Integer, int[]>> neighborQueue = new LinkedList<>();
         neighborQueue.add(neighbors);
 
-        final int k = kConf.getK();
-        for (int iter = 0 ; iter < kConf.getMaxIter(); iter ++ ) {
+        final int k = kConf.getKc();
+        for (int iter = 0; iter < kConf.getKcMaxIter(); iter ++ ) {
             long t1 = System.currentTimeMillis();
             JavaPairRDD<Integer, Iterable<Integer>> invUpdate = neighbors
                     .filter(nl -> nl._2.length < k)
@@ -92,7 +92,9 @@ public class KCore extends NeighborList {
         Logger.getLogger("org.apache.spar").setLevel(Level.INFO);
 
         long t1 = System.currentTimeMillis();
-        KConf kConf = new KConf(new ArgumentReader(args), "KCore");
+        KCoreConf kConf = new KCoreConf(new ArgumentReader(args));
+        kConf.init();
+
         EdgeLoader edgeLoader = new EdgeLoader(kConf);
         NeighborList neighborList = new NeighborList(edgeLoader);
 

@@ -2,7 +2,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22149 ms
-start ktruss with k = 3, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+start ktruss with kc = 3, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 498 ms
 tc duration: 13413 ms
 iteration 1, invalid size: 0 time: 26 ms
@@ -16,7 +16,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22037 ms
-start ktruss with k = 4, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+start ktruss with kc = 4, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 495 ms
 tc duration: 14716 ms
 iteration 1, invalid size: 4357294 time: 183 ms
@@ -66,7 +66,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22197 ms
-start ktruss with k = 5, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+start ktruss with kc = 5, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 500 ms
 tc duration: 13766 ms
 iteration 1, invalid size: 7639353 time: 186 ms
@@ -126,7 +126,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22267 ms
-start ktruss with k = 6, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+start ktruss with kc = 6, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 524 ms
 tc duration: 14130 ms
 iteration 1, invalid size: 10228285 time: 127 ms
@@ -190,7 +190,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 23319 ms
-start ktruss with k = 7, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+start ktruss with kc = 7, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 506 ms
 tc duration: 14203 ms
 iteration 1, invalid size: 12343981 time: 196 ms
@@ -278,7 +278,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22871 ms
-start ktruss with k = 8, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+start ktruss with kc = 8, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 546 ms
 tc duration: 13936 ms
 iteration 1, invalid size: 14106860 time: 154 ms
@@ -356,7 +356,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22219 ms
-start ktruss with k = 9, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+start ktruss with kc = 9, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 528 ms
 tc duration: 13495 ms
 iteration 1, invalid size: 15594258 time: 173 ms
@@ -448,7 +448,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 20684 ms
-start ktruss with k = 10, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+start ktruss with kc = 10, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 639 ms
 tc duration: 14323 ms
 iteration 1, invalid size: 16864360 time: 139 ms
@@ -550,7 +550,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22100 ms
-start ktruss with k = 11, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+start ktruss with kc = 11, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 498 ms
 tc duration: 13581 ms
 iteration 1, invalid size: 17957408 time: 142 ms
@@ -646,7 +646,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 21555 ms
-start ktruss with k = 12, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+start ktruss with kc = 12, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 521 ms
 tc duration: 13537 ms
 iteration 1, invalid size: 18904278 time: 159 ms
@@ -758,7 +758,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22451 ms
-start ktruss with k = 13, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+start ktruss with kc = 13, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 496 ms
 tc duration: 13881 ms
 iteration 1, invalid size: 19732908 time: 97 ms
@@ -872,7 +872,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22484 ms
-start ktruss with k = 14, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+start ktruss with kc = 14, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 486 ms
 tc duration: 13689 ms
 iteration 1, invalid size: 20456591 time: 226 ms
@@ -986,7 +986,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 21835 ms
-start ktruss with k = 15, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+start ktruss with kc = 15, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 506 ms
 tc duration: 14296 ms
 iteration 1, invalid size: 21090955 time: 91 ms
@@ -1098,7 +1098,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22625 ms
-start ktruss with k = 16, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+start ktruss with kc = 16, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 457 ms
 tc duration: 15337 ms
 iteration 1, invalid size: 21653935 time: 169 ms
@@ -1204,7 +1204,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 23244 ms
-start ktruss with k = 17, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+start ktruss with kc = 17, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 437 ms
 tc duration: 14477 ms
 iteration 1, invalid size: 22152511 time: 179 ms
@@ -1294,7 +1294,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 21957 ms
-start ktruss with k = 18, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+start ktruss with kc = 18, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 527 ms
 tc duration: 13077 ms
 iteration 1, invalid size: 22596010 time: 197 ms
@@ -1416,7 +1416,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22398 ms
-start ktruss with k = 19, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+start ktruss with kc = 19, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 522 ms
 tc duration: 13713 ms
 iteration 1, invalid size: 22992246 time: 138 ms
@@ -1560,7 +1560,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 21503 ms
-start ktruss with k = 20, threads = 12, method = 6 input: /home/i/graph-data/live-journal
+start ktruss with kc = 20, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 560 ms
 tc duration: 14595 ms
 iteration 1, invalid size: 23348153 time: 259 ms

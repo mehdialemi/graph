@@ -1,5 +1,5 @@
 /home/i/spark-2.1/bin/spark-submit --class ir.ac.sbu.graph.ktruss.spark.KTrussSpark --total-executor-cores 120 --master spark://alemi-1:7077 /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar hdfs://alemi-1/graph-data/orkut 240 4
-[SBM] Input: hdfs://alemi-1/graph-data/orkut, partitionNum: 240, k: 4
+[SBM] Input: hdfs://alemi-1/graph-data/orkut, partitionNum: 240, kc: 4
 [KTrussSpark] iteration: 1, invalid edge count: 11523968, duration: 175766 ms
 [KTrussSpark] iteration: 2, invalid edge count: 1794826, duration: 7524 ms
 [KTrussSpark] iteration: 3, invalid edge count: 470803, duration: 5788 ms

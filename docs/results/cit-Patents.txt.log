@@ -2,7 +2,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 10902 ms
-start ktruss with k = 3, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
+start ktruss with kc = 3, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 996 ms
 tc duration: 1917 ms
 iteration 1, invalid size: 0 time: 29 ms
@@ -16,7 +16,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11399 ms
-start ktruss with k = 4, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
+start ktruss with kc = 4, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1063 ms
 tc duration: 1638 ms
 iteration 1, invalid size: 3416336 time: 135 ms
@@ -64,7 +64,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11265 ms
-start ktruss with k = 5, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
+start ktruss with kc = 5, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1051 ms
 tc duration: 1394 ms
 iteration 1, invalid size: 5102318 time: 116 ms
@@ -112,7 +112,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11232 ms
-start ktruss with k = 6, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
+start ktruss with kc = 6, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1082 ms
 tc duration: 1662 ms
 iteration 1, invalid size: 6032783 time: 162 ms
@@ -172,7 +172,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11180 ms
-start ktruss with k = 7, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
+start ktruss with kc = 7, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 991 ms
 tc duration: 1863 ms
 iteration 1, invalid size: 6585182 time: 298 ms
@@ -224,7 +224,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11040 ms
-start ktruss with k = 8, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
+start ktruss with kc = 8, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1041 ms
 tc duration: 1556 ms
 iteration 1, invalid size: 6930673 time: 203 ms
@@ -290,7 +290,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11233 ms
-start ktruss with k = 9, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
+start ktruss with kc = 9, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1169 ms
 tc duration: 1727 ms
 iteration 1, invalid size: 7156456 time: 276 ms
@@ -338,7 +338,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 10682 ms
-start ktruss with k = 10, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
+start ktruss with kc = 10, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1060 ms
 tc duration: 1754 ms
 iteration 1, invalid size: 7309734 time: 91 ms
@@ -390,7 +390,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11102 ms
-start ktruss with k = 11, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
+start ktruss with kc = 11, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1032 ms
 tc duration: 1970 ms
 iteration 1, invalid size: 7416992 time: 257 ms
@@ -434,7 +434,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11197 ms
-start ktruss with k = 12, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
+start ktruss with kc = 12, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1066 ms
 tc duration: 1762 ms
 iteration 1, invalid size: 7494931 time: 130 ms
@@ -494,7 +494,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 10693 ms
-start ktruss with k = 13, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
+start ktruss with kc = 13, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1038 ms
 tc duration: 1529 ms
 iteration 1, invalid size: 7552072 time: 129 ms
@@ -538,7 +538,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 10704 ms
-start ktruss with k = 14, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
+start ktruss with kc = 14, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1055 ms
 tc duration: 1415 ms
 iteration 1, invalid size: 7595363 time: 234 ms
@@ -576,7 +576,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11042 ms
-start ktruss with k = 15, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
+start ktruss with kc = 15, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1061 ms
 tc duration: 1436 ms
 iteration 1, invalid size: 7628016 time: 137 ms
@@ -614,7 +614,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11083 ms
-start ktruss with k = 16, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
+start ktruss with kc = 16, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1052 ms
 tc duration: 1673 ms
 iteration 1, invalid size: 7653986 time: 175 ms
@@ -648,7 +648,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11205 ms
-start ktruss with k = 17, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
+start ktruss with kc = 17, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1071 ms
 tc duration: 1662 ms
 iteration 1, invalid size: 7674534 time: 116 ms
@@ -674,7 +674,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11063 ms
-start ktruss with k = 18, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
+start ktruss with kc = 18, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1004 ms
 tc duration: 1988 ms
 iteration 1, invalid size: 7690842 time: 182 ms
@@ -698,7 +698,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11081 ms
-start ktruss with k = 19, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
+start ktruss with kc = 19, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1031 ms
 tc duration: 1557 ms
 iteration 1, invalid size: 7704389 time: 262 ms
@@ -722,7 +722,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11789 ms
-start ktruss with k = 20, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
+start ktruss with kc = 20, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1080 ms
 tc duration: 1688 ms
 iteration 1, invalid size: 7715465 time: 129 ms

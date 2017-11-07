@@ -2,7 +2,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
 Graph loaded, edges: 1900654, load time: 1313 ms
-start ktruss with k = 10, threads = 1, method = 6 input: /home/i/graph-data/gowalla
+start ktruss with kc = 10, threads = 1, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 197 ms
 tc duration: 1985 ms
 iteration 1, invalid size: 639322 time: 40 ms
@@ -36,7 +36,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
 Graph loaded, edges: 1900654, load time: 1354 ms
-start ktruss with k = 10, threads = 2, method = 6 input: /home/i/graph-data/gowalla
+start ktruss with kc = 10, threads = 2, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 184 ms
 tc duration: 1169 ms
 iteration 1, invalid size: 639322 time: 36 ms
@@ -70,7 +70,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
 Graph loaded, edges: 1900654, load time: 1278 ms
-start ktruss with k = 10, threads = 3, method = 6 input: /home/i/graph-data/gowalla
+start ktruss with kc = 10, threads = 3, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 211 ms
 tc duration: 936 ms
 iteration 1, invalid size: 639322 time: 39 ms
@@ -104,7 +104,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
 Graph loaded, edges: 1900654, load time: 1328 ms
-start ktruss with k = 10, threads = 4, method = 6 input: /home/i/graph-data/gowalla
+start ktruss with kc = 10, threads = 4, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 173 ms
 tc duration: 910 ms
 iteration 1, invalid size: 639322 time: 44 ms
@@ -138,7 +138,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
 Graph loaded, edges: 1900654, load time: 1340 ms
-start ktruss with k = 10, threads = 5, method = 6 input: /home/i/graph-data/gowalla
+start ktruss with kc = 10, threads = 5, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 258 ms
 tc duration: 911 ms
 iteration 1, invalid size: 639322 time: 61 ms
@@ -172,7 +172,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
 Graph loaded, edges: 1900654, load time: 1313 ms
-start ktruss with k = 10, threads = 6, method = 6 input: /home/i/graph-data/gowalla
+start ktruss with kc = 10, threads = 6, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 278 ms
 tc duration: 907 ms
 iteration 1, invalid size: 639322 time: 48 ms
@@ -206,7 +206,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
 Graph loaded, edges: 1900654, load time: 1325 ms
-start ktruss with k = 10, threads = 7, method = 6 input: /home/i/graph-data/gowalla
+start ktruss with kc = 10, threads = 7, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 376 ms
 tc duration: 854 ms
 iteration 1, invalid size: 639322 time: 49 ms
@@ -240,7 +240,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
 Graph loaded, edges: 1900654, load time: 1340 ms
-start ktruss with k = 10, threads = 8, method = 6 input: /home/i/graph-data/gowalla
+start ktruss with kc = 10, threads = 8, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 320 ms
 tc duration: 850 ms
 iteration 1, invalid size: 639322 time: 47 ms
@@ -274,7 +274,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
 Graph loaded, edges: 1900654, load time: 1329 ms
-start ktruss with k = 10, threads = 9, method = 6 input: /home/i/graph-data/gowalla
+start ktruss with kc = 10, threads = 9, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 323 ms
 tc duration: 940 ms
 iteration 1, invalid size: 639322 time: 61 ms
@@ -308,7 +308,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
 Graph loaded, edges: 1900654, load time: 1314 ms
-start ktruss with k = 10, threads = 10, method = 6 input: /home/i/graph-data/gowalla
+start ktruss with kc = 10, threads = 10, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 371 ms
 tc duration: 958 ms
 iteration 1, invalid size: 639322 time: 42 ms
@@ -342,7 +342,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
 Graph loaded, edges: 1900654, load time: 1220 ms
-start ktruss with k = 10, threads = 11, method = 6 input: /home/i/graph-data/gowalla
+start ktruss with kc = 10, threads = 11, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 390 ms
 tc duration: 790 ms
 iteration 1, invalid size: 639322 time: 66 ms
@@ -376,7 +376,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
 Graph loaded, edges: 1900654, load time: 1322 ms
-start ktruss with k = 10, threads = 12, method = 6 input: /home/i/graph-data/gowalla
+start ktruss with kc = 10, threads = 12, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 306 ms
 tc duration: 1112 ms
 iteration 1, invalid size: 639322 time: 55 ms

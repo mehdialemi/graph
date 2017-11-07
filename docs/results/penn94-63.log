@@ -2,7 +2,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/penn94
 Graph loaded, edges: 1362220, load time: 983 ms
-start ktruss with k = 63, threads = 12, method = 6 input: /home/i/graph-data/penn94
+start ktruss with kc = 63, threads = 12, method = 6 input: /home/i/graph-data/penn94
 create fonl in 212 ms
 tc duration: 1197 ms
 iteration 1, invalid size: 1274471 time: 197 ms
@@ -19,7 +19,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/penn94
 Graph loaded, edges: 1362220, load time: 943 ms
-start ktruss with k = 63, threads = 12, method = 6 input: /home/i/graph-data/penn94
+start ktruss with kc = 63, threads = 12, method = 6 input: /home/i/graph-data/penn94
 create fonl in 183 ms
 tc duration: 1222 ms
 iteration 1, invalid size: 1274471 time: 86 ms
@@ -36,7 +36,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/penn94
 Graph loaded, edges: 1362220, load time: 968 ms
-start ktruss with k = 63, threads = 12, method = 6 input: /home/i/graph-data/penn94
+start ktruss with kc = 63, threads = 12, method = 6 input: /home/i/graph-data/penn94
 create fonl in 195 ms
 tc duration: 1230 ms
 iteration 1, invalid size: 1274471 time: 145 ms

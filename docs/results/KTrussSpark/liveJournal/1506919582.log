@@ -1,5 +1,5 @@
 /home/i/spark-2.1/bin/spark-submit --class ir.ac.sbu.graph.ktruss.spark.KTrussSpark --total-executor-cores 200 --master spark://alemi-1:7077 /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar hdfs://alemi-1/graph-data/liveJournal 60 4
-[SBM] Input: hdfs://alemi-1/graph-data/liveJournal, partitionNum: 60, k: 4
+[SBM] Input: hdfs://alemi-1/graph-data/liveJournal, partitionNum: 60, kc: 4
 02 Oct 2017 08:16:24,158 WARN - NativeCodeLoader.<clinit>(62) -  Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 02 Oct 2017 08:16:24,242 WARN - Logging$class.logWarning(66) -  In Spark 1.0 and later spark.local.dir will be overridden by the value set by the cluster manager (via SPARK_LOCAL_DIRS in mesos/standalone and LOCAL_DIRS in YARN).
 02 Oct 2017 08:16:24,250 WARN - Logging$class.logWarning(66) -  

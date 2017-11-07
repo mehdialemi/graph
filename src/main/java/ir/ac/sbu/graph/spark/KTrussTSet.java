@@ -2,6 +2,8 @@ package ir.ac.sbu.graph.spark;
 
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
@@ -25,19 +27,19 @@ public class KTrussTSet extends SparkApp {
     private final NeighborList neighborList;
     private final int k;
     private final int partitionNum;
-    private KConf kConf;
+    private KTrussConf ktConf;
 
-    public KTrussTSet(NeighborList neighborList, KConf kConf) {
+    public KTrussTSet(NeighborList neighborList, KTrussConf ktConf) {
         super(neighborList);
         this.neighborList = neighborList;
-        this.k = kConf.getK();
-        this.partitionNum = kConf.getPartitionNum() * 5;
-        this.kConf = kConf;
+        this.k = ktConf.getKt();
+        this.partitionNum = ktConf.getPartitionNum() * 5;
+        this.ktConf = ktConf;
     }
 
     public JavaPairRDD<Edge, int[]> generate() {
 
-        NeighborList kCore = new KCore(neighborList, kConf.create(k - 1, 1));
+        NeighborList kCore = new KCore(neighborList, ktConf);
 
         Triangle triangle = new Triangle(kCore);
         JavaPairRDD<Integer, int[]> fonl = triangle.createFonl(partitionNum);
@@ -50,7 +52,7 @@ public class KTrussTSet extends SparkApp {
         Queue<JavaPairRDD<Edge, int[]>> tSetQueue = new LinkedList<>();
         tSetQueue.add(tSet);
 
-        for (int iter = 0; iter < kConf.getMaxIter(); iter ++) {
+        for (int iter = 0; iter < ktConf.getKtMaxIter(); iter ++) {
 
             long t1 = System.currentTimeMillis();
 
@@ -226,15 +228,20 @@ public class KTrussTSet extends SparkApp {
     }
 
     public static void main(String[] args) {
+        Logger.getLogger("org.apache.spar").setLevel(Level.INFO);
         long t1 = System.currentTimeMillis();
-        KConf kConf = new KConf(new ArgumentReader(args), "KTruss");
-        EdgeLoader edgeLoader = new EdgeLoader(kConf);
+
+        KTrussConf ktConf = new KTrussConf(new ArgumentReader(args));
+        ktConf.init();
+
+        EdgeLoader edgeLoader = new EdgeLoader(ktConf);
         NeighborList neighborList = new NeighborList(edgeLoader);
 
-        KTrussTSet kTrussTSet = new KTrussTSet(neighborList, kConf);
+        KTrussTSet kTrussTSet = new KTrussTSet(neighborList, ktConf);
         JavaPairRDD<Edge, int[]> subgraph = kTrussTSet.generate();
         log("KTruss edge count: " + subgraph.count(), t1, System.currentTimeMillis());
 
         kTrussTSet.close();
     }
 }
+

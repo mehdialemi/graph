@@ -11,25 +11,26 @@ import java.io.File;
  */
 public class SparkAppConf {
 
-    private final String inputPath;
-    private final int partitionNum;
-    private final SparkConf sparkConf;
-    private final JavaSparkContext sc;
+    private String inputPath;
+    private int partitionNum;
+    private SparkConf sparkConf;
+    private JavaSparkContext sc;
 
-    public SparkAppConf (SparkAppConf conf) {
-        this.inputPath = conf.inputPath;
-        this.partitionNum = conf.partitionNum;
-        this.sparkConf = conf.sparkConf;
-        this.sc = conf.sc;
-    }
-    public SparkAppConf (ArgumentReader argumentReader, String name) {
-        sparkConf = new SparkConf();
-        if (argumentReader.isEmpty())
-            getSparkConf().setMaster("local[2]");
-
+    public SparkAppConf (ArgumentReader argumentReader) {
         inputPath = argumentReader.nextString("/home/mehdi/graph-data/com-amazon.ungraph.txt");
         partitionNum = argumentReader.nextInt(10);
-        String appName = name + "-" + partitionNum + "-" + new File(getInputPath()).getName();
+    }
+
+    protected String createAppName() {
+        return "app-" + new File(getInputPath()).getName() + partitionNum;
+    }
+
+    public void init() {
+        String appName = createAppName();
+
+        sparkConf = new SparkConf();
+        if (inputPath.equals("/home/mehdi/graph-data/com-amazon.ungraph.txt"))
+            sparkConf.setMaster("local[2]");
 
         sparkConf.setAppName(appName);
         sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
@@ -39,6 +40,7 @@ public class SparkAppConf {
         sc = new JavaSparkContext(sparkConf);
         Log.log(appName);
     }
+
 
     public String getInputPath() {
         return inputPath;

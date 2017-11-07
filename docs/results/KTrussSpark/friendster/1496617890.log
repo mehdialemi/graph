@@ -1,5 +1,5 @@
 /home/i/spark-2.1/bin/spark-submit --class ir.ac.sbu.graph.ktruss.spark.KTrussSpark --total-executor-cores 120 --master spark://alemi-1:7077 /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar hdfs://alemi-1/graph-data/friendster 700 4
-[SBM] Input: hdfs://alemi-1/graph-data/friendster, partitionNum: 700, k: 4
+[SBM] Input: hdfs://alemi-1/graph-data/friendster, partitionNum: 700, kc: 4
 [KTrussSpark] iteration: 1, invalid edge count: 314825403, duration: 1337789 ms
 [KTrussSpark] iteration: 2, invalid edge count: 60390012, duration: 138361 ms
 [KTrussSpark] iteration: 3, invalid edge count: 18503837, duration: 78235 ms

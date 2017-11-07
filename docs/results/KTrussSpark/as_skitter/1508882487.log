@@ -1,5 +1,5 @@
 /home/i/spark-2.2/bin/spark-submit --class ir.ac.sbu.graph.ktruss.spark.KTrussSpark --total-executor-cores 120 --master spark://alemi-1:7077 /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar hdfs://alemi-1/graph-data/as_skitter 240 9
-[SBM] Input: hdfs://alemi-1/graph-data/as_skitter, partitionNum: 240, k: 9
+[SBM] Input: hdfs://alemi-1/graph-data/as_skitter, partitionNum: 240, kc: 9
 [SBM] Spark conf: spark.app.name=KTrussSpark-240-as_skitter
 spark.cores.max=120
 spark.driver.maxResultSize=1g

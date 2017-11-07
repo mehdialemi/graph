@@ -2,7 +2,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/as-skitter
 Graph loaded, edges: 11095298, load time: 7429 ms
-start ktruss with k = 112, threads = 12, method = 6 input: /home/i/graph-data/as-skitter
+start ktruss with kc = 112, threads = 12, method = 6 input: /home/i/graph-data/as-skitter
 create fonl in 398 ms
 tc duration: 2076 ms
 iteration 1, invalid size: 8710016 time: 87 ms
@@ -21,7 +21,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/as-skitter
 Graph loaded, edges: 11095298, load time: 6976 ms
-start ktruss with k = 112, threads = 12, method = 6 input: /home/i/graph-data/as-skitter
+start ktruss with kc = 112, threads = 12, method = 6 input: /home/i/graph-data/as-skitter
 create fonl in 448 ms
 tc duration: 2509 ms
 iteration 1, invalid size: 8710016 time: 238 ms
@@ -40,7 +40,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/as-skitter
 Graph loaded, edges: 11095298, load time: 7443 ms
-start ktruss with k = 112, threads = 12, method = 6 input: /home/i/graph-data/as-skitter
+start ktruss with kc = 112, threads = 12, method = 6 input: /home/i/graph-data/as-skitter
 create fonl in 471 ms
 tc duration: 2182 ms
 iteration 1, invalid size: 8710016 time: 306 ms

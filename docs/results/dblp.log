@@ -2,7 +2,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 751 ms
-start ktruss with k = 3, threads = 12, method = 6 input: /home/i/graph-data/dblp
+start ktruss with kc = 3, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 207 ms
 tc duration: 446 ms
 iteration 1, invalid size: 0 time: 29 ms
@@ -16,7 +16,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 781 ms
-start ktruss with k = 4, threads = 12, method = 6 input: /home/i/graph-data/dblp
+start ktruss with kc = 4, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 211 ms
 tc duration: 622 ms
 iteration 1, invalid size: 168538 time: 32 ms
@@ -46,7 +46,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 743 ms
-start ktruss with k = 5, threads = 12, method = 6 input: /home/i/graph-data/dblp
+start ktruss with kc = 5, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 231 ms
 tc duration: 550 ms
 iteration 1, invalid size: 354949 time: 39 ms
@@ -84,7 +84,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 749 ms
-start ktruss with k = 6, threads = 12, method = 6 input: /home/i/graph-data/dblp
+start ktruss with kc = 6, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 194 ms
 tc duration: 933 ms
 iteration 1, invalid size: 502639 time: 62 ms
@@ -128,7 +128,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 762 ms
-start ktruss with k = 7, threads = 12, method = 6 input: /home/i/graph-data/dblp
+start ktruss with kc = 7, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 252 ms
 tc duration: 464 ms
 iteration 1, invalid size: 611701 time: 79 ms
@@ -174,7 +174,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 764 ms
-start ktruss with k = 8, threads = 12, method = 6 input: /home/i/graph-data/dblp
+start ktruss with kc = 8, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 262 ms
 tc duration: 537 ms
 iteration 1, invalid size: 687583 time: 65 ms
@@ -210,7 +210,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 735 ms
-start ktruss with k = 9, threads = 12, method = 6 input: /home/i/graph-data/dblp
+start ktruss with kc = 9, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 242 ms
 tc duration: 526 ms
 iteration 1, invalid size: 741927 time: 107 ms
@@ -250,7 +250,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 763 ms
-start ktruss with k = 10, threads = 12, method = 6 input: /home/i/graph-data/dblp
+start ktruss with kc = 10, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 230 ms
 tc duration: 585 ms
 iteration 1, invalid size: 781337 time: 85 ms
@@ -280,7 +280,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 768 ms
-start ktruss with k = 11, threads = 12, method = 6 input: /home/i/graph-data/dblp
+start ktruss with kc = 11, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 253 ms
 tc duration: 710 ms
 iteration 1, invalid size: 811141 time: 81 ms
@@ -308,7 +308,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 742 ms
-start ktruss with k = 12, threads = 12, method = 6 input: /home/i/graph-data/dblp
+start ktruss with kc = 12, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 229 ms
 tc duration: 507 ms
 iteration 1, invalid size: 832421 time: 105 ms
@@ -334,7 +334,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 756 ms
-start ktruss with k = 13, threads = 12, method = 6 input: /home/i/graph-data/dblp
+start ktruss with kc = 13, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 228 ms
 tc duration: 580 ms
 iteration 1, invalid size: 848865 time: 87 ms
@@ -356,7 +356,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 744 ms
-start ktruss with k = 14, threads = 12, method = 6 input: /home/i/graph-data/dblp
+start ktruss with kc = 14, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 246 ms
 tc duration: 574 ms
 iteration 1, invalid size: 863740 time: 103 ms
@@ -380,7 +380,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 775 ms
-start ktruss with k = 15, threads = 12, method = 6 input: /home/i/graph-data/dblp
+start ktruss with kc = 15, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 250 ms
 tc duration: 576 ms
 iteration 1, invalid size: 876304 time: 73 ms
@@ -404,7 +404,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 744 ms
-start ktruss with k = 16, threads = 12, method = 6 input: /home/i/graph-data/dblp
+start ktruss with kc = 16, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 245 ms
 tc duration: 435 ms
 iteration 1, invalid size: 886249 time: 127 ms
@@ -426,7 +426,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 731 ms
-start ktruss with k = 17, threads = 12, method = 6 input: /home/i/graph-data/dblp
+start ktruss with kc = 17, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 240 ms
 tc duration: 533 ms
 iteration 1, invalid size: 895486 time: 146 ms
@@ -446,7 +446,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 751 ms
-start ktruss with k = 18, threads = 12, method = 6 input: /home/i/graph-data/dblp
+start ktruss with kc = 18, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 246 ms
 tc duration: 487 ms
 iteration 1, invalid size: 901774 time: 69 ms
@@ -468,7 +468,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 748 ms
-start ktruss with k = 19, threads = 12, method = 6 input: /home/i/graph-data/dblp
+start ktruss with kc = 19, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 222 ms
 tc duration: 665 ms
 iteration 1, invalid size: 907907 time: 66 ms
@@ -488,7 +488,7 @@ GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=4
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 735 ms
-start ktruss with k = 20, threads = 12, method = 6 input: /home/i/graph-data/dblp
+start ktruss with kc = 20, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 254 ms
 tc duration: 465 ms
 iteration 1, invalid size: 911837 time: 112 ms
