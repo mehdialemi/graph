@@ -15,7 +15,7 @@ public class KCoreConf extends SparkAppConf {
 
     @Override
     protected String createAppName() {
-        return "KCore-" + kc + "-" + kcMaxIter + "(" + super.createAppName() + ")";
+        return "KCore-" + kc + "-" + kcMaxIter + " (" + super.createAppName() + ")";
     }
 
     public int getKcMaxIter() {

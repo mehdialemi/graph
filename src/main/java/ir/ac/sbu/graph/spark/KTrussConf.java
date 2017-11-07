@@ -5,7 +5,6 @@ package ir.ac.sbu.graph.spark;
  */
 public class KTrussConf extends KCoreConf {
 
-
     private int kt;
     private int ktMaxIter;
 
@@ -18,7 +17,7 @@ public class KTrussConf extends KCoreConf {
 
     @Override
     protected String createAppName() {
-        return "KTruss-" + kt + "-" + ktMaxIter + "==" + super.createAppName();
+        return "KTruss-" + kt + "-" + ktMaxIter + "--" + super.createAppName();
     }
 
     public int getKt() {
