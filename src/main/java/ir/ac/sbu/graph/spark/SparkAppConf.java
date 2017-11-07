@@ -22,7 +22,7 @@ public class SparkAppConf {
     }
 
     protected String createAppName() {
-        return "app-" + new File(getInputPath()).getName() + "-" + partitionNum;
+        return new File(getInputPath()).getName() + "-" + partitionNum;
     }
 
     public void init() {
