@@ -1,6 +1,7 @@
 package ir.ac.sbu.graph.utils;
 
 import com.google.gson.Gson;
+import ir.ac.sbu.graph.spark.ArgumentReader;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -15,14 +16,12 @@ public class AnalyzeResultsRestClient {
 
     public static void main(String[] args) throws IOException {
         CloseableHttpClient client = HttpClients.createDefault();
-        String hostname = args[0];
+        ArgumentReader argumentReader = new ArgumentReader(args);
 
-        int limit = 100;
-        if (args.length > 1)
-            limit = Integer.parseInt(args[1]);
+        String hostname = argumentReader.nextString("localhost");
 
-        String logDir = "/tmp/analyze";
-        if (args.length > 2)    logDir = args[2];
+        int limit = argumentReader.nextInt(10);
+        String logDir = argumentReader.nextString("/tmp/analyze");
 
         String url = "http://" + hostname + ":18080/api/v1/";
         String applicationUrl = url + "applications?limit=" + limit;
