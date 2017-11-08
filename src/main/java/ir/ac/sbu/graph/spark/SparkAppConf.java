@@ -50,6 +50,10 @@ public class SparkAppConf {
         return partitionNum;
     }
 
+    public void setPartitionNum(int partitionNum) {
+        this.partitionNum = partitionNum;
+    }
+
     public SparkConf getSparkConf() {
         return sparkConf;
     }
