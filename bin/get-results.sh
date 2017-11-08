@@ -17,7 +17,7 @@ do
     echo "$conf_name = $conf_value"
 done < bin/result.conf
 
-input=$(head -n 1 $config[inputs])
+input=$(head -n 1 ${config[inputs]})
 
 if [ -z "$1" ]
   then
@@ -26,4 +26,4 @@ if [ -z "$1" ]
     app=$1
 fi
 
-java -cp $config[jar] ir.ac.sbu.graph.utils.AnalyzeResultsRestClient $config[host] $config[limit] logs/$config[app]/$input
+java -cp ${config[jar]} ir.ac.sbu.graph.utils.AnalyzeResultsRestClient ${config[host]} ${config[limit]} logs/${config[app]}/${input}
