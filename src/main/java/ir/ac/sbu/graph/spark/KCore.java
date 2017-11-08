@@ -18,14 +18,12 @@ public class KCore extends NeighborList {
     private final NeighborList neighborList;
     private final KCoreConf kConf;
     private final Queue<JavaPairRDD<Integer, int[]>> neighborQueue;
-    private final Queue<JavaPairRDD<Integer, Iterable<Integer>>> invUpdateQueue;
 
     public KCore(NeighborList neighborList, KCoreConf kConf) {
         super(neighborList);
         this.neighborList = neighborList;
         this.kConf = kConf;
         neighborQueue = new LinkedList<>();
-        invUpdateQueue = new LinkedList<>();
     }
 
     public void unpersist() {
@@ -33,9 +31,6 @@ public class KCore extends NeighborList {
             rdd.unpersist();
         }
 
-        for (JavaPairRDD<Integer, Iterable<Integer>> rdd : invUpdateQueue) {
-            rdd.unpersist();
-        }
     }
 
     @Override
@@ -59,21 +54,18 @@ public class KCore extends NeighborList {
                             out.add(new Tuple2<>(v, nl._1));
                         }
                         return out.iterator();
-                    }).groupByKey(conf.getPartitionNum()).cache();
+                    }).groupByKey(conf.getPartitionNum());
 
             long count = invUpdate.count();
             long t2 = System.currentTimeMillis();
             log("K-core, current invUpdate count: " + count, t1, t2);
+
             if (count == 0)
                 break;
-
-            invUpdateQueue.add(invUpdate);
 
             if (neighborQueue.size() > 1)
                 neighborQueue.remove().unpersist();
 
-            if (invUpdateQueue.size() > 3)
-                invUpdateQueue.remove().unpersist();
 
             neighbors = neighbors.filter(nl -> nl._2.length >= k)
                     .leftOuterJoin(invUpdate)
