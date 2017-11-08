@@ -98,7 +98,7 @@ public class KCore extends NeighborList {
         Logger.getLogger("org.apache.spar").setLevel(Level.INFO);
 
         long t1 = System.currentTimeMillis();
-        KCoreConf kConf = new KCoreConf(new ArgumentReader(args));
+        KCoreConf kConf = new KCoreConf(new ArgumentReader(args), true);
         kConf.init();
 
         EdgeLoader edgeLoader = new EdgeLoader(kConf);
