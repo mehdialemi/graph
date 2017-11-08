@@ -23,7 +23,6 @@ public class KTrussTSet extends SparkApp {
     private static final byte U_UVW = (byte) 2;
     public static final int META_LEN = 4;
     public static final int INVALID = -1;
-    public static final int P_MULTIPLIER = 5;
 
     private final NeighborList neighborList;
     private final int k;
@@ -42,7 +41,8 @@ public class KTrussTSet extends SparkApp {
 
         Triangle triangle = new Triangle(kCore);
 
-        JavaPairRDD<Integer, int[]> fonl = triangle.createFonl(P_MULTIPLIER);
+        JavaPairRDD<Integer, int[]> fonl = triangle.createFonl(5);
+        int partitionNum = fonl.getNumPartitions();
         JavaPairRDD<Integer, int[]> candidates = triangle.generateCandidates(fonl)
                 .persist(StorageLevel.MEMORY_AND_DISK());
 
@@ -153,7 +153,7 @@ public class KTrussTSet extends SparkApp {
     }
 
     private JavaPairRDD<Edge, int[]> createTSet(JavaPairRDD<Integer, int[]> fonl, JavaPairRDD<Integer, int[]> candidates) {
-
+        int partitionNum = fonl.getNumPartitions();
         // Generate kv such that key is an edge and value is its triangle vertices.
 //        JavaPairRDD<Edge, int[]> tSet = candidates.cogroup(fonl, partitionNum).flatMapToPair(t -> {
         JavaPairRDD<Edge, int[]> tSet = candidates.cogroup(fonl).flatMapToPair(t -> {
