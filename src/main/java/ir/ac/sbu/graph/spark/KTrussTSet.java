@@ -26,14 +26,13 @@ public class KTrussTSet extends SparkApp {
 
     private final NeighborList neighborList;
     private final int k;
-    private final int partitionNum;
+    private int partitionNum;
     private KTrussConf ktConf;
 
     public KTrussTSet(NeighborList neighborList, KTrussConf ktConf) {
         super(neighborList);
         this.neighborList = neighborList;
         this.k = ktConf.getKt();
-        this.partitionNum = ktConf.getPartitionNum() * 5;
         this.ktConf = ktConf;
     }
 
@@ -42,6 +41,9 @@ public class KTrussTSet extends SparkApp {
         KCore kCore = new KCore(neighborList, ktConf);
 
         Triangle triangle = new Triangle(kCore);
+
+        partitionNum = ktConf.getPartitionNum() * 5;
+
         JavaPairRDD<Integer, int[]> fonl = triangle.createFonl(partitionNum);
         JavaPairRDD<Integer, int[]> candidates = triangle.generateCandidates(fonl)
                 .persist(StorageLevel.MEMORY_AND_DISK());
