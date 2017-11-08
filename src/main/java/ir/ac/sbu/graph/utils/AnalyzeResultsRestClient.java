@@ -73,8 +73,6 @@ public class AnalyzeResultsRestClient {
                 long shuffleReadRecordsMax = 0;
                 long shuffleWriteBytesMax = 0;
                 long shuffleWriteRecordsMax = 0;
-                long memoryBytesSpilledMax = 0;
-                long diskBytesSpilledMax = 0;
 
                 for (Job job : jobs) {
 
@@ -145,12 +143,6 @@ public class AnalyzeResultsRestClient {
                     if (shuffleWriteRecords > shuffleWriteRecordsMax)
                         shuffleReadRecordsMax = shuffleWriteRecords;
 
-                    if (memoryBytesSpilled > memoryBytesSpilledMax)
-                        memoryBytesSpilledMax = memoryBytesSpilled;
-
-                    if (diskBytesSpilled > diskBytesSpilledMax)
-                        diskBytesSpilledMax = diskBytesSpilled;
-
                     pwJobsJson.println(gson.toJson(job));
                     pwJobsJson.println();
                     pwJobsJson.println();
@@ -165,9 +157,7 @@ public class AnalyzeResultsRestClient {
                 pwOverall.println("shuffleReadRecords: " + shuffleReadRecordsMax);
                 pwOverall.println("shuffleWriteBytes: " + shuffleWriteBytesMax);
                 pwOverall.println("shuffleWriteRecords: " + shuffleWriteRecordsMax);
-                pwOverall.println("memoryBytesSpilled: " + memoryBytesSpilledMax);
-                pwOverall.println("diskBytesSpilled: " + diskBytesSpilledMax);
-
+                
                 pwJobs.close();
                 pwJobsJson.close();
                 pwStagesJson.close();
