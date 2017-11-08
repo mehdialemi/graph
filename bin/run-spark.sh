@@ -55,7 +55,7 @@ do
     info=($graph_info)
     graph_name=${info[0]}
     graph_path="$input_prefix/$graph_name"
-    partitionNum=${info[1]}
+    #partitionNum=${info[1]}
 
     # Create log dir
     log_dir="logs/$class_name/$graph_name"
@@ -68,7 +68,8 @@ do
     echo "log file: $log_file"
 
     # Build argument
-    jar_argument="$graph_path $partitionNum $other_args"
+#    jar_argument="$graph_path $partitionNum $other_args"
+    jar_argument="$graph_path $other_args"
     echo "jar argument: $jar_argument"
 
     command="${config[spark_home]}/bin/spark-submit --class $main_class --total-executor-cores ${config[cores]} --master spark://${config[master]}:7077 ${config[jar]} $jar_argument"

@@ -30,7 +30,6 @@ public class KCore extends NeighborList {
         for (JavaPairRDD<Integer, int[]> rdd : neighborQueue) {
             rdd.unpersist();
         }
-
     }
 
     @Override

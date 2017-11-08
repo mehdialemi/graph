@@ -18,7 +18,7 @@ public class SparkAppConf {
 
     public SparkAppConf (ArgumentReader argumentReader) {
         inputPath = argumentReader.nextString("/home/mehdi/graph-data/com-amazon.ungraph.txt");
-        partitionNum = argumentReader.nextInt(10);
+        //partitionNum = argumentReader.nextInt(10);
     }
 
     protected String createAppName() {
