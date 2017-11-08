@@ -157,7 +157,7 @@ public class AnalyzeResultsRestClient {
                 pwOverall.println("shuffleReadRecords: " + shuffleReadRecordsMax);
                 pwOverall.println("shuffleWriteBytes: " + shuffleWriteBytesMax);
                 pwOverall.println("shuffleWriteRecords: " + shuffleWriteRecordsMax);
-                
+
                 pwJobs.close();
                 pwJobsJson.close();
                 pwStagesJson.close();

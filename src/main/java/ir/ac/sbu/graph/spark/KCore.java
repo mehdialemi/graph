@@ -72,7 +72,7 @@ public class KCore extends NeighborList {
             if (neighborQueue.size() > 1)
                 neighborQueue.remove().unpersist();
 
-            if (invUpdateQueue.size() > 1)
+            if (invUpdateQueue.size() > 3)
                 invUpdateQueue.remove().unpersist();
 
             neighbors = neighbors.filter(nl -> nl._2.length >= k)
