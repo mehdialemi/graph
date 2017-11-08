@@ -24,11 +24,13 @@ public class Triangle extends SparkApp {
     }
 
     public JavaPairRDD<Integer, int[]> createFonl() {
-        return createFonl(conf.getPartitionNum());
+        return createFonl(1);
     }
 
-    public JavaPairRDD<Integer, int[]> createFonl(int partitionNum) {
-        return neighborList.create().flatMapToPair(t -> {
+    public JavaPairRDD<Integer, int[]> createFonl(final int pMultiplier) {
+        JavaPairRDD<Integer, int[]> neighborList = this.neighborList.create();
+        int partitions = neighborList.getNumPartitions() * pMultiplier;
+        return neighborList.flatMapToPair(t -> {
             int deg = t._2.length;
             if (deg == 0)
                 return Collections.emptyIterator();
@@ -42,7 +44,7 @@ public class Triangle extends SparkApp {
             }
 
             return degreeList.iterator();
-        }).groupByKey(partitionNum).mapToPair(v -> {
+        }).groupByKey(partitions).mapToPair(v -> {
             int degree = 0;
             // Iterate over higherIds to calculate degree of the current vertex
             if (v._2 == null)
