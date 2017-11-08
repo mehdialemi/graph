@@ -84,8 +84,6 @@ public class AnalyzeResultsRestClient {
                     long shuffleReadRecords = 0;
                     long shuffleWriteBytes = 0;
                     long shuffleWriteRecords = 0;
-                    long memoryBytesSpilled = 0;
-                    long diskBytesSpilled = 0;
 
                     for (Integer stageId : job.getStageIds()) {
                         String urlStage = appUrl + "/stages/" + stageId;
@@ -121,12 +119,6 @@ public class AnalyzeResultsRestClient {
                         if (stage.getShuffleWriteRecords() > shuffleWriteRecords)
                             shuffleWriteRecords = stage.getShuffleWriteRecords();
 
-                        if (stage.getMemoryBytesSpilled() > memoryBytesSpilled)
-                            memoryBytesSpilled = stage.getMemoryBytesSpilled();
-
-                        if (stage.getDiskBytesSpilled() > diskBytesSpilled)
-                            diskBytesSpilled = stage.getDiskBytesSpilled();
-
                         pwStagesJson.println(gson.toJson(stage));
                         pwStagesJson.println();
                         pwStagesJson.println();
@@ -136,8 +128,7 @@ public class AnalyzeResultsRestClient {
                     }
 
                     pwJobs.println(duration + "," + inputBytes + "," + shuffleReadBytes + "," +
-                            shuffleReadRecords + "," + shuffleWriteBytes + "," + shuffleWriteRecords + "," +
-                            memoryBytesSpilled + "," + diskBytesSpilled);
+                            shuffleReadRecords + "," + shuffleWriteBytes + "," + shuffleWriteRecords);
 
                     if (inputBytes > inputBytesMax)
                         inputBytesMax = inputBytes;
