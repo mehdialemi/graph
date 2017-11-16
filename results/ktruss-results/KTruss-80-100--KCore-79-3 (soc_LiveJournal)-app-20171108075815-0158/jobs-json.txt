@@ -1,0 +1,216 @@
+{"jobId":35,"name":"count at KTrussTSet.java:244","submissionTime":"2017-11-08T04:30:02.751GMT","completionTime":"2017-11-08T04:30:02.812GMT","stageIds":[843,865,844,836,866,837,867,859,838,860,839,831,861,840,832,862,854,833,863,855,834,856,835,857,858,850,851,830,852,853,845,846,868,847,869,848,870,849,841,842,864],"status":"SUCCEEDED","numTasks":6137,"numActiveTasks":0,"numCompletedTasks":170,"numSkippedTasks":5967,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":1,"numSkippedStages":40,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":34,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:30:02.238GMT","completionTime":"2017-11-08T04:30:02.671GMT","stageIds":[814,793,815,816,808,817,809,810,789,811,812,804,805,827,806,828,807,799,829,800,822,801,823,802,794,824,803,795,825,796,826,818,797,819,798,790,820,791,821,813,792],"status":"SUCCEEDED","numTasks":6137,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":5797,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":39,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":33,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:30:01.719GMT","completionTime":"2017-11-08T04:30:02.138GMT","stageIds":[763,785,764,786,765,787,766,758,788,759,781,760,782,761,753,783,754,784,776,755,777,756,778,757,749,779,771,750,780,772,751,773,752,774,775,767,768,769,770,762],"status":"SUCCEEDED","numTasks":5967,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":5627,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":38,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":32,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:30:01.213GMT","completionTime":"2017-11-08T04:30:01.622GMT","stageIds":[712,742,734,713,743,735,714,736,715,737,738,730,731,710,732,733,725,726,748,727,728,729,721,722,744,723,745,724,716,746,717,747,739,718,740,719,711,741,720],"status":"SUCCEEDED","numTasks":5797,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":5457,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":37,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":31,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:30:00.751GMT","completionTime":"2017-11-08T04:30:01.118GMT","stageIds":[691,692,684,685,707,686,708,687,679,709,680,702,681,703,682,674,704,683,675,705,676,706,698,677,699,678,700,701,693,672,694,673,695,696,688,697,689,690],"status":"SUCCEEDED","numTasks":5627,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":5287,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":36,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":30,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:30:00.249GMT","completionTime":"2017-11-08T04:30:00.656GMT","stageIds":[661,640,662,641,663,664,656,635,657,636,658,659,651,660,652,653,654,655,647,648,670,649,671,650,642,643,665,644,666,645,637,667,646,638,668,639,669],"status":"SUCCEEDED","numTasks":5457,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":5117,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":35,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":29,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:59.760GMT","completionTime":"2017-11-08T04:30:00.161GMT","stageIds":[610,611,633,612,634,613,605,606,628,607,629,608,630,609,601,631,602,632,624,603,625,604,626,627,619,620,599,621,600,622,614,623,615,616,617,618],"status":"SUCCEEDED","numTasks":5287,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":4947,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":34,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":28,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:59.291GMT","completionTime":"2017-11-08T04:29:59.673GMT","stageIds":[589,590,582,583,584,585,577,586,578,579,580,581,573,574,596,575,597,576,568,598,569,591,570,592,571,593,572,564,594,565,595,587,566,588,567],"status":"SUCCEEDED","numTasks":5117,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":4777,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":33,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":27,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:58.835GMT","completionTime":"2017-11-08T04:29:59.196GMT","stageIds":[538,560,539,531,561,540,532,562,554,533,563,555,534,556,535,557,558,550,551,530,552,553,545,546,547,548,549,541,542,543,544,536,537,559],"status":"SUCCEEDED","numTasks":4947,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":4607,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":32,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":26,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:58.370GMT","completionTime":"2017-11-08T04:29:58.747GMT","stageIds":[509,510,511,512,504,505,527,506,528,507,499,529,500,522,501,523,502,524,503,525,517,526,518,497,519,498,520,521,513,514,515,516,508],"status":"SUCCEEDED","numTasks":4777,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":4437,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":31,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":25,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:57.845GMT","completionTime":"2017-11-08T04:29:58.285GMT","stageIds":[466,488,489,481,482,483,484,476,477,478,479,471,480,472,494,473,495,474,496,475,467,468,490,469,491,470,492,493,485,486,465,487],"status":"SUCCEEDED","numTasks":4607,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":4267,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":30,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":24,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:57.292GMT","completionTime":"2017-11-08T04:29:57.759GMT","stageIds":[458,437,459,438,460,461,453,454,455,456,448,449,450,451,452,444,445,446,447,439,440,462,441,463,442,434,464,443,435,457,436],"status":"SUCCEEDED","numTasks":4437,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":4097,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":29,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":23,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:56.778GMT","completionTime":"2017-11-08T04:29:57.200GMT","stageIds":[407,408,430,409,431,410,432,433,425,404,426,405,427,406,428,429,421,422,423,424,416,417,418,419,411,420,412,413,414,415],"status":"SUCCEEDED","numTasks":4267,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":3927,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":28,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":22,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:56.081GMT","completionTime":"2017-11-08T04:29:56.685GMT","stageIds":[386,387,379,380,402,381,403,382,383,375,397,376,398,377,399,378,400,401,393,394,395,396,388,389,390,391,392,384,385],"status":"SUCCEEDED","numTasks":4097,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":3757,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":27,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":21,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:55.618GMT","completionTime":"2017-11-08T04:29:55.995GMT","stageIds":[356,357,358,359,351,360,352,374,353,354,355,347,348,370,349,371,350,372,373,365,366,367,368,369,361,362,363,364],"status":"SUCCEEDED","numTasks":3927,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":3587,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":26,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":20,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:55.089GMT","completionTime":"2017-11-08T04:29:55.492GMT","stageIds":[320,335,342,321,336,328,343,322,329,344,323,330,345,337,331,346,338,332,324,339,325,340,326,341,333,327,334],"status":"SUCCEEDED","numTasks":3757,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":3417,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":25,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":19,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:54.573GMT","completionTime":"2017-11-08T04:29:54.998GMT","stageIds":[305,299,306,300,307,314,308,315,294,309,301,316,295,302,317,303,318,310,304,296,311,297,312,319,298,313],"status":"SUCCEEDED","numTasks":3587,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":3247,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":24,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":18,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:54.107GMT","completionTime":"2017-11-08T04:29:54.487GMT","stageIds":[269,284,291,270,285,277,292,271,286,278,293,272,279,280,287,281,273,288,274,289,275,290,282,276,283],"status":"SUCCEEDED","numTasks":3417,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":3077,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":23,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":17,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:53.614GMT","completionTime":"2017-11-08T04:29:54.022GMT","stageIds":[248,263,255,249,256,257,264,258,250,265,251,266,252,267,259,253,245,260,246,261,268,247,262,254],"status":"SUCCEEDED","numTasks":3247,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":2907,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":22,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":16,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:53.054GMT","completionTime":"2017-11-08T04:29:53.528GMT","stageIds":[233,234,241,235,227,242,228,243,229,244,236,230,222,237,223,238,224,239,231,225,240,232,226],"status":"SUCCEEDED","numTasks":3077,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":2737,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":21,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":15,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:52.467GMT","completionTime":"2017-11-08T04:29:52.973GMT","stageIds":[212,204,219,205,220,206,221,213,207,214,200,215,201,216,208,202,209,203,210,217,211,218],"status":"SUCCEEDED","numTasks":2907,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":2567,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":20,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":14,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:51.814GMT","completionTime":"2017-11-08T04:29:52.388GMT","stageIds":[197,183,198,190,184,191,192,199,193,185,179,186,180,187,194,188,195,189,181,196,182],"status":"SUCCEEDED","numTasks":2737,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":2397,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":19,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":13,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:51.244GMT","completionTime":"2017-11-08T04:29:51.736GMT","stageIds":[161,168,169,176,170,162,177,163,178,164,171,165,172,166,173,159,174,160,175,167],"status":"SUCCEEDED","numTasks":2567,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":2227,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":18,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":12,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:50.609GMT","completionTime":"2017-11-08T04:29:51.168GMT","stageIds":[153,147,154,140,155,141,156,148,142,149,143,150,157,151,158,152,144,145,146],"status":"SUCCEEDED","numTasks":2397,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":2057,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":17,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":11,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:49.955GMT","completionTime":"2017-11-08T04:29:50.542GMT","stageIds":[132,139,133,125,126,127,134,128,135,129,136,122,137,123,138,130,124,131],"status":"SUCCEEDED","numTasks":2227,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":1887,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":16,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":10,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:49.249GMT","completionTime":"2017-11-08T04:29:49.884GMT","stageIds":[117,118,119,111,105,120,112,106,113,114,121,115,107,108,109,116,110],"status":"SUCCEEDED","numTasks":2057,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":1717,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":15,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":9,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:48.316GMT","completionTime":"2017-11-08T04:29:49.046GMT","stageIds":[102,96,103,89,104,90,97,91,98,92,99,100,101,93,94,95],"status":"SUCCEEDED","numTasks":1887,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":1547,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":14,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":8,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:47.429GMT","completionTime":"2017-11-08T04:29:48.250GMT","stageIds":[81,88,82,74,83,75,76,77,84,78,85,86,87,79,80],"status":"SUCCEEDED","numTasks":1717,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":1377,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":13,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":7,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:46.390GMT","completionTime":"2017-11-08T04:29:47.363GMT","stageIds":[66,60,67,68,69,61,62,63,70,64,71,72,73,65],"status":"SUCCEEDED","numTasks":1547,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":1207,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":12,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":6,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:45.087GMT","completionTime":"2017-11-08T04:29:46.320GMT","stageIds":[51,48,52,49,56,53,50,57,54,58,55,47,59],"status":"SUCCEEDED","numTasks":1377,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":1037,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":11,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":5,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:43.638GMT","completionTime":"2017-11-08T04:29:45.029GMT","stageIds":[45,37,46,38,35,42,39,36,43,40,44,41],"status":"SUCCEEDED","numTasks":1207,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":867,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":10,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":4,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:29:39.081GMT","completionTime":"2017-11-08T04:29:43.548GMT","stageIds":[33,30,27,34,31,32,24,28,25,29,26],"status":"SUCCEEDED","numTasks":1037,"numActiveTasks":0,"numCompletedTasks":340,"numSkippedTasks":697,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":9,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":3,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-08T04:28:54.960GMT","completionTime":"2017-11-08T04:29:38.957GMT","stageIds":[15,19,16,20,17,21,18,22,14,23],"status":"SUCCEEDED","numTasks":867,"numActiveTasks":0,"numCompletedTasks":714,"numSkippedTasks":153,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":5,"numSkippedStages":5,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":2,"name":"count at KCore.java:58","submissionTime":"2017-11-08T04:28:54.157GMT","completionTime":"2017-11-08T04:28:54.870GMT","stageIds":[12,9,13,10,11,8],"status":"SUCCEEDED","numTasks":187,"numActiveTasks":0,"numCompletedTasks":68,"numSkippedTasks":119,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":4,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":1,"name":"count at KCore.java:58","submissionTime":"2017-11-08T04:28:50.748GMT","completionTime":"2017-11-08T04:28:54.108GMT","stageIds":[5,6,3,7,4],"status":"SUCCEEDED","numTasks":153,"numActiveTasks":0,"numCompletedTasks":102,"numSkippedTasks":51,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":3,"numSkippedStages":2,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":0,"name":"count at KCore.java:58","submissionTime":"2017-11-08T04:28:16.799GMT","completionTime":"2017-11-08T04:28:50.684GMT","stageIds":[0,1,2],"status":"SUCCEEDED","numTasks":85,"numActiveTasks":0,"numCompletedTasks":85,"numSkippedTasks":0,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":3,"numSkippedStages":0,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+

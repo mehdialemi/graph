@@ -1,0 +1,30 @@
+{"jobId":4,"name":"count at KTrussTSet.java:244","submissionTime":"2017-11-09T08:32:23.567GMT","completionTime":"2017-11-09T08:32:24.479GMT","stageIds":[33,30,37,34,31,38,35,32,36],"status":"SUCCEEDED","numTasks":35259,"numActiveTasks":0,"numCompletedTasks":4830,"numSkippedTasks":30429,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":1,"numSkippedStages":8,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":3,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-09T08:32:20.363GMT","completionTime":"2017-11-09T08:32:22.982GMT","stageIds":[27,24,21,28,25,22,29,26,23],"status":"SUCCEEDED","numTasks":35259,"numActiveTasks":0,"numCompletedTasks":9660,"numSkippedTasks":25599,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":7,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":2,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-09T08:32:12.296GMT","completionTime":"2017-11-09T08:32:19.973GMT","stageIds":[15,19,16,13,20,17,18,14],"status":"SUCCEEDED","numTasks":30429,"numActiveTasks":0,"numCompletedTasks":9660,"numSkippedTasks":20769,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":6,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":1,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-09T08:12:21.259GMT","completionTime":"2017-11-09T08:32:11.404GMT","stageIds":[12,9,6,10,7,11,8],"status":"SUCCEEDED","numTasks":25599,"numActiveTasks":0,"numCompletedTasks":9660,"numSkippedTasks":15939,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":5,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":0,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-09T07:49:20.405GMT","completionTime":"2017-11-09T08:12:18.564GMT","stageIds":[0,1,5,2,3,4],"status":"SUCCEEDED","numTasks":20769,"numActiveTasks":0,"numCompletedTasks":20769,"numSkippedTasks":0,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":6,"numSkippedStages":0,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+

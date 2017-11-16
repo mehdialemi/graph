@@ -1,0 +1,6 @@
+{"jobId":0,"name":"count at KCore.java:53","submissionTime":"2017-11-03T12:57:14.841GMT","completionTime":"2017-11-03T12:59:01.677GMT","stageIds":[0,1,2],"status":"FAILED","numTasks":5379,"numActiveTasks":120,"numCompletedTasks":269,"numSkippedTasks":4800,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":0,"numSkippedStages":2,"numFailedStages":1,"additionalProperties":{}}
+
+
+************************
+
+

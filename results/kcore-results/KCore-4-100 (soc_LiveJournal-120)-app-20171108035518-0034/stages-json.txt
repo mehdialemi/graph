@@ -1,0 +1,6 @@
+{"status":"FAILED","stageId":0,"attemptId":0,"numActiveTasks":17,"numCompleteTasks":0,"numFailedTasks":0,"executorRunTime":0,"executorCpuTime":0,"submissionTime":"2017-11-08T00:25:20.156GMT","firstTaskLaunchedTime":"2017-11-08T00:25:20.924GMT","completionTime":"2017-11-08T00:25:27.615GMT","inputBytes":0,"inputRecords":0,"outputBytes":0,"outputRecords":0,"shuffleReadBytes":0,"shuffleReadRecords":0,"shuffleWriteBytes":0,"shuffleWriteRecords":0,"memoryBytesSpilled":0,"diskBytesSpilled":0,"name":"flatMapToPair at EdgeLoader.java:23","schedulingPool":"default","accumulatorUpdates":[],"additionalProperties":{}}
+
+
+************************
+
+

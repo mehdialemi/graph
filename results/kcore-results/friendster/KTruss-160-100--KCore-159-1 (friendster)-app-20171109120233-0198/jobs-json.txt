@@ -1,0 +1,36 @@
+{"jobId":5,"name":"count at KTrussTSet.java:244","submissionTime":"2017-11-09T08:57:16.891GMT","completionTime":"2017-11-09T08:57:17.695GMT","stageIds":[51,48,45,49,46,50,42,43,47,44,41],"status":"SUCCEEDED","numTasks":37191,"numActiveTasks":0,"numCompletedTasks":4830,"numSkippedTasks":32361,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":1,"numSkippedStages":10,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":4,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-09T08:57:13.983GMT","completionTime":"2017-11-09T08:57:16.175GMT","stageIds":[33,30,37,34,31,38,35,32,39,36,40],"status":"SUCCEEDED","numTasks":37191,"numActiveTasks":0,"numCompletedTasks":9660,"numSkippedTasks":27531,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":9,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":3,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-09T08:57:07.222GMT","completionTime":"2017-11-09T08:57:13.394GMT","stageIds":[27,20,24,21,28,25,22,29,26,23],"status":"SUCCEEDED","numTasks":32361,"numActiveTasks":0,"numCompletedTasks":9660,"numSkippedTasks":22701,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":8,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":2,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-09T08:47:45.911GMT","completionTime":"2017-11-09T08:57:06.427GMT","stageIds":[15,12,19,16,13,17,18,14,11],"status":"SUCCEEDED","numTasks":27531,"numActiveTasks":0,"numCompletedTasks":9660,"numSkippedTasks":17871,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":2,"numSkippedStages":7,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":1,"name":"count at KTrussTSet.java:67","submissionTime":"2017-11-09T08:36:25.592GMT","completionTime":"2017-11-09T08:47:44.374GMT","stageIds":[9,5,6,3,10,7,4,8],"status":"SUCCEEDED","numTasks":22701,"numActiveTasks":0,"numCompletedTasks":21252,"numSkippedTasks":1449,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":6,"numSkippedStages":2,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":0,"name":"count at KCore.java:58","submissionTime":"2017-11-09T08:32:35.797GMT","completionTime":"2017-11-09T08:36:25.269GMT","stageIds":[0,1,2],"status":"SUCCEEDED","numTasks":2415,"numActiveTasks":0,"numCompletedTasks":2415,"numSkippedTasks":0,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":3,"numSkippedStages":0,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+

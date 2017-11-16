@@ -1,0 +1,29 @@
+/home/i/spark-2.2/bin/spark-submit --class ir.ac.sbu.graph.spark.KTrussTSet --total-executor-cores 120 --master spark://alemi-1:7077 /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar hdfs://alemi-1/graph-data/soc_LiveJournal 100 4 100
+[SBM] KTruss-4-100--KCore-3-100 (soc_LiveJournal)
+[SBM] K-core, current invUpdate count: 1256000, duration: 25795 ms
+[SBM] K-core, current invUpdate count: 143648, duration: 2670 ms
+[SBM] K-core, current invUpdate count: 19888, duration: 1228 ms
+[SBM] K-core, current invUpdate count: 3180, duration: 1207 ms
+[SBM] K-core, current invUpdate count: 556, duration: 984 ms
+[SBM] K-core, current invUpdate count: 89, duration: 3302 ms
+[SBM] K-core, current invUpdate count: 17, duration: 6402 ms
+[SBM] K-core, current invUpdate count: 2, duration: 1033 ms
+[SBM] K-core, current invUpdate count: 2, duration: 981 ms
+[SBM] K-core, current invUpdate count: 2, duration: 950 ms
+[SBM] K-core, current invUpdate count: 2, duration: 937 ms
+[SBM] K-core, current invUpdate count: 2, duration: 927 ms
+[SBM] K-core, current invUpdate count: 2, duration: 917 ms
+[SBM] K-core, current invUpdate count: 2, duration: 1008 ms
+[SBM] K-core, current invUpdate count: 2, duration: 931 ms
+[SBM] K-core, current invUpdate count: 2, duration: 997 ms
+[SBM] K-core, current invUpdate count: 2, duration: 1114 ms
+[SBM] K-core, current invUpdate count: 2, duration: 953 ms
+[SBM] K-core, current invUpdate count: 2, duration: 897 ms
+[SBM] K-core, current invUpdate count: 2, duration: 1188 ms
+[SBM] K-core, current invUpdate count: 2, duration: 1126 ms
+[SBM] K-core, current invUpdate count: 2, duration: 967 ms
+[SBM] K-core, current invUpdate count: 2, duration: 930 ms
+[SBM] K-core, current invUpdate count: 2, duration: 932 ms
+[SBM] K-core, current invUpdate count: 0, duration: 882 ms
+[SBM] iteration: 1, invalid edge count: 4668883, duration: 63438 ms
+[SBM] iteration: 2, invalid edge count: 638549, duration: 5492 ms
