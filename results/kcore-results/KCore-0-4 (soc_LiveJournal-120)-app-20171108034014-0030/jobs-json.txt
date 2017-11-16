@@ -1,0 +1,12 @@
+{"jobId":1,"name":"count at KCore.java:110","submissionTime":"2017-11-08T00:11:03.164GMT","completionTime":"2017-11-08T00:11:03.398GMT","stageIds":[3,4],"status":"SUCCEEDED","numTasks":137,"numActiveTasks":0,"numCompletedTasks":120,"numSkippedTasks":17,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":1,"numSkippedStages":1,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":0,"name":"count at KCore.java:58","submissionTime":"2017-11-08T00:10:15.932GMT","completionTime":"2017-11-08T00:11:03.138GMT","stageIds":[0,1,2],"status":"SUCCEEDED","numTasks":257,"numActiveTasks":0,"numCompletedTasks":257,"numSkippedTasks":0,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":3,"numSkippedStages":0,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+

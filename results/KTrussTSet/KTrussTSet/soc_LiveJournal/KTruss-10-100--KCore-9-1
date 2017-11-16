@@ -1,0 +1,44 @@
+/home/i/spark-2.2/bin/spark-submit --class ir.ac.sbu.graph.spark.KTrussTSet --total-executor-cores 120 --master spark://alemi-1:7077 /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar hdfs://alemi-1/graph-data/soc_LiveJournal 1 10 100
+[SBM] KTruss-10-100--KCore-9-1 (soc_LiveJournal)
+[SBM] K-core, current invUpdate count: 2827260, duration: 26091 ms
+[SBM] iteration: 1, invalid edge count: 15487043, duration: 178297 ms
+[SBM] iteration: 2, invalid edge count: 3023423, duration: 6825 ms
+[SBM] iteration: 3, invalid edge count: 1040564, duration: 3153 ms
+[SBM] iteration: 4, invalid edge count: 463442, duration: 2059 ms
+[SBM] iteration: 5, invalid edge count: 241077, duration: 1435 ms
+[SBM] iteration: 6, invalid edge count: 136343, duration: 1320 ms
+[SBM] iteration: 7, invalid edge count: 82571, duration: 1280 ms
+[SBM] iteration: 8, invalid edge count: 52106, duration: 1191 ms
+[SBM] iteration: 9, invalid edge count: 33898, duration: 1074 ms
+[SBM] iteration: 10, invalid edge count: 23352, duration: 1078 ms
+[SBM] iteration: 11, invalid edge count: 16419, duration: 1024 ms
+[SBM] iteration: 12, invalid edge count: 10914, duration: 975 ms
+[SBM] iteration: 13, invalid edge count: 7609, duration: 1118 ms
+[SBM] iteration: 14, invalid edge count: 5239, duration: 1264 ms
+[SBM] iteration: 15, invalid edge count: 3725, duration: 1013 ms
+[SBM] iteration: 16, invalid edge count: 2671, duration: 1187 ms
+[SBM] iteration: 17, invalid edge count: 1932, duration: 850 ms
+[SBM] iteration: 18, invalid edge count: 1542, duration: 1003 ms
+[SBM] iteration: 19, invalid edge count: 1071, duration: 1011 ms
+[SBM] iteration: 20, invalid edge count: 779, duration: 1074 ms
+[SBM] iteration: 21, invalid edge count: 617, duration: 838 ms
+[SBM] iteration: 22, invalid edge count: 459, duration: 888 ms
+[SBM] iteration: 23, invalid edge count: 372, duration: 1046 ms
+[SBM] iteration: 24, invalid edge count: 336, duration: 993 ms
+[SBM] iteration: 25, invalid edge count: 243, duration: 1005 ms
+[SBM] iteration: 26, invalid edge count: 123, duration: 1074 ms
+[SBM] iteration: 27, invalid edge count: 128, duration: 796 ms
+[SBM] iteration: 28, invalid edge count: 95, duration: 895 ms
+[SBM] iteration: 29, invalid edge count: 73, duration: 980 ms
+[SBM] iteration: 30, invalid edge count: 43, duration: 922 ms
+[SBM] iteration: 31, invalid edge count: 34, duration: 830 ms
+[SBM] iteration: 32, invalid edge count: 32, duration: 782 ms
+[SBM] iteration: 33, invalid edge count: 31, duration: 793 ms
+[SBM] iteration: 34, invalid edge count: 26, duration: 823 ms
+[SBM] iteration: 35, invalid edge count: 11, duration: 782 ms
+[SBM] iteration: 36, invalid edge count: 5, duration: 761 ms
+[SBM] iteration: 37, invalid edge count: 3, duration: 795 ms
+[SBM] iteration: 38, invalid edge count: 3, duration: 770 ms
+[SBM] iteration: 39, invalid edge count: 6, duration: 826 ms
+[SBM] iteration: 40, invalid edge count: 11, duration: 965 ms
+[SBM] KTruss edge count: 9808536, duration: 256782 ms

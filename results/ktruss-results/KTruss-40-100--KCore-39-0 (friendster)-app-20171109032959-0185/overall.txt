@@ -1,0 +1,9 @@
+startTime: 2017-11-08T23:59:56.647GMT
+endTime: 2017-11-09T00:47:28.401GMT
+duration: 2851754
+numJobs: 52
+inputBytes: 94882478742
+shuffleReadBytes: 357844469950
+shuffleReadRecords: 12521172426
+shuffleWriteBytes: 349893431671
+shuffleWriteRecords: 0

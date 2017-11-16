@@ -1,0 +1,9 @@
+startTime: 2017-11-07T22:13:39.108GMT
+endTime: 2017-11-07T22:13:42.145GMT
+duration: 3037
+numJobs: 0
+inputBytes: 0
+shuffleReadBytes: 0
+shuffleReadRecords: 0
+shuffleWriteBytes: 0
+shuffleWriteRecords: 0

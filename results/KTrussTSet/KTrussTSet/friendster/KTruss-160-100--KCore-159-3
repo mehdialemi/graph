@@ -1,0 +1,9 @@
+/home/i/spark-2.2/bin/spark-submit --class ir.ac.sbu.graph.spark.KTrussTSet --total-executor-cores 120 --master spark://alemi-1:7077 /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar hdfs://alemi-1/graph-data/friendster 3 160 100
+[SBM] KTruss-160-100--KCore-159-3 (friendster)
+[SBM] K-core, current invUpdate count: 59304830, duration: 220775 ms
+[SBM] K-core, current invUpdate count: 6056379, duration: 33696 ms
+[SBM] K-core, current invUpdate count: 3281939, duration: 11649 ms
+[SBM] iteration: 1, invalid edge count: 320745591, duration: 382955 ms
+[SBM] iteration: 2, invalid edge count: 346389, duration: 312815 ms
+[SBM] iteration: 3, invalid edge count: 119, duration: 5793 ms
+[SBM] KTruss edge count: 0, duration: 976621 ms

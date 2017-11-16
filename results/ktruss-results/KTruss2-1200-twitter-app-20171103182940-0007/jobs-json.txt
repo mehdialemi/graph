@@ -1,0 +1,12 @@
+{"jobId":1,"name":"count at KTrussTSet2.java:59","submissionTime":"2017-11-03T15:03:06.558GMT","completionTime":"2017-11-04T17:01:10.680GMT","stageIds":[9,5,6,3,10,7,4,8],"status":"FAILED","numTasks":28179,"numActiveTasks":120,"numCompletedTasks":22896,"numSkippedTasks":1779,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":5,"numSkippedStages":2,"numFailedStages":1,"additionalProperties":{}}
+
+
+************************
+
+
+{"jobId":0,"name":"count at KCore.java:52","submissionTime":"2017-11-03T14:59:44.117GMT","completionTime":"2017-11-03T15:03:06.090GMT","stageIds":[0,1,2],"status":"SUCCEEDED","numTasks":2979,"numActiveTasks":0,"numCompletedTasks":2979,"numSkippedTasks":0,"numFailedTasks":0,"numActiveStages":0,"numCompletedStages":3,"numSkippedStages":0,"numFailedStages":0,"additionalProperties":{}}
+
+
+************************
+
+
