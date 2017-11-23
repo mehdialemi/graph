@@ -45,26 +45,27 @@ public class KCore extends NeighborList {
         final int k = kConf.getKc();
         for (int iter = 0; iter < kConf.getKcMaxIter(); iter ++ ) {
             long t1 = System.currentTimeMillis();
-            JavaPairRDD<Integer, Iterable<Integer>> invUpdate = neighbors
-                    .filter(nl -> nl._2.length < k)
-                    .flatMapToPair(nl -> {
-                        List<Tuple2<Integer, Integer>> out = new ArrayList<>(nl._2.length);
-                        for (int v : nl._2) {
-                            out.add(new Tuple2<>(v, nl._1));
-                        }
-                        return out.iterator();
-                    }).groupByKey(conf.getPartitionNum());
 
-            long count = invUpdate.count();
+            JavaPairRDD<Integer, int[]> invalids = neighbors.filter(nl -> nl._2.length < k).cache();
+            long count = invalids.count();
             long t2 = System.currentTimeMillis();
-            log("K-core, current invUpdate count: " + count, t1, t2);
+            log("K-core, invalids: " + count, t1, t2);
 
-            if (count == 0)
+            if (invalids.count() == 0)
                 break;
 
             if (neighborQueue.size() > 1)
                 neighborQueue.remove().unpersist();
 
+            JavaPairRDD<Integer, Iterable<Integer>> invUpdate = invalids
+                    .flatMapToPair(nl -> {
+                        List<Tuple2<Integer, Integer>> out = new ArrayList<>(nl._2.length);
+
+                        for (int v : nl._2) {
+                            out.add(new Tuple2<>(v, nl._1));
+                        }
+                        return out.iterator();
+                    }).groupByKey(conf.getPartitionNum());
 
             neighbors = neighbors.filter(nl -> nl._2.length >= k)
                     .leftOuterJoin(invUpdate)
