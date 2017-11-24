@@ -5,28 +5,48 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Create triangle from neighbor list
  */
 public class Triangle extends SparkApp {
 
+    public static final int P_MULTIPLIER = 5;
     private final NeighborList neighborList;
+    private JavaPairRDD<Integer, int[]> fonl;
+    private JavaPairRDD<Integer, int[]> candidates;
+    private JavaPairRDD<Integer, Integer> vertexTC;
 
     public Triangle(NeighborList neighborList) {
         super(neighborList);
         this.neighborList = neighborList;
-        conf.getSparkConf().registerKryoClasses(new Class[] {GraphUtils.VertexDegreeInt.class});
+        conf.getSparkConf().registerKryoClasses(new Class[] {GraphUtils.VertexDegreeInt.class, int[].class});
     }
 
-    public JavaPairRDD<Integer, int[]> createFonl(final int pMultiplier) {
+    public JavaPairRDD<Integer, int[]> getFonl() {
+        if (fonl == null)
+            createFonl(P_MULTIPLIER);
+        return fonl;
+    }
+
+    public JavaPairRDD<Integer, int[]> getCandidates() {
+        if (candidates == null)
+            createCandidates();
+        return candidates;
+    }
+
+    public JavaPairRDD<Integer, Integer> getVertexTC() {
+        if (vertexTC == null)
+            createVertexTC();
+
+        return vertexTC;
+    }
+
+    public void createFonl(final int pMultiplier) {
         JavaPairRDD<Integer, int[]> neighborList = this.neighborList.create();
         int partitions = neighborList.getNumPartitions() * pMultiplier;
-        return neighborList.flatMapToPair(t -> {
+        fonl = neighborList.flatMapToPair(t -> {
             int deg = t._2.length;
             if (deg == 0)
                 return Collections.emptyIterator();
@@ -76,9 +96,8 @@ public class Triangle extends SparkApp {
         }).persist(StorageLevel.MEMORY_AND_DISK_2());
     }
 
-    public JavaPairRDD<Integer, int[]> generateCandidates(JavaPairRDD<Integer, int[]> fonl) {
-        return fonl
-                .filter(t -> t._2.length > 2) // Select vertices having more than 2 items in their values
+    public void createCandidates() {
+        candidates = getFonl().filter(t -> t._2.length > 2) // Select vertices having more than 2 items in their values
                 .flatMapToPair(t -> {
 
                     int size = t._2.length - 1; // one is for the first index holding node's degree
@@ -99,6 +118,50 @@ public class Triangle extends SparkApp {
                     }
 
                     return output.iterator();
-                });
+                }).persist(StorageLevel.MEMORY_AND_DISK());
+    }
+
+    public void createVertexTC() {
+
+        JavaPairRDD<Integer, int[]> fonl = getFonl();
+        JavaPairRDD<Integer, int[]> candidates = getCandidates();
+
+        vertexTC = candidates.cogroup(fonl, fonl.getNumPartitions())
+                .flatMapToPair(t -> {
+            Iterator<int[]> iterator = t._2._2.iterator();
+            List<Tuple2<Integer, Integer>> output = new ArrayList<>();
+            if (!iterator.hasNext())
+                return output.iterator();
+
+            int[] hDegs = iterator.next();
+
+            iterator = t._2._1.iterator();
+            if (!iterator.hasNext())
+                return output.iterator();
+
+            Arrays.sort(hDegs, 1, hDegs.length);
+
+            int sum = 0;
+            do {
+                int[] forward = iterator.next();
+                int count = GraphUtils.sortedIntersectionCountInt(hDegs, forward, output, 1, 1);
+                if (count > 0) {
+                    sum += count;
+                    output.add(new Tuple2<>(forward[0], count));
+                }
+            } while (iterator.hasNext());
+
+            if (sum > 0) {
+                output.add(new Tuple2<>(t._1, sum));
+            }
+
+            return output.iterator();
+        }).reduceByKey((a, b) -> a + b)
+                .persist(StorageLevel.MEMORY_AND_DISK());
+    }
+
+    public long triangleCount() {
+        Long tc3 = getVertexTC().map(kv -> Long.valueOf(kv._2)).reduce((a, b) -> a + b);
+        return tc3 / 3;
     }
 }

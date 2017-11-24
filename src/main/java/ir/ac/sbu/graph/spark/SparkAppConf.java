@@ -24,6 +24,10 @@ public class SparkAppConf {
     }
 
     protected String createAppName() {
+        return getFileName();
+    }
+
+    public String getFileName() {
         return new File(getInputPath()).getName();
     }
 
