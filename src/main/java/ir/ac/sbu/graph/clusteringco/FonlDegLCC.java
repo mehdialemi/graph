@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import static ir.ac.sbu.graph.utils.Log.log;
+
 /**
  * Calculate local clustering coefficient using fonl structure which is sorted based on degree of nodes. This causes
  * that in all steps of program we could have a balanced workload.
@@ -21,7 +23,7 @@ import java.util.List;
 public class FonlDegLCC {
 
     public static void main(String[] args) {
-        String inputPath = "/home/mehdi/ir.ac.sbu.graph-data/com-amazon.ungraph.txt";
+        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
         if (args.length > 0)
             inputPath = args[0];
 
@@ -36,6 +38,7 @@ public class FonlDegLCC {
         conf.registerKryoClasses(new Class[] {GraphUtils.class, GraphUtils.VertexDegree.class, long[].class});
         JavaSparkContext sc = new JavaSparkContext(conf);
 
+        long t1 = System.currentTimeMillis();
         JavaRDD<String> input = sc.textFile(inputPath, partition);
         JavaPairRDD<Long, Long> edges = GraphLoader.loadEdges(input);
 
@@ -84,7 +87,12 @@ public class FonlDegLCC {
             .map(t -> t._2)
             .reduce((a, b) -> a + b);
 
+        long t2 = System.currentTimeMillis();
+
         float avgLCC = sumLCC / totalNodes;
+
+        log("Average lcc: " + avgLCC, t1, t2);
+
         OutUtils.printOutputLCC(totalNodes, sumLCC, avgLCC);
 
         sc.close();

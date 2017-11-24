@@ -275,9 +275,8 @@ public class GraphUtils implements Serializable {
         return list;
     }
 
-    public static int sortedIntersectionCountInt(int[] hDegs, int[] forward, List<Tuple2<Integer, Integer>> output, int
-        hIndex,
-                                                 int fIndex) {
+    public static int sortedIntersectionCountInt(int[] hDegs, int[] forward, List<Tuple2<Integer, Integer>> output,
+                                                 int hIndex, int fIndex) {
         int fLen = forward.length;
         int hLen = hDegs.length;
 

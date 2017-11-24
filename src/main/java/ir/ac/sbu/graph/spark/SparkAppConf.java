@@ -1,6 +1,8 @@
 package ir.ac.sbu.graph.spark;
 
 import ir.ac.sbu.graph.utils.Log;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 
@@ -26,6 +28,11 @@ public class SparkAppConf {
     }
 
     public void init() {
+        Logger.getLogger("org.apache.spar").setLevel(Level.INFO);
+        Logger.getLogger("ServletHandler").setLevel(Level.INFO);
+        Logger.getLogger("AbstractLifeCycle").setLevel(Level.INFO);
+        Logger.getLogger("AbstractHandler").setLevel(Level.INFO);
+
         String appName = createAppName();
 
         sparkConf = new SparkConf();

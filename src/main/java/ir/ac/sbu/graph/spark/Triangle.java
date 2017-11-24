@@ -23,10 +23,6 @@ public class Triangle extends SparkApp {
         conf.getSparkConf().registerKryoClasses(new Class[] {GraphUtils.VertexDegreeInt.class});
     }
 
-    public JavaPairRDD<Integer, int[]> createFonl() {
-        return createFonl(1);
-    }
-
     public JavaPairRDD<Integer, int[]> createFonl(final int pMultiplier) {
         JavaPairRDD<Integer, int[]> neighborList = this.neighborList.create();
         int partitions = neighborList.getNumPartitions() * pMultiplier;
@@ -77,7 +73,7 @@ public class Triangle extends SparkApp {
                 higherDegs[i] = list.get(i - 1).vertex;
 
             return new Tuple2<>(v._1, higherDegs);
-        }).persist(StorageLevel.MEMORY_AND_DISK_2());
+        }).persist(StorageLevel.MEMORY_AND_DISK());
     }
 
     public JavaPairRDD<Integer, int[]> generateCandidates(JavaPairRDD<Integer, int[]> fonl) {

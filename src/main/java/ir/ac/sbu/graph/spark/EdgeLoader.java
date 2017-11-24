@@ -20,6 +20,7 @@ public class EdgeLoader extends SparkApp {
 
     public JavaPairRDD<Integer, Integer> create() {
         JavaRDD<String> input = conf.getSc().textFile(conf.getInputPath());
+
         JavaPairRDD<Integer, Integer> result = input.flatMapToPair(line -> {
             if (line.startsWith("#"))
                 return Collections.emptyIterator();
