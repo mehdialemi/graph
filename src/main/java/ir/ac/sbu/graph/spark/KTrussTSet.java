@@ -57,7 +57,6 @@ public class KTrussTSet extends SparkApp {
             long t1 = System.currentTimeMillis();
 
             if (iter == 1) {
-                candidates.unpersist();
                 kCore.unpersist();
                 fonl.unpersist();
             }
