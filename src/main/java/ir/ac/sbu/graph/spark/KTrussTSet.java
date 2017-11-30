@@ -142,7 +142,7 @@ public class KTrussTSet extends SparkApp {
 
                         return set;
                     }).filter(kv -> kv._2 != null)
-                    .persist(StorageLevel.MEMORY_AND_DISK());
+                    .persist(StorageLevel.MEMORY_AND_DISK_SER());
 
             invalids.unpersist();
             tSetQueue.add(tSet);
@@ -224,7 +224,7 @@ public class KTrussTSet extends SparkApp {
                     }
 
                     return set;
-                }).persist(StorageLevel.MEMORY_AND_DISK()); // Use disk too if graph is very large
+                }).persist(StorageLevel.MEMORY_AND_DISK_SER()); // Use disk too if graph is very large
 
         return tSet;
     }

@@ -1,5 +1,7 @@
 package ir.ac.sbu.graph.ktruss
 
+import java.io.File
+
 import ir.ac.sbu.graph.utils.GraphUtils
 import org.apache.spark.graphx._
 import org.apache.spark.storage.StorageLevel
@@ -18,31 +20,31 @@ object KTrussPregel {
     case class NeighborMessage(list: ListBuffer[OneNeighborMsg])
 
 
+    val P_MULTIPLIER = 5
+
     def main(args: Array[String]): Unit = {
         var inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt"
         if (args != null && args.length > 0)
             inputPath = args(0);
 
-        var partition = 2
-        if (args != null && args.length > 1)
-            partition = args(1).toInt;
-
         var k = 4
         if (args.length > 2)
-            k = args(2).toInt
+            k = args(1).toInt
         val support: Int = k - 2
 
         val conf = new SparkConf()
         if (args == null || args.length == 0)
             conf.setMaster("local[2]")
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-        GraphUtils.setAppName(conf, "KTruss-Pregel-" + k, partition, inputPath)
+        conf.setAppName("KTruss-Pregel" + "(" + new File(inputPath).getName + ")")
 
         val sc = SparkContext.getOrCreate(conf)
 
         val start = System.currentTimeMillis()
         // Load int ir.ac.sbu.graph which is as a list of edges
-        val inputGraph = GraphLoader.edgeListFile(sc, inputPath, numEdgePartitions = partition)
+        val inputGraph = GraphLoader.edgeListFile(sc, inputPath)
+
+        val partition = inputGraph.edges.getNumPartitions * P_MULTIPLIER
 
         // Change direction from lower degree node to a higher node
         // First find degree of each node
@@ -58,7 +60,7 @@ object KTrussPregel {
                 Edge(et.srcId, et.dstId, 0)
             else
                 Edge(et.dstId, et.srcId, 0)
-        }
+        }.repartition(partition)
 
         val empty = sc.makeRDD(Array[(Long, Int)]())
 
