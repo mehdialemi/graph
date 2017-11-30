@@ -12,6 +12,7 @@ import scala.Tuple2;
 public class NeighborList extends SparkApp {
 
     private EdgeLoader edgeLoader;
+    private JavaPairRDD<Integer, int[]> neighbors;
 
     public NeighborList(NeighborList neighborList) {
         this(neighborList.edgeLoader);
@@ -23,13 +24,16 @@ public class NeighborList extends SparkApp {
     }
 
     public JavaPairRDD<Integer, int[]> create() {
-        JavaPairRDD<Integer, Integer> edges = edgeLoader.create();
-        return edges.groupByKey(conf.getPartitionNum()).mapToPair(t -> {
-            IntSet set = new IntOpenHashSet();
-            for (Integer v : t._2) {
-                set.add(v.intValue());
-            }
-            return new Tuple2<>(t._1, set.toIntArray());
-        }).cache();
+        if (neighbors == null) {
+            JavaPairRDD<Integer, Integer> edges = edgeLoader.create();
+            neighbors = edges.groupByKey(conf.getPartitionNum()).mapToPair(t -> {
+                IntSet set = new IntOpenHashSet();
+                for (Integer v : t._2) {
+                    set.add(v.intValue());
+                }
+                return new Tuple2<>(t._1, set.toIntArray());
+            }).cache();
+        }
+        return neighbors;
     }
 }
