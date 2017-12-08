@@ -156,7 +156,13 @@ public class Cohen extends SparkApp {
     public static void main(String[] args) {
         Logger.getLogger("org.apache.spar").setLevel(Level.INFO);
         long t1 = System.currentTimeMillis();
-        KTrussConf ktConf = new KTrussConf(new ArgumentReader(args));
+        KTrussConf ktConf = new KTrussConf(new ArgumentReader(args)) {
+            @Override
+            protected String createAppName() {
+                return "KTruss-Cohen-" + super.getKt() + "-(" + super.getFileName() +")";
+            }
+        };
+
         ktConf.init();
 
         Cohen cohen = new Cohen(ktConf);

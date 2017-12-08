@@ -36,7 +36,7 @@ object KTrussPregel {
         if (args == null || args.length == 0)
             conf.setMaster("local[2]")
         conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-        conf.setAppName("KTruss-Pregel" + "(" + new File(inputPath).getName + ")")
+        conf.setAppName("KTruss-Pregel-" + k + "-(" + new File(inputPath).getName + ")")
 
         val sc = SparkContext.getOrCreate(conf)
 
