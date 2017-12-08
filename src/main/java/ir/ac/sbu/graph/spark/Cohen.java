@@ -45,7 +45,7 @@ public class Cohen extends SparkApp {
         for (int iter = 0; iter < ktConf.getKtMaxIter(); iter++) {
             long t1 = System.currentTimeMillis();
 
-            JavaRDD<Edge[]> triangles = createTriangles(edgeList);
+            JavaRDD<Edge[]> triangles = createTriangles(edgeList).repartition(partitions);
 
             JavaPairRDD<Edge, Integer> eSup = triangles
                     .flatMapToPair(kv -> Arrays.asList(
@@ -61,7 +61,7 @@ public class Cohen extends SparkApp {
             if (invCount == 0)
                 break;
 
-            edgeList = eSup.filter(kv -> kv._2 >= minSup).map(kv -> kv._1).cache();
+            edgeList = eSup.filter(kv -> kv._2 >= minSup).map(kv -> kv._1).persist(StorageLevel.MEMORY_AND_DISK());
         }
 
         return edgeList;
