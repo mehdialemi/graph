@@ -4,6 +4,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.util.ArrayList;
@@ -79,7 +80,7 @@ public class Cohen extends SparkApp {
         // Third, construct key-value <Edge, VertexDegree> which each edge of the current vertex is as a key (Edge)
         // and the value (VertexDegree) is the degree of the current vertex. Here, values for all the keys are the
         // same.
-        JavaPairRDD<Edge, int[]> edgeOneDeg = vertexEdge.groupByKey()
+        JavaPairRDD<Edge, int[]> edgeOneDeg = vertexEdge.groupByKey(partitions)
                 .flatMapToPair(kv -> {
                     List<Tuple2<Edge, int[]>> list = new ArrayList<>();
                     Iterator<Edge> iterator = kv._2.iterator();
@@ -102,7 +103,7 @@ public class Cohen extends SparkApp {
         // Find each edge and its corresponding degree of vertices. Here, key is an edge and value includes two
         // integers that first one is the degree of first vertex of the edge and second one is the degree of the
         // second vertex of the edge.
-        JavaPairRDD<Edge, int[]> edgeTwoDegs = edgeOneDeg.groupByKey().mapValues(degs -> {
+        JavaPairRDD<Edge, int[]> edgeTwoDegs = edgeOneDeg.groupByKey(partitions).mapValues(degs -> {
             Iterator<int[]> iterator = degs.iterator();
             int[] deg = iterator.next();
             int[] deg2 = iterator.next();
@@ -112,7 +113,7 @@ public class Cohen extends SparkApp {
             else
                 deg[1] = deg2[1];
             return deg;
-        }).cache();
+        }).persist(StorageLevel.MEMORY_AND_DISK());
 
         JavaPairRDD<Integer, Edge> lowDegVertex = edgeTwoDegs
                 .mapToPair(kv -> {
