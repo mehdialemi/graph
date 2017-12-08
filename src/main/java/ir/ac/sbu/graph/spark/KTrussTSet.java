@@ -43,8 +43,8 @@ public class KTrussTSet extends SparkApp {
 
         JavaPairRDD<Integer, int[]> fonl = triangle.getFonl();
         int partitionNum = fonl.getNumPartitions();
-        JavaPairRDD<Integer, int[]> candidates = triangle.getCandidates();
-//                .persist(StorageLevel.MEMORY_AND_DISK());
+
+        JavaPairRDD<Integer, int[]> candidates = triangle.createCandidates();
 
         JavaPairRDD<Edge, int[]> tSet = createTSet(fonl, candidates);
 
@@ -142,7 +142,7 @@ public class KTrussTSet extends SparkApp {
 
                         return set;
                     }).filter(kv -> kv._2 != null)
-                    .persist(StorageLevel.MEMORY_AND_DISK_SER());
+                    .persist(StorageLevel.MEMORY_AND_DISK());
 
             invalids.unpersist();
             tSetQueue.add(tSet);
@@ -151,10 +151,10 @@ public class KTrussTSet extends SparkApp {
         return tSet;
     }
 
-    private JavaPairRDD<Edge, int[]> createTSet(JavaPairRDD<Integer, int[]> fonl, JavaPairRDD<Integer, int[]> candidates) {
+    private JavaPairRDD<Edge, int[]> createTSet(JavaPairRDD<Integer, int[]> fonl,
+                                                JavaPairRDD<Integer, int[]> candidates) {
         int partitionNum = fonl.getNumPartitions();
         // Generate kv such that key is an edge and value is its triangle vertices.
-//        JavaPairRDD<Edge, int[]> tSet = candidates.cogroup(fonl, partitionNum).flatMapToPair(t -> {
         JavaPairRDD<Edge, int[]> tSet = candidates.cogroup(fonl)
                 .flatMapToPair(t -> {
             int[] fVal = t._2._2.iterator().next();
@@ -224,7 +224,7 @@ public class KTrussTSet extends SparkApp {
                     }
 
                     return set;
-                }).persist(StorageLevel.MEMORY_AND_DISK_SER()); // Use disk too if graph is very large
+                }).persist(StorageLevel.DISK_ONLY()); // Use disk too because this RDD often is very large
 
         return tSet;
     }

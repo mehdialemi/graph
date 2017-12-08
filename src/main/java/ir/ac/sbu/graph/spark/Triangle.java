@@ -26,13 +26,13 @@ public class Triangle extends SparkApp {
 
     public JavaPairRDD<Integer, int[]> getFonl() {
         if (fonl == null)
-            createFonl(P_MULTIPLIER);
+            fonl = createFonl(P_MULTIPLIER).persist(StorageLevel.MEMORY_AND_DISK_2());
         return fonl;
     }
 
     public JavaPairRDD<Integer, int[]> getCandidates() {
         if (candidates == null)
-            createCandidates();
+            candidates = createCandidates().persist(StorageLevel.MEMORY_AND_DISK());
         return candidates;
     }
 
@@ -43,10 +43,10 @@ public class Triangle extends SparkApp {
         return vertexTC;
     }
 
-    public void createFonl(final int pMultiplier) {
+    public JavaPairRDD<Integer, int[]> createFonl(final int pMultiplier) {
         JavaPairRDD<Integer, int[]> neighborList = this.neighborList.create();
         int partitions = neighborList.getNumPartitions() * pMultiplier;
-        fonl = neighborList.flatMapToPair(t -> {
+        return neighborList.flatMapToPair(t -> {
             int deg = t._2.length;
             if (deg == 0)
                 return Collections.emptyIterator();
@@ -93,11 +93,11 @@ public class Triangle extends SparkApp {
                 higherDegs[i] = list.get(i - 1).vertex;
 
             return new Tuple2<>(v._1, higherDegs);
-        }).persist(StorageLevel.MEMORY_ONLY_SER_2());
+        });
     }
 
-    public void createCandidates() {
-        candidates = getFonl().filter(t -> t._2.length > 2) // Select vertices having more than 2 items in their values
+    public JavaPairRDD<Integer, int[]>  createCandidates() {
+        return getFonl().filter(t -> t._2.length > 2) // Select vertices having more than 2 items in their values
                 .flatMapToPair(t -> {
 
                     int size = t._2.length - 1; // one is for the first index holding node's degree
@@ -118,7 +118,7 @@ public class Triangle extends SparkApp {
                     }
 
                     return output.iterator();
-                }).persist(StorageLevel.MEMORY_AND_DISK());
+                });
     }
 
     public void createVertexTC() {
