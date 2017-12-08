@@ -32,11 +32,12 @@ public class Cohen extends SparkApp {
     public JavaRDD<Edge> generate(EdgeLoader edgeLoader) {
 
         JavaRDD<Edge> edgeList = edgeLoader.create()
-                .map(kv -> kv._1 < kv._2 ? new Edge(kv._1, kv._2) : new Edge(kv._2, kv._1))
+                .map(kv -> kv._1 < kv._2 ? new Edge(kv._1, kv._2) : new Edge(kv._2, kv._1));
+        partitions = edgeList.getNumPartitions() * P_MULTIPLIER;
+        edgeList = edgeList.distinct(partitions)
                 .distinct()
                 .cache();
 
-        partitions = edgeList.getNumPartitions() * P_MULTIPLIER;
 
         final int minSup = ktConf.getKt() - 2;
 
