@@ -94,7 +94,7 @@ public class AnalyzeAppResults {
                     response = client.execute(new HttpGet(urlStage));
                     json = EntityUtils.toString(response.getEntity());
                     if (json.contains("unknown stage"))
-                        break;
+                        continue;
 
                     Stage[] stages = gson.fromJson(json, Stage[].class);
                     Stage stage = null;
