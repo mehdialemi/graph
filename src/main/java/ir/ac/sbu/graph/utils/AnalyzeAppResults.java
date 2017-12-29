@@ -89,7 +89,7 @@ public class AnalyzeAppResults {
                     if (json.contains("unknown stage"))
                         break;
 
-                    Stage stage = gson.fromJson(json, Stage.class);
+                    Stage[] stages = gson.fromJson(json, Stage[].class);
 //                    Stage[] stages;
 //                    try {
 //                        stages = gson.fromJson(json, Stage[].class);
@@ -99,7 +99,7 @@ public class AnalyzeAppResults {
 //                    if (stages == null || stages.length == 0)
 //                        continue;
 //
-//                    Stage stage = stages[0];
+                    Stage stage = stages[0];
 
                     if (stage.getInputBytes() > sMap.getOrDefault(INPUT_BYTES_MAX, 0L))
                         sMap.put(INPUT_BYTES_MAX, stage.getInputBytes());
