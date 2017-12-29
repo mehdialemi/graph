@@ -238,7 +238,7 @@ public class KTrussTSet extends SparkApp {
         return tSet;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws URISyntaxException {
         Logger.getLogger("org.apache.spar").setLevel(Level.INFO);
         long t1 = System.currentTimeMillis();
 
