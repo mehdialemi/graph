@@ -82,6 +82,11 @@ public class AnalyzeAppResults {
                 long duration = DiffTime.diffMillis(job.getSubmissionTime(), job.getCompletionTime());
                 sMap.put(JOB_DURATION, duration);
 
+                long inputBytesMax = 0;
+                long shuffleReadBytesMax = 0;
+                long shuffleReadRecordsMax = 0;
+                long shuffleWriteBytesMax = 0;
+                long shuffleWriteRecordsMax = 0;
                 for (Integer stageId : job.getStageIds()) {
 
                     String urlStage = appUrl + "/stages/" + stageId;
@@ -91,15 +96,6 @@ public class AnalyzeAppResults {
                         break;
 
                     Stage[] stages = gson.fromJson(json, Stage[].class);
-//                    Stage[] stages;
-//                    try {
-//                        stages = gson.fromJson(json, Stage[].class);
-//                    } catch (Exception e) {
-//                        stages = new Stage[]{gson.fromJson(json, Stage.class)};
-//                    }
-//                    if (stages == null || stages.length == 0)
-//                        continue;
-//
                     Stage stage = null;
                     for (Stage st : stages) {
                         if (st.getStatus().equals("COMPLETE")) {
@@ -114,21 +110,27 @@ public class AnalyzeAppResults {
                         break;
                     }
 
-                    if (stage.getInputBytes() > sMap.getOrDefault(INPUT_BYTES_MAX, 0L))
-                        sMap.put(INPUT_BYTES_MAX, stage.getInputBytes());
+                    if (stage.getInputBytes() > inputBytesMax)
+                        inputBytesMax =  stage.getInputBytes();
 
-                    if (stage.getShuffleReadBytes() > sMap.getOrDefault(SHUFFLE_READ_BYTES_MAX, 0L))
-                        sMap.put(SHUFFLE_READ_BYTES_MAX, stage.getShuffleReadBytes());
+                    if (stage.getShuffleReadBytes() > shuffleReadBytesMax)
+                        shuffleReadBytesMax = stage.getShuffleReadBytes();
 
-                    if (stage.getShuffleReadRecords() > sMap.getOrDefault(SHUFFLE_READ_RECORDS_MAX, 0L))
-                        sMap.put(SHUFFLE_READ_RECORDS_MAX, stage.getShuffleReadRecords());
+                    if (stage.getShuffleReadRecords() > shuffleReadRecordsMax)
+                        shuffleReadRecordsMax = stage.getShuffleReadRecords();
 
-                    if (stage.getShuffleWriteBytes() > sMap.getOrDefault(SHUFFLE_WRITE_BYTES_MAX, 0L))
-                        sMap.put(SHUFFLE_WRITE_BYTES_MAX, stage.getShuffleWriteBytes());
+                    if (stage.getShuffleWriteBytes() > shuffleWriteBytesMax)
+                        shuffleWriteBytesMax = stage.getShuffleWriteBytes();
 
-                    if (stage.getShuffleWriteRecords() > sMap.getOrDefault(SHUFFLE_WRITE_RECORDS_MAX, 0L))
-                        sMap.put(SHUFFLE_WRITE_RECORDS_MAX, stage.getShuffleWriteRecords());
+                    if (stage.getShuffleWriteRecords() > shuffleWriteRecordsMax)
+                        shuffleWriteRecordsMax = stage.getShuffleWriteRecords();
                 }
+
+                sMap.put(INPUT_BYTES_MAX, inputBytesMax);
+                sMap.put(SHUFFLE_READ_BYTES_MAX, shuffleReadRecordsMax);
+                sMap.put(SHUFFLE_READ_RECORDS_MAX, shuffleReadRecordsMax);
+                sMap.put(SHUFFLE_WRITE_BYTES_MAX, shuffleWriteBytesMax);
+                sMap.put(SHUFFLE_WRITE_RECORDS_MAX, shuffleWriteRecordsMax);
 
                 jobsMap.put(jobId, sMap);
                 jobId++;
