@@ -144,8 +144,8 @@ public class AnalyzeAppResults {
             long shuffleWriteBytesSum = 0;
             long shuffleWriteRecordsSum = 0;
 
-            for (Map.Entry<Integer, Map<String, Long>> jobMap : jobsMap.entrySet()) {
-                Map<String, Long> map = jobMap.getValue();
+            for (Map.Entry<Integer, Map<String, Long>> entry : jobsMap.entrySet()) {
+                Map<String, Long> map = entry.getValue();
                 Long duration = map.get(JOB_DURATION);
                 Long inputBytes = map.get(INPUT_BYTES_MAX);
                 Long shuffleReadBytes = map.get(SHUFFLE_READ_BYTES_MAX);
@@ -160,7 +160,8 @@ public class AnalyzeAppResults {
                 shuffleWriteBytesSum += shuffleWriteBytes;
                 shuffleWriteRecordsSum += shuffleWriteRecords;
 
-                pwJobs.println("duration: " + duration + ", " +
+                pwJobs.println("jobId: " + entry.getKey() + ", " +
+                        "duration: " + duration + ", " +
                         "inputBytes: " + inputBytes + ", " +
                         "shuffleReadBytes: " + shuffleReadBytes + ", " +
                         "shuffleReadRecords: " +shuffleReadRecords + ", " +
