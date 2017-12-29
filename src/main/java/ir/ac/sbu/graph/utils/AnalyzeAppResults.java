@@ -89,16 +89,17 @@ public class AnalyzeAppResults {
                     if (json.contains("unknown stage"))
                         break;
 
-                    Stage[] stages;
-                    try {
-                        stages = gson.fromJson(json, Stage[].class);
-                    } catch (Exception e) {
-                        stages = new Stage[]{gson.fromJson(json, Stage.class)};
-                    }
-                    if (stages == null || stages.length == 0)
-                        continue;
-
-                    Stage stage = stages[0];
+                    Stage stage = gson.fromJson(json, Stage.class);
+//                    Stage[] stages;
+//                    try {
+//                        stages = gson.fromJson(json, Stage[].class);
+//                    } catch (Exception e) {
+//                        stages = new Stage[]{gson.fromJson(json, Stage.class)};
+//                    }
+//                    if (stages == null || stages.length == 0)
+//                        continue;
+//
+//                    Stage stage = stages[0];
 
                     if (stage.getInputBytes() > sMap.getOrDefault(INPUT_BYTES_MAX, 0L))
                         sMap.put(INPUT_BYTES_MAX, stage.getInputBytes());
