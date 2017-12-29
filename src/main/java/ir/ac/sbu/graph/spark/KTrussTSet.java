@@ -8,6 +8,8 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 
 import static ir.ac.sbu.graph.utils.Log.log;
@@ -29,12 +31,13 @@ public class KTrussTSet extends SparkApp {
     private final int k;
     private KTrussConf ktConf;
 
-    public KTrussTSet(NeighborList neighborList, KTrussConf ktConf) {
+    public KTrussTSet(NeighborList neighborList, KTrussConf ktConf) throws URISyntaxException {
         super(neighborList);
         this.neighborList = neighborList;
         this.k = ktConf.getKt();
         this.ktConf = ktConf;
-        this.ktConf.getSc().setCheckpointDir("hdfs://"+this.ktConf.getSc().master()+"/shared/checkpoint");
+        String master = new URI(ktConf.getSc().master()).getHost();
+        this.ktConf.getSc().setCheckpointDir("hdfs://" + master + "/shared/checkpoint");
     }
 
     public JavaPairRDD<Edge, int[]> generate() {
