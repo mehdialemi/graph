@@ -59,7 +59,7 @@ public class AnalyzeAppResults {
 
             PrintWriter pwJobs = new PrintWriter(new File(dir + "/jobs.txt"));
 
-            int jobId = 0;
+            Integer jobId = 0;
 
             Map<Integer, Map<String, Long>> jobsMap = new HashMap<>();
 
