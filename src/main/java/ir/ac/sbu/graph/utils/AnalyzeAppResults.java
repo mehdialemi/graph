@@ -53,8 +53,6 @@ public class AnalyzeAppResults {
             String appUrl = url + "applications/" + application.getId();
 
             PrintWriter pwJobs = new PrintWriter(new File(dir + "/jobs.txt"));
-            PrintWriter pwJobsJson = new PrintWriter(new File(dir + "/jobs-json.txt"));
-            PrintWriter pwStagesJson = new PrintWriter(new File(dir + "/stages-json.txt"));
 
             int jobId = 0;
 
@@ -198,8 +196,6 @@ public class AnalyzeAppResults {
             pwOverall.println("shuffleWriteRecordsSum: " + shuffleWriteRecordsSum);
 
             pwJobs.close();
-            pwJobsJson.close();
-            pwStagesJson.close();
             pwOverall.close();
         } catch (Exception e) {
             e.printStackTrace();
