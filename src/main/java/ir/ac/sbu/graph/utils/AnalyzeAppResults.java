@@ -63,7 +63,8 @@ public class AnalyzeAppResults {
 
             Map<Integer, Map<String, Long>> jobsMap = new HashMap<>();
 
-            while (true) {
+            boolean stop = false;
+            while (!stop) {
                 CloseableHttpResponse response = client.execute(new HttpGet(appUrl + "/jobs/" + jobId));
                 String json = EntityUtils.toString(response.getEntity());
                 if (json.contains("unknown job"))
@@ -99,7 +100,19 @@ public class AnalyzeAppResults {
 //                    if (stages == null || stages.length == 0)
 //                        continue;
 //
-                    Stage stage = stages[0];
+                    Stage stage = null;
+                    for (Stage st : stages) {
+                        if (st.getStatus().equals("COMPLETE")) {
+                            stage = st;
+                            break;
+                        }
+                    }
+
+                    if (stage == null) {
+                        jobsMap.clear();
+                        stop = true;
+                        break;
+                    }
 
                     if (stage.getInputBytes() > sMap.getOrDefault(INPUT_BYTES_MAX, 0L))
                         sMap.put(INPUT_BYTES_MAX, stage.getInputBytes());
