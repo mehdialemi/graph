@@ -90,6 +90,8 @@ public class AnalyzeAppResults {
                     System.out.println("Url stage: " + urlStage);
                     response = client.execute(new HttpGet(urlStage));
                     json = EntityUtils.toString(response.getEntity());
+                    if (json.contains("unknown stage"))
+                        break;
 
                     Stage[] stages;
                     try {
