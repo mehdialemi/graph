@@ -34,7 +34,7 @@ public class KTrussTSet extends SparkApp {
         this.neighborList = neighborList;
         this.k = ktConf.getKt();
         this.ktConf = ktConf;
-        this.ktConf.getSc().setCheckpointDir("hdfs://shared/checkpoint");
+        this.ktConf.getSc().setCheckpointDir("hdfs://"+this.ktConf.getSc().master()+"/shared/checkpoint");
     }
 
     public JavaPairRDD<Edge, int[]> generate() {
