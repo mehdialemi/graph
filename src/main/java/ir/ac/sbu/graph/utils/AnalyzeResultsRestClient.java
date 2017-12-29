@@ -33,8 +33,8 @@ public class AnalyzeResultsRestClient {
         System.out.println("application num: " + applications.length);
         for (Application application : applications) {
 
-            System.out.println("Application id: " + application.getId());
             if (command.equals(BATCH_COMMAND) || appId.equals(application.getId()) ) {
+                System.out.println("Analyzing results for " + application.getId());
                 AnalyzeAppResults analyzeAppResults = new AnalyzeAppResults(url, client, application, outputDir);
                 analyzeAppResults.start();
             }
