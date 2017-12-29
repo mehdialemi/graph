@@ -76,19 +76,13 @@ public class AnalyzeAppResults {
                     break;
                 }
 
-                Map<String, Long> statsMap = new HashMap<>();
-                statsMap.put(INPUT_BYTES_MAX, 0L);
-                statsMap.put(SHUFFLE_READ_BYTES_MAX, 0L);
-                statsMap.put(SHUFFLE_READ_RECORDS_MAX, 0L);
-                statsMap.put(SHUFFLE_WRITE_BYTES_MAX, 0L);
-                statsMap.put(SHUFFLE_WRITE_RECORDS_MAX, 0L);
-                jobsMap.put(jobId, statsMap);
+                Map<String, Long> sMap = new HashMap<>();
 
                 long duration = DiffTime.diffMillis(job.getSubmissionTime(), job.getCompletionTime());
-                statsMap.put(JOB_DURATION, duration);
-
+                sMap.put(JOB_DURATION, duration);
 
                 for (Integer stageId : job.getStageIds()) {
+
                     String urlStage = appUrl + "/stages/" + stageId;
                     response = client.execute(new HttpGet(urlStage));
                     json = EntityUtils.toString(response.getEntity());
@@ -106,22 +100,23 @@ public class AnalyzeAppResults {
 
                     Stage stage = stages[0];
 
-                    if (stage.getInputBytes() > statsMap.get(INPUT_BYTES_MAX))
-                        statsMap.put(INPUT_BYTES_MAX, stage.getInputBytes());
+                    if (stage.getInputBytes() > sMap.getOrDefault(INPUT_BYTES_MAX, 0L))
+                        sMap.put(INPUT_BYTES_MAX, stage.getInputBytes());
 
-                    if (stage.getShuffleReadBytes() > statsMap.get(SHUFFLE_READ_BYTES_MAX))
-                        statsMap.put(SHUFFLE_READ_BYTES_MAX, stage.getShuffleReadBytes());
+                    if (stage.getShuffleReadBytes() > sMap.getOrDefault(SHUFFLE_READ_BYTES_MAX, 0L))
+                        sMap.put(SHUFFLE_READ_BYTES_MAX, stage.getShuffleReadBytes());
 
-                    if (stage.getShuffleReadRecords() > statsMap.get(SHUFFLE_READ_RECORDS_MAX))
-                        statsMap.put(SHUFFLE_READ_RECORDS_MAX, stage.getShuffleReadRecords());
+                    if (stage.getShuffleReadRecords() > sMap.getOrDefault(SHUFFLE_READ_RECORDS_MAX, 0L))
+                        sMap.put(SHUFFLE_READ_RECORDS_MAX, stage.getShuffleReadRecords());
 
-                    if (stage.getShuffleWriteBytes() > statsMap.get(SHUFFLE_WRITE_BYTES_MAX))
-                        statsMap.put(SHUFFLE_WRITE_BYTES_MAX, stage.getShuffleWriteBytes());
+                    if (stage.getShuffleWriteBytes() > sMap.getOrDefault(SHUFFLE_WRITE_BYTES_MAX, 0L))
+                        sMap.put(SHUFFLE_WRITE_BYTES_MAX, stage.getShuffleWriteBytes());
 
-                    if (stage.getShuffleWriteRecords() > statsMap.get(SHUFFLE_WRITE_RECORDS_MAX))
-                        statsMap.put(SHUFFLE_WRITE_RECORDS_MAX, stage.getShuffleWriteRecords());
+                    if (stage.getShuffleWriteRecords() > sMap.getOrDefault(SHUFFLE_WRITE_RECORDS_MAX, 0L))
+                        sMap.put(SHUFFLE_WRITE_RECORDS_MAX, stage.getShuffleWriteRecords());
                 }
 
+                jobsMap.put(jobId, sMap);
                 jobId++;
             }
 
