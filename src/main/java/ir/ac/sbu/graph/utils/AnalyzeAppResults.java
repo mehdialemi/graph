@@ -42,7 +42,7 @@ public class AnalyzeAppResults {
             int startIndex = name.indexOf('(');
             int endIndex = name.indexOf(')');
             String graph = name.substring(startIndex + 1, endIndex).trim();
-            String app = name.substring(0, startIndex);
+            String app = name.substring(0, startIndex).trim();
             String directory = outputDir + "/" + graph + "/" + app;
             System.out.println("dir: " + directory);
             File dir = new File(directory);
