@@ -60,8 +60,6 @@ private Integer numCompletedStages;
 private Integer numSkippedStages;
 @JsonProperty("numFailedStages")
 private Integer numFailedStages;
-@JsonIgnore
-private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 @JsonProperty("jobId")
 public Integer getJobId() {
@@ -211,16 +209,6 @@ return numFailedStages;
 @JsonProperty("numFailedStages")
 public void setNumFailedStages(Integer numFailedStages) {
 this.numFailedStages = numFailedStages;
-}
-
-@JsonAnyGetter
-public Map<String, Object> getAdditionalProperties() {
-return this.additionalProperties;
-}
-
-@JsonAnySetter
-public void setAdditionalProperty(String name, Object value) {
-this.additionalProperties.put(name, value);
 }
 
 }

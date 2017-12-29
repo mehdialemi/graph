@@ -7,6 +7,8 @@ config=(
     [host]="alemi-1"
     [inputs]="$PWD/bin/inputs"
     [app]="kcore"
+    [command]="batch"
+    [appId]="0"
 )
 
 while read -r line
@@ -26,4 +28,4 @@ if [ -z "$1" ]
     app=$1
 fi
 
-java -cp ${config[jar]} ir.ac.sbu.graph.utils.AnalyzeResultsRestClient ${config[host]} ${config[limit]} logs/${config[app]}-results/${input}
+java -cp ${config[jar]} ir.ac.sbu.graph.utils.AnalyzeResultsRestClient ${config[host]} logs/${config[app]}-results/${input} ${config[command]} ${config[appId]} ${config[limit]}
