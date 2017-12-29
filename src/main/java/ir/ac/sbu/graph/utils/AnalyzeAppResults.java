@@ -156,11 +156,11 @@ public class AnalyzeAppResults {
             for (Map.Entry<Integer, Map<String, Long>> entry : jobsMap.entrySet()) {
                 Map<String, Long> map = entry.getValue();
                 Long duration = map.get(JOB_DURATION);
-                Long inputBytes = map.get(INPUT_BYTES_MAX);
-                Long shuffleReadBytes = map.get(SHUFFLE_READ_BYTES_MAX);
-                Long shuffleReadRecords = map.get(SHUFFLE_READ_RECORDS_MAX);
-                Long shuffleWriteBytes = map.get(SHUFFLE_WRITE_BYTES_MAX);
-                Long shuffleWriteRecords = map.get(SHUFFLE_WRITE_RECORDS_MAX);
+                Long inputBytes = map.getOrDefault(INPUT_BYTES_MAX, 0L);
+                Long shuffleReadBytes = map.getOrDefault(SHUFFLE_READ_BYTES_MAX, 0L);
+                Long shuffleReadRecords = map.getOrDefault(SHUFFLE_READ_RECORDS_MAX, 0L);
+                Long shuffleWriteBytes = map.getOrDefault(SHUFFLE_WRITE_BYTES_MAX, 0L);
+                Long shuffleWriteRecords = map.getOrDefault(SHUFFLE_WRITE_RECORDS_MAX, 0L);
 
                 totalDuration += duration;
                 inputBytesSum += inputBytes;
