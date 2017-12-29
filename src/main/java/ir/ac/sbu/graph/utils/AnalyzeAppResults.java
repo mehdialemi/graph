@@ -90,7 +90,6 @@ public class AnalyzeAppResults {
                 for (Integer stageId : job.getStageIds()) {
 
                     String urlStage = appUrl + "/stages/" + stageId;
-                    System.out.println("job: " + jobId + ", stage: " + stageId + ", url: " + urlStage);
                     response = client.execute(new HttpGet(urlStage));
                     json = EntityUtils.toString(response.getEntity());
                     if (json.contains("unknown stage"))
