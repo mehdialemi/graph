@@ -87,9 +87,9 @@ public class AnalyzeAppResults {
 
                 for (Integer stageId : job.getStageIds()) {
                     String urlStage = appUrl + "/stages/" + stageId;
+                    System.out.println("Url stage: " + urlStage);
                     response = client.execute(new HttpGet(urlStage));
                     json = EntityUtils.toString(response.getEntity());
-
 
                     Stage[] stages;
                     try {
