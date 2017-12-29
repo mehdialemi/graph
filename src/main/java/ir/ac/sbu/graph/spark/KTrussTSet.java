@@ -18,11 +18,12 @@ import static ir.ac.sbu.graph.utils.Log.log;
  * 2: Iteratively, prune invalid edges which have not enough support
  */
 public class KTrussTSet extends SparkApp {
+    private static final int INVALID = -1;
+    private static final int META_LEN = 4;
     private static final byte W_UVW = (byte) 0;
     private static final byte V_UVW = (byte) 1;
     private static final byte U_UVW = (byte) 2;
-    public static final int META_LEN = 4;
-    public static final int INVALID = -1;
+    public static final int CHECKPOINT_ITERATION = 50;
 
     private final NeighborList neighborList;
     private final int k;
@@ -33,6 +34,7 @@ public class KTrussTSet extends SparkApp {
         this.neighborList = neighborList;
         this.k = ktConf.getKt();
         this.ktConf = ktConf;
+        this.ktConf.getSc().setCheckpointDir("hdfs://shared/checkpoint");
     }
 
     public JavaPairRDD<Edge, int[]> generate() {
@@ -55,6 +57,10 @@ public class KTrussTSet extends SparkApp {
         for (int iter = 0; iter < ktConf.getKtMaxIter(); iter ++) {
 
             long t1 = System.currentTimeMillis();
+
+            if ((iter + 1 ) % CHECKPOINT_ITERATION == 0) {
+                tSet.checkpoint();
+            }
 
             if (iter == 1) {
                 kCore.unpersist();
