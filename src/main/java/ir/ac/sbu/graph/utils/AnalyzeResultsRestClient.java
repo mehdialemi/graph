@@ -27,7 +27,7 @@ public class AnalyzeResultsRestClient {
 
         String url = "http://" + hostname + ":18080/api/v1/";
 
-        String applicationUrl = url + "applications" + (limit == 0 ? "" : "?limit=" + limit);
+        String applicationUrl = url + "applications" + (command.equals(BATCH_COMMAND) ? "?limit=" + limit: "");
 
         Application[] applications = getApplications(client, applicationUrl);
         System.out.println("application num: " + applications.length);
