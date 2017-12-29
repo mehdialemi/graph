@@ -160,12 +160,12 @@ public class AnalyzeAppResults {
                 shuffleWriteBytesSum += shuffleWriteBytes;
                 shuffleWriteRecordsSum += shuffleWriteRecords;
 
-                pwJobs.println(duration + "," +
-                        inputBytes + "," +
-                        shuffleReadBytes + "," +
-                        shuffleReadRecords + "," +
-                        shuffleWriteBytes + "," +
-                        shuffleWriteRecords);
+                pwJobs.println("duration: " + duration + ", " +
+                        "inputBytes: " + inputBytes + ", " +
+                        "shuffleReadBytes: " + shuffleReadBytes + ", " +
+                        "shuffleReadRecords: " +shuffleReadRecords + ", " +
+                        "shuffleWriteBytes: " + shuffleWriteBytes + ", " +
+                        "shuffleWriteRecords: " + shuffleWriteRecords);
 
                 if (inputBytes > inputBytesMax)
                     inputBytesMax = inputBytes;
