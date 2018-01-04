@@ -169,12 +169,12 @@ public class AnalyzeAppResults {
                             neighborMap.put(SHUFFLE, df2.format(stage.getShuffleWriteBytes() / (double) (1024 * 1024 * 1024)));
                         } else {
                             long lastDuration = Long.parseLong(kcoreMap.getOrDefault(DURATION, "0"));
-                            kcoreMap.put(DURATION, df2.format(lastDuration + stageDuration));
+                            kcoreMap.put(DURATION, String.valueOf(lastDuration + stageDuration));
 
-                            if (stage.getInputBytes() > Long.parseLong(kcoreMap.getOrDefault(INPUT, "0")))
+                            if (stage.getInputBytes() > Double.parseDouble(kcoreMap.getOrDefault(INPUT, "0.0")))
                                 kcoreMap.put(INPUT, df2.format(stage.getInputBytes() / (double) (1024 * 1024 * 1024)));
 
-                            if (stage.getShuffleWriteBytes() > Long.parseLong(kcoreMap.getOrDefault(SHUFFLE, "0")))
+                            if (stage.getShuffleWriteBytes() > Double.parseDouble(kcoreMap.getOrDefault(SHUFFLE, "0.0")))
                                 kcoreMap.put(SHUFFLE, df2.format(stage.getShuffleWriteBytes() / (double) (1024 * 1024 * 1024)));
                         }
                     }
@@ -190,22 +190,22 @@ public class AnalyzeAppResults {
                             neighborMap.put(SHUFFLE, df2.format(stage.getShuffleWriteBytes() / (double) (1024 * 1024 * 1024)));
                         } else {
                             long lastDuration = Long.parseLong(tsetMap.getOrDefault(DURATION, "0"));
-                            tsetMap.put(DURATION, df2.format(lastDuration + stageDuration));
+                            tsetMap.put(DURATION, String.valueOf(lastDuration + stageDuration));
 
-                            if (stage.getInputBytes() > Long.parseLong(tsetMap.getOrDefault(INPUT, "0")))
+                            if (stage.getInputBytes() > Double.parseDouble(tsetMap.getOrDefault(INPUT, "0.0")))
                                 tsetMap.put(INPUT, df2.format(stage.getInputBytes() / (double) (1024 * 1024 * 1024)));
 
-                            if (stage.getShuffleWriteBytes() > Long.parseLong(tsetMap.getOrDefault(SHUFFLE, "0")))
+                            if (stage.getShuffleWriteBytes() > Double.parseDouble(tsetMap.getOrDefault(SHUFFLE, "0.0")))
                                 tsetMap.put(SHUFFLE, df2.format(stage.getShuffleWriteBytes() / (double) (1024 * 1024 * 1024)));
                         }
                     } else if (logKTruss) {
                         long lastDuration = Long.parseLong(ktrussMap.getOrDefault(DURATION, "0"));
-                        ktrussMap.put(DURATION, df2.format(lastDuration + stageDuration));
+                        ktrussMap.put(DURATION, String.valueOf(lastDuration + stageDuration));
 
-                        if (stage.getInputBytes() > Long.parseLong(ktrussMap.getOrDefault(INPUT, "0")))
+                        if (stage.getInputBytes() > Double.parseDouble(ktrussMap.getOrDefault(INPUT, "0.0")))
                             ktrussMap.put(INPUT, df2.format(stage.getInputBytes() / (double) (1024 * 1024 * 1024)));
 
-                        if (stage.getShuffleWriteBytes() > Long.parseLong(ktrussMap.getOrDefault(SHUFFLE, "0")))
+                        if (stage.getShuffleWriteBytes() > Double.parseDouble(ktrussMap.getOrDefault(SHUFFLE, "0.0")))
                             ktrussMap.put(SHUFFLE, df2.format(stage.getShuffleWriteBytes() / (double) (1024 * 1024 * 1024)));
                     }
                 }
