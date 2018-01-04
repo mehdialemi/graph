@@ -8,7 +8,10 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,7 +40,6 @@ public class AnalyzeAppResults {
     public void start() {
 
         try {
-
             String name = application.getName();
             int startIndex = name.indexOf('(');
             int endIndex = name.indexOf(')');
@@ -63,7 +65,12 @@ public class AnalyzeAppResults {
 
             Map<Integer, Map<String, Long>> jobsMap = new HashMap<>();
 
+            List<Stage> kcoreStages = null;
+            List<Stage> ktrussStages = null;
+
             boolean stop = false;
+            boolean addKCoreStages = false;
+            boolean addKTrussStages = false;
             while (!stop) {
                 CloseableHttpResponse response = client.execute(new HttpGet(appUrl + "/jobs/" + jobId));
                 String json = EntityUtils.toString(response.getEntity());
@@ -75,6 +82,16 @@ public class AnalyzeAppResults {
                 if (!job.getStatus().toUpperCase().equals("SUCCEEDED")) {
                     jobsMap.clear();
                     break;
+                }
+
+                if (job.getName().contains("KCore") && !addKCoreStages && kcoreStages == null) {
+                    kcoreStages = new ArrayList<>();
+                    addKCoreStages = true;
+                }
+
+                if (job.getName().contains("KTrussTSet") && !addKTrussStages && ktrussStages == null) {
+                    ktrussStages = new ArrayList<>();
+                    addKTrussStages = true;
                 }
 
                 Map<String, Long> sMap = new HashMap<>();
@@ -110,6 +127,12 @@ public class AnalyzeAppResults {
                         break;
                     }
 
+                    if (addKCoreStages)
+                        kcoreStages.add(stage);
+
+                    if (addKTrussStages)
+                        ktrussStages.add(stage);
+
                     if (stage.getInputBytes() > inputBytesMax)
                         inputBytesMax =  stage.getInputBytes();
 
@@ -125,6 +148,12 @@ public class AnalyzeAppResults {
                     if (stage.getShuffleWriteRecords() > shuffleWriteRecordsMax)
                         shuffleWriteRecordsMax = stage.getShuffleWriteRecords();
                 }
+
+                if (addKCoreStages)
+                    addKCoreStages = false;
+
+                if (addKTrussStages)
+                    addKTrussStages = false;
 
                 sMap.put(INPUT_BYTES_MAX, inputBytesMax);
                 sMap.put(SHUFFLE_READ_BYTES_MAX, shuffleReadRecordsMax);
@@ -171,13 +200,16 @@ public class AnalyzeAppResults {
                 shuffleWriteBytesSum += shuffleWriteBytes;
                 shuffleWriteRecordsSum += shuffleWriteRecords;
 
-                pwJobs.println("jobId: " + entry.getKey() + ", " +
+                String line = "jobId: " + entry.getKey() + ", " +
                         "duration: " + duration + ", " +
                         "inputBytes: " + inputBytes + ", " +
                         "shuffleReadBytes: " + shuffleReadBytes + ", " +
-                        "shuffleReadRecords: " +shuffleReadRecords + ", " +
+                        "shuffleReadRecords: " + shuffleReadRecords + ", " +
                         "shuffleWriteBytes: " + shuffleWriteBytes + ", " +
-                        "shuffleWriteRecords: " + shuffleWriteRecords);
+                        "shuffleWriteRecords: " + shuffleWriteRecords;
+
+
+                pwJobs.println(line);
 
                 if (inputBytes > inputBytesMax)
                     inputBytesMax = inputBytes;
@@ -198,18 +230,23 @@ public class AnalyzeAppResults {
 
             pwOverall.println("numJobs: " + jobId);
             pwOverall.println("total duration: " + totalDuration);
-
+            pwOverall.println();
             pwOverall.println("inputBytesMax: " + inputBytesMax);
             pwOverall.println("shuffleReadBytesMax: " + shuffleReadBytesMax);
             pwOverall.println("shuffleReadRecordsMax: " + shuffleReadRecordsMax);
             pwOverall.println("shuffleWriteBytesMax: " + shuffleWriteBytesMax);
             pwOverall.println("shuffleWriteRecordsMax: " + shuffleWriteRecordsMax);
-
+            pwOverall.println();
             pwOverall.println("inputBytesSum: " + inputBytesSum);
             pwOverall.println("shuffleReadBytesSum: " + shuffleReadBytesSum);
             pwOverall.println("shuffleReadRecordsSum: " + shuffleReadRecordsSum);
             pwOverall.println("shuffleWriteBytesSum: " + shuffleWriteBytesSum);
             pwOverall.println("shuffleWriteRecordsSum: " + shuffleWriteRecordsSum);
+
+            if (kcoreStages == null) {
+                pwOverall.println("*****************");
+                pwOverall.println("Load input");
+            }
 
             pwJobs.close();
             pwOverall.close();
@@ -218,5 +255,45 @@ public class AnalyzeAppResults {
             System.out.println("Error in " + application.getId());
             return;
         }
+    }
+
+    public static Map<String, Long> createMapStage(List<Stage> stages) throws ParseException {
+        long inputBytesMax = 0;
+        long shuffleReadBytesMax = 0;
+        long shuffleReadRecordsMax = 0;
+        long shuffleWriteBytesMax = 0;
+        long shuffleWriteRecordsMax = 0;
+
+        long duration = 0;
+        for (Stage stage : stages) {
+            String launchedTime = stage.getFirstTaskLaunchedTime();
+            String completionTime = stage.getCompletionTime();
+            duration += TimeUtil.diff(completionTime, launchedTime);
+
+            if (stage.getInputBytes() > inputBytesMax)
+                inputBytesMax =  stage.getInputBytes();
+
+            if (stage.getShuffleReadBytes() > shuffleReadBytesMax)
+                shuffleReadBytesMax = stage.getShuffleReadBytes();
+
+            if (stage.getShuffleReadRecords() > shuffleReadRecordsMax)
+                shuffleReadRecordsMax = stage.getShuffleReadRecords();
+
+            if (stage.getShuffleWriteBytes() > shuffleWriteBytesMax)
+                shuffleWriteBytesMax = stage.getShuffleWriteBytes();
+
+            if (stage.getShuffleWriteRecords() > shuffleWriteRecordsMax)
+                shuffleWriteRecordsMax = stage.getShuffleWriteRecords();
+        }
+
+        Map<String, Long> sMap = new HashMap<>();
+        sMap.put(INPUT_BYTES_MAX, inputBytesMax);
+        sMap.put(SHUFFLE_READ_BYTES_MAX, shuffleReadRecordsMax);
+        sMap.put(SHUFFLE_READ_RECORDS_MAX, shuffleReadRecordsMax);
+        sMap.put(SHUFFLE_WRITE_BYTES_MAX, shuffleWriteBytesMax);
+        sMap.put(SHUFFLE_WRITE_RECORDS_MAX, shuffleWriteRecordsMax);
+        sMap.put(JOB_DURATION, duration);
+
+        return sMap;
     }
 }

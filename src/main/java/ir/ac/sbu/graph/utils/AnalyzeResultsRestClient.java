@@ -22,8 +22,8 @@ public class AnalyzeResultsRestClient {
         String hostname = argumentReader.nextString("localhost");
         String outputDir = argumentReader.nextString("/tmp/analyze");
         String command = argumentReader.nextString(BATCH_COMMAND);
-        String appId = argumentReader.nextString("0");
         int limit = argumentReader.nextInt(0);
+        String appId = argumentReader.nextString("0");
 
         String url = "http://" + hostname + ":18080/api/v1/";
 
