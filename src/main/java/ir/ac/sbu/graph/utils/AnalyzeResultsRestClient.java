@@ -43,7 +43,6 @@ public class AnalyzeResultsRestClient {
                         enable = true;
                     }
                 case "name":
-
                     if (application.getName().contains(app)) {
                         enable = true;
                     }
