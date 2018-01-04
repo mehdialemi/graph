@@ -54,9 +54,6 @@ public class KCore extends NeighborList {
             if (invalids.count() == 0)
                 break;
 
-            if (neighborQueue.size() > 1)
-                neighborQueue.remove().unpersist();
-
             JavaPairRDD<Integer, Iterable<Integer>> invUpdate = invalids
                     .flatMapToPair(nl -> {
                         List<Tuple2<Integer, Integer>> out = new ArrayList<>(nl._2.length);
@@ -87,6 +84,9 @@ public class KCore extends NeighborList {
 
                         return nSet.toIntArray();
             }).cache();
+
+            if (neighborQueue.size() > 1)
+                neighborQueue.remove().unpersist();
 
             neighborQueue.add(neighbors);
         }

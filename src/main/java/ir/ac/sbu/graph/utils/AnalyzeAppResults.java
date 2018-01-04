@@ -202,14 +202,16 @@ public class AnalyzeAppResults {
                 shuffleWriteBytesSum += shuffleWriteBytes;
                 shuffleWriteRecordsSum += shuffleWriteRecords;
 
-                String line = "jobId: " + entry.getKey() + ", " +
-                        "duration: " + duration + ", " +
-                        "inputBytes: " + inputBytes + ", " +
-                        "shuffleReadBytes: " + shuffleReadBytes + ", " +
-                        "shuffleReadRecords: " + shuffleReadRecords + ", " +
-                        "shuffleWriteBytes: " + shuffleWriteBytes + ", " +
-                        "shuffleWriteRecords: " + shuffleWriteRecords;
+//                String line = "jobId: " + entry.getKey() + ", " +
+//                        "duration: " + duration + ", " +
+//                        "inputBytes: " + inputBytes + ", " +
+//                        "shuffleReadBytes: " + shuffleReadBytes + ", " +
+//                        "shuffleReadRecords: " + shuffleReadRecords + ", " +
+//                        "shuffleWriteBytes: " + shuffleWriteBytes + ", " +
+//                        "shuffleWriteRecords: " + shuffleWriteRecords;
 
+
+                String line = duration + ", " + inputBytes + ", " + shuffleWriteBytes;
 
                 pwJobs.println(line);
 
