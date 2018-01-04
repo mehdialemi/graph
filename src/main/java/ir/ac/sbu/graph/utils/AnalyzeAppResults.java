@@ -49,8 +49,10 @@ public class AnalyzeAppResults {
             System.out.println("dir: " + directory);
             File dir = new File(directory);
             boolean successful = dir.mkdirs();
-            if (!successful)
+            if (!successful) {
                 System.err.println("unable to create directory " + dir);
+                return;
+            }
 
             PrintWriter pwOverall = new PrintWriter(new File(dir + "/overall.txt"));
             pwOverall.println("startTime: " + application.getAttempts().get(0).getStartTime());
