@@ -27,4 +27,4 @@ if [ -z "$1" ]
     app=$1
 fi
 
-java -cp ${config[jar]} ir.ac.sbu.graph.utils.AnalyzeResultsRestClient ${config[host]} logs/${config[app]}-results ${config[command]} ${config[limit]} $1
+java -cp ${config[jar]} ir.ac.sbu.graph.utils.AnalyzeResultsRestClient ${config[host]} logs/${config[app]}-results ${config[command]} ${config[limit]} $app

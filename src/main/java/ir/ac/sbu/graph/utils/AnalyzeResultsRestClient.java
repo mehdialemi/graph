@@ -23,7 +23,7 @@ public class AnalyzeResultsRestClient {
         String outputDir = argumentReader.nextString("/tmp/analyze");
         String command = argumentReader.nextString(BATCH_COMMAND);
         int limit = argumentReader.nextInt(0);
-        String appId = argumentReader.nextString("0");
+        String app = argumentReader.nextString("0");
 
         String url = "http://" + hostname + ":18080/api/v1/";
 
@@ -33,10 +33,28 @@ public class AnalyzeResultsRestClient {
         System.out.println("application num: " + applications.length);
         for (Application application : applications) {
 
-            if (command.equals(BATCH_COMMAND) || appId.equals(application.getId()) ) {
+            boolean enable = false;
+            switch (BATCH_COMMAND) {
+                case "batch":
+                    enable = true;
+                    break;
+                case "single":
+                    if (app.equals(application.getId())) {
+                        enable = true;
+                    }
+                case "name":
+                    if (app.contains(application.getName())) {
+                        enable = true;
+                    }
+                    break;
+            }
+
+            if (enable) {
                 System.out.println("Analyzing results for " + application.getId());
                 AnalyzeAppResults analyzeAppResults = new AnalyzeAppResults(url, client, application, outputDir);
                 analyzeAppResults.start();
+            }
+            if (command.equals(BATCH_COMMAND) || app.equals(application.getId()) ) {
             }
         }
 
