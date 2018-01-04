@@ -33,6 +33,7 @@ public class AnalyzeResultsRestClient {
         System.out.println("application num: " + applications.length);
         for (Application application : applications) {
 
+            System.out.println("app name: " + application.getName());
             boolean enable = false;
             switch (BATCH_COMMAND) {
                 case "batch":
