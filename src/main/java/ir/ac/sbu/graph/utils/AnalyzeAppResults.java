@@ -196,20 +196,16 @@ public class AnalyzeAppResults {
                             if (stage.getShuffleWriteBytes() > tsetMap.getOrDefault(SHUFFLE, 0L))
                                 tsetMap.put(SHUFFLE, stage.getShuffleWriteBytes());
                         }
-                    } else if (logKTruss) {
-                        long lastDuration = ktrussMap.getOrDefault(DURATION, 0L);
-                        ktrussMap.put(DURATION, lastDuration + stageDuration);
-
-                        if (stage.getInputBytes() > ktrussMap.getOrDefault(INPUT, 0L))
-                            ktrussMap.put(INPUT, stage.getInputBytes());
-
-                        if (stage.getShuffleWriteBytes() > ktrussMap.getOrDefault(SHUFFLE, 0L))
-                            ktrussMap.put(SHUFFLE, stage.getShuffleWriteBytes());
                     }
                 }
 
                 if (logTSet)
                     logTSet = false;
+                else if (logKTruss) {
+                    ktrussMap.put(DURATION, jobDuration);
+                    ktrussMap.put(INPUT, inputBytesMax);
+                    ktrussMap.put(SHUFFLE, shuffleWriteBytesMax);
+                }
 
                 sMap.put(INPUT_BYTES_MAX, inputBytesMax);
                 sMap.put(SHUFFLE_READ_BYTES_MAX, shuffleReadBytesMax);
