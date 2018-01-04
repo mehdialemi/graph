@@ -198,7 +198,6 @@ public class AnalyzeAppResults {
                             if (stage.getShuffleWriteBytes() > Long.parseLong(tsetMap.getOrDefault(SHUFFLE, "0")))
                                 tsetMap.put(SHUFFLE, df2.format(stage.getShuffleWriteBytes() / (double) (1024 * 1024 * 1024)));
                         }
-
                     } else if (logKTruss) {
                         long lastDuration = Long.parseLong(ktrussMap.getOrDefault(DURATION, "0"));
                         ktrussMap.put(DURATION, df2.format(lastDuration + stageDuration));
@@ -289,25 +288,25 @@ public class AnalyzeAppResults {
 
             }
 
-            pwSteps.println("load: " + loadingMap.getOrDefault(DURATION, 0L) + ", " +
-                    loadingMap.getOrDefault(INPUT, 0L) + ", " +
-                    loadingMap.getOrDefault(SHUFFLE, 0L));
+            pwSteps.println("load: " + loadingMap.getOrDefault(DURATION, "0") + ", " +
+                    loadingMap.getOrDefault(INPUT, "0") + ", " +
+                    loadingMap.getOrDefault(SHUFFLE, "0"));
 
-            pwSteps.println("neighbor: " + neighborMap.getOrDefault(DURATION, 0L) + ", " +
-                    neighborMap.getOrDefault(INPUT, 0L) + ", " +
-                    neighborMap.getOrDefault(SHUFFLE, 0L));
+            pwSteps.println("neighbor: " + neighborMap.getOrDefault(DURATION, "0") + ", " +
+                    neighborMap.getOrDefault(INPUT, "0") + ", " +
+                    neighborMap.getOrDefault(SHUFFLE, "0"));
 
-            pwSteps.println("kcore: " + kcoreMap.getOrDefault(DURATION, 0L) + ", " +
-                    kcoreMap.getOrDefault(INPUT, 0L) + ", " +
-                    kcoreMap.getOrDefault(SHUFFLE, 0L));
+            pwSteps.println("kcore: " + kcoreMap.getOrDefault(DURATION, "0") + ", " +
+                    kcoreMap.getOrDefault(INPUT, "0") + ", " +
+                    kcoreMap.getOrDefault(SHUFFLE, "0"));
 
-            pwSteps.println("tset: " + tsetMap.getOrDefault(DURATION, 0L) + ", " +
-                    tsetMap.getOrDefault(INPUT, 0L) + ", " +
-                    tsetMap.getOrDefault(SHUFFLE, 0L));
+            pwSteps.println("tset: " + tsetMap.getOrDefault(DURATION, "0") + ", " +
+                    tsetMap.getOrDefault(INPUT, "0") + ", " +
+                    tsetMap.getOrDefault(SHUFFLE, "0"));
 
-            pwSteps.println("ktruss: " + ktrussMap.getOrDefault(DURATION, 0L) + ", " +
-                    ktrussMap.getOrDefault(INPUT, 0L) + ", " +
-                    ktrussMap.getOrDefault(SHUFFLE, 0L));
+            pwSteps.println("ktruss: " + ktrussMap.getOrDefault(DURATION, "0") + ", " +
+                    ktrussMap.getOrDefault(INPUT, "0") + ", " +
+                    ktrussMap.getOrDefault(SHUFFLE, "0"));
 
             pwOverall.println("numJobs: " + jobId);
             pwOverall.println("total duration: " + totalDuration);
