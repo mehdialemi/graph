@@ -25,18 +25,16 @@ public class AnalyzeResultsRestClient {
         int limit = argumentReader.nextInt(0);
         String app = argumentReader.nextString("0");
 
-        System.out.println("app: " + app);
         String url = "http://" + hostname + ":18080/api/v1/";
-
         String applicationUrl = url + "applications" + (command.equals(BATCH_COMMAND) ? "?limit=" + limit: "");
 
         Application[] applications = getApplications(client, applicationUrl);
         System.out.println("application num: " + applications.length);
+
         for (Application application : applications) {
 
-            System.out.println("app name: " + application.getName());
             boolean enable = false;
-            switch (BATCH_COMMAND) {
+            switch (command) {
                 case "batch":
                     enable = true;
                     break;
@@ -55,8 +53,6 @@ public class AnalyzeResultsRestClient {
                 System.out.println("Analyzing results for " + application.getId());
                 AnalyzeAppResults analyzeAppResults = new AnalyzeAppResults(url, client, application, outputDir);
                 analyzeAppResults.start();
-            }
-            if (command.equals(BATCH_COMMAND) || app.equals(application.getId()) ) {
             }
         }
 
