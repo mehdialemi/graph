@@ -160,11 +160,11 @@ public class AnalyzeAppResults {
 
                     if (logKCore) {
                         if (loadingMap.isEmpty()) {
-                            loadingMap.put(DURATION, df2.format(stageDuration));
+                            loadingMap.put(DURATION, String.valueOf(stageDuration));
                             loadingMap.put(INPUT, df2.format(stage.getInputBytes() / (double) (1024 * 1024 * 1024)));
                             loadingMap.put(SHUFFLE, df2.format(stage.getShuffleWriteBytes() / (double) (1024 * 1024 * 1024)));
                         } else if (neighborMap.isEmpty()) {
-                            neighborMap.put(DURATION, df2.format(stageDuration));
+                            neighborMap.put(DURATION, String.valueOf(stageDuration));
                             neighborMap.put(INPUT, df2.format(stage.getInputBytes() / (double) (1024 * 1024 * 1024)));
                             neighborMap.put(SHUFFLE, df2.format(stage.getShuffleWriteBytes() / (double) (1024 * 1024 * 1024)));
                         } else {
@@ -181,11 +181,11 @@ public class AnalyzeAppResults {
 
                     if (logTSet) {
                         if (loadingMap.isEmpty()) {
-                            loadingMap.put(DURATION, df2.format(stageDuration));
+                            loadingMap.put(DURATION, String.valueOf(stageDuration));
                             loadingMap.put(INPUT, df2.format(stage.getInputBytes() / (double) (1024 * 1024 * 1024)));
                             loadingMap.put(SHUFFLE, df2.format(stage.getShuffleWriteBytes() / (double) (1024 * 1024 * 1024)));
                         } else if (neighborMap.isEmpty()) {
-                            neighborMap.put(DURATION, df2.format(stageDuration));
+                            neighborMap.put(DURATION, String.valueOf(stageDuration));
                             neighborMap.put(INPUT, df2.format(stage.getInputBytes() / (double) (1024 * 1024 * 1024)));
                             neighborMap.put(SHUFFLE, df2.format(stage.getShuffleWriteBytes() / (double) (1024 * 1024 * 1024)));
                         } else {
