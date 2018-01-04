@@ -167,8 +167,12 @@ public class AnalyzeAppResults {
                         } else {
                             long lastDuration = kcoreMap.getOrDefault(DURATION, 0L);
                             kcoreMap.put(DURATION, lastDuration + stageDuration);
-                            kcoreMap.put(INPUT, inputBytesMax / (1024 * 1024 * 1024));
-                            kcoreMap.put(SHUFFLE, shuffleWriteBytesMax / (1024 * 1024 * 1024));
+
+                            if (stage.getInputBytes() > kcoreMap.getOrDefault(INPUT, 0L))
+                                kcoreMap.put(INPUT, stage.getInputBytes() / (1024 * 1024 * 1024));
+
+                            if (stage.getShuffleWriteBytes() > kcoreMap.getOrDefault(SHUFFLE, 0L))
+                                kcoreMap.put(SHUFFLE, stage.getShuffleWriteBytes() / (1024 * 1024 * 1024));
                         }
                     }
 
@@ -184,15 +188,23 @@ public class AnalyzeAppResults {
                         } else {
                             long lastDuration = tsetMap.getOrDefault(DURATION, 0L);
                             tsetMap.put(DURATION, lastDuration + stageDuration);
-                            tsetMap.put(INPUT, inputBytesMax / (1024 * 1024 * 1024));
-                            tsetMap.put(SHUFFLE, shuffleWriteBytesMax / (1024 * 1024 * 1024));
+
+                            if (stage.getInputBytes() > tsetMap.getOrDefault(INPUT, 0L))
+                                tsetMap.put(INPUT, stage.getInputBytes() / (1024 * 1024 * 1024));
+
+                            if (stage.getShuffleWriteBytes() > tsetMap.getOrDefault(SHUFFLE, 0L))
+                                tsetMap.put(SHUFFLE, stage.getShuffleWriteBytes() / (1024 * 1024 * 1024));
                         }
 
                     } else if (logKTruss) {
                         long lastDuration = ktrussMap.getOrDefault(DURATION, 0L);
                         ktrussMap.put(DURATION, lastDuration + stageDuration);
-                        ktrussMap.put(INPUT, inputBytesMax / (1024 * 1024 * 1024));
-                        ktrussMap.put(SHUFFLE, shuffleWriteBytesMax / (1024 * 1024 * 1024));
+
+                        if (stage.getInputBytes() > ktrussMap.getOrDefault(INPUT, 0L))
+                            ktrussMap.put(INPUT, stage.getInputBytes() / (1024 * 1024 * 1024));
+
+                        if (stage.getShuffleWriteBytes() > ktrussMap.getOrDefault(SHUFFLE, 0L))
+                            ktrussMap.put(SHUFFLE, stage.getShuffleWriteBytes() / (1024 * 1024 * 1024));
                     }
                 }
 
