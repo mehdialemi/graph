@@ -158,7 +158,7 @@ public class AnalyzeAppResults {
                     addKTrussStages = false;
 
                 sMap.put(INPUT_BYTES_MAX, inputBytesMax);
-                sMap.put(SHUFFLE_READ_BYTES_MAX, shuffleReadRecordsMax);
+                sMap.put(SHUFFLE_READ_BYTES_MAX, shuffleReadBytesMax);
                 sMap.put(SHUFFLE_READ_RECORDS_MAX, shuffleReadRecordsMax);
                 sMap.put(SHUFFLE_WRITE_BYTES_MAX, shuffleWriteBytesMax);
                 sMap.put(SHUFFLE_WRITE_RECORDS_MAX, shuffleWriteRecordsMax);
