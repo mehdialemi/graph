@@ -139,7 +139,7 @@ public class AnalyzeAppResults {
                     }
 
                     long stageDuration =
-                            DiffTime.diffMillis(stage.getFirstTaskLaunchedTime(), stage.getCompletionTime());
+                            DiffTime.diffMillis(stage.getSubmissionTime(), stage.getCompletionTime());
 
                     if (stage.getInputBytes() > inputBytesMax)
                         inputBytesMax = stage.getInputBytes();
