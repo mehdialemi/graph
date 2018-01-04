@@ -25,6 +25,7 @@ public class AnalyzeResultsRestClient {
         int limit = argumentReader.nextInt(0);
         String app = argumentReader.nextString("0");
 
+        System.out.println("app: " + app);
         String url = "http://" + hostname + ":18080/api/v1/";
 
         String applicationUrl = url + "applications" + (command.equals(BATCH_COMMAND) ? "?limit=" + limit: "");
