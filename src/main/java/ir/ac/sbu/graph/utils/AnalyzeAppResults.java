@@ -202,7 +202,8 @@ public class AnalyzeAppResults {
                 if (logTSet)
                     logTSet = false;
                 else if (logKTruss) {
-                    ktrussMap.put(DURATION, jobDuration);
+                    long lastJobDuration = ktrussMap.getOrDefault(DURATION, 0L);
+                    ktrussMap.put(DURATION, jobDuration + lastJobDuration);
                     ktrussMap.put(INPUT, inputBytesMax);
                     ktrussMap.put(SHUFFLE, shuffleWriteBytesMax);
                 }
