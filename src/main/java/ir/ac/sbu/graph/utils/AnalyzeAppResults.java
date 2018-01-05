@@ -200,7 +200,7 @@ public class AnalyzeAppResults {
                 if (logTSet) {
                     long loadTime = loadingMap.get(DURATION);
                     long neighborTime = neighborMap.get(INPUT);
-                    tsetMap.put(DURATION, jobDuration - (loadTime + neighborTime));
+                    tsetMap.put(DURATION, jobDuration);
                     logTSet = false;
                 }
                 else if (logKTruss) {
