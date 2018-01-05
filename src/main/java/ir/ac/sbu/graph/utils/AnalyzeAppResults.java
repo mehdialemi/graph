@@ -188,9 +188,6 @@ public class AnalyzeAppResults {
                             neighborMap.put(INPUT, stage.getInputBytes());
                             neighborMap.put(SHUFFLE, stage.getShuffleWriteBytes());
                         } else {
-                            long lastDuration = tsetMap.getOrDefault(DURATION, 0L);
-                            tsetMap.put(DURATION, lastDuration + stageDuration);
-
                             if (stage.getInputBytes() > tsetMap.getOrDefault(INPUT, 0L))
                                 tsetMap.put(INPUT, stage.getInputBytes());
 
@@ -200,8 +197,12 @@ public class AnalyzeAppResults {
                     }
                 }
 
-                if (logTSet)
+                if (logTSet) {
+                    long loadTime = loadingMap.getOrDefault(DURATION, 0L);
+                    long neighborTime = neighborMap.getOrDefault(INPUT, 0L);
+                    tsetMap.put(DURATION, jobDuration - (loadTime + neighborTime));
                     logTSet = false;
+                }
                 else if (logKTruss) {
                     long lastJobDuration = ktrussMap.getOrDefault(DURATION, 0L);
                     ktrussMap.put(DURATION, jobDuration + lastJobDuration);
