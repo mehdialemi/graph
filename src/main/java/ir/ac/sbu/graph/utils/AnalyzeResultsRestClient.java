@@ -58,9 +58,13 @@ public class AnalyzeResultsRestClient {
                 } catch (Exception e) {
                     continue;
                 }
-                System.out.println("Analyzing results for " + application.getId());
-                AnalyzeAppResults analyzeAppResults = new AnalyzeAppResults(url, client, application, outputDir);
-                analyzeAppResults.start();
+                try {
+                    System.out.println("Analyzing results for " + application.getId());
+                    AnalyzeAppResults analyzeAppResults = new AnalyzeAppResults(url, client, application, outputDir);
+                    analyzeAppResults.start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
 
