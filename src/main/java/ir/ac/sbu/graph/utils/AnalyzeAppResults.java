@@ -29,7 +29,7 @@ public class AnalyzeAppResults {
     public static final String INPUT = "input";
     public static final String SHUFFLE = "shuffle";
     public static final double GB = 1024 * 1024 * 1024.0;
-    private static DecimalFormat df2 = new DecimalFormat(".##");
+    private static DecimalFormat df2 = new DecimalFormat("#.##");
     private String url;
     private final CloseableHttpClient client;
     private final Application application;
