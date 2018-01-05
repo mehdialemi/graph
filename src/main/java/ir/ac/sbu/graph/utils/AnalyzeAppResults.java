@@ -198,6 +198,7 @@ public class AnalyzeAppResults {
                 }
 
                 if (logTSet) {
+                    System.out.println("jobId: " + jobId);
                     Long loadTime = loadingMap.get(DURATION);
                     System.out.println("loadTime: " + loadTime);
 
@@ -213,6 +214,7 @@ public class AnalyzeAppResults {
                     logTSet = false;
                 }
                 else if (logKTruss) {
+
                     long lastJobDuration = ktrussMap.getOrDefault(DURATION, 0L);
                     ktrussMap.put(DURATION, jobDuration + lastJobDuration);
 
