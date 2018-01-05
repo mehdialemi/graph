@@ -198,7 +198,16 @@ public class AnalyzeAppResults {
                 }
 
                 if (logTSet) {
-                    long tsetTime = jobDuration - (loadingMap.get(DURATION) + neighborMap.get(INPUT));
+                    Long loadTime = loadingMap.get(DURATION);
+                    System.out.println("loadTime: " + loadTime);
+
+                    Long neighborTime = neighborMap.get(DURATION);
+                    System.out.println("neighborTime: " + neighborTime);
+
+                    long sumTwo = loadTime + neighborTime;
+                    long tsetTime = jobDuration - sumTwo;
+                    System.out.println("sumTwo: " + sumTwo);
+                    System.out.println("tsetTime: " + tsetTime);
                     tsetMap.put(DURATION, tsetTime);
                     logTSet = false;
                 }
