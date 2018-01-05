@@ -44,19 +44,20 @@ public class AnalyzeResultsRestClient {
                     }
                 case "name":
                     if (application.getName().contains(app)) {
-                        String[] split = application.getName().split("-");
-                        try {
-                            int k = Integer.parseInt(split[1]);
-                            if (k == 4 || k == 40 || k == 80 || k == 160)
-                                enable = true;
-                        } catch (Exception e) {
-                            continue;
-                        }
+                        enable = true;
                     }
                     break;
             }
 
             if (enable) {
+                String[] split = application.getName().split("-");
+                try {
+                    int k = Integer.parseInt(split[1]);
+                    if (!(k == 4 || k == 40 || k == 80 || k == 160))
+                        continue;
+                } catch (Exception e) {
+                    continue;
+                }
                 System.out.println("Analyzing results for " + application.getId());
                 AnalyzeAppResults analyzeAppResults = new AnalyzeAppResults(url, client, application, outputDir);
                 analyzeAppResults.start();
