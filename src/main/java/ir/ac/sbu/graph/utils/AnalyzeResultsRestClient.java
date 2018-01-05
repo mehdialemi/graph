@@ -44,7 +44,14 @@ public class AnalyzeResultsRestClient {
                     }
                 case "name":
                     if (application.getName().contains(app)) {
-                        enable = true;
+                        String[] split = application.getName().split("-");
+                        try {
+                            int k = Integer.parseInt(split[1]);
+                            if (k == 4 || k == 40 || k == 80 || k == 160)
+                                enable = true;
+                        } catch (Exception e) {
+                            continue;
+                        }
                     }
                     break;
             }
