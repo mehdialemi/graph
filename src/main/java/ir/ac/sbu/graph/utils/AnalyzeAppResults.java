@@ -198,8 +198,8 @@ public class AnalyzeAppResults {
                 }
 
                 if (logTSet) {
-                    long loadTime = loadingMap.getOrDefault(DURATION, 0L);
-                    long neighborTime = neighborMap.getOrDefault(INPUT, 0L);
+                    long loadTime = loadingMap.get(DURATION);
+                    long neighborTime = neighborMap.get(INPUT);
                     tsetMap.put(DURATION, jobDuration - (loadTime + neighborTime));
                     logTSet = false;
                 }
