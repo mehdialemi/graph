@@ -207,6 +207,7 @@ public class AnalyzeAppResults {
                     long sumTwo = loadTime + neighborTime;
                     long tsetTime = jobDuration - sumTwo;
                     System.out.println("sumTwo: " + sumTwo);
+                    System.out.println("jobDuration: " + jobDuration);
                     System.out.println("tsetTime: " + tsetTime);
                     tsetMap.put(DURATION, tsetTime);
                     logTSet = false;
