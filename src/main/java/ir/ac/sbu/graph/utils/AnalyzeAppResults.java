@@ -206,13 +206,11 @@ public class AnalyzeAppResults {
                     long lastJobDuration = ktrussMap.getOrDefault(DURATION, 0L);
                     ktrussMap.put(DURATION, jobDuration + lastJobDuration);
 
-                    long in = ktrussMap.getOrDefault(INPUT, 0L);
-                    if (inputBytesMax > in)
-                        ktrussMap.put(INPUT, inputBytesMax + in);
+                    if (inputBytesMax > ktrussMap.getOrDefault(INPUT, 0L))
+                        ktrussMap.put(INPUT, inputBytesMax);
 
-                    long shuffle = ktrussMap.getOrDefault(SHUFFLE, 0L);
-                    if (shuffleWriteBytesMax > shuffle)
-                        ktrussMap.put(SHUFFLE, shuffleWriteBytesMax + shuffle);
+                    if (shuffleWriteBytesMax > ktrussMap.getOrDefault(SHUFFLE, 0L))
+                        ktrussMap.put(SHUFFLE, shuffleWriteBytesMax);
                 }
 
                 sMap.put(INPUT_BYTES_MAX, inputBytesMax);
