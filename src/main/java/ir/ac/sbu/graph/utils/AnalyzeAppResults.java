@@ -28,6 +28,7 @@ public class AnalyzeAppResults {
     public static final String DURATION = "duration";
     public static final String INPUT = "input";
     public static final String SHUFFLE = "shuffle";
+    public static final double GB = 1024 * 1024 * 1024.0;
     private static DecimalFormat df2 = new DecimalFormat(".##");
     private String url;
     private final CloseableHttpClient client;
@@ -273,30 +274,31 @@ public class AnalyzeAppResults {
                     shuffleWriteRecordsMax = shuffleWriteRecords;
             }
 
+            double ms = 1000.0;
             pwSteps.println("load: " +
-                    df2.format(loadingMap.getOrDefault(DURATION, 0L) / 1000.0) + ", " +
-                    df2.format(loadingMap.getOrDefault(INPUT, 0L) / (1024 * 1024 * 1024.0)) + ", " +
-                    df2.format(loadingMap.getOrDefault(SHUFFLE, 0L) / (1024 * 1024 * 1024.0)));
+                    df2.format(loadingMap.getOrDefault(DURATION, 0L) / ms) + ", " +
+                    df2.format(loadingMap.getOrDefault(INPUT, 0L) / GB) + ", " +
+                    df2.format(loadingMap.getOrDefault(SHUFFLE, 0L) / GB));
 
             pwSteps.println("neighbor: " +
-                    df2.format(neighborMap.getOrDefault(DURATION, 0L) / 1000.0) + ", " +
-                    df2.format(neighborMap.getOrDefault(INPUT, 0L) / (1024 * 1024 * 1024.0))+ ", " +
-                    df2.format(neighborMap.getOrDefault(SHUFFLE, 0L)/ (1024 * 1024 * 1024.0)));
+                    df2.format(neighborMap.getOrDefault(DURATION, 0L) / ms) + ", " +
+                    df2.format(neighborMap.getOrDefault(INPUT, 0L) / GB)+ ", " +
+                    df2.format(neighborMap.getOrDefault(SHUFFLE, 0L)/ GB));
 
             pwSteps.println("kcore: " +
-                    df2.format(kcoreMap.getOrDefault(DURATION, 0L) / 1000.0) + ", " +
-                    df2.format(kcoreMap.getOrDefault(INPUT, 0L)/ (1024 * 1024 * 1024.0)) + ", " +
-                    df2.format(kcoreMap.getOrDefault(SHUFFLE, 0L)/ (1024 * 1024 * 1024.0)));
+                    df2.format(kcoreMap.getOrDefault(DURATION, 0L) / ms) + ", " +
+                    df2.format(kcoreMap.getOrDefault(INPUT, 0L)/ GB) + ", " +
+                    df2.format(kcoreMap.getOrDefault(SHUFFLE, 0L)/ GB));
 
             pwSteps.println("tset: " +
-                    df2.format(tsetMap.getOrDefault(DURATION, 0L)/ 1000.0) + ", " +
-                    df2.format(tsetMap.getOrDefault(INPUT, 0L) / (1024 * 1024 * 1024.0))+ ", " +
-                    df2.format(tsetMap.getOrDefault(SHUFFLE, 0L)/ (1024 * 1024 * 1024.0)));
+                    df2.format(tsetMap.getOrDefault(DURATION, 0L)/ ms) + ", " +
+                    df2.format(tsetMap.getOrDefault(INPUT, 0L) / GB) + ", " +
+                    df2.format(tsetMap.getOrDefault(SHUFFLE, 0L)/ GB));
 
             pwSteps.println("ktruss: " +
-                    df2.format(ktrussMap.getOrDefault(DURATION, 0L) / 1000.0) + ", " +
-                    df2.format(ktrussMap.getOrDefault(INPUT, 0L) / (1024 * 1024 * 1024.0))+ ", " +
-                    df2.format(ktrussMap.getOrDefault(SHUFFLE, 0L)/ (1024 * 1024 * 1024.0)));
+                    df2.format(ktrussMap.getOrDefault(DURATION, 0L) / ms) + ", " +
+                    df2.format(ktrussMap.getOrDefault(INPUT, 0L) / GB)+ ", " +
+                    df2.format(ktrussMap.getOrDefault(SHUFFLE, 0L)/ GB));
 
             pwOverall.println("numJobs: " + jobId);
             pwOverall.println("total duration: " + totalDuration);
