@@ -32,7 +32,8 @@ public class Triangle extends SparkApp {
 
     public JavaPairRDD<Integer, int[]> getCandidates() {
         if (candidates == null)
-            candidates = createCandidates().persist(StorageLevel.MEMORY_AND_DISK());
+            candidates = createCandidates(getFonl())
+                    .persist(StorageLevel.MEMORY_AND_DISK());
         return candidates;
     }
 
@@ -96,8 +97,8 @@ public class Triangle extends SparkApp {
         });
     }
 
-    public JavaPairRDD<Integer, int[]>  createCandidates() {
-        return getFonl().filter(t -> t._2.length > 2) // Select vertices having more than 2 items in their values
+    public JavaPairRDD<Integer, int[]>  createCandidates(JavaPairRDD<Integer, int[]> fonl) {
+        return fonl.filter(t -> t._2.length > 2) // Select vertices having more than 2 items in their values
                 .flatMapToPair(t -> {
 
                     int size = t._2.length - 1; // one is for the first index holding node's degree
