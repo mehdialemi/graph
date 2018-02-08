@@ -4,7 +4,6 @@ typeset -A config
 config=(
     [jar]="$PWD/target/subgraph-mining-1.0-jar-with-dependencies.jar"
     [master]="alemi-1"
-    [cores]="10"
     [spark_home]="$SPARK_HOME"
     [inputs]="$PWD/bin/inputs"
 )
@@ -19,6 +18,7 @@ fi
 args=($@)
 main_class=${args[0]}
 conf_file=${args[1]}
+cores=${args[2]}
 class_name=`echo $main_class | rev | cut -d. -f1 | rev`
 echo "main class: $main_class"
 echo "config file: $conf_file"
@@ -69,10 +69,10 @@ do
 
     # Build argument
 #    jar_argument="$graph_path $partitionNum $other_args"
-    jar_argument="$graph_path $other_args"
+    jar_argument="$graph_path $cores $other_args"
     echo "jar argument: $jar_argument"
 
-    command="${config[spark_home]}/bin/spark-submit --class $main_class --total-executor-cores ${config[cores]} --master spark://${config[master]}:7077 ${config[jar]} $jar_argument"
+    command="${config[spark_home]}/bin/spark-submit --class $main_class --total-executor-cores $cores --master spark://${config[master]}:7077 ${config[jar]} $jar_argument"
     echo $command > $log_file
 
     SECONDS=0

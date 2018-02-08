@@ -16,10 +16,12 @@ public class SparkAppConf {
     private String inputPath;
     private int partitionNum;
     private SparkConf sparkConf;
+    private int cores;
     private JavaSparkContext sc;
 
     public SparkAppConf (ArgumentReader argumentReader) {
         inputPath = argumentReader.nextString("/home/mehdi/graph-data/com-amazon.ungraph.txt");
+        cores = argumentReader.nextInt(2);
         //partitionNum = argumentReader.nextInt(10);
     }
 
@@ -28,7 +30,7 @@ public class SparkAppConf {
     }
 
     public String getFileName() {
-        return new File(getInputPath()).getName();
+        return new File(getInputPath()).getName() + "-Cores-" + cores;
     }
 
     public void init() {
