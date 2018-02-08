@@ -1,6 +1,6 @@
 package ir.ac.sbu.graph.utils;
 
-import ir.ac.sbu.graph.Edge;
+import ir.ac.sbu.graph.types.Edge;
 import it.unimi.dsi.fastutil.ints.*;
 import org.apache.spark.SparkConf;
 import scala.Tuple2;
@@ -275,68 +275,6 @@ public class GraphUtils implements Serializable {
         return list;
     }
 
-    public static int sortedIntersectionCountInt(int[] hDegs, int[] forward, List<Tuple2<Integer, Integer>> output,
-                                                 int hIndex, int fIndex) {
-        int fLen = forward.length;
-        int hLen = hDegs.length;
-
-        if (hDegs.length == 0 || fLen == 0)
-            return 0;
-
-        boolean leftRead = true;
-        boolean rightRead = true;
-
-        int h = 0;
-        int f = 0;
-        int count = 0;
-
-        boolean finish = false;
-        while (!finish) {
-
-            if (hIndex >= hLen && fIndex >= fLen)
-                break;
-
-            if ((hIndex >= hLen && !rightRead) || (fIndex >= fLen && !leftRead))
-                break;
-
-            if (leftRead && hIndex < hLen) {
-                h = hDegs[hIndex++];
-            }
-
-            if (rightRead && fIndex < fLen) {
-                f = forward[fIndex++];
-            }
-
-            if (h == f) {
-                if (output != null)
-                    output.add(new Tuple2<>(h, 1));
-                count++;
-                leftRead = true;
-                rightRead = true;
-            } else if (h < f) {
-                leftRead = true;
-                rightRead = false;
-            } else {
-                leftRead = false;
-                rightRead = true;
-            }
-        }
-        return count;
-    }
-
-    public static class VertexDegreeInteger {
-        public int vertex;
-        public int degree;
-
-        public VertexDegreeInteger() {
-        }
-
-        public VertexDegreeInteger(int vertex, int degree) {
-            this.vertex = vertex;
-            this.degree = degree;
-        }
-    }
-
     public static class VertexDegree {
         public long vertex;
         public int degree;
@@ -345,19 +283,6 @@ public class GraphUtils implements Serializable {
         }
 
         public VertexDegree(long vertex, int degree) {
-            this.vertex = vertex;
-            this.degree = degree;
-        }
-    }
-
-    public static class VertexDegreeInt {
-        public int vertex;
-        public int degree;
-
-        public VertexDegreeInt() {
-        }
-
-        public VertexDegreeInt(int vertex, int degree) {
             this.vertex = vertex;
             this.degree = degree;
         }

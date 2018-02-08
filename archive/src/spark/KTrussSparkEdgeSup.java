@@ -122,7 +122,7 @@ public class KTrussSparkEdgeSup extends KTruss {
                     IntSet set = new IntOpenHashSet(cInvalids);
                     // Update the invalid list for the current value.
                     // TODO we can store SortedSet or Set as value
-                    // TODO create this object just once in the partition and reuse it
+                    // TODO getOrCreate this object just once in the partition and reuse it
                     for (int u : joinValue._2.get()) {
                         set.add(u);
                     }

@@ -1,2 +1,2 @@
-/home/i/spark-2.2/bin/spark-submit --class ir.ac.sbu.graph.spark.KTrussTSet --total-executor-cores 120 --master spark://alemi-1:7077 /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar hdfs://alemi-1/graph-data/live_journal 120 0 4 100
+/home/i/spark-2.2/bin/spark-submit --class ir.ac.sbu.graph.spark.ktruss.KTrussTSet --total-executor-cores 120 --master spark://alemi-1:7077 /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar hdfs://alemi-1/graph-data/live_journal 120 0 4 100
 [SBM] KTruss-4-100--KCore-3-0 (live_journal-120)

@@ -1,4 +1,4 @@
-/home/i/spark-2.2/bin/spark-submit --class ir.ac.sbu.graph.spark.KTrussTSet --total-executor-cores 120 --master spark://alemi-1:7077 /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar hdfs://alemi-1/graph-data/soc_LiveJournal 3 4 100
+/home/i/spark-2.2/bin/spark-submit --class ir.ac.sbu.graph.spark.ktruss.KTrussTSet --total-executor-cores 120 --master spark://alemi-1:7077 /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar hdfs://alemi-1/graph-data/soc_LiveJournal 3 4 100
 [SBM] KTruss-4-100--KCore-3-3 (soc_LiveJournal)
 [SBM] K-core, current invUpdate count: 1256000, duration: 26042 ms
 [SBM] K-core, current invUpdate count: 143648, duration: 2838 ms

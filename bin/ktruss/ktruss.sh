@@ -9,7 +9,7 @@ do
     do
         for kci in {0,1,2,3,4}
         do
-            bin/run-spark.sh "ir.ac.sbu.graph.spark.KTrussTSet" $CONF_FILE $cores $kci $k 100
+            bin/run-spark.sh "ir.ac.sbu.graph.spark.ktruss.KTrussTSet" $CONF_FILE $cores $kci $k 100
         done
     done
 done
