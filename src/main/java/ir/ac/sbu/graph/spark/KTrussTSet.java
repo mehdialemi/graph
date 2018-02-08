@@ -201,7 +201,7 @@ public class KTrussTSet extends SparkApp {
             }
 
             return output.iterator();
-        }).groupByKey(partitionNum)
+        }).groupByKey(partitionNum * 2)
                 .mapValues(values -> {
                     List<VertexByte> list = new ArrayList<>();
                     int sw = 0, sv = 0, su = 0;
