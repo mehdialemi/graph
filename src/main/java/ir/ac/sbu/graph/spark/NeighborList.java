@@ -23,7 +23,7 @@ public class NeighborList extends SparkApp {
         this.edgeLoader = edgeLoader;
     }
 
-    public JavaPairRDD<Integer, int[]> create() {
+    public JavaPairRDD<Integer, int[]> getOrCreate() {
         if (neighbors == null) {
             JavaPairRDD<Integer, Integer> edges = edgeLoader.create();
             neighbors = edges.groupByKey(conf.getPartitionNum()).mapToPair(t -> {

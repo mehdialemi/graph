@@ -51,7 +51,7 @@ public class CountingSort {
             counts[array[i] - min]++;
         }
 
-        // recalculate the array - create the array of occurences
+        // recalculate the array - getOrCreate the array of occurences
         counts[0]--;
         for (int i = 1; i < counts.length; i++) {
             counts[i] = counts[i] + counts[i-1];

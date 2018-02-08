@@ -4,8 +4,6 @@ import ir.ac.sbu.graph.spark.ArgumentReader;
 import ir.ac.sbu.graph.spark.EdgeLoader;
 import ir.ac.sbu.graph.spark.NeighborList;
 import it.unimi.dsi.fastutil.ints.*;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
 
@@ -36,9 +34,9 @@ public class KCore extends NeighborList {
     }
 
     @Override
-    public JavaPairRDD<Integer, int[]> create() {
+    public JavaPairRDD<Integer, int[]> getOrCreate() {
 
-        JavaPairRDD<Integer, int[]> neighbors = neighborList.create();
+        JavaPairRDD<Integer, int[]> neighbors = neighborList.getOrCreate();
         if (kConf.getKcMaxIter() < 1) {
             return neighbors;
         }
@@ -109,7 +107,7 @@ public class KCore extends NeighborList {
         NeighborList neighborList = new NeighborList(edgeLoader);
 
         KCore kCore = new KCore(neighborList, kConf);
-        JavaPairRDD<Integer, int[]> kCoreSubGraph = kCore.create();
+        JavaPairRDD<Integer, int[]> kCoreSubGraph = kCore.getOrCreate();
 
         log("KCore vertex count: " + kCoreSubGraph.count(), t1, System.currentTimeMillis());
 

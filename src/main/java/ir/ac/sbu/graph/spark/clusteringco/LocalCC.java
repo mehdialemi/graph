@@ -14,7 +14,6 @@ public class LocalCC extends SparkApp {
 
     private Triangle triangle;
 
-
     private JavaPairRDD<Integer, Float> lcc;
 
     public LocalCC(Triangle triangle) {
@@ -30,7 +29,7 @@ public class LocalCC extends SparkApp {
     }
 
     public void generateLcc() {
-        lcc = triangle.getFonl()
+        lcc = triangle.getOrCreateFonl()
                 .leftOuterJoin(triangle.getVertexTC())
                 .mapValues(v -> (!v._2.isPresent() || v._1[0] < 2) ? 0.0f : 2.0f * v._2.get() / (v._1[0] * (v._1[0] - 1)))
                 .persist(StorageLevel.MEMORY_AND_DISK());
@@ -48,7 +47,10 @@ public class LocalCC extends SparkApp {
         SparkAppConf conf = new SparkAppConf(new ArgumentReader(args));
         conf.init();
 
-        LocalCC lcc = new LocalCC(new Triangle(new NeighborList(new EdgeLoader(conf))));
+        EdgeLoader edgeLoader = new EdgeLoader(conf);
+        NeighborList neighborList = new NeighborList(edgeLoader);
+
+        LocalCC lcc = new LocalCC(new Triangle(neighborList));
         lcc.generateLcc();
 
         long t2 = System.currentTimeMillis();

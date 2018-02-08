@@ -49,7 +49,7 @@ public class ParallelKTruss8 extends ParallelKTrussBase {
             set.add(e.v1);
         }
         long tneighbor = System.currentTimeMillis();
-        System.out.println("create neighbor list in " + (tneighbor - tStart) + " ms");
+        System.out.println("getOrCreate neighbor list in " + (tneighbor - tStart) + " ms");
 
         Long2IntMap partitions = PartitioningUtils.createPartition(edges, neighbors, threads);
 

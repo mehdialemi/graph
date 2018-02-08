@@ -25,7 +25,7 @@ public class GraphStats extends SparkApp {
     }
 
     public Map<String, String> generateStats() {
-        JavaPairRDD<Integer, int[]> neighbors = neighborList.create();
+        JavaPairRDD<Integer, int[]> neighbors = neighborList.getOrCreate();
 
         Map<String, String> statMap = new HashMap<>();
         long vCount = neighbors.count();

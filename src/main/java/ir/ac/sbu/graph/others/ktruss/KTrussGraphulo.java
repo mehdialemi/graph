@@ -125,7 +125,7 @@ public class KTrussGraphulo {
         String password = args[4];
 
         if (args.length < 6)
-            Log.log("Enter table name to create");
+            Log.log("Enter table name to getOrCreate");
         String tableName = args[5];
 
 

@@ -49,7 +49,7 @@ object KTrussPregel {
         // Change direction from lower degree node to a higher node
         // First find degree of each node
         // Second find correct edge direction
-        // Third create a new ir.ac.sbu.graph with new edges and previous vertices
+        // Third getOrCreate a new ir.ac.sbu.graph with new edges and previous vertices
 
         // Set degree of each vertex in the property.
         val graphVD = inputGraph.outerJoinVertices(inputGraph.degrees)((vid, v, deg) => deg)

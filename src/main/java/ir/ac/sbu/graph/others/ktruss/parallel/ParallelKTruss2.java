@@ -52,7 +52,7 @@ public class ParallelKTruss2 extends ParallelKTrussBase {
             System.out.println("Invalid size: " + invalids.size() + ", duration: " + (t2 - t1) + " ms");
             final Object lock = new Object();
 
-            // find edges that should be updated. Here we create a map from edge to vertices which should be removed
+            // find edges that should be updated. Here we getOrCreate a map from edge to vertices which should be removed
             final int invalidSize = invalids.size();
             AtomicInteger batchSelector = new AtomicInteger(0);
             forkJoinPool.submit(() ->
@@ -114,7 +114,7 @@ public class ParallelKTruss2 extends ParallelKTrussBase {
         throws Exception {
         long t1 = System.currentTimeMillis();
 
-        // for each thread, create a map from vertex id to its degree
+        // for each thread, getOrCreate a map from vertex id to its degree
         final List<Tuple2<Integer, Integer>> edgeBuckets = createBuckets(threads, edges.length);
         Stream<Map<Integer, Integer>> vdResult = forkJoinPool.submit(() -> {
             return edgeBuckets.parallelStream().map(bucket -> {
@@ -142,7 +142,7 @@ public class ParallelKTruss2 extends ParallelKTrussBase {
         final int vertexNum = vdLocalMaps.stream().map(v -> v.size()).reduce((a, b) -> b + a).get() + 1;
         final int batchSize = ((int) (vertexNum * batchRatio) / threads) * threads; // make batchSize as a multiplier of threads
 
-        // create an arrayList to hold each vertex's degree. index of this arrayList corresponds to vertex Id
+        // getOrCreate an arrayList to hold each vertex's degree. index of this arrayList corresponds to vertex Id
         int[] vertexDegrees = new int[vertexNum];
 
         // Iterate over local vertex degree map (vdLocalMaps) and update vertexDegrees accordingly.
@@ -220,7 +220,7 @@ public class ParallelKTruss2 extends ParallelKTrussBase {
                 int syncSize = syncSizeSelector.getAndAdd(syncIncrement) + batchSize;
                 Map<Long, Set<Integer>> eVerticesMap = new HashMap<>(batchSize * 2);
 
-                // Each thread create an output as Map which represents edge as a key and a list of pair ver as value.
+                // Each thread getOrCreate an output as Map which represents edge as a key and a list of pair ver as value.
                 while (start < vertexNum) {
                     start = batchSelector.getAndAdd(batchSize);
 

@@ -54,7 +54,7 @@ public class KTrussTSet extends SparkApp {
 
         Triangle triangle = new Triangle(kCore);
 
-        JavaPairRDD<Integer, int[]> fonl = triangle.getFonl();
+        JavaPairRDD<Integer, int[]> fonl = triangle.getOrCreateFonl();
 
         JavaPairRDD<Integer, int[]> candidates = triangle.createCandidates(fonl);
 

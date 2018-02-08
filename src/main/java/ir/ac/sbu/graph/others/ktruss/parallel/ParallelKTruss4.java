@@ -291,7 +291,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         })).get();
 
         long tsorted2 = System.currentTimeMillis();
-        System.out.println("initialize and create sort index in " + (tsorted2 - tsorted1) + " ms");
+        System.out.println("initialize and getOrCreate sort index in " + (tsorted2 - tsorted1) + " ms");
 //        int[] partitions = PartitioningUtils.createPartitions(vCount, threads, BATCH_SIZE);
         long tupdate1 = System.currentTimeMillis();
         DataInputBuffer in1 = new DataInputBuffer();
@@ -421,7 +421,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
             partitions[u] = -1;
         }
 
-        // create dominate set
+        // getOrCreate dominate set
         DataInputBuffer in = new DataInputBuffer();
         int neighborhood = 5;
         int currentPartition = 0;

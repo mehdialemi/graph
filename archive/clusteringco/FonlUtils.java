@@ -13,14 +13,14 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * Utility class to create fonl sorted based on degree or ids
+ * Utility class to getOrCreate fonl sorted based on degree or ids
  */
 public class FonlUtils implements Serializable {
 
     /**
-     * This utility function create fonl such that more load balancing is achieved and tries to prevent out of memory
+     * This utility function getOrCreate fonl such that more load balancing is achieved and tries to prevent out of memory
      * error by reducing the size of required memory when calling reduce by key function for long tail vertex neighbors.
-     * It does its work by first finding degree of each vertex. Then it create an edge list which in it each edge
+     * It does its work by first finding degree of each vertex. Then it getOrCreate an edge list which in it each edge
      * has vertices such that lower degree vertex is the key and higher degree vertex is value. The final data
      * structure is fonl which in it key is a vertex and value is its neighbors sorted by their degree.
      *

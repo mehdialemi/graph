@@ -26,28 +26,28 @@ public class Triangle extends SparkApp {
         conf.getSparkConf().registerKryoClasses(new Class[] {VertexDeg.class, int[].class});
     }
 
-    public JavaPairRDD<Integer, int[]> getFonl() {
+    public JavaPairRDD<Integer, int[]> getOrCreateFonl() {
         if (fonl == null)
             fonl = createFonl(P_MULTIPLIER).persist(StorageLevel.MEMORY_AND_DISK_2());
         return fonl;
     }
 
-    public JavaPairRDD<Integer, int[]> getCandidates() {
+    public JavaPairRDD<Integer, int[]> getOrCreateCandidates(JavaPairRDD<Integer, int[]> fonl) {
         if (candidates == null)
-            candidates = createCandidates(getFonl())
+            candidates = createCandidates(fonl)
                     .persist(StorageLevel.MEMORY_AND_DISK());
         return candidates;
     }
 
     public JavaPairRDD<Integer, Integer> getVertexTC() {
         if (vertexTC == null)
-            createVertexTC();
+            vertexTC = createVertexTC();
 
         return vertexTC;
     }
 
     public JavaPairRDD<Integer, int[]> createFonl(final int pMultiplier) {
-        JavaPairRDD<Integer, int[]> neighborList = this.neighborList.create();
+        JavaPairRDD<Integer, int[]> neighborList = this.neighborList.getOrCreate();
         int partitions = neighborList.getNumPartitions() * pMultiplier;
         return neighborList.flatMapToPair(t -> {
             int deg = t._2.length;
@@ -99,7 +99,7 @@ public class Triangle extends SparkApp {
         });
     }
 
-    public JavaPairRDD<Integer, int[]>  createCandidates(JavaPairRDD<Integer, int[]> fonl) {
+    public JavaPairRDD<Integer, int[]> createCandidates(JavaPairRDD<Integer, int[]> fonl) {
         return fonl.filter(t -> t._2.length > 2) // Select vertices having more than 2 items in their values
                 .flatMapToPair(t -> {
 
@@ -124,21 +124,19 @@ public class Triangle extends SparkApp {
                 });
     }
 
-    public void createVertexTC() {
-
-        JavaPairRDD<Integer, int[]> fonl = getFonl();
-        JavaPairRDD<Integer, int[]> candidates = getCandidates();
-
-        vertexTC = candidates.cogroup(fonl, fonl.getNumPartitions())
-                .flatMapToPair(t -> {
-            Iterator<int[]> iterator = t._2._2.iterator();
+    public JavaPairRDD<Integer, Integer> createVertexTC() {
+        JavaPairRDD<Integer, int[]> fonl = getOrCreateFonl();
+        JavaPairRDD<Integer, int[]> candidates = getOrCreateCandidates(fonl);
+        return candidates.cogroup(fonl)
+                .flatMapToPair(kv -> {
+            Iterator<int[]> iterator = kv._2._2.iterator();
             List<Tuple2<Integer, Integer>> output = new ArrayList<>();
             if (!iterator.hasNext())
                 return output.iterator();
 
             int[] hDegs = iterator.next();
 
-            iterator = t._2._1.iterator();
+            iterator = kv._2._1.iterator();
             if (!iterator.hasNext())
                 return output.iterator();
 
@@ -155,7 +153,7 @@ public class Triangle extends SparkApp {
             } while (iterator.hasNext());
 
             if (sum > 0) {
-                output.add(new Tuple2<>(t._1, sum));
+                output.add(new Tuple2<>(kv._1, sum));
             }
 
             return output.iterator();
@@ -168,7 +166,7 @@ public class Triangle extends SparkApp {
         return tc3 / 3;
     }
 
-    private int sortedIntersection(int[] hDegs, int[] forward, List<Tuple2<Integer, Integer>> output,
+    private static int sortedIntersection(int[] hDegs, int[] forward, List<Tuple2<Integer, Integer>> output,
                                    int hIndex, int fIndex) {
         int fLen = forward.length;
         int hLen = hDegs.length;

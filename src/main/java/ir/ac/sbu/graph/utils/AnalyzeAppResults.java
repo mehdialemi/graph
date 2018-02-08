@@ -55,7 +55,7 @@ public class AnalyzeAppResults {
             File dir = new File(directory);
             boolean successful = dir.mkdirs();
             if (!successful) {
-                System.err.println("unable to create directory " + dir);
+                System.err.println("unable to getOrCreate directory " + dir);
                 return;
             }
 
