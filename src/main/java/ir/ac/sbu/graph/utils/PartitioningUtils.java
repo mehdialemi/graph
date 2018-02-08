@@ -1,6 +1,6 @@
 package ir.ac.sbu.graph.utils;
 
-import ir.ac.sbu.graph.Edge;
+import ir.ac.sbu.graph.types.Edge;
 import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
@@ -9,7 +9,6 @@ import org.apache.hadoop.io.WritableUtils;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.Arrays;
 import java.util.BitSet;
 
 /**

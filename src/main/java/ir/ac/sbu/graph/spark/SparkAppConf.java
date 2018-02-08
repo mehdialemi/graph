@@ -1,5 +1,8 @@
 package ir.ac.sbu.graph.spark;
 
+import ir.ac.sbu.graph.types.Edge;
+import ir.ac.sbu.graph.types.VertexByte;
+import ir.ac.sbu.graph.types.VertexDeg;
 import ir.ac.sbu.graph.utils.Log;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;

@@ -2,7 +2,6 @@ package ir.ac.sbu.graph.ktruss.spark;
 
 import ir.ac.sbu.graph.clusteringco.FonlDegTC;
 import ir.ac.sbu.graph.clusteringco.FonlUtils;
-import ir.ac.sbu.graph.utils.IntGraphUtils;
 import ir.ac.sbu.graph.utils.Log;
 import org.apache.spark.HashPartitioner;
 import org.apache.spark.Partitioner;

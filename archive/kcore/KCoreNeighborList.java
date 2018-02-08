@@ -1,6 +1,5 @@
 package ir.ac.sbu.graph.kcore;
 
-import ir.ac.sbu.graph.utils.IntGraphUtils;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.log4j.Level;
