@@ -12,7 +12,7 @@ import java.util.*;
  */
 public class Triangle extends SparkApp {
 
-    public static final int P_MULTIPLIER = 5;
+    public static final int P_MULTIPLIER = 7;
     private final NeighborList neighborList;
     private JavaPairRDD<Integer, int[]> fonl;
     private JavaPairRDD<Integer, int[]> candidates;
