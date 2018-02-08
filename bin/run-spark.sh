@@ -27,7 +27,7 @@ other_args=""
 
 if [ $# -gt 2 ]
 then
-    for i in $(seq 2 $#)
+    for i in $(seq 3 $#)
     do
         echo $i
         arg=${args[$i]}
