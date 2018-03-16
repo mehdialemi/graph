@@ -45,8 +45,8 @@ public class SparkAppConf {
         String appName = createAppName();
 
         sparkConf = new SparkConf();
-        if (inputPath.equals("/home/mehdi/graph-data/com-amazon.ungraph.txt"))
-            sparkConf.setMaster("local[2]");
+        if (!inputPath.startsWith("hdfs"))
+            sparkConf.setMaster("local[" + cores + "]");
 
         sparkConf.setAppName(appName);
         sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
