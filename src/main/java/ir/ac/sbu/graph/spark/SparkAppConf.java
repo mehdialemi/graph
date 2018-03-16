@@ -49,6 +49,7 @@ public class SparkAppConf {
             sparkConf.setMaster("local[" + cores + "]");
             sparkConf.set("spark.driver.memory", "10g");
             sparkConf.set("spark.driver.maxResultSize", "9g");
+            sparkConf.set("spark.kryoserializer.buffer.max", "256m");
         }
 
         sparkConf.setAppName(appName);
