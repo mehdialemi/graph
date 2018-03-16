@@ -45,8 +45,11 @@ public class SparkAppConf {
         String appName = createAppName();
 
         sparkConf = new SparkConf();
-        if (!inputPath.startsWith("hdfs"))
+        if (!inputPath.startsWith("hdfs")) {
             sparkConf.setMaster("local[" + cores + "]");
+            sparkConf.set("spark.driver.memory", "10g");
+            sparkConf.set("spark.driver.maxResultSize", "9g");
+        }
 
         sparkConf.setAppName(appName);
         sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
