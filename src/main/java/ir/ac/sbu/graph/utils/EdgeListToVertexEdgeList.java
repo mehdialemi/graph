@@ -67,7 +67,7 @@ public class EdgeListToVertexEdgeList extends SparkApp  {
         System.out.println("New vertex edge list file in " + outPath);
         PrintWriter pw = new PrintWriter(new File(outPath));
         for (Tuple2<Integer, Iterable<Integer>> vEdgeList : result.groupByKey().collect()) {
-            pw.print(vEdgeList._1 + "\t ");
+            pw.print(vEdgeList._1 + "\t");
             for (Integer edge : vEdgeList._2) {
                 pw.print(edge + "\t ");
             }
