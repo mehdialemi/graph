@@ -24,8 +24,7 @@ public class EdgeListUndirector extends SparkApp  {
         JavaRDD<String> input = conf.getSc().textFile(conf.getInputPath());
         JavaRDD<String> edges = input.filter(l -> !l.startsWith("#"))
                 .map(s -> s.split("\\s+"))
-                .flatMap(array -> Arrays.asList(array[0] + "\t" + array[1], array[1] + "\t" + array[0]).iterator())
-                .distinct();
+                .flatMap(array -> Arrays.asList(array[0] + "\t" + array[1], array[1] + "\t" + array[0]).iterator());
 
         String outPath = conf.getInputPath() + ".edges";
         System.out.println("Deleting " + outPath);
