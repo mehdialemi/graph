@@ -42,7 +42,7 @@ public class KTrussGraphulo {
     }
 
     public void run(String tableName, int k) {
-        String newTable = tableName + "-output";
+        String newTable = tableName + "output";
         long ts = System.currentTimeMillis();
 //        long nnz = graphulo.kTrussAdj(tableName, newTable,k,null,true,Authorizations.EMPTY,"");
 //        long nnz = graphulo.kTrussAdj(tableName, newTable, k, null,
