@@ -36,6 +36,7 @@ public class KTrussGraphulo {
 
     public void setup() throws AccumuloSecurityException, AccumuloException {
         ClientConfiguration cc = ClientConfiguration.loadDefault().withInstance(instanceName).withZkHosts(zkServers);
+        cc.withZkTimeout(20000);
         Instance instance = new ZooKeeperInstance(cc);
         Connector connector = instance.getConnector(username, token);
         graphulo = new Graphulo(connector, token);
