@@ -42,15 +42,15 @@ public class KTrussGraphulo {
     }
 
     public void run(String tableName, int k) {
-        String newTable = tableName + "output";
+        String newTable = tableName + "_output_" + k;
         long ts = System.currentTimeMillis();
 //        long nnz = graphulo.kTrussAdj(tableName, newTable,k,null,true,Authorizations.EMPTY,"");
 //        long nnz = graphulo.kTrussAdj(tableName, newTable, k, null,
 //                true, Authorizations.EMPTY, "", Integer.MAX_VALUE,null);
-        long nnz = graphulo.kTrussAdj_Smart(tableName, newTable, k, null, true, Authorizations.EMPTY,
-                null, Integer.MAX_VALUE, null);
+//        long nnz = graphulo.kTrussAdj_Smart(tableName, newTable, k, null, true, Authorizations.EMPTY,
+//                null, Integer.MAX_VALUE, null);
 //        long nnz = graphulo.kTrussAdj_Fused(tableName, newTable , k, null, true, Authorizations.EMPTY, null);
-        Log.log("nnz: " + nnz, ts, System.currentTimeMillis());
+//        Log.log("nnz: " + nnz, ts, System.currentTimeMillis());
     }
 
     public void fillTable(String tableName, String fileName, SortedSet<Text> splits) throws Exception {
