@@ -25,7 +25,7 @@ import static ir.ac.sbu.graph.utils.Log.log;
 public class Cohen extends SparkApp {
 
     public static final int INV_DEG = -1;
-    public static final int P_MULTIPLIER = 5;
+    public static final int P_MULTIPLIER = 10;
     private KTrussConf ktConf;
     private int partitions;
 
