@@ -48,9 +48,9 @@ public class KTrussGraphulo {
 //        long nnz = graphulo.kTrussAdj(tableName, newTable,k,null,true,Authorizations.EMPTY,"");
 //        long nnz = graphulo.kTrussAdj(tableName, newTable, k, null,
 //                true, Authorizations.EMPTY, "", Integer.MAX_VALUE,null);
-//        long nnz = graphulo.kTrussAdj_Smart(tableName, newTable, k, null, true, Authorizations.EMPTY,
-//                null, Integer.MAX_VALUE, null);
-        long nnz = graphulo.kTrussAdj_Fused(tableName, newTable , k, null, true, Authorizations.EMPTY, null);
+        long nnz = graphulo.kTrussAdj_Smart(tableName, newTable, k, null, true, Authorizations.EMPTY,
+                null, 1000, null);
+//        long nnz = graphulo.kTrussAdj_Fused(tableName, newTable , k, null, true, Authorizations.EMPTY, null);
 //        long nnz = graphulo.kTrussEdge(tableName, null, null, newTable, k, null,
 //                true, Authorizations.EMPTY);
         Log.log("nnz: " + nnz, ts, System.currentTimeMillis());
