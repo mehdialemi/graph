@@ -40,9 +40,7 @@ public class Cohen extends SparkApp {
                 .map(kv -> kv._1 < kv._2 ? new Edge(kv._1, kv._2) : new Edge(kv._2, kv._1));
         partitions = edgeList.getNumPartitions() * P_MULTIPLIER;
         edgeList = edgeList.distinct(partitions)
-                .distinct()
                 .cache();
-
 
         final int minSup = ktConf.getKt() - 2;
 
