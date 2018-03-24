@@ -158,7 +158,7 @@ public class KTrussGraphulo {
 
         File file = new File(fileName);
         long size = file.length();
-        long batchSizeBytes = size / 1000;
+        long batchSizeBytes = size / 100;
 
         BufferedReader br = new BufferedReader(new FileReader(file));
 
