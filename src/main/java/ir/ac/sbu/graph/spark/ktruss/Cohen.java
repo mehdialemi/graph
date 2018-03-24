@@ -47,7 +47,7 @@ public class Cohen extends SparkApp {
         for (int iter = 0; iter < ktConf.getKtMaxIter(); iter++) {
             long t1 = System.currentTimeMillis();
 
-            JavaRDD<Edge[]> triangles = createTriangles(edgeList);
+            JavaRDD<Edge[]> triangles = createTriangles(edgeList).repartition(partitions);
 
             JavaPairRDD<Edge, Integer> eSup = triangles
                     .flatMapToPair(kv -> Arrays.asList(
