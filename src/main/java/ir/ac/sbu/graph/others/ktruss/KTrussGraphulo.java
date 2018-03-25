@@ -142,7 +142,7 @@ public class KTrussGraphulo {
                 String fileName = args[6];
 
                 int numTablets = 500;
-                if (args.length < 8)
+                if (args.length > 7)
                     numTablets = Integer.parseInt(args[7]);
 
                 Log.log("Num tablets is: " + numTablets);
