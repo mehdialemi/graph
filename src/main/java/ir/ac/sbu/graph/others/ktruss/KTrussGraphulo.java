@@ -141,11 +141,11 @@ public class KTrussGraphulo {
                     Log.log("Enter fileName to fill in tables");
                 String fileName = args[6];
 
-                int numTablets = 100;
+                int numTablets = 500;
                 if (args.length < 8)
                     numTablets = Integer.parseInt(args[7]);
 
-
+                Log.log("Num tablets is: " + numTablets);
                 kTrussGraphulo.fillTable(tableName, fileName, createSplits(fileName, numTablets));
 
                 break;
