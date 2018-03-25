@@ -141,7 +141,12 @@ public class KTrussGraphulo {
                     Log.log("Enter fileName to fill in tables");
                 String fileName = args[6];
 
-                kTrussGraphulo.fillTable(tableName, fileName, createSplits(fileName));
+                int numTablets = 100;
+                if (args.length < 8)
+                    numTablets = Integer.parseInt(args[7]);
+
+
+                kTrussGraphulo.fillTable(tableName, fileName, createSplits(fileName, numTablets));
 
                 break;
             case "RUN":
@@ -154,11 +159,11 @@ public class KTrussGraphulo {
         }
     }
 
-    private static SortedSet<Text> createSplits(String fileName) throws IOException {
+    private static SortedSet<Text> createSplits(String fileName, int numTablets) throws IOException {
 
         File file = new File(fileName);
         long size = file.length();
-        long batchSizeBytes = size / 100;
+        long batchSizeBytes = size / numTablets;
 
         BufferedReader br = new BufferedReader(new FileReader(file));
 
