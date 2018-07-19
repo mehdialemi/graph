@@ -309,7 +309,7 @@ under the License.
                     <Git-Committer-Name>${mvngit.commit.committer.name}</Git-Committer-Name>
                   </manifestEntries>
                 </archive>
-                <outputDirectory>target</outputDirectory>
+                <outputDirectory>../target</outputDirectory>
               </configuration>
               <goals>
                 <goal>single</goal>
