@@ -20,7 +20,7 @@ public class PartitioningCost extends SparkApp {
         this.vertexPartition = vertexPartition;
     }
 
-    public long getCost() {
+    public long getNumCut() {
         JavaPairRDD<Integer, int[]> neighbors = neighborList.getOrCreate();
 
         JavaPairRDD<Integer, Tuple2<Integer, int[]>> neighborListPartition = neighbors
@@ -50,7 +50,7 @@ public class PartitioningCost extends SparkApp {
             return true;
         }).count();
 
-        return cost;
+        return cost / 2;
     }
 
 }

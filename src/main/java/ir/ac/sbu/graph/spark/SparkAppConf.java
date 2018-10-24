@@ -1,5 +1,6 @@
 package ir.ac.sbu.graph.spark;
 
+import ir.ac.sbu.graph.spark.partitioning.PartitionInfoAccumulator;
 import ir.ac.sbu.graph.types.Edge;
 import ir.ac.sbu.graph.types.VertexByte;
 import ir.ac.sbu.graph.types.VertexDeg;
@@ -23,7 +24,7 @@ public class SparkAppConf {
     private JavaSparkContext sc;
 
     public SparkAppConf (ArgumentReader argumentReader) {
-        inputPath = argumentReader.nextString("/home/mehdi/graph-data/com-amazon.ungraph.txt");
+        inputPath = argumentReader.nextString("/home/mehdi/graph-data/com-youtube.ungraph.txt");
         cores = argumentReader.nextInt(2);
         //partitionNum = argumentReader.nextInt(10);
     }
@@ -46,6 +47,7 @@ public class SparkAppConf {
 
         sparkConf = new SparkConf();
         if (!inputPath.startsWith("hdfs")) {
+            sparkConf.set("spark.driver.bindAddress", "localhost");
             sparkConf.setMaster("local[" + cores + "]");
             sparkConf.set("spark.driver.memory", "10g");
             sparkConf.set("spark.driver.maxResultSize", "9g");
@@ -54,7 +56,7 @@ public class SparkAppConf {
 
         sparkConf.setAppName(appName);
         sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-        sparkConf.registerKryoClasses(new Class[] {int[].class, VertexDeg.class,
+        sparkConf.registerKryoClasses(new Class[] {int[].class, VertexDeg.class, PartitionInfoAccumulator.class,
                 Edge.class, VertexByte.class});
 
         sc = new JavaSparkContext(sparkConf);
