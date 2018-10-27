@@ -82,7 +82,7 @@ public class MaxKTrussTSet extends SparkApp {
                     generate(minSup, tSet, partitionNum);
 
             final int support = minSup - 1;
-            JavaRDD <Edge> kTruss = result._1.repartition(partitionNum).cache();
+            JavaRDD <Edge> kTruss = result._1.coalesce(partitionNum).cache();
 
             eTrussMap.put(support, kTruss);
 
