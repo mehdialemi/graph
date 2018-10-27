@@ -13,7 +13,7 @@ public class KTrussConf extends KCoreConf {
 
     public KTrussConf(ArgumentReader argumentReader) {
         super(argumentReader);
-        kt = argumentReader.nextInt(4);
+        kt = argumentReader.nextInt(3);
         kc = kt - 1;
         ktMaxIter = argumentReader.nextInt(10);
     }

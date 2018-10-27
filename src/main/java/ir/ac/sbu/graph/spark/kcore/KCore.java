@@ -3,8 +3,10 @@ package ir.ac.sbu.graph.spark.kcore;
 import ir.ac.sbu.graph.spark.ArgumentReader;
 import ir.ac.sbu.graph.spark.EdgeLoader;
 import ir.ac.sbu.graph.spark.NeighborList;
+import ir.ac.sbu.graph.types.Edge;
 import it.unimi.dsi.fastutil.ints.*;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
 import scala.Tuple2;
 
 import java.util.*;
@@ -16,13 +18,17 @@ import static ir.ac.sbu.graph.utils.Log.log;
  */
 public class KCore extends NeighborList {
 
-    private final NeighborList neighborList;
-    private final KCoreConf kConf;
-    private final Queue<JavaPairRDD<Integer, int[]>> neighborQueue;
+    private KCoreConf kConf;
+    private Queue<JavaPairRDD<Integer, int[]>> neighborQueue;
 
     public KCore(NeighborList neighborList, KCoreConf kConf) {
         super(neighborList);
-        this.neighborList = neighborList;
+        this.kConf = kConf;
+        neighborQueue = new LinkedList<>();
+    }
+
+    public KCore(JavaRDD<Edge> rdd, KCoreConf kConf) {
+        super(kConf, rdd);
         this.kConf = kConf;
         neighborQueue = new LinkedList<>();
     }
@@ -36,7 +42,7 @@ public class KCore extends NeighborList {
     @Override
     public JavaPairRDD<Integer, int[]> getOrCreate() {
 
-        JavaPairRDD<Integer, int[]> neighbors = neighborList.getOrCreate();
+        JavaPairRDD<Integer, int[]> neighbors = super.getOrCreate();
         if (kConf.getKcMaxIter() < 1) {
             return neighbors;
         }

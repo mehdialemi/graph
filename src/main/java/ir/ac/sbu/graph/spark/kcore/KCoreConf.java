@@ -23,6 +23,14 @@ public class KCoreConf extends SparkAppConf {
         kcMaxIter = argumentReader.nextInt(10);
     }
 
+    public void setKcMaxIter(int iter) {
+        this.kcMaxIter = iter;
+    }
+
+    public void setKc(int kc) {
+        this.kc = kc;
+    }
+
     @Override
     protected String createAppName() {
         return "KCore-" + kc + "-" + kcMaxIter + " (" + super.createAppName() + ")";

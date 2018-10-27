@@ -26,7 +26,6 @@ public class SparkAppConf {
     public SparkAppConf (ArgumentReader argumentReader) {
         inputPath = argumentReader.nextString("/home/mehdi/graph-data/com-youtube.ungraph.txt");
         cores = argumentReader.nextInt(2);
-        //partitionNum = argumentReader.nextInt(10);
     }
 
     protected String createAppName() {
@@ -38,11 +37,6 @@ public class SparkAppConf {
     }
 
     public void init() {
-        Logger.getLogger("org.apache.spar").setLevel(Level.INFO);
-        Logger.getLogger("ServletHandler").setLevel(Level.INFO);
-        Logger.getLogger("AbstractLifeCycle").setLevel(Level.INFO);
-        Logger.getLogger("AbstractHandler").setLevel(Level.INFO);
-
         String appName = createAppName();
 
         sparkConf = new SparkConf();
