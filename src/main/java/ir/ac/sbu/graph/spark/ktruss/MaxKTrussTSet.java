@@ -82,7 +82,7 @@ public class MaxKTrussTSet extends SparkApp {
                     generate(minSup, tSet, partitionNum);
 
             final int support = minSup - 1;
-            JavaRDD <Edge> kTruss = result._1;
+            JavaRDD <Edge> kTruss = result._1.repartition(partitionNum).cache();
 
             eTrussMap.put(support, kTruss);
 
@@ -129,7 +129,7 @@ public class MaxKTrussTSet extends SparkApp {
 //        JavaPairRDD <Edge, int[]> kCoreInvalid = invalidByKCore(tSet, minSup);
 
         // Detect invalid edges by comparing the size of triangle vertex set
-        JavaPairRDD<Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup).cache();
+//        JavaPairRDD<Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup).cache();
 //        invalids = invalids.fullOuterJoin(kCoreInvalid).mapValues(v -> v._1.isPresent() ? v._1.get() : v._2.get());
 
         Queue<JavaPairRDD<Edge, int[]>> tSetQueue = new LinkedList<>();
@@ -145,7 +145,7 @@ public class MaxKTrussTSet extends SparkApp {
                 tSet.checkpoint();
                 log("check pointing tSet", t, System.currentTimeMillis());
             }
-
+            JavaPairRDD<Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup).cache();
             long invalidCount = invalids.count();
 
             // If no invalid edge is found then the program terminates
