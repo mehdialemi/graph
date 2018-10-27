@@ -82,7 +82,8 @@ public class MaxKTrussTSet extends SparkApp {
                     generate(minSup, tSet, partitionNum);
 
             final int support = minSup - 1;
-            JavaRDD <Edge> kTruss = result._1.coalesce(partitionNum).cache();
+            JavaRDD <Edge> kTruss = result._1;
+            kTruss.checkpoint();
 
             eTrussMap.put(support, kTruss);
 
@@ -143,6 +144,7 @@ public class MaxKTrussTSet extends SparkApp {
             if (iterations.get() % CHECKPOINT_ITERATION == 0) {
                 long t = System.currentTimeMillis();
                 tSet.checkpoint();
+
                 log("check pointing tSet", t, System.currentTimeMillis());
             }
             JavaPairRDD<Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup).cache();
@@ -152,7 +154,7 @@ public class MaxKTrussTSet extends SparkApp {
             if (invalidCount == 0) {
                 break;
             }
-            eTruss = eTruss.union(invalids.map(kv -> kv._1).cache());
+            eTruss = eTruss.union(invalids.map(kv -> kv._1));
 
             if (tSetQueue.size() > 1)
                 tSetQueue.remove().unpersist();
@@ -224,7 +226,6 @@ public class MaxKTrussTSet extends SparkApp {
                         return set;
                     }).filter(kv -> kv._2 != null)
                     .persist(StorageLevel.MEMORY_ONLY());
-            invalids = tSet.filter(kv -> kv._2[0] < minSup).cache();
             tSetQueue.add(tSet);
         }
 
