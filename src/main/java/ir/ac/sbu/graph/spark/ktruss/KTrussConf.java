@@ -15,7 +15,7 @@ public class KTrussConf extends KCoreConf {
         super(argumentReader);
         kt = argumentReader.nextInt(3);
         kc = kt - 1;
-        ktMaxIter = argumentReader.nextInt(10);
+        ktMaxIter = argumentReader.nextInt(1000);
     }
 
     @Override

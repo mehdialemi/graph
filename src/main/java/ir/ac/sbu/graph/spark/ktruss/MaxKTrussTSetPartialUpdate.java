@@ -78,20 +78,20 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
         log("edge count: " + count);
 
         long eTrussCount = 0;
-        tSet.checkpoint();
+//        tSet.checkpoint();
         while (true) {
             long t1 = System.currentTimeMillis();
             final int minSup = k - 2;
             final int maxSup = minSup + 5;
 
             JavaPairRDD <Edge, int[]> subTSet = tSet.filter(kv -> kv._2[0] < maxSup).cache();
-//            subTSet.checkpoint();
+            subTSet.checkpoint();
             Tuple2 <JavaRDD <Edge>, JavaPairRDD <Edge, int[]>> result =
                     generate(minSup, subTSet, partitionNum);
 
             final int support = minSup - 1;
             JavaRDD <Edge> kTruss = result._1;
-            kTruss.checkpoint();
+//            kTruss.checkpoint();
 
             eTrussMap.put(support, kTruss);
 
@@ -124,7 +124,7 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                     }
                 }
                 return set;
-            });
+            }).cache();
 
             long t2 = System.currentTimeMillis();
             long kTrussCount = kTruss.count();

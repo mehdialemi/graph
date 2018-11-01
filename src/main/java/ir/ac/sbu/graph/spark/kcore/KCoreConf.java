@@ -13,13 +13,13 @@ public class KCoreConf extends SparkAppConf {
 
     public KCoreConf(ArgumentReader argumentReader) {
         super(argumentReader);
-        kcMaxIter = argumentReader.nextInt(10);
+        kcMaxIter = argumentReader.nextInt(1000);
     }
 
     public KCoreConf(ArgumentReader argumentReader, boolean readK) {
         super(argumentReader);
         if (readK)
-            kc = argumentReader.nextInt(3);
+            kc = argumentReader.nextInt(2);
         kcMaxIter = argumentReader.nextInt(10);
     }
 
