@@ -16,6 +16,12 @@ public class KCoreConf extends SparkAppConf {
         kcMaxIter = argumentReader.nextInt(1000);
     }
 
+    public KCoreConf(SparkAppConf conf, int kc, int kcMaxIter) {
+        super(conf);
+        this.kc = kc;
+        this.kcMaxIter = kcMaxIter;
+    }
+
     public KCoreConf(ArgumentReader argumentReader, boolean readK) {
         super(argumentReader);
         if (readK)

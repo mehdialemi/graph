@@ -23,6 +23,10 @@ public class SparkAppConf {
     private int cores;
     private JavaSparkContext sc;
 
+    public SparkAppConf(SparkAppConf conf) {
+        this.inputPath = conf.inputPath;
+        this.cores = conf.cores;
+    }
     public SparkAppConf (ArgumentReader argumentReader) {
         inputPath = argumentReader.nextString("/home/mehdi/graph-data/com-youtube.ungraph.txt");
         cores = argumentReader.nextInt(2);

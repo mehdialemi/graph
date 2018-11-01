@@ -1,10 +1,8 @@
 package ir.ac.sbu.graph.spark.ktruss;
 
-import ir.ac.sbu.graph.spark.ArgumentReader;
-import ir.ac.sbu.graph.spark.EdgeLoader;
-import ir.ac.sbu.graph.spark.NeighborList;
-import ir.ac.sbu.graph.spark.SparkApp;
+import ir.ac.sbu.graph.spark.*;
 import ir.ac.sbu.graph.spark.kcore.KCore;
+import ir.ac.sbu.graph.spark.kcore.KCoreConf;
 import ir.ac.sbu.graph.spark.triangle.Triangle;
 import ir.ac.sbu.graph.types.Edge;
 import ir.ac.sbu.graph.types.VertexByte;
@@ -41,24 +39,24 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
     public static final int CHECKPOINT_ITERATION = 50;
 
     private final NeighborList neighborList;
-    private KTrussConf ktConf;
     private AtomicInteger iterations = new AtomicInteger(0);
+    private final KCoreConf kCoreConf;
 
-    public MaxKTrussTSetPartialUpdate(NeighborList neighborList, KTrussConf ktConf) throws URISyntaxException {
+    public MaxKTrussTSetPartialUpdate(NeighborList neighborList, SparkAppConf conf) throws URISyntaxException {
         super(neighborList);
         this.neighborList = neighborList;
-        this.ktConf = ktConf;
-        String master = ktConf.getSc().master();
-        this.ktConf.getSc().setCheckpointDir("/tmp/checkpoint");
+        String master = conf.getSc().master();
+        this.conf.getSc().setCheckpointDir("/tmp/checkpoint");
+        kCoreConf = new KCoreConf(conf, 2, 1000);
         if (master.contains("local")) {
             return;
         }
-        String masterHost = new URI(ktConf.getSc().master()).getHost();
-        this.ktConf.getSc().setCheckpointDir("hdfs://" + masterHost + "/shared/checkpoint");
+        String masterHost = new URI(conf.getSc().master()).getHost();
+        this.conf.getSc().setCheckpointDir("hdfs://" + masterHost + "/shared/checkpoint");
     }
 
     public Map<Integer, JavaRDD<Edge>> explore() {
-        KCore kCore = new KCore(neighborList, ktConf);
+        KCore kCore = new KCore(neighborList, kCoreConf);
 
         Triangle triangle = new Triangle(kCore);
 
@@ -143,9 +141,9 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
     }
 
     private  JavaPairRDD<Edge, int[]> invalidByKCore( JavaPairRDD<Edge, int[]> tSet, int kc) {
-        ktConf.setKcMaxIter(Integer.MAX_VALUE);
-        ktConf.setKc(kc);
-        KCore kCore = new KCore(tSet.keys(), ktConf);
+        kCoreConf.setKcMaxIter(Integer.MAX_VALUE);
+        kCoreConf.setKc(kc);
+        KCore kCore = new KCore(tSet.keys(), kCoreConf);
         JavaPairRDD <Integer, int[]> kCoreNeighbors = kCore.getOrCreate();
 
         JavaPairRDD <Edge, Integer> kCoreEdges = kCoreNeighbors.flatMapToPair(kv -> {
@@ -154,7 +152,7 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                 edges.add(new Tuple2 <>(new Edge(kv._1, v), 1));
             }
             return edges.iterator();
-        }).repartition(ktConf.getPartitionNum());
+        }).repartition(kCoreConf.getPartitionNum());
 
         return tSet.subtractByKey(kCoreEdges);
     }
@@ -167,8 +165,9 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
         Queue<JavaPairRDD<Edge, int[]>> tSetQueue = new LinkedList<>();
         tSetQueue.add(tSet);
 
-        for (int iter = 0; iter < ktConf.getKtMaxIter(); iter ++) {
-
+        int iter = 0;
+        while(true) {
+            iter ++;
             long t1 = System.currentTimeMillis();
             iterations.incrementAndGet();
 
@@ -369,13 +368,18 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
     public static void main(String[] args) throws URISyntaxException {
         long t1 = System.currentTimeMillis();
 
-        KTrussConf ktConf = new KTrussConf(new ArgumentReader(args));
-        ktConf.init();
+        SparkAppConf conf = new SparkAppConf(new ArgumentReader(args)) {
+            @Override
+            protected String createAppName() {
+                return this.getClass().getSimpleName() + "-" + super.createAppName();
+            }
+        };
+        conf.init();
 
-        EdgeLoader edgeLoader = new EdgeLoader(ktConf);
+        EdgeLoader edgeLoader = new EdgeLoader(conf);
         NeighborList neighborList = new NeighborList(edgeLoader);
 
-        MaxKTrussTSetPartialUpdate kTrussTSet = new MaxKTrussTSetPartialUpdate(neighborList, ktConf);
+        MaxKTrussTSetPartialUpdate kTrussTSet = new MaxKTrussTSetPartialUpdate(neighborList, conf);
         Map <Integer, JavaRDD <Edge>> eTrussMap = kTrussTSet.explore();
         log("KTruss edge count: " + eTrussMap.size(), t1, System.currentTimeMillis());
 
