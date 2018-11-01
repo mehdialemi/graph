@@ -73,10 +73,10 @@ do
     echo "jar argument: $jar_argument"
 
     command="${config[spark_home]}/bin/spark-submit --class $main_class --total-executor-cores $cores --master spark://${config[master]}:7077 ${config[jar]} $jar_argument"
-    echo $command > $log_file
+    echo $command >> $log_file
 
     SECONDS=0
-    $command >> $log_file
+    $command | tee $log_file
     echo "Duration = $SECONDS"
 
 done < $input_file
