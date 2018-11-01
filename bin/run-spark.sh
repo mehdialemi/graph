@@ -63,7 +63,7 @@ do
     echo "executing command $dirCmd"
     $dirCmd
 
-    file_name=`date +%s`
+    file_name=`date +%Y-%m-%d.%H.%M.%S`
     log_file="$log_dir/$file_name.log"
     echo "log file: $log_file"
 
