@@ -33,11 +33,11 @@ public class SparkAppConf {
     }
 
     protected String createAppName() {
-        return getFileName();
+        return getFileName()+ "-Cores-" + cores;
     }
 
     public String getFileName() {
-        return new File(getInputPath()).getName() + "-Cores-" + cores;
+        return new File(getInputPath()).getName() ;
     }
 
     public void init() {

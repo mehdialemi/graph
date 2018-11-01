@@ -72,12 +72,13 @@ public class MaxTrussTSet extends SparkApp {
 
     private void maxTruss(JavaPairRDD<Edge, int[]> tSet) {
         JavaPairRDD <Edge, Integer> eSup = tSet.mapValues(v -> v[0]).cache();
+
         JavaPairRDD <Edge, Tuple2 <Integer, Integer>> extend = extend(tSet).repartition(partitionNum);
+
         JavaPairRDD <Edge, Iterable <Tuple2 <Integer, Integer>>> joinResult = eSup.join(extend)
                 .filter(kv -> kv._2._1 > kv._2._2._2)
                 .mapValues(v -> v._2)
                 .groupByKey();
-
     }
 
     private JavaPairRDD <Edge, Tuple2 <Integer, Integer>> extend(JavaPairRDD<Edge, int[]> tSet) {

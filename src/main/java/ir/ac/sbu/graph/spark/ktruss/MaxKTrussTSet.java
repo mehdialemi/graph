@@ -317,7 +317,7 @@ public class MaxKTrussTSet extends SparkApp {
         SparkAppConf conf = new SparkAppConf(new ArgumentReader(args)) {
             @Override
             protected String createAppName() {
-                return this.getClass().getSimpleName() + "-" + super.createAppName();
+                return "MaxKTrussTSet-" + super.createAppName();
             }
         };
         conf.init();

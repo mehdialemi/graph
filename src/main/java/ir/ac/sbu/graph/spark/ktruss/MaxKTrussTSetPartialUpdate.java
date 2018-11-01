@@ -371,7 +371,7 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
         SparkAppConf conf = new SparkAppConf(new ArgumentReader(args)) {
             @Override
             protected String createAppName() {
-                return this.getClass().getSimpleName() + "-" + super.createAppName();
+                return "MaxKTrussTSetPartialUpdate-" + super.createAppName();
             }
         };
         conf.init();
