@@ -235,7 +235,8 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
             }).groupByKey(partitionNum).cache();
 
             // Remove the invalid vertices from the triangle vertex set of each remaining (valid) edge.
-            tSet = tSet.fullOuterJoin(invUpdates)
+            tSet = tSet.filter(kv -> kv._2[0] == REMOVED)
+                    .fullOuterJoin(invUpdates)
                     .mapValues(values -> {
                         Optional <int[]> optionalTSet = values._1;
                         Optional <Iterable <Integer>> optionalInvUpdate = values._2;
