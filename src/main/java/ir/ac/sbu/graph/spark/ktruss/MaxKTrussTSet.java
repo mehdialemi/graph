@@ -221,8 +221,8 @@ public class MaxKTrussTSet extends SparkApp {
                         for (; i < set[1]; i++) {
                             if (set[i] == INVALID || iSet.contains(set[i]))
                                 continue;
-                            wLen ++;
                             set[offsetW + wLen] = set[i];
+                            wLen ++;
                         }
                         set[1] = offsetW + wLen; // exclusive index of w
 
@@ -231,8 +231,8 @@ public class MaxKTrussTSet extends SparkApp {
                         for (; i < set[2]; i++) {
                             if (set[i] == INVALID || iSet.contains(set[i]))
                                 continue;
-                            vLen ++;
                             set[offsetV + vLen] = set[i];
+                            vLen ++;
                         }
                         set[2] = offsetV + vLen; // exclusive index of v
 
@@ -241,10 +241,19 @@ public class MaxKTrussTSet extends SparkApp {
                         for (; i < set[3]; i++) {
                             if (set[i] == INVALID || iSet.contains(set[i]))
                                 continue;
-                            uLen ++;
                             set[offsetU + uLen] = set[i];
+                            uLen ++;
                         }
                         set[3] = offsetU + uLen; // exclusive index of u
+
+                        set[0] = wLen + vLen + uLen;
+
+                        float consumeRatio = (set[0] + META_LEN) / (float) set.length;
+                        if (consumeRatio < 0.5f) {
+                            int[] value = new int[META_LEN + set[0]];
+                            System.arraycopy(set, 0, value, 0, value.length);
+                            return value;
+                        }
 
                         return set;
                     }).filter(kv -> kv._2 != null)
