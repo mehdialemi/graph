@@ -240,7 +240,7 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                     .mapValues(values -> {
                         Optional <int[]> optionalTSet = values._1;
                         Optional <Iterable <Integer>> optionalInvUpdate = values._2;
-                        if (!optionalTSet.isPresent() || optionalTSet.get()[0] == OUTER_UPDATE) {
+                        if (!optionalTSet.isPresent()) {
                             IntList iList = new IntArrayList();
                             iList.add(OUTER_UPDATE);
                             if (optionalInvUpdate.isPresent()) {
@@ -248,15 +248,26 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                                     iList.add(v);
                                 }
                             }
-                            if (optionalTSet.isPresent()) {
-                                for (int i = 1; i < optionalTSet.get().length; i++) {
-                                    iList.add(optionalTSet.get()[i]);
-                                }
-                            }
+
                             return iList.toIntArray();
                         }
 
                         int[] set = optionalTSet.get();
+                        if (set[0] == OUTER_UPDATE) {
+                            if (!optionalInvUpdate.isPresent()) {
+                                return set;
+                            }
+                            IntList iList = new IntArrayList();
+                            iList.add(OUTER_UPDATE);
+                            for (int v : optionalInvUpdate.get()) {
+                                iList.add(v);
+                            }
+                            for (int v : set) {
+                                iList.add(v);
+                            }
+                            return set;
+                        }
+
                         if (set[0] < minSup) {
                             set[0] = REMOVED;
                             return set;
