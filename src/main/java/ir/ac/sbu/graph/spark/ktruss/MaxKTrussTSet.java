@@ -156,9 +156,9 @@ public class MaxKTrussTSet extends SparkApp {
                 break;
             }
             eTruss = eTruss.union(invalids.map(kv -> kv._1));
-
-            if (tSetQueue.size() > 1)
-                tSetQueue.remove().unpersist();
+//
+//            if (tSetQueue.size() > 1)
+//                tSetQueue.remove().unpersist();
 
             long t2 = System.currentTimeMillis();
             String msg = "iteration: " + iter + ", invalid edge count: " + invalidCount;
