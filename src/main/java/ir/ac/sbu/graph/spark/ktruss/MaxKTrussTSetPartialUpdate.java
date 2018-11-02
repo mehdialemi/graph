@@ -199,7 +199,7 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                 tSetQueue.remove().unpersist();
 
             long t2 = System.currentTimeMillis();
-            String msg = "iteration: " + (iter + 1) + ", invalid edge count: " + invalidCount;
+            String msg = "iteration: " + iter + ", invalid edge count: " + invalidCount;
             log(msg, t2 - t1);
 
             // The edges in the key part of invalids key-values should be removed. So, we detect other
@@ -258,6 +258,9 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                             return set;
 
                         if (set[0] == OUTER_UPDATE) {
+                            if (!optionalInvUpdate.isPresent())
+                                return set;
+
                             IntSet iSet = new IntOpenHashSet();
                             for (int v : optionalInvUpdate.get()) {
                                 iSet.add(v);

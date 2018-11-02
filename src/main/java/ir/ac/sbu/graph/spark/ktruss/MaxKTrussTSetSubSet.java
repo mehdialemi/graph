@@ -73,9 +73,8 @@ public class MaxKTrussTSetSubSet extends SparkApp {
         JavaPairRDD <Edge, int[]> freezedSubTSet = null;
 
         boolean checkNextSubset = true;
-        int cMinSup = 0;
-        int minSup = 2;
-        int maxSup = minSup;
+        int minSup = 0;
+        int maxSup = 1;
         while (true) {
             long t1 = System.currentTimeMillis();
             if (checkNextSubset) {
@@ -94,7 +93,13 @@ public class MaxKTrussTSetSubSet extends SparkApp {
                     maxSup ++;
                     final int max = maxSup;
                     subTSet = tSet.filter(kv -> kv._2[0] < max).cache();
-//                    minSup = subTSet.map(kv -> kv._2[0]).min(Comparator.comparingInt(a -> a));
+                    Map <Integer, Integer> map = tSet.mapToPair(kv -> new Tuple2 <>(kv._2[0], 1))
+                            .reduceByKey((a, b) -> a + b)
+                            .collectAsMap();
+                    OptionalInt minValue = map.entrySet().stream().mapToInt(kv -> kv.getKey()).min();
+                    if (minValue.isPresent()) {
+                        minSup = minValue.getAsInt() + 1;
+                    }
                     long subTSetCount = subTSet.count();
                     log("subTSetCount: " + subTSetCount);
                     if (subTSetCount > 0) {
@@ -105,11 +110,9 @@ public class MaxKTrussTSetSubSet extends SparkApp {
 
                 freezedSubTSet = subTSet;
                 freezedSubTSet.checkpoint();
-                cMinSup = minSup;
             }
 
-            final int min = cMinSup;
-            Tuple2 <JavaPairRDD <Edge, Integer>, JavaPairRDD <Edge, int[]>> result = generate(min, subTSet, partitionNum);
+            Tuple2 <JavaPairRDD <Edge, Integer>, JavaPairRDD <Edge, int[]>> result = generate(minSup, subTSet, partitionNum);
             JavaPairRDD <Edge, Integer> kTruss = result._1.repartition(partitionNum);
             truss = truss.fullOuterJoin(kTruss)
                     .mapValues(v -> Math.min(v._1.orElse(Integer.MAX_VALUE), v._2.orElse(Integer.MAX_VALUE)))
@@ -118,14 +121,9 @@ public class MaxKTrussTSetSubSet extends SparkApp {
             long kTrussCount = kTruss.count();
             long t2 = System.currentTimeMillis();
             log("kTrussCount: " + kTrussCount, t1, t2);
-            if (kTrussCount == 0 && cMinSup == minSup) {
-                minSup ++;
-                cMinSup ++;
-            } else {
-                cMinSup ++;
-            }
+            minSup ++;
 
-            if (cMinSup >= maxSup) {
+            if (minSup >= maxSup) {
                 checkNextSubset = true;
             }
         }
@@ -191,7 +189,7 @@ public class MaxKTrussTSetSubSet extends SparkApp {
             long tSetCount = tSet.count();
 
             long t2 = System.currentTimeMillis();
-            String msg = "iteration: " + (iter + 1) +
+            String msg = "iteration: " + iter +
                     ", invalid edge count: " + invalidCount +
                     ", tSetCount: " + tSetCount;
             log(msg, t2 - t1);
