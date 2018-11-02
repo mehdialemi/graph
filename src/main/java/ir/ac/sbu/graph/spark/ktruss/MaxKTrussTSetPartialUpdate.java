@@ -82,50 +82,33 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
             final int minSup = k - 2;
             final int maxSup = minSup + 5;
 
-            JavaPairRDD <Edge, int[]> subTSet = tSet.filter(kv -> kv._2[0] < maxSup).cache();
-            subTSet.checkpoint();
-            Tuple2 <JavaRDD <Edge>, JavaPairRDD <Edge, int[]>> result =
-                    generate(minSup, subTSet, partitionNum);
+            JavaRDD<Edge> kTruss = conf.getSc().parallelize(new ArrayList <>());
+            long kTrussCount = 0;
+            while (true) {
+                JavaPairRDD <Edge, int[]> subTSet = tSet.filter(kv -> kv._2[0] < maxSup).cache();
+                subTSet.checkpoint();
+                Tuple2 <JavaRDD <Edge>, JavaPairRDD <Edge, int[]>> result =
+                        generate(minSup, subTSet, partitionNum);
 
-            final int support = minSup - 1;
-            JavaRDD <Edge> kTruss = result._1;
-//            kTruss.checkpoint();
+                final int support = minSup - 1;
+                JavaRDD <Edge> cTruss = result._1;
+                long eCount = cTruss.count();
+                log("current cTruss count: " + eCount);
+                if (eCount == 0)
+                    break;
 
-            eTrussMap.put(support, kTruss);
+                kTrussCount += eCount;
+                kTruss = kTruss.union(cTruss);
 
-            JavaPairRDD <Edge, int[]> tSetUpdate = result._2
-                    .filter(kv -> kv._2[0] != REMOVED && kv._2[0] != 0)
-                    .repartition(partitionNum);
+                eTrussMap.put(support, kTruss);
 
-            tSet = tSet.filter(kv -> kv._2[0] >= minSup)
-                    .leftOuterJoin(tSetUpdate)
-                    .mapValues(v -> {
-                if (!v._2.isPresent())
-                    return v._1;
+                JavaPairRDD <Edge, int[]> tSetUpdate = result._2
+                        .filter(kv -> kv._2[0] == OUTER_UPDATE)
+                        .repartition(partitionNum);
 
-                int[] update = v._2.get();
-                if (update[0] != OUTER_UPDATE)
-                    return update;
-
-                IntSet iSet = new IntOpenHashSet();
-                for (int u : update) {
-                    iSet.add(u);
-                }
-
-                int[] set = v._1;
-                for (int i = META_LEN; i < set.length; i++) {
-                    if (set[i] == INVALID)
-                        continue;
-                    if (iSet.contains(set[i])) {
-                        set[0]--;
-                        set[i] = INVALID;
-                    }
-                }
-                return set;
-            }).cache();
-
+                tSet = updateTSet(tSet, minSup, maxSup, tSetUpdate);
+            }
             long t2 = System.currentTimeMillis();
-            long kTrussCount = kTruss.count();
             eTrussCount += kTrussCount;
             long tSetCount = tSet.count();
             long totalCount = tSetCount + eTrussCount;
@@ -138,6 +121,32 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
             k ++;
         }
         return eTrussMap;
+    }
+
+    private JavaPairRDD <Edge, int[]> updateTSet(JavaPairRDD <Edge, int[]> tSet, int minSup, int maxSup, JavaPairRDD <Edge, int[]> tSetUpdate) {
+        return tSet.filter(kv -> kv._2[0] >= minSup)
+                .leftOuterJoin(tSetUpdate)
+                .mapValues(v -> {
+            if (!v._2.isPresent() || v._1[0] < maxSup)
+                return v._1;
+
+            int[] update = v._2.get();
+            IntSet iSet = new IntOpenHashSet();
+            for (int u : update) {
+                iSet.add(u);
+            }
+
+            int[] set = v._1;
+            for (int i = META_LEN; i < set.length; i++) {
+                if (set[i] == INVALID)
+                    continue;
+                if (iSet.contains(set[i])) {
+                    set[0]--;
+                    set[i] = INVALID;
+                }
+            }
+            return set;
+        }).cache();
     }
 
     private  JavaPairRDD<Edge, int[]> invalidByKCore( JavaPairRDD<Edge, int[]> tSet, int kc) {
@@ -225,13 +234,12 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                 return out.iterator();
             }).groupByKey(partitionNum).cache();
 
-
             // Remove the invalid vertices from the triangle vertex set of each remaining (valid) edge.
             tSet = tSet.fullOuterJoin(invUpdates)
                     .mapValues(values -> {
                         Optional <int[]> optionalTSet = values._1;
                         Optional <Iterable <Integer>> optionalInvUpdate = values._2;
-                        if (!optionalTSet.isPresent() || (optionalTSet.isPresent() && optionalTSet.get()[0] == OUTER_UPDATE)) {
+                        if (!optionalTSet.isPresent() || optionalTSet.get()[0] == OUTER_UPDATE) {
                             IntList iList = new IntArrayList();
                             iList.add(OUTER_UPDATE);
                             if (optionalInvUpdate.isPresent()) {
@@ -248,16 +256,13 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                         }
 
                         int[] set = optionalTSet.get();
-                        if (set[0] == REMOVED)
-                            return set;
-
-                        if (set[0] < minSup) {
-                            set[0] = REMOVED;
+                        // If no invalid vertex is present for the current edge then return the set value.
+                        if (!optionalInvUpdate.isPresent() || set[0] == REMOVED) {
                             return set;
                         }
 
-                        // If no invalid vertex is present for the current edge then return the set value.
-                        if (!optionalInvUpdate.isPresent()) {
+                        if (set[0] < minSup) {
+                            set[0] = REMOVED;
                             return set;
                         }
 
@@ -279,8 +284,7 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                         }
 
                         return set;
-                    }).filter(kv -> kv._2 != null)
-                    .persist(StorageLevel.MEMORY_ONLY());
+                    }).persist(StorageLevel.MEMORY_ONLY());
             tSetQueue.add(tSet);
         }
 

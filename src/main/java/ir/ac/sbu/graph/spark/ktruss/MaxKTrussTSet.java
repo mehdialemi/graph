@@ -322,7 +322,6 @@ public class MaxKTrussTSet extends SparkApp {
         };
         conf.init();
 
-
         EdgeLoader edgeLoader = new EdgeLoader(conf);
         NeighborList neighborList = new NeighborList(edgeLoader);
 
