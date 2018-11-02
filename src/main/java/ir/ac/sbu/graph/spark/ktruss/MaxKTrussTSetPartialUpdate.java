@@ -92,13 +92,13 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
 
                 final int support = minSup - 1;
                 JavaRDD <Edge> cTruss = result._1;
-                long eCount = cTruss.count();
-                log("current cTruss count: " + eCount);
-                if (eCount == 0)
+                long cCount = cTruss.count();
+                log("cTruss count: " + cCount);
+                if (cCount == 0)
                     break;
 
-                kTrussCount += eCount;
-                kTruss = kTruss.union(cTruss);
+                kTrussCount += cCount;
+                kTruss = kTruss.union(cTruss).cache();
 
                 eTrussMap.put(support, kTruss);
 
