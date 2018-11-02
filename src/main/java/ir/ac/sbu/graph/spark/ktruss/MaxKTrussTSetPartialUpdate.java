@@ -83,7 +83,7 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
             JavaRDD <Edge> kTruss = conf.getSc().parallelize(new ArrayList <>());
             long kTrussCount = 0;
             while (true) {
-                JavaPairRDD <Edge, int[]> subTSet = tSet.filter(kv -> kv._2[0] < maxSup).cache();
+                JavaPairRDD <Edge, int[]> subTSet = tSet.filter(kv -> kv._2[0] <= maxSup).cache();
                 subTSet.checkpoint();
                 Tuple2 <JavaRDD <Edge>, JavaPairRDD <Edge, int[]>> result =
                         generate(minSup, subTSet, partitionNum);
@@ -101,10 +101,9 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                 eTrussMap.put(support, kTruss);
 
                 JavaPairRDD <Edge, int[]> tSetUpdate = result._2
-                        .filter(kv -> kv._2[0] == OUTER_UPDATE)
                         .repartition(partitionNum);
 
-                tSet = updateTSet(tSet, minSup, maxSup, tSetUpdate);
+                tSet = updateTSet(tSet, minSup, tSetUpdate);
             }
             kTruss.checkpoint();
             long t2 = System.currentTimeMillis();
@@ -122,17 +121,20 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
         return eTrussMap;
     }
 
-    private JavaPairRDD <Edge, int[]> updateTSet(JavaPairRDD <Edge, int[]> tSet, int minSup, int maxSup, JavaPairRDD <Edge, int[]> tSetUpdate) {
+    private JavaPairRDD <Edge, int[]> updateTSet(JavaPairRDD <Edge, int[]> tSet, int minSup, JavaPairRDD <Edge, int[]> tSetUpdate) {
         return tSet.filter(kv -> kv._2[0] >= minSup)
                 .leftOuterJoin(tSetUpdate)
                 .mapValues(v -> {
-                    if (!v._2.isPresent() || v._1[0] < maxSup)
+                    if (!v._2.isPresent())
                         return v._1;
 
-                    int[] update = v._2.get();
+                    int [] uValue = v._2.get();
+                    if (uValue[0] != OUTER_UPDATE)
+                        return uValue;
+
                     IntSet iSet = new IntOpenHashSet();
-                    for (int i = 1; i < update.length; i++) {
-                        iSet.add(update[i]);
+                    for (int i = 1; i < uValue.length; i++) {
+                        iSet.add(uValue[i]);
                     }
 
                     int[] set = v._1;
@@ -186,7 +188,9 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
 
                 log("check pointing tSet", t, System.currentTimeMillis());
             }
-            JavaPairRDD <Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] != OUTER_UPDATE && kv._2[0] < minSup).cache();
+            JavaPairRDD <Edge, int[]> invalids = tSet
+                    .filter(kv -> kv._2[0] >= 0 && kv._2[0] < minSup)
+                    .cache();
             long invalidCount = invalids.count();
 
             // If no invalid edge is found then the program terminates
