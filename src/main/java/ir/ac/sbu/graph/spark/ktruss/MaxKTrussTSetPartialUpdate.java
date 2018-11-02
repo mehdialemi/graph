@@ -91,7 +91,7 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                 final int support = minSup - 1;
                 JavaRDD <Edge> cTruss = result._1;
                 long cCount = cTruss.count();
-                log("cTruss count: " + cCount);
+                log("cCount: " + cCount);
                 if (cCount == 0)
                     break;
 
@@ -402,9 +402,12 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
         Map <Integer, JavaRDD <Edge>> eTrussMap = kTrussTSet.explore();
         log("KTruss edge count: " + eTrussMap.size(), t1, System.currentTimeMillis());
 
+        long sum = 0;
         for (Map.Entry <Integer, JavaRDD <Edge>> entry : eTrussMap.entrySet()) {
             log("K: " + entry.getKey() + ", Count: " + entry.getValue().count());
+            sum += entry.getValue().count();
         }
+        log("Truss edge count: " + sum);
         kTrussTSet.close();
     }
 }

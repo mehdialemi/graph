@@ -70,7 +70,6 @@ public class MaxKTrussTSetSubSet extends SparkApp {
         long count = tSet.count();
         log("edge count: " + count);
 
-        long eTrussCount = 0;
         JavaPairRDD <Edge, int[]> subTSet = null;
         JavaPairRDD <Edge, Integer> truss = conf.getSc().parallelizePairs(new ArrayList <>());
         truss = truss.repartition(partitionNum);
@@ -110,7 +109,6 @@ public class MaxKTrussTSetSubSet extends SparkApp {
                     .mapValues(v -> Math.min(v._1.orElse(Integer.MAX_VALUE), v._2.orElse(Integer.MAX_VALUE)))
                     .cache();
             subTSet = result._2.cache();
-            cMinSup ++;
 
             if (cMinSup >= maxSup) {
                 tSet = updateTSet(maxSup, tSet, freezeSubTSet).cache();
@@ -119,15 +117,17 @@ public class MaxKTrussTSetSubSet extends SparkApp {
                 if (tSetCount == 0)
                     break;
 
+                checkNextSubset = true;
                 tSet.checkpoint();
             }
 
             long t2 = System.currentTimeMillis();
             long kTrussCount = kTruss.count();
             long tSetCount = tSet.count();
-            log("minSup = " + minSup + ", kTrussCount: " + kTrussCount+
-                    ", eTrussCount: " + eTrussCount + ", tSetCount: " + tSetCount,
+            log("cMinSup = " + cMinSup + ", kTrussCount: " + kTrussCount+
+                    ", tSetCount: " + tSetCount,
                     t1, t2);
+            cMinSup ++;
 
         }
         return truss.mapToPair(kv -> new Tuple2 <>(kv._2, 1))
