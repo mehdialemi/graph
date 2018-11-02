@@ -186,7 +186,7 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
 
                 log("check pointing tSet", t, System.currentTimeMillis());
             }
-            JavaPairRDD <Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup && kv._2[0] >= 0).cache();
+            JavaPairRDD <Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] != OUTER_UPDATE && kv._2[0] < minSup).cache();
             long invalidCount = invalids.count();
 
             // If no invalid edge is found then the program terminates
@@ -235,7 +235,7 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
             }).groupByKey(partitionNum).cache();
 
             // Remove the invalid vertices from the triangle vertex set of each remaining (valid) edge.
-            tSet = tSet.filter(kv -> kv._2[0] != REMOVED)
+            tSet = tSet.filter(kv -> kv._2[0] == OUTER_UPDATE || kv._2[0] >= minSup)
                     .fullOuterJoin(invUpdates)
                     .mapValues(values -> {
                         Optional <int[]> optionalTSet = values._1;
@@ -271,11 +271,6 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                             value[0] = OUTER_UPDATE;
                             System.arraycopy(iSet.toIntArray(), 0, value, 1, iSet.size());
                             return value;
-                        }
-
-                        if (set[0] < minSup) {
-                            set[0] = REMOVED;
-                            return set;
                         }
                         // If no invalid vertex is present for the current edge then return the set value.
                         if (!optionalInvUpdate.isPresent()) {
