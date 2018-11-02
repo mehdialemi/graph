@@ -29,7 +29,6 @@ import static ir.ac.sbu.graph.utils.Log.log;
 public class MaxKTrussTSetPartialUpdate extends SparkApp {
     private static final int INVALID = -1;
     private static final int OUTER_UPDATE = -2;
-    private static final int REMOVED = -3;
     private static final int META_LEN = 4;
     private static final byte W_UVW = (byte) 0;
     private static final byte V_UVW = (byte) 1;
@@ -57,24 +56,16 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
         KCore kCore = new KCore(neighborList, kCoreConf);
 
         Triangle triangle = new Triangle(kCore);
-
         JavaPairRDD <Integer, int[]> fonl = triangle.getOrCreateFonl();
-
         JavaPairRDD <Integer, int[]> candidates = triangle.createCandidates(fonl);
-
         int partitionNum = fonl.getNumPartitions();
-
         JavaPairRDD <Edge, int[]> tSet = createTSet(fonl, candidates);
-
-        Map <Integer, JavaRDD <Edge>> eTrussMap = new HashMap <>();
-
-        int k = 4;
         long count = tSet.count();
-
         log("edge count: " + count);
 
+        Map <Integer, JavaRDD <Edge>> eTrussMap = new HashMap <>();
+        int k = 4;
         long eTrussCount = 0;
-//        tSet.checkpoint();
         while (true) {
             long t1 = System.currentTimeMillis();
             final int minSup = k - 2;
@@ -83,7 +74,7 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
             JavaRDD <Edge> kTruss = conf.getSc().parallelize(new ArrayList <>());
             long kTrussCount = 0;
             while (true) {
-                JavaPairRDD <Edge, int[]> subTSet = tSet.filter(kv -> kv._2[0] <= maxSup).cache();
+                JavaPairRDD <Edge, int[]> subTSet = tSet.filter(kv -> kv._2[0] < maxSup).cache();
                 subTSet.checkpoint();
                 Tuple2 <JavaRDD <Edge>, JavaPairRDD <Edge, int[]>> result =
                         generate(minSup, subTSet, partitionNum);
