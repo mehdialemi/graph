@@ -281,6 +281,9 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                             return value;
                         }
 
+                        if (!optionalInvUpdate.isPresent())
+                            return set;
+
                         IntSet iSet = new IntOpenHashSet();
                         for (int v : optionalInvUpdate.get()) {
                             iSet.add(v);

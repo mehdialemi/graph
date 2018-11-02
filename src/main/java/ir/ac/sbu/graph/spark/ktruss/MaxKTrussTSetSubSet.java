@@ -93,21 +93,16 @@ public class MaxKTrussTSetSubSet extends SparkApp {
                     maxSup ++;
                     final int max = maxSup;
                     subTSet = tSet.filter(kv -> kv._2[0] < max).cache();
-                    Map <Integer, Integer> map = tSet.mapToPair(kv -> new Tuple2 <>(kv._2[0], 1))
-                            .reduceByKey((a, b) -> a + b)
-                            .collectAsMap();
-                    OptionalInt minValue = map.entrySet().stream().mapToInt(kv -> kv.getKey()).min();
-                    if (minValue.isPresent()) {
-                        minSup = minValue.getAsInt() + 1;
-                    }
+                    minSup = tSet.filter(kv -> kv._2[0] > 0)
+                            .map(kv -> kv._2[0])
+                            .reduce((a, b) -> Math.min(a, b)) + 1;
                     long subTSetCount = subTSet.count();
                     log("subTSetCount: " + subTSetCount);
                     if (subTSetCount > 0) {
                         break;
                     }
-                    log("minSup: " + minSup + ", maxSup: " + maxSup);
                 }
-
+                log("minSup: " + minSup + ", maxSup: " + maxSup);
                 freezedSubTSet = subTSet;
                 freezedSubTSet.checkpoint();
             }
