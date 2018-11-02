@@ -37,15 +37,10 @@ public class MaxKTrussTSet extends SparkApp {
     private final NeighborList neighborList;
     private AtomicInteger iterations = new AtomicInteger(0);
     private final KCoreConf kCoreConf;
-    private final float consumptionRatio;
 
     public MaxKTrussTSet(NeighborList neighborList, SparkAppConf conf) throws URISyntaxException {
-        this(neighborList, conf, 0.5f);
-    }
-    public MaxKTrussTSet(NeighborList neighborList, SparkAppConf conf, float consumptionRatio) throws URISyntaxException {
         super(neighborList);
         this.neighborList = neighborList;
-        this.consumptionRatio = consumptionRatio;
         String master = conf.getSc().master();
         this.conf.getSc().setCheckpointDir("/tmp/checkpoint");
         kCoreConf = new KCoreConf(conf, 2, 1000);
@@ -57,7 +52,7 @@ public class MaxKTrussTSet extends SparkApp {
 
     }
 
-    public Map<Integer, JavaRDD<Edge>> explore() {
+    public Map<Integer, JavaRDD<Edge>> explore(float consumptionRatio) {
 
         KCore kCore = new KCore(neighborList, kCoreConf);
 
@@ -84,7 +79,7 @@ public class MaxKTrussTSet extends SparkApp {
             final int minSup = k - 2;
 
             Tuple2 <JavaRDD <Edge>, JavaPairRDD <Edge, int[]>> result =
-                    generate(minSup, tSet, partitionNum);
+                    generate(minSup, tSet, partitionNum, consumptionRatio);
 
             final int support = minSup - 1;
             JavaRDD <Edge> kTruss = result._1;
@@ -128,7 +123,7 @@ public class MaxKTrussTSet extends SparkApp {
     }
 
     public Tuple2<JavaRDD<Edge>, JavaPairRDD<Edge, int[]>> generate(
-            int minSup, JavaPairRDD<Edge, int[]> tSet, int partitionNum) {
+            int minSup, JavaPairRDD <Edge, int[]> tSet, int partitionNum, float consumptionRatio) {
 
         JavaRDD<Edge> eTruss = conf.getSc().parallelize(new ArrayList <>());
 
@@ -166,7 +161,7 @@ public class MaxKTrussTSet extends SparkApp {
                 tSetQueue.remove().unpersist();
 
             long t2 = System.currentTimeMillis();
-            String msg = "iteration: " + (iter + 1) + ", invalid edge count: " + invalidCount;
+            String msg = "iteration: " + iter + ", invalid edge count: " + invalidCount;
             log(msg, t2 - t1);
 
             // The edges in the key part of invalids key-values should be removed. So, we detect other
@@ -254,7 +249,7 @@ public class MaxKTrussTSet extends SparkApp {
                         set[0] = wLen + vLen + uLen;
 
                         float consumeRatio = (set[0] + META_LEN) / (float) set.length;
-                        if (consumeRatio < this.consumptionRatio) {
+                        if (consumeRatio < consumptionRatio) {
                             int[] value = new int[META_LEN + set[0]];
                             System.arraycopy(set, 0, value, 0, value.length);
                             return value;
@@ -364,7 +359,7 @@ public class MaxKTrussTSet extends SparkApp {
         NeighborList neighborList = new NeighborList(edgeLoader);
 
         MaxKTrussTSet kTrussTSet = new MaxKTrussTSet(neighborList, conf);
-        Map <Integer, JavaRDD <Edge>> eTrussMap = kTrussTSet.explore();
+        Map <Integer, JavaRDD <Edge>> eTrussMap = kTrussTSet.explore(consumptionRatio);
         log("KTruss edge count: " + eTrussMap.size(), t1, System.currentTimeMillis());
 
         for (Map.Entry <Integer, JavaRDD <Edge>> entry : eTrussMap.entrySet()) {
