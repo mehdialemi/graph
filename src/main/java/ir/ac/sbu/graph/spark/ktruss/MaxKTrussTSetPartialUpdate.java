@@ -257,13 +257,12 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                         }
 
                         int[] set = optionalTSet.get();
-                        // If no invalid vertex is present for the current edge then return the set value.
-                        if (!optionalInvUpdate.isPresent() || set[0] == REMOVED) {
-                            return set;
-                        }
-
                         if (set[0] < minSup) {
                             set[0] = REMOVED;
+                            return set;
+                        }
+                        // If no invalid vertex is present for the current edge then return the set value.
+                        if (!optionalInvUpdate.isPresent() || set[0] == REMOVED) {
                             return set;
                         }
 
