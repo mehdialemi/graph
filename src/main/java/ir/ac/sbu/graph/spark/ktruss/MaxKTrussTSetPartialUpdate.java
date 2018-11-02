@@ -95,7 +95,7 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                 JavaPairRDD <Edge, int[]> tSetUpdate = result._2
                         .repartition(partitionNum);
 
-                tSet = updateTSet(tSet, minSup, tSetUpdate);
+                tSet = updateTSet(tSet, tSetUpdate);
             }
             kTruss.checkpoint();
             long t2 = System.currentTimeMillis();
@@ -113,11 +113,16 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
         return eTrussMap;
     }
 
-    private JavaPairRDD <Edge, int[]> updateTSet(JavaPairRDD <Edge, int[]> tSet, int minSup, JavaPairRDD <Edge, int[]> tSetUpdate) {
-        return tSet.filter(kv -> kv._2[0] >= minSup)
+    private JavaPairRDD <Edge, int[]> updateTSet(JavaPairRDD <Edge, int[]> tSet, JavaPairRDD <Edge, int[]> tSetUpdate) {
+        return tSet
                 .leftOuterJoin(tSetUpdate)
                 .mapValues(v -> {
+                    int[] set = v._1;
+
                     if (!v._2.isPresent())
+                        return set;
+
+                    if (set[0] == REMOVED)
                         return v._1;
 
                     int [] uValue = v._2.get();
@@ -129,7 +134,6 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                         iSet.add(uValue[i]);
                     }
 
-                    int[] set = v._1;
                     for (int i = META_LEN; i < set.length; i++) {
                         if (set[i] == INVALID)
                             continue;
