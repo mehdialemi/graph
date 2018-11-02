@@ -80,6 +80,16 @@ public class MaxKTrussTSetSubSet extends SparkApp {
             long t1 = System.currentTimeMillis();
             if (checkNextSubset) {
                 checkNextSubset = false;
+
+                if (freezedSubTSet != null) {
+                    tSet = updateTSet(maxSup, tSet, freezedSubTSet, partitionNum).cache();
+                    long tSetCount = tSet.count();
+                    log("tSetCount: " + tSetCount);
+                    if (tSetCount == 0)
+                        break;
+                    tSet.checkpoint();
+                }
+
                 while (true) {
                     maxSup ++;
                     final int max = maxSup;
@@ -93,8 +103,8 @@ public class MaxKTrussTSetSubSet extends SparkApp {
                     log("minSup: " + minSup + ", maxSup: " + maxSup);
                 }
 
-                subTSet.checkpoint();
                 freezedSubTSet = subTSet;
+                freezedSubTSet.checkpoint();
                 cMinSup = minSup;
             }
 
@@ -117,12 +127,6 @@ public class MaxKTrussTSetSubSet extends SparkApp {
 
             if (cMinSup >= maxSup) {
                 checkNextSubset = true;
-                tSet = updateTSet(maxSup, tSet, freezedSubTSet, partitionNum).cache();
-                long tSetCount = tSet.count();
-                log("tSetCount: " + tSetCount);
-                if (tSetCount == 0)
-                    break;
-                tSet.checkpoint();
             }
         }
 

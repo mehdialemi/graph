@@ -29,6 +29,7 @@ import static ir.ac.sbu.graph.utils.Log.log;
 public class MaxKTrussTSetPartialUpdate extends SparkApp {
     private static final int INVALID = -1;
     private static final int OUTER_UPDATE = -2;
+    private static final int REMOVED = -3;
     private static final int META_LEN = 4;
     private static final byte W_UVW = (byte) 0;
     private static final byte V_UVW = (byte) 1;
@@ -230,12 +231,12 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
             }).groupByKey(partitionNum).cache();
 
             // Remove the invalid vertices from the triangle vertex set of each remaining (valid) edge.
-            tSet = tSet.filter(kv -> kv._2[0] == OUTER_UPDATE || kv._2[0] >= minSup)
+            tSet = tSet
                     .fullOuterJoin(invUpdates)
                     .mapValues(values -> {
                         Optional <int[]> optionalTSet = values._1;
                         Optional <Iterable <Integer>> optionalInvUpdate = values._2;
-                        if (!optionalTSet.isPresent()) {
+                        if (!optionalTSet.isPresent()) { // This says invUpdate is present
                             IntSet iSet = new IntOpenHashSet();
                             iSet.add(OUTER_UPDATE);
                             for (int v : optionalInvUpdate.get()) {
@@ -249,11 +250,10 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                         }
 
                         int[] set = optionalTSet.get();
-                        if (set[0] == OUTER_UPDATE) {
-                            if (!optionalInvUpdate.isPresent()) {
-                                return set;
-                            }
+                        if (set[0] == REMOVED)
+                            return set;
 
+                        if (set[0] == OUTER_UPDATE) {
                             IntSet iSet = new IntOpenHashSet();
                             for (int v : optionalInvUpdate.get()) {
                                 iSet.add(v);
@@ -267,9 +267,11 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                             System.arraycopy(iSet.toIntArray(), 0, value, 1, iSet.size());
                             return value;
                         }
-                        // If no invalid vertex is present for the current edge then return the set value.
-                        if (!optionalInvUpdate.isPresent()) {
-                            return set;
+
+                        if (set[0] < minSup) {
+                            int[] value = new int[1];
+                            value[0] = REMOVED;
+                            return value;
                         }
 
                         IntSet iSet = new IntOpenHashSet();
@@ -287,6 +289,12 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                                 set[0]--;
                                 set[i] = INVALID;
                             }
+                        }
+
+                        if (set[0] == 0) {
+                            int[] value = new int[1];
+                            value[0] = REMOVED;
+                            return value;
                         }
 
                         return set;
