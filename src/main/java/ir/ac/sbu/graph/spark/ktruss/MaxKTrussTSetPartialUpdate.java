@@ -158,6 +158,7 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
             List <Tuple2 <Edge, Integer>> edges = new ArrayList <>();
             for (int v : kv._2) {
                 edges.add(new Tuple2 <>(new Edge(kv._1, v), 1));
+                edges.add(new Tuple2 <>(new Edge(v, kv._1), 1));
             }
             return edges.iterator();
         }).repartition(kCoreConf.getPartitionNum());
@@ -245,7 +246,10 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                                 iSet.add(v);
                             }
 
-                            return iSet.toIntArray();
+                            int[] value = new int[iSet.size() + 1];
+                            value[0] = OUTER_UPDATE;
+                            System.arraycopy(iSet.toIntArray(), 0, value, 1, iSet.size());
+                            return value;
                         }
 
                         int[] set = optionalTSet.get();
@@ -255,7 +259,6 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                             }
 
                             IntSet iSet = new IntOpenHashSet();
-                            iSet.add(OUTER_UPDATE);
                             for (int v : optionalInvUpdate.get()) {
                                 iSet.add(v);
                             }
@@ -263,7 +266,10 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                                 iSet.add(v);
                             }
 
-                            return iSet.toIntArray();
+                            int[] value = new int[iSet.size() + 1];
+                            value[0] = OUTER_UPDATE;
+                            System.arraycopy(iSet.toIntArray(), 0, value, 1, iSet.size());
+                            return value;
                         }
 
                         if (set[0] < minSup) {
