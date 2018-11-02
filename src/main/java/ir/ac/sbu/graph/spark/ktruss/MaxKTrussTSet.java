@@ -37,10 +37,15 @@ public class MaxKTrussTSet extends SparkApp {
     private final NeighborList neighborList;
     private AtomicInteger iterations = new AtomicInteger(0);
     private final KCoreConf kCoreConf;
+    private final float consumptionRatio;
 
     public MaxKTrussTSet(NeighborList neighborList, SparkAppConf conf) throws URISyntaxException {
+        this(neighborList, conf, 0.5f);
+    }
+    public MaxKTrussTSet(NeighborList neighborList, SparkAppConf conf, float consumptionRatio) throws URISyntaxException {
         super(neighborList);
         this.neighborList = neighborList;
+        this.consumptionRatio = consumptionRatio;
         String master = conf.getSc().master();
         this.conf.getSc().setCheckpointDir("/tmp/checkpoint");
         kCoreConf = new KCoreConf(conf, 2, 1000);
@@ -249,7 +254,7 @@ public class MaxKTrussTSet extends SparkApp {
                         set[0] = wLen + vLen + uLen;
 
                         float consumeRatio = (set[0] + META_LEN) / (float) set.length;
-                        if (consumeRatio < 0.5f) {
+                        if (consumeRatio < this.consumptionRatio) {
                             int[] value = new int[META_LEN + set[0]];
                             System.arraycopy(set, 0, value, 0, value.length);
                             return value;
@@ -345,13 +350,15 @@ public class MaxKTrussTSet extends SparkApp {
     public static void main(String[] args) throws URISyntaxException {
         long t1 = System.currentTimeMillis();
 
-        SparkAppConf conf = new SparkAppConf(new ArgumentReader(args)) {
+        ArgumentReader argumentReader = new ArgumentReader(args);
+        SparkAppConf conf = new SparkAppConf(argumentReader) {
             @Override
             protected String createAppName() {
                 return "MaxKTrussTSet-" + super.createAppName();
             }
         };
         conf.init();
+        float consumptionRatio = argumentReader.nextInt(50) / 100f;
 
         EdgeLoader edgeLoader = new EdgeLoader(conf);
         NeighborList neighborList = new NeighborList(edgeLoader);
