@@ -6,8 +6,6 @@ import ir.ac.sbu.graph.spark.kcore.KCoreConf;
 import ir.ac.sbu.graph.spark.triangle.Triangle;
 import ir.ac.sbu.graph.types.Edge;
 import ir.ac.sbu.graph.types.VertexByte;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -241,15 +239,13 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                         Optional <int[]> optionalTSet = values._1;
                         Optional <Iterable <Integer>> optionalInvUpdate = values._2;
                         if (!optionalTSet.isPresent()) {
-                            IntList iList = new IntArrayList();
-                            iList.add(OUTER_UPDATE);
-                            if (optionalInvUpdate.isPresent()) {
-                                for (int v : optionalInvUpdate.get()) {
-                                    iList.add(v);
-                                }
+                            IntSet iSet = new IntOpenHashSet();
+                            iSet.add(OUTER_UPDATE);
+                            for (int v : optionalInvUpdate.get()) {
+                                iSet.add(v);
                             }
 
-                            return iList.toIntArray();
+                            return iSet.toIntArray();
                         }
 
                         int[] set = optionalTSet.get();
@@ -257,15 +253,17 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                             if (!optionalInvUpdate.isPresent()) {
                                 return set;
                             }
-                            IntList iList = new IntArrayList();
-                            iList.add(OUTER_UPDATE);
+
+                            IntSet iSet = new IntOpenHashSet();
+                            iSet.add(OUTER_UPDATE);
                             for (int v : optionalInvUpdate.get()) {
-                                iList.add(v);
+                                iSet.add(v);
                             }
                             for (int v : set) {
-                                iList.add(v);
+                                iSet.add(v);
                             }
-                            return set;
+
+                            return iSet.toIntArray();
                         }
 
                         if (set[0] < minSup) {
@@ -273,7 +271,7 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                             return set;
                         }
                         // If no invalid vertex is present for the current edge then return the set value.
-                        if (!optionalInvUpdate.isPresent() || set[0] == REMOVED) {
+                        if (!optionalInvUpdate.isPresent()) {
                             return set;
                         }
 
