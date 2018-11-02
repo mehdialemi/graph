@@ -36,7 +36,6 @@ public class MaxKTrussTSetSubSet extends SparkApp {
     private final NeighborList neighborList;
     private AtomicInteger iterations = new AtomicInteger(0);
     private final KCoreConf kCoreConf;
-    private int partitionNum;
 
     public MaxKTrussTSetSubSet(NeighborList neighborList, SparkAppConf conf) throws URISyntaxException {
         super(neighborList);
@@ -62,7 +61,7 @@ public class MaxKTrussTSetSubSet extends SparkApp {
 
         JavaPairRDD<Integer, int[]> candidates = triangle.createCandidates(fonl);
 
-        this.partitionNum = fonl.getNumPartitions();
+        int partitionNum = fonl.getNumPartitions();
 
         JavaPairRDD<Edge, int[]> tSet = createTSet(fonl, candidates);
 
@@ -71,7 +70,6 @@ public class MaxKTrussTSetSubSet extends SparkApp {
 
         JavaPairRDD <Edge, int[]> subTSet = null;
         JavaPairRDD <Edge, Integer> truss = conf.getSc().parallelizePairs(new ArrayList <>());
-        truss = truss.repartition(partitionNum);
         JavaPairRDD <Edge, int[]> freezedSubTSet = null;
 
         boolean checkNextSubset = true;
@@ -86,7 +84,7 @@ public class MaxKTrussTSetSubSet extends SparkApp {
                     maxSup ++;
                     final int max = maxSup;
                     subTSet = tSet.filter(kv -> kv._2[0] < max).cache();
-                    minSup = subTSet.map(kv -> kv._2[0]).min(Comparator.comparingInt(a -> a));
+//                    minSup = subTSet.map(kv -> kv._2[0]).min(Comparator.comparingInt(a -> a));
                     long subTSetCount = subTSet.count();
                     log("subTSetCount: " + subTSetCount);
                     if (subTSetCount > 0) {
@@ -100,7 +98,8 @@ public class MaxKTrussTSetSubSet extends SparkApp {
                 cMinSup = minSup;
             }
 
-            Tuple2 <JavaPairRDD <Edge, Integer>, JavaPairRDD <Edge, int[]>> result = generate(cMinSup, subTSet);
+            final int min = cMinSup;
+            Tuple2 <JavaPairRDD <Edge, Integer>, JavaPairRDD <Edge, int[]>> result = generate(min, subTSet, partitionNum);
             JavaPairRDD <Edge, Integer> kTruss = result._1.repartition(partitionNum);
             truss = truss.fullOuterJoin(kTruss)
                     .mapValues(v -> Math.min(v._1.orElse(Integer.MAX_VALUE), v._2.orElse(Integer.MAX_VALUE)))
@@ -111,13 +110,14 @@ public class MaxKTrussTSetSubSet extends SparkApp {
             log("kTrussCount: " + kTrussCount, t1, t2);
             if (kTrussCount == 0 && cMinSup == minSup) {
                 minSup ++;
+                cMinSup ++;
             } else {
                 cMinSup ++;
             }
 
             if (cMinSup >= maxSup) {
                 checkNextSubset = true;
-                tSet = updateTSet(maxSup, tSet, freezedSubTSet).cache();
+                tSet = updateTSet(maxSup, tSet, freezedSubTSet, partitionNum).cache();
                 long tSetCount = tSet.count();
                 log("tSetCount: " + tSetCount);
                 if (tSetCount == 0)
@@ -149,7 +149,7 @@ public class MaxKTrussTSetSubSet extends SparkApp {
     }
 
     public Tuple2<JavaPairRDD<Edge, Integer>, JavaPairRDD <Edge, int[]>> generate(
-            int minSup, JavaPairRDD<Edge, int[]> tSet) {
+            int minSup, JavaPairRDD <Edge, int[]> tSet, int partitionNum) {
 
         JavaPairRDD<Edge, Integer> eTruss = conf.getSc().parallelizePairs(new ArrayList <>());
         Queue<JavaPairRDD<Edge, int[]>> tSetQueue = new LinkedList<>();
@@ -182,7 +182,7 @@ public class MaxKTrussTSetSubSet extends SparkApp {
                 tSetQueue.remove().unpersist();
 
             // Remove the invalid vertices from the triangle vertex set of each remaining (valid) edge.
-            tSet = updateTSet(minSup, tSet, invalids);
+            tSet = updateTSet(minSup, tSet, invalids, partitionNum);
             tSetQueue.add(tSet);
             long tSetCount = tSet.count();
 
@@ -197,7 +197,8 @@ public class MaxKTrussTSetSubSet extends SparkApp {
         return new Tuple2 <>(eTruss, tSet);
     }
 
-    private JavaPairRDD<Edge, int[]> updateTSet(final int minSup, JavaPairRDD<Edge, int[]> tSet, JavaPairRDD<Edge, int[]> invalids) {
+    private JavaPairRDD<Edge, int[]> updateTSet(final int minSup, JavaPairRDD<Edge, int[]> tSet,
+                                                JavaPairRDD<Edge, int[]> invalids, int partitionNum) {
         // The edges in the key part of invalids key-values should be removed. So, we detect other
         // edges of their involved triangle from their triangle vertex set. Here, we determine the
         // vertices which should be removed from the triangle vertex set related to the other edges.
