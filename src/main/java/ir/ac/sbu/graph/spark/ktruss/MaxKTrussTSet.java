@@ -52,7 +52,7 @@ public class MaxKTrussTSet extends SparkApp {
 
     }
 
-    public Map<Integer, JavaRDD<Edge>> explore(float consumptionRatio) {
+    public Map<Integer, JavaRDD<Edge>> explore(float consumptionRatio, int minPartitions) {
 
         KCore kCore = new KCore(neighborList, kCoreConf);
 
@@ -62,7 +62,7 @@ public class MaxKTrussTSet extends SparkApp {
 
         JavaPairRDD<Integer, int[]> candidates = triangle.createCandidates(fonl);
 
-        int partitionNum = fonl.getNumPartitions();
+        int partitionNum = Math.max(minPartitions, fonl.getNumPartitions());
 
         JavaPairRDD<Edge, int[]> tSet = createTSet(fonl, candidates);
 
@@ -354,12 +354,13 @@ public class MaxKTrussTSet extends SparkApp {
         };
         conf.init();
         float consumptionRatio = argumentReader.nextInt(50) / 100f;
+        int minPartitions = argumentReader.nextInt(10);
 
         EdgeLoader edgeLoader = new EdgeLoader(conf);
         NeighborList neighborList = new NeighborList(edgeLoader);
 
         MaxKTrussTSet kTrussTSet = new MaxKTrussTSet(neighborList, conf);
-        Map <Integer, JavaRDD <Edge>> eTrussMap = kTrussTSet.explore(consumptionRatio);
+        Map <Integer, JavaRDD <Edge>> eTrussMap = kTrussTSet.explore(consumptionRatio, minPartitions);
         log("KTruss edge count: " + eTrussMap.size(), t1, System.currentTimeMillis());
 
         for (Map.Entry <Integer, JavaRDD <Edge>> entry : eTrussMap.entrySet()) {
