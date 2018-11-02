@@ -108,6 +108,7 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
 
                 tSet = updateTSet(tSet, minSup, maxSup, tSetUpdate);
             }
+            kTruss.checkpoint();
             long t2 = System.currentTimeMillis();
             eTrussCount += kTrussCount;
             long tSetCount = tSet.count();
