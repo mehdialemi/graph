@@ -76,11 +76,10 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
             long kTrussCount = 0;
             while (true) {
                 JavaPairRDD <Edge, int[]> subTSet = tSet.filter(kv -> kv._2[0] < maxSup).cache();
-                subTSet.checkpoint();
-                Tuple2 <JavaRDD <Edge>, JavaPairRDD <Edge, int[]>> result =
-                        generate(minSup, subTSet, partitionNum);
 
-                final int support = minSup - 1;
+                Tuple2 <JavaRDD <Edge>, JavaPairRDD <Edge, int[]>> result = generate(minSup, subTSet, partitionNum);
+
+                final int maxK = minSup - 1;
                 JavaRDD <Edge> cTruss = result._1;
                 long cCount = cTruss.count();
                 log("cCount: " + cCount);
@@ -90,23 +89,22 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                 kTrussCount += cCount;
                 kTruss = kTruss.union(cTruss).cache();
 
-                eTrussMap.put(support, kTruss);
+                eTrussMap.put(maxK, kTruss);
 
-                JavaPairRDD <Edge, int[]> tSetUpdate = result._2
-                        .repartition(partitionNum);
+                JavaPairRDD <Edge, int[]> tSetUpdate = result._2;
 
                 tSet = updateTSet(tSet, tSetUpdate);
             }
             kTruss.checkpoint();
             long t2 = System.currentTimeMillis();
             eTrussCount += kTrussCount;
-            long tSetCount = tSet.count();
-            long totalCount = tSetCount + eTrussCount;
+            long toProcessCount = tSet.filter(kv -> kv._2[0] != REMOVED).count();
+            long totalCount = toProcessCount + eTrussCount;
             log("minSup = " + minSup + ", kTrussCount: " + kTrussCount +
-                            ", eTrussCount: " + eTrussCount + ", tSetCount: " + tSetCount + ", total count: " + totalCount,
+                            ", eTrussCount: " + eTrussCount + ", toProcessCount: " + toProcessCount + ", total count: " + totalCount,
                     t1, t2);
 
-            if (tSetCount == 0)
+            if (toProcessCount == 0)
                 break;
             k++;
         }
