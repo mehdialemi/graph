@@ -121,7 +121,7 @@ public class MaxKTrussTSetPartialUpdate extends SparkApp {
                         return set;
 
                     if (set[0] == REMOVED)
-                        return v._1;
+                        return set;
 
                     int [] uValue = v._2.get();
                     if (uValue[0] != OUTER_UPDATE)
