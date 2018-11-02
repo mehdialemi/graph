@@ -215,14 +215,36 @@ public class MaxKTrussTSet extends SparkApp {
                         if (iSet.size() == 0)
                             return set;
 
-                        for (int i = META_LEN; i < set.length; i++) {
-                            if (set[i] == INVALID)
+                        int i = META_LEN;
+                        int offsetW = META_LEN;
+                        int wLen = 0;
+                        for (; i < set[1]; i++) {
+                            if (set[i] == INVALID || iSet.contains(set[i]))
                                 continue;
-                            if (iSet.contains(set[i])) {
-                                set[0]--;
-                                set[i] = INVALID;
-                            }
+                            wLen ++;
+                            set[offsetW + wLen] = set[i];
                         }
+                        set[1] = offsetW + wLen; // exclusive index of w
+
+                        int offsetV = set[1];
+                        int vLen = 0;
+                        for (; i < set[2]; i++) {
+                            if (set[i] == INVALID || iSet.contains(set[i]))
+                                continue;
+                            vLen ++;
+                            set[offsetV + vLen] = set[i];
+                        }
+                        set[2] = offsetV + vLen; // exclusive index of v
+
+                        int offsetU = set[2];
+                        int uLen = 0;
+                        for (; i < set[3]; i++) {
+                            if (set[i] == INVALID || iSet.contains(set[i]))
+                                continue;
+                            uLen ++;
+                            set[offsetU + uLen] = set[i];
+                        }
+                        set[3] = offsetU + uLen; // exclusive index of u
 
                         return set;
                     }).filter(kv -> kv._2 != null)
