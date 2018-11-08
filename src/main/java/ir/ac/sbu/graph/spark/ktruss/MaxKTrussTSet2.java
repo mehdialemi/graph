@@ -69,6 +69,9 @@ public class MaxKTrussTSet2 extends SparkApp {
 
         int k = 4;
         long totalInvalids = 0;
+        JavaPairRDD<Edge, Integer> maxTruss = conf.getSc().parallelizePairs(new ArrayList <>());
+        maxTruss = maxTruss.repartition(partitionNum);
+
         while (totalInvalids < count) {
             long t1 = System.currentTimeMillis();
             final int minSup = k - 2;
@@ -89,7 +92,8 @@ public class MaxKTrussTSet2 extends SparkApp {
                     log("check pointing tSet", t, System.currentTimeMillis());
                 }
 
-                JavaPairRDD <Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup && kv._2[0] >= 0).cache();
+                JavaPairRDD <Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup).cache();
+                maxTruss = maxTruss.union(invalids.mapValues(v -> minSup)).cache();
                 long invalidCount = invalids.count();
 
                 // If no invalid edge is found then the program terminates
@@ -140,23 +144,10 @@ public class MaxKTrussTSet2 extends SparkApp {
                 }).groupByKey(partitionNum).cache();
 
                 // Remove the invalid vertices from the triangle vertex set of each remaining (valid) edge.
-                tSet = tSet.leftOuterJoin(invUpdates)
+                tSet = tSet.filter(kv -> kv._2[0] >= minSup).leftOuterJoin(invUpdates)
                         .mapValues(values -> {
                             Optional <Iterable <Integer>> invalidUpdate = values._2;
                             int[] set = values._1;
-
-                            if(set[0] < 0)
-                                return set;
-
-                            if (set[0] == 0) {
-                                set = new int[] {-minSup + 1};
-                                return set;
-                            }
-
-                            if (set[0] < minSup) {
-                                set = new int[] { -minSup };
-                                return set;
-                            }
 
                             // If no invalid vertex is present for the current edge then return the set value.
                             if (!invalidUpdate.isPresent()) {
