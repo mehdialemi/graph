@@ -53,7 +53,7 @@ public class SparkAppConf {
         sparkConf.setAppName(appName);
         sparkConf.set("spark.driver.memory", "10g");
         sparkConf.set("spark.driver.maxResultSize", "9g");
-        sparkConf.set("spark.kryoserializer.buffer.max", "256m");
+//        sparkConf.set("spark.kryoserializer.buffer.max", "256m");
         sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
         sparkConf.registerKryoClasses(new Class[] {int[].class, VertexDeg.class, PartitionInfoAccumulator.class,
                 Edge.class, VertexByte.class});
