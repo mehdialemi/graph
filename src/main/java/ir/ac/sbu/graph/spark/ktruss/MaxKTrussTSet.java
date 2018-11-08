@@ -91,10 +91,9 @@ public class MaxKTrussTSet extends SparkApp {
             long t2 = System.currentTimeMillis();
             long kTrussCount = kTruss.count();
             eTrussCount += kTrussCount;
-            long tSetCount = tSet.count();
-            long totalCount = tSetCount + eTrussCount;
-            log("minSup = " + minSup + ", kTrussCount: " + kTrussCount+
-                    ", eTrussCount: " + eTrussCount + ", tSetCount: " + tSetCount + ", total count: " + totalCount,
+//            long tSetCount = tSet.count();
+//            long totalCount = tSetCount + eTrussCount;
+            log("minSup = " + minSup + ", kTrussCount: " + kTrussCount+ ", eTrussCount: " + eTrussCount,
                     t1, t2);
 
             if (eTrussCount == count)
