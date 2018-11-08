@@ -74,8 +74,8 @@ public class MaxKTrussTSet2 extends SparkApp {
             final int minSup = k - 2;
             long minSupInvalids = 0;
 
-            Queue <JavaPairRDD <Edge, int[]>> tSetQueue = new LinkedList <>();
-            tSetQueue.add(tSet);
+//            Queue <JavaPairRDD <Edge, int[]>> tSetQueue = new LinkedList <>();
+//            tSetQueue.add(tSet);
 
             int iter = 0;
             while (true) {
@@ -100,8 +100,8 @@ public class MaxKTrussTSet2 extends SparkApp {
                 totalInvalids += invalidCount;
                 minSupInvalids += invalidCount;
 
-                if (tSetQueue.size() > 1)
-                    tSetQueue.remove().unpersist();
+//                if (tSetQueue.size() > 1)
+//                    tSetQueue.remove().unpersist();
 
                 long t2Iter = System.currentTimeMillis();
                 String msg = "iteration: " + iter + ", invalid edge count: " + invalidCount;
@@ -181,9 +181,8 @@ public class MaxKTrussTSet2 extends SparkApp {
                             }
 
                             return set;
-                        }).filter(kv -> kv._2 != null)
-                        .persist(StorageLevel.MEMORY_ONLY());
-                tSetQueue.add(tSet);
+                        }).persist(StorageLevel.MEMORY_ONLY());
+//                tSetQueue.add(tSet);
             }
 
             long t2 = System.currentTimeMillis();
