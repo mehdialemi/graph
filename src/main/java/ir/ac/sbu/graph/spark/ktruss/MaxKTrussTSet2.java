@@ -79,6 +79,7 @@ public class MaxKTrussTSet2 extends SparkApp {
             long minSupInvalids = 0;
 
             int iter = 0;
+            JavaRDD <Edge> edges = conf.getSc().parallelize(new ArrayList <>());
             while (true) {
                 iter++;
                 long t1Iter = System.currentTimeMillis();
@@ -99,11 +100,6 @@ public class MaxKTrussTSet2 extends SparkApp {
                     break;
                 }
 
-                JavaRDD <Edge> edges = maxTruss.get(maxSupport);
-                if (edges == null) {
-                    edges = conf.getSc().parallelize(new ArrayList <>());
-                    maxTruss.put(maxSupport, edges);
-                }
                 edges = edges.union(invalidEdges);
 
                 totalInvalids += invalidCount;
@@ -201,8 +197,9 @@ public class MaxKTrussTSet2 extends SparkApp {
                             System.arraycopy(set, 0, value, 0, value.length);
                             return value;
                         }).persist(StorageLevel.MEMORY_ONLY());
-//                tSetQueue.add(tSet);
             }
+
+            maxTruss.put(maxSupport, edges);
 
             long t2 = System.currentTimeMillis();
             log("Support: " + maxSupport + ", MinSupInvalids: " + minSupInvalids +
