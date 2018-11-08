@@ -306,6 +306,7 @@ public class MaxKTrussTSet2 extends SparkApp {
 
         MaxKTrussTSet2 kTrussTSet = new MaxKTrussTSet2(neighborList, conf);
         JavaPairRDD <Edge, Integer> maxTruss = kTrussTSet.explore();
+        long t2 = System.currentTimeMillis();
         Map <Integer, Long> kCounts = maxTruss.map(kv -> kv._2).countByValue();
 
         int edgeCount = 0;
@@ -315,7 +316,7 @@ public class MaxKTrussTSet2 extends SparkApp {
             edgeCount += entry.getValue();
         }
 
-        log("KTruss edge count: " + edgeCount, t1, System.currentTimeMillis());
+        log("KTruss edge count: " + edgeCount, t1, t2);
 
         kTrussTSet.close();
     }
