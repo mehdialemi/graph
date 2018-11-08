@@ -142,7 +142,7 @@ public class MaxKTrussTSet extends SparkApp {
                 log("check pointing tSet", t, System.currentTimeMillis());
             }
             JavaPairRDD<Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup).cache();
-            JavaRDD <Edge> edges = invalids.keys().cache();
+            JavaRDD <Edge> edges = invalids.keys().persist(StorageLevel.DISK_ONLY());
             long invalidCount = edges.count();
 
             // If no invalid edge is found then the program terminates
