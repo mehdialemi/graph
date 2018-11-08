@@ -182,7 +182,7 @@ public class MaxKTrussTSet2 extends SparkApp {
             k++;
         }
 
-        return tSet.mapValues(value -> -value[0]);
+        return maxTruss;
     }
 
     private JavaPairRDD <Edge, int[]> createTSet(JavaPairRDD <Integer, int[]> fonl,
