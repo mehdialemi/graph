@@ -91,7 +91,8 @@ public class MaxKTrussTSet2 extends SparkApp {
                 }
 
                 JavaPairRDD <Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup).cache();
-                long invalidCount = invalids.count();
+                JavaRDD <Edge> invalidEdges = invalids.keys().cache();
+                long invalidCount = invalidEdges.count();
 
                 // If no invalid edge is found then the program terminates
                 if (invalidCount == 0) {
@@ -103,7 +104,7 @@ public class MaxKTrussTSet2 extends SparkApp {
                     edges = conf.getSc().parallelize(new ArrayList <>());
                     maxTruss.put(maxSupport, edges);
                 }
-                edges.union(invalids.keys().cache());
+                edges = edges.union(invalidEdges);
 
                 totalInvalids += invalidCount;
                 minSupInvalids += invalidCount;
