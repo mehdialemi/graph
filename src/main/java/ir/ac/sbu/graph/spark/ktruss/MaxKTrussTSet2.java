@@ -9,6 +9,7 @@ import ir.ac.sbu.graph.types.VertexByte;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.Optional;
 import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
@@ -51,7 +52,7 @@ public class MaxKTrussTSet2 extends SparkApp {
 
     }
 
-    public JavaPairRDD <Edge, Integer> explore() {
+    public Map <Integer, JavaRDD <Edge>> explore() {
 
         KCore kCore = new KCore(neighborList, kCoreConf);
 
@@ -69,16 +70,13 @@ public class MaxKTrussTSet2 extends SparkApp {
 
         int k = 4;
         long totalInvalids = 0;
-        JavaPairRDD <Edge, Integer> maxTruss = conf.getSc().parallelizePairs(new ArrayList <>());
-        maxTruss = maxTruss.repartition(partitionNum);
+        Map<Integer, JavaRDD<Edge>> maxTruss = new HashMap <>();
 
         while (totalInvalids < count) {
             long t1 = System.currentTimeMillis();
             final int minSup = k - 2;
+            final int maxSupport = minSup - 1;
             long minSupInvalids = 0;
-
-//            Queue <JavaPairRDD <Edge, int[]>> tSetQueue = new LinkedList <>();
-//            tSetQueue.add(tSet);
 
             int iter = 0;
             while (true) {
@@ -93,7 +91,6 @@ public class MaxKTrussTSet2 extends SparkApp {
                 }
 
                 JavaPairRDD <Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup).cache();
-                maxTruss = maxTruss.union(invalids.mapValues(v -> minSup).cache());
                 long invalidCount = invalids.count();
 
                 // If no invalid edge is found then the program terminates
@@ -101,11 +98,15 @@ public class MaxKTrussTSet2 extends SparkApp {
                     break;
                 }
 
+                JavaRDD <Edge> edges = maxTruss.get(maxSupport);
+                if (edges == null) {
+                    edges = conf.getSc().parallelize(new ArrayList <>());
+                    maxTruss.put(maxSupport, edges);
+                }
+                edges.union(invalids.keys().cache());
+
                 totalInvalids += invalidCount;
                 minSupInvalids += invalidCount;
-
-//                if (tSetQueue.size() > 1)
-//                    tSetQueue.remove().unpersist();
 
                 long t2Iter = System.currentTimeMillis();
                 String msg = "iteration: " + iter + ", invalid edge count: " + invalidCount;
@@ -305,18 +306,12 @@ public class MaxKTrussTSet2 extends SparkApp {
         NeighborList neighborList = new NeighborList(edgeLoader);
 
         MaxKTrussTSet2 kTrussTSet = new MaxKTrussTSet2(neighborList, conf);
-        JavaPairRDD <Edge, Integer> maxTruss = kTrussTSet.explore();
-        long t2 = System.currentTimeMillis();
-        Map <Integer, Long> kCounts = maxTruss.map(kv -> kv._2).countByValue();
+        Map <Integer, JavaRDD <Edge>> eTrussMap = kTrussTSet.explore();
+        log("KTruss edge count: " + eTrussMap.size(), t1, System.currentTimeMillis());
 
-        int edgeCount = 0;
-        SortedMap <Integer, Long> sortedMap = new TreeMap <>(kCounts);
-        for (Map.Entry <Integer, Long> entry : sortedMap.entrySet()) {
-            log("K: " + entry.getKey() + ", Count: " + entry.getValue());
-            edgeCount += entry.getValue();
+        for (Map.Entry <Integer, JavaRDD <Edge>> entry : eTrussMap.entrySet()) {
+            log("K: " + entry.getKey() + ", Count: " + entry.getValue().count());
         }
-
-        log("KTruss edge count: " + edgeCount, t1, t2);
 
         kTrussTSet.close();
     }
