@@ -28,7 +28,7 @@ object GraphX_GCC {
         val graph = GraphLoader.edgeListFile(sc, inputPath, numEdgePartitions=partition)
 
         val triangleGraph = TriangleCount.run(graph)
-        val triangle3 = triangleGraph.vertices.map(v => v._2.toLong).reduce((a , b) => a + b)
+        val triangle3 = triangleGraph.vertices.map(vertex => vertex._2.toLong).reduce((a , sign) => a + sign)
         val totalTriangles = triangle3 / 3
 
         val nodes = graph.vertices.count()

@@ -5,13 +5,13 @@ package ir.ac.sbu.graph.types;
  */
 public class VertexByte {
 
-    public int v;
-    public byte b;
+    public int vertex;
+    public byte sign;
 
     public VertexByte() { }
 
-    public VertexByte(int v, byte b) {
-        this.v = v;
-        this.b = b;
+    public VertexByte(int vertex, byte sign) {
+        this.vertex = vertex;
+        this.sign = sign;
     }
 }

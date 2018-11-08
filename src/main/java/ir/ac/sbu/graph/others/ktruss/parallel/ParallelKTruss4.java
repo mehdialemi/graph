@@ -158,7 +158,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                         int[] vNeighbors = neighbors[v];
 
                         int intersection = 0;
-                        // intersection on u neighbors and v neighbors
+                        // intersection on u neighbors and vertex neighbors
                         int uwIndex = vIndex + 1, vwIndex = 0;
 
                         while (uwIndex < flen[u] && vwIndex < flen[v]) {
@@ -323,7 +323,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
                     int vwIndex = WritableUtils.readVInt(in2);
                     if (vwIndex >= fonlThirds[v].length) {
-                        System.out.println("For v: " + v + ", vwIndex: " + vwIndex +
+                        System.out.println("For vertex: " + v + ", vwIndex: " + vwIndex +
                                 ", len: " + fonlThirds[v].length +
                                 ", neighbor: " + u + " len: " + len);
                     }
@@ -356,8 +356,8 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 //                for(int i = 0; i < lcCount[u]; i ++) {
 //                    try {
 //                        vIndexes[lastIndex] = WritableUtils.readVInt(in);
-//                        int v = uNeighbors[vIndexes[lastIndex]];
-//                        if (!local && partitions[v] != partition)
+//                        int vertex = uNeighbors[vIndexes[lastIndex]];
+//                        if (!local && partitions[vertex] != partition)
 //                            continue;
 //                        lens[lastIndex] = WritableUtils.readVInt(in);
 //                        localThirds[lastIndex] = thirds[u][lastIndex];
@@ -382,8 +382,8 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 //
 //                    if (local)
 //                        out.reset(fonlThirds[u][i]);
-//                    int v = uNeighbors[vIndexes[index]];
-//                    boolean update = partitions[v] == partition;
+//                    int vertex = uNeighbors[vIndexes[index]];
+//                    boolean update = partitions[vertex] == partition;
 //                    try {
 //                        in.reset(localThirds[index], localThirds[index].length);
 //                        if (local)
@@ -392,7 +392,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 //                            int uwIndex = WritableUtils.readVInt(in);
 //                            int vwIndex = WritableUtils.readVInt(in);
 //                            if (update) {
-//                                out2.reset(fonlThirds[v][vwIndex]);
+//                                out2.reset(fonlThirds[vertex][vwIndex]);
 //                                WritableUtils.writeVInt(out2, -1);
 //                                WritableUtils.writeVInt(out2, u);
 //                                WritableUtils.writeVInt(out2, vwIndex);

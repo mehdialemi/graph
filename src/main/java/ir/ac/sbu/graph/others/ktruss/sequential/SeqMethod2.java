@@ -119,15 +119,15 @@ public class SeqMethod2 extends SequentialBase {
             for (int j = 0; j < neighborCount[u]; j++) {
                 int v = neighbors[u][j];  // one neighbor of u
 
-                // iterate over neighbors of v
+                // iterate over neighbors of vertex
                 for (int k = 0; k < neighborCount[v]; k++) {
-                    w = neighbors[v][k];  // one neighbor of v
-                    if (mark[w]) {  // if w is marked, a triangle with {u,v,w} is found.
+                    w = neighbors[v][k];  // one neighbor of vertex
+                    if (mark[w]) {  // if w is marked, a triangle with {u,vertex,w} is found.
                         Edge e1 = new Edge(u, v);
                         Edge e2 = new Edge(u, w);
                         Edge e3 = new Edge(v, w);
 
-                        // add w in front of e1 {u,v}
+                        // add w in front of e1 {u,vertex}
                         Set<Integer> nodes = edgeNodes.get(e1);
                         if (nodes == null) {
                             nodes = new HashSet<>();
@@ -135,7 +135,7 @@ public class SeqMethod2 extends SequentialBase {
                         }
                         nodes.add(w);
 
-                        // add v in front of e2 {u,w}
+                        // add vertex in front of e2 {u,w}
                         nodes = edgeNodes.get(e2);
                         if (nodes == null) {
                             nodes = new HashSet<>();
@@ -143,7 +143,7 @@ public class SeqMethod2 extends SequentialBase {
                         }
                         nodes.add(v);
 
-                        // add u in front of e3 {v,w}
+                        // add u in front of e3 {vertex,w}
                         nodes = edgeNodes.get(e3);
                         if (nodes == null) {
                             nodes = new HashSet<>();

@@ -141,7 +141,7 @@ public class TriangleParallelForkJoin {
                             for (int w : vNeighbors) {
                                 if (uNeighbors.contains(w)) {
 
-                                    // A triangle with vertices u,v,w is found.
+                                    // A triangle with vertices u,vertex,w is found.
                                     // Construct edges from lower vertex Id to higher vertex Id
                                     long uv = u < v ? (long) u << 32 | v & 0xFFFFFFFFL : (long) v << 32 | u & 0xFFFFFFFFL; // edge uv
                                     long vw = v < w ? (long) v << 32 | w & 0xFFFFFFFFL : (long) w << 32 | v & 0xFFFFFFFFL; // edge vw

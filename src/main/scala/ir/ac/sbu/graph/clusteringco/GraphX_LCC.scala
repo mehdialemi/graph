@@ -31,9 +31,9 @@ object GraphX_LCC {
 
         // sum of all local clustering coefficient
         val sumLCC = triangleGraph.vertices.join(triangleGraph.degrees, partition)
-            .filter(v => v._2._2 > 1)
-            .map(v => 2 * v._2._1 / (v._2._2 * (v._2._2 - 1)).toFloat)  // local clustering coefficient in each node
-            .reduce((a, b) => a + b) // sum all node's lcc
+            .filter(vertex => vertex._2._2 > 1)
+            .map(vertex => 2 * vertex._2._1 / (vertex._2._2 * (vertex._2._2 - 1)).toFloat)  // local clustering coefficient in each node
+            .reduce((a, sign) => a + sign) // sum all node's lcc
 
         val totalNodes = graph.vertices.count()
         val avgLCC = sumLCC / totalNodes

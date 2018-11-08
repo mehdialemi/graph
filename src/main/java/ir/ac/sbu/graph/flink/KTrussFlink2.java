@@ -69,9 +69,9 @@
 //                public void reduce(Iterable<Tuple2<Integer, Integer>> values, Collector<Tuple3<Integer, Integer, Integer>> collector)
 //                    throws Exception {
 //                    set.clear();
-//                    int v = -1;
+//                    int vertex = -1;
 //                    for (Tuple2<Integer, Integer> value : values) {
-//                        v = value.f0;
+//                        vertex = value.f0;
 //                        set.add(value.f1);
 //                    }
 //
@@ -79,7 +79,7 @@
 //                        return;
 //
 //                    for (Integer i : set) {
-//                        collector.collect(new Tuple3<>(i, v, set.size()));
+//                        collector.collect(new Tuple3<>(i, vertex, set.size()));
 //                    }
 //                }
 //            }).returns(TUPLE_3_TYPE_HINT)
@@ -96,7 +96,7 @@
 //                        list.add(value);
 //                    }
 //
-//                    int v = list.get(0).f0;
+//                    int vertex = list.get(0).f0;
 //                    int deg = list.size();
 //                    holds.clear();
 //
@@ -106,14 +106,14 @@
 //                            holds.add(tuple);
 //                    }
 //
-//                    Collections.sort(holds, (a, b) -> a.f2 != b.f2 ? a.f2 - b.f2 : a.f1 - b.f1);
+//                    Collections.sort(holds, (a, sign) -> a.f2 != sign.f2 ? a.f2 - sign.f2 : a.f1 - sign.f1);
 //
 //                    int[] higherDegs = new int[holds.size() + 1];
 //                    higherDegs[0] = deg;
 //                    for (int i = 1; i < higherDegs.length; i++)
 //                        higherDegs[i] = holds.get(i - 1).f1;
 //
-//                    collector.collect(new Tuple2<>(v, higherDegs));
+//                    collector.collect(new Tuple2<>(vertex, higherDegs));
 //                }
 //            }).returns(TUPLE_2_INT_ARRAY_TYPE_HINT);
 //
@@ -145,16 +145,16 @@
 //                (first, second, collector) -> {
 //                    int[] fonl = first.f1;
 //                    int[] can = second.f1;
-//                    int v = first.f0;
+//                    int vertex = first.f0;
 //                    int u = can[0];
 //                    Tuple2<Integer, Integer> uv;
-//                    if (u < v)
-//                        uv = new Tuple2<>(u, v);
+//                    if (u < vertex)
+//                        uv = new Tuple2<>(u, vertex);
 //                    else
-//                        uv = new Tuple2<>(v, u);
+//                        uv = new Tuple2<>(vertex, u);
 //
-//                    // The intersection determines triangles which u and v are two of their vertices.
-//                    // Always generate and edge (u, v) such that u < v.
+//                    // The intersection determines triangles which u and vertex are two of their vertices.
+//                    // Always generate and edge (u, vertex) such that u < vertex.
 //                    int fi = 1;
 //                    int ci = 1;
 //                    while (fi < fonl.length && ci < can.length) {
@@ -166,14 +166,14 @@
 //                            int w = fonl[fi];
 //                            collector.collect(new Tuple3<>(uv.f0, uv.f1, w));
 //                            if (u < w)
-//                                collector.collect(new Tuple3<>(u, w, v));
+//                                collector.collect(new Tuple3<>(u, w, vertex));
 //                            else
-//                                collector.collect(new Tuple3<>(w, u, v));
+//                                collector.collect(new Tuple3<>(w, u, vertex));
 //
-//                            if (v < w)
-//                                collector.collect(new Tuple3<>(v, w, u));
+//                            if (vertex < w)
+//                                collector.collect(new Tuple3<>(vertex, w, u));
 //                            else
-//                                collector.collect(new Tuple3<>(w, v, u));
+//                                collector.collect(new Tuple3<>(w, vertex, u));
 //                            fi++;
 //                            ci++;
 //                        }
@@ -207,18 +207,18 @@
 //                .flatMap((Tuple2<Tuple2<Integer, Integer>, int[]> kv,
 //                          Collector<Tuple2<Tuple2<Integer, Integer>, Integer>> collector) -> {
 //                    int u = kv.f0.f0;
-//                    int v = kv.f0.f1;
+//                    int vertex = kv.f0.f1;
 //                    for (int i = 0; i < kv.f1.length; i++) {
 //                        int w = kv.f1[i];
 //                        if (w < u)
-//                            collector.collect(new Tuple2<>(new Tuple2<>(w, u), v));
+//                            collector.collect(new Tuple2<>(new Tuple2<>(w, u), vertex));
 //                        else
-//                            collector.collect(new Tuple2<>(new Tuple2<>(u, w), v));
+//                            collector.collect(new Tuple2<>(new Tuple2<>(u, w), vertex));
 //
-//                        if (w < v)
-//                            collector.collect(new Tuple2<>(new Tuple2<>(w, v), u));
+//                        if (w < vertex)
+//                            collector.collect(new Tuple2<>(new Tuple2<>(w, vertex), u));
 //                        else
-//                            collector.collect(new Tuple2<>(new Tuple2<>(v, w), u));
+//                            collector.collect(new Tuple2<>(new Tuple2<>(vertex, w), u));
 //                    }
 //                }).returns(TYPE_TUPLE2_INT)
 //                .groupBy(0).reduceGroup((Iterable<Tuple2<Tuple2<Integer, Integer>, Integer>> values,

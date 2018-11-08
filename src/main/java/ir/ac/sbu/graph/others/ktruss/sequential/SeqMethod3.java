@@ -97,7 +97,7 @@ public class SeqMethod3 extends SequentialBase {
                 int[] vNeighbors = fonls[v];
 
                 int idx = 0;
-                // intersection on u neighbors and v neighbors
+                // intersection on u neighbors and vertex neighbors
                 int f = j + 1, vn = 0;
                 while (f < fl[u] && vn < fl[v]) {
                     if (fonl[f] == vNeighbors[vn]) {

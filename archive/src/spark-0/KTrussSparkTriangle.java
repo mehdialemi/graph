@@ -79,10 +79,10 @@ public class KTrussSparkTriangle {
                         if (w == fv[j]) {
                             if (uv == null) {
                                 if (u < v) {
-                                    //uv = (long) u << 32 | v & 0xFFFFFFFFL;
+                                    //uv = (long) u << 32 | vertex & 0xFFFFFFFFL;
                                     uv = new Tuple2<>(u, v);
                                 } else {
-//                                    uv = (long) v << 32 | u & 0xFFFFFFFFL;
+//                                    uv = (long) vertex << 32 | u & 0xFFFFFFFFL;
                                     uv = new Tuple2<>(v, u);
                                 }
                                 wSet = new ArrayList<>(Math.min(fv.length, cvalue.length) / 2);
@@ -98,7 +98,7 @@ public class KTrussSparkTriangle {
                         index = lastIndex;
                 }
 
-                // TODO use min1 and min2 as u and v and others should be sorted
+                // TODO use min1 and min2 as u and vertex and others should be sorted
                 if (wSet != null) {
                     int[] wArray = new int[wSet.size()];
                     for (int i = 0; i < wSet.size(); i++) {
@@ -114,7 +114,7 @@ public class KTrussSparkTriangle {
 
         JavaPairRDD<Tuple2<Integer, Integer>, Integer> edgeSup = eTriangleMap.flatMapToPair(t -> {
 //            int u = (int) (t._1 >> 32);
-//            int v = (int) t._1.longValue();
+//            int vertex = (int) t._1.longValue();
             int u = t._1._1;
             int v = t._1._2;
 
@@ -127,17 +127,17 @@ public class KTrussSparkTriangle {
                 Tuple2<Integer, Integer> t2;
                 if (w < u) {
 //                    t1 = (long) w << 32 | u & 0xFFFFFFFFL;
-//                    t2 = (long) w << 32 | v & 0xFFFFFFFFL;
+//                    t2 = (long) w << 32 | vertex & 0xFFFFFFFFL;
                     t1 = new Tuple2<>(w, u);
                     t2 = new Tuple2<>(w, v);
                 } else if (w > v) {
 //                    t1 = (long) u << 32 | w & 0xFFFFFFFFL;
-//                    t2 = (long) v << 32 | w & 0xFFFFFFFFL;
+//                    t2 = (long) vertex << 32 | w & 0xFFFFFFFFL;
                     t1 = new Tuple2<>(u, w);
                     t2 = new Tuple2<>(v, w);
                 } else {
 //                    t1 = (long) u << 32 | w & 0xFFFFFFFFL;
-//                    t2 = (long) w << 32 | v & 0xFFFFFFFFL;
+//                    t2 = (long) w << 32 | vertex & 0xFFFFFFFFL;
                     t1 = new Tuple2<>(u, w);
                     t2 = new Tuple2<>(w, v);
                 }

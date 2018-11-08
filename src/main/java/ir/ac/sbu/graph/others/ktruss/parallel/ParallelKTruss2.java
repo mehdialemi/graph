@@ -77,7 +77,7 @@ public class ParallelKTruss2 extends ParallelKTrussBase {
                                     vertices = new ArrayList<>();
                                     edgeInvalidVertices.put(uw, vertices);
                                 }
-                                vertices.add(v);  // add vertex v to include in invalid edges of uw
+                                vertices.add(v);  // add vertex vertex to include in invalid edges of uw
 
                                 vertices = edgeInvalidVertices.get(vw);
                                 if (vertices == null) {
@@ -236,7 +236,7 @@ public class ParallelKTruss2 extends ParallelKTrussBase {
                             for (int w : vNeighbors) {
                                 if (uNeighbors.contains(w)) {
 
-                                    // A triangle with vertices u,v,w is found.
+                                    // A triangle with vertices u,vertex,w is found.
                                     // Construct edges from lower vertex Id to higher vertex Id
                                     long uv = u < v ? (long) u << 32 | v & 0xFFFFFFFFL : (long) v << 32 | u & 0xFFFFFFFFL; // edge uv
                                     long vw = v < w ? (long) v << 32 | w & 0xFFFFFFFFL : (long) w << 32 | v & 0xFFFFFFFFL; // edge vw

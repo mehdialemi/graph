@@ -79,12 +79,12 @@ public class KTrussSparkInvalidVertices {
             for (int[] cVal : t._2._1) {
                 int u = cVal[0];
 
-                // The intersection determines triangles which u and v are two of their vertices.
+                // The intersection determines triangles which u and vertex are two of their vertices.
                 IntList wList = GraphUtils.sortedIntersectionTest(fVal, 1, cVal, 1);
                 if (wList == null)
                     continue;
 
-                // Always generate and edge (u, v) such that u < v.
+                // Always generate and edge (u, vertex) such that u < vertex.
                 Tuple2<Integer, Integer> uv;
                 if (u < v)
                     uv = new Tuple2<>(u, v);
@@ -218,7 +218,7 @@ public class KTrussSparkInvalidVertices {
 //            prevEdgeSup.unpersist();
 
             // TODO calculate the best repartition for each steps of the above algorithm using the information of graph sizes
-//            Float sumRatio = edgeSup.map(kv -> (kv._2._1 - kv._2._2.length) / (float) kv._2._1).reduce((a, b) -> a + b);
+//            Float sumRatio = edgeSup.map(kv -> (kv._2._1 - kv._2._2.length) / (float) kv._2._1).reduce((a, sign) -> a + sign);
 //            long edgeCount = edgeSup.count();
 //            float ratio = sumRatio / (float) edgeCount;
 //            long t3 = System.currentTimeMillis();
@@ -232,10 +232,10 @@ public class KTrussSparkInvalidVertices {
 //
 //                    List<Integer> list = new ArrayList<>(newSup);
 //
-//                    for (Integer v : joinValues._1) {
-//                        if (Arrays.binarySearch(joinValues._2._2, v) >= 0)
+//                    for (Integer vertex : joinValues._1) {
+//                        if (Arrays.binarySearch(joinValues._2._2, vertex) >= 0)
 //                            continue;
-//                        list.add(v);
+//                        list.add(vertex);
 //                    }
 //                    return list;
 //

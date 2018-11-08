@@ -315,12 +315,12 @@ public class GraphUtils implements Serializable {
                     second = u;
                 }
             }
-        } else { // u > v
-            if (v > w) { // u > v > w
+        } else { // u > vertex
+            if (v > w) { // u > vertex > w
                 first = w;
                 second = v;
                 third = u;
-            } else { // u > v & v < w
+            } else { // u > vertex & vertex < w
                 first = v;
                 if (u < w) {
                     second = u;
@@ -352,12 +352,12 @@ public class GraphUtils implements Serializable {
                     second = u;
                 }
             }
-        } else { // u > v
-            if (v > w) { // u > v > w
+        } else { // u > vertex
+            if (v > w) { // u > vertex > w
                 first = w;
                 second = v;
                 third = u;
-            } else { // u > v & v < w
+            } else { // u > vertex & vertex < w
                 first = v;
                 if (u < w) {
                     second = u;

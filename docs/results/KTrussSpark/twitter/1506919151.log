@@ -1941,7 +1941,7 @@ Please instead use:
 02 Oct 2017 08:09:57,221 DEBUG - HttpParser.setState(1587) -  HEADER_IN_VALUE --> HEADER
 02 Oct 2017 08:09:57,220 DEBUG - ChannelEndPoint.fill(142) -  filled 381 SelectChannelEndPoint@25667aa3{/10.10.109.62:58152<->4040,Open,in,out,-,-,51/30000,HttpConnection}{io=0,kio=0,kro=1}
 02 Oct 2017 08:09:57,220 DEBUG - SelectorManager$ManagedSelector.select(600) -  Selector loop waiting on select
-02 Oct 2017 08:09:57,221 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@21e32380[p=0,l=381,c=16384,r=381]={<<<GET /static/log-v...: max-age=0\r\n\r\n>>>x-age=0\r\n\r\n\x00\x00\x00\x00\x00\x00...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
+02 Oct 2017 08:09:57,221 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@21e32380[p=0,l=381,c=16384,r=381]={<<<GET /static/log-vertex...: max-age=0\r\n\r\n>>>x-age=0\r\n\r\n\x00\x00\x00\x00\x00\x00...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
 02 Oct 2017 08:09:57,221 DEBUG - HttpParser.setState(1587) -  HEADER --> HEADER_IN_VALUE
 02 Oct 2017 08:09:57,221 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@423c62fe[p=0,l=0,c=16384,r=0]={<<<>>>GET /static/webui...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
 02 Oct 2017 08:09:57,221 DEBUG - HttpParser.setState(1587) -  HEADER_IN_VALUE --> HEADER
@@ -3511,7 +3511,7 @@ Please instead use:
 02 Oct 2017 08:09:58,625 DEBUG - HttpChannel.handle(448) -  HttpChannelOverHttp@14d76bce{r=5,c=false,a=IDLE,uri=} handle exit, result COMPLETE
 02 Oct 2017 08:09:58,625 DEBUG - HttpChannelState.handling(174) -  HttpChannelState@73bd5c07{s=IDLE i=true a=null} handling IDLE
 02 Oct 2017 08:09:58,626 DEBUG - ChannelEndPoint.fill(142) -  filled 0 SelectChannelEndPoint@6638aea5{/10.10.109.62:58162<->4040,Open,in,out,-,-,3/30000,HttpConnection}{io=0,kio=0,kro=1}
-02 Oct 2017 08:09:58,625 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=381,c=16384,r=381]={<<<GET /static/log-v...: max-age=0\r\n\r\n>>>\nche-Control: max...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
+02 Oct 2017 08:09:58,625 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=381,c=16384,r=381]={<<<GET /static/log-vertex...: max-age=0\r\n\r\n>>>\nche-Control: max...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
 02 Oct 2017 08:09:58,626 DEBUG - ChannelEndPoint.fill(142) -  filled 0 SelectChannelEndPoint@6638aea5{/10.10.109.62:58162<->4040,Open,in,out,-,-,3/30000,HttpConnection}{io=0,kio=0,kro=1}
 02 Oct 2017 08:09:58,626 DEBUG - HttpChannel.handle(296) -  HttpChannelOverHttp@36bfc4b4{r=5,c=false,a=DISPATCHED,uri=/static/timeline-view.js} action REQUEST_DISPATCH
 02 Oct 2017 08:09:58,626 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@1b199328[p=0,l=0,c=16384,r=0]={<<<>>>GET /static/boots...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
@@ -3705,7 +3705,7 @@ Please instead use:
 02 Oct 2017 08:09:58,661 DEBUG - HttpChannel.handle(448) -  HttpChannelOverHttp@1cc0def5{r=5,c=false,a=IDLE,uri=} handle exit, result COMPLETE
 02 Oct 2017 08:09:58,661 DEBUG - ChannelEndPoint.fill(142) -  filled 0 SelectChannelEndPoint@147936f1{/10.10.109.62:58160<->4040,Open,in,out,-,-,1/30000,HttpConnection}{io=0,kio=0,kro=1}
 02 Oct 2017 08:09:58,661 DEBUG - ChannelEndPoint.fill(142) -  filled 0 SelectChannelEndPoint@147936f1{/10.10.109.62:58160<->4040,Open,in,out,-,-,1/30000,HttpConnection}{io=0,kio=0,kro=1}
-02 Oct 2017 08:09:58,661 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=0,c=16384,r=0]={<<<>>>GET /static/log-v...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
+02 Oct 2017 08:09:58,661 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=0,c=16384,r=0]={<<<>>>GET /static/log-vertex...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
 02 Oct 2017 08:09:58,661 DEBUG - AbstractConnection.fillInterested(128) -  fillInterested HttpConnection@31f7b32b[FILLING,SelectChannelEndPoint@147936f1{/10.10.109.62:58160<->4040,Open,in,out,-,-,1/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@1cc0def5{r=5,c=false,a=IDLE,uri=}]
 02 Oct 2017 08:09:58,662 DEBUG - AbstractConnection.next(275) -  FILLING-->FILLING_FILL_INTERESTED HttpConnection@31f7b32b[FILLING_FILL_INTERESTED,SelectChannelEndPoint@147936f1{/10.10.109.62:58160<->4040,Open,in,out,-,-,2/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@1cc0def5{r=5,c=false,a=IDLE,uri=}]
 02 Oct 2017 08:09:58,662 DEBUG - AbstractConnection.next(275) -  FILLING_FILL_INTERESTED-->FILL_INTERESTED HttpConnection@31f7b32b[FILL_INTERESTED,SelectChannelEndPoint@147936f1{/10.10.109.62:58160<->4040,Open,in,out,-,-,2/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@1cc0def5{r=5,c=false,a=IDLE,uri=}]
@@ -3806,7 +3806,7 @@ Please instead use:
 02 Oct 2017 08:09:58,690 DEBUG - HttpChannel.handle(448) -  HttpChannelOverHttp@14d76bce{r=6,c=false,a=IDLE,uri=} handle exit, result COMPLETE
 02 Oct 2017 08:09:58,690 DEBUG - ChannelEndPoint.fill(142) -  filled 0 SelectChannelEndPoint@6638aea5{/10.10.109.62:58162<->4040,Open,in,out,-,-,1/30000,HttpConnection}{io=0,kio=0,kro=1}
 02 Oct 2017 08:09:58,690 DEBUG - ChannelEndPoint.fill(142) -  filled 0 SelectChannelEndPoint@6638aea5{/10.10.109.62:58162<->4040,Open,in,out,-,-,1/30000,HttpConnection}{io=0,kio=0,kro=1}
-02 Oct 2017 08:09:58,690 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=0,c=16384,r=0]={<<<>>>GET /static/log-v...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
+02 Oct 2017 08:09:58,690 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=0,c=16384,r=0]={<<<>>>GET /static/log-vertex...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
 02 Oct 2017 08:09:58,690 DEBUG - AbstractConnection.fillInterested(128) -  fillInterested HttpConnection@4118f724[FILLING,SelectChannelEndPoint@6638aea5{/10.10.109.62:58162<->4040,Open,in,out,-,-,1/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@14d76bce{r=6,c=false,a=IDLE,uri=}]
 02 Oct 2017 08:09:58,690 DEBUG - AbstractConnection.next(275) -  FILLING-->FILLING_FILL_INTERESTED HttpConnection@4118f724[FILLING_FILL_INTERESTED,SelectChannelEndPoint@6638aea5{/10.10.109.62:58162<->4040,Open,in,out,-,-,1/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@14d76bce{r=6,c=false,a=IDLE,uri=}]
 02 Oct 2017 08:09:58,690 DEBUG - AbstractConnection.next(275) -  FILLING_FILL_INTERESTED-->FILL_INTERESTED HttpConnection@4118f724[FILL_INTERESTED,SelectChannelEndPoint@6638aea5{/10.10.109.62:58162<->4040,Open,in,out,-,-,1/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@14d76bce{r=6,c=false,a=IDLE,uri=}]
@@ -5270,7 +5270,7 @@ Please instead use:
 02 Oct 2017 08:10:05,229 DEBUG - SelectorManager$ManagedSelector.select(600) -  Selector loop waiting on select
 02 Oct 2017 08:10:05,229 DEBUG - HttpConnection.onFillable(207) -  HttpConnection@7285f43b[FILLING,SelectChannelEndPoint@3280563c{/10.10.109.62:58156<->4040,Open,in,out,-,-,45/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@36bfc4b4{r=7,c=false,a=IDLE,uri=}] onFillable HttpChannelState@73bd5c07{s=IDLE i=true a=null}
 02 Oct 2017 08:10:05,229 DEBUG - ChannelEndPoint.fill(142) -  filled 381 SelectChannelEndPoint@3280563c{/10.10.109.62:58156<->4040,Open,in,out,-,-,45/30000,HttpConnection}{io=0,kio=0,kro=1}
-02 Oct 2017 08:10:05,229 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@493d94e3[p=0,l=381,c=16384,r=381]={<<<GET /static/log-v...: max-age=0\r\n\r\n>>>age=0\r\n\r\n\r\n\r\n\ne=0...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
+02 Oct 2017 08:10:05,229 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@493d94e3[p=0,l=381,c=16384,r=381]={<<<GET /static/log-vertex...: max-age=0\r\n\r\n>>>age=0\r\n\r\n\r\n\r\n\ne=0...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
 02 Oct 2017 08:10:05,229 DEBUG - HttpParser.setState(1587) -  START --> SPACE1
 02 Oct 2017 08:10:05,230 DEBUG - HttpParser.setState(1587) -  SPACE1 --> URI
 02 Oct 2017 08:10:05,230 DEBUG - HttpParser.setState(1587) -  URI --> SPACE2
@@ -5486,7 +5486,7 @@ Please instead use:
 02 Oct 2017 08:10:05,288 DEBUG - WriteFlusher.updateState(118) -  update WriteFlusher@5c8c829a{WRITING}:IDLE-->WRITING
 02 Oct 2017 08:10:05,288 DEBUG - ChannelEndPoint.fill(142) -  filled 0 SelectChannelEndPoint@147936f1{/10.10.109.62:58160<->4040,Open,in,out,-,-,3/30000,HttpConnection}{io=0,kio=0,kro=1}
 02 Oct 2017 08:10:05,288 DEBUG - ChannelEndPoint.flush(188) -  flushed 97 SelectChannelEndPoint@472a5bd1{/10.10.109.62:58154<->4040,Open,in,out,-,W,83/30000,HttpConnection}{io=0,kio=0,kro=1}
-02 Oct 2017 08:10:05,288 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@493d94e3[p=0,l=0,c=16384,r=0]={<<<>>>GET /static/log-v...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
+02 Oct 2017 08:10:05,288 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@493d94e3[p=0,l=0,c=16384,r=0]={<<<>>>GET /static/log-vertex...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
 02 Oct 2017 08:10:05,288 DEBUG - WriteFlusher.updateState(118) -  update WriteFlusher@5c8c829a{IDLE}:WRITING-->IDLE
 02 Oct 2017 08:10:05,288 DEBUG - AbstractConnection.fillInterested(128) -  fillInterested HttpConnection@31f7b32b[FILLING,SelectChannelEndPoint@147936f1{/10.10.109.62:58160<->4040,Open,in,out,-,-,3/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@1cc0def5{r=9,c=false,a=IDLE,uri=}]
 02 Oct 2017 08:10:05,289 DEBUG - HttpConnection$SendCallback.process(657) -  org.spark_project.jetty.server.HttpConnection$SendCallback@18fc7fb2[PROCESSING][i=ResponseInfo{HTTP/1.1 304 null,-1,false},cb=org.spark_project.jetty.server.HttpChannel$CommitCallback@72ce79db] generate: DONE ([p=97,l=97,c=8192,r=0],[p=0,l=0,c=0,r=0],false)@COMMITTED
@@ -6871,7 +6871,7 @@ Please instead use:
 02 Oct 2017 08:10:07,417 DEBUG - HttpChannelState.unhandle(289) -  HttpChannelState@73bd5c07{s=DISPATCHED i=true a=null} unhandle DISPATCHED
 02 Oct 2017 08:10:07,417 DEBUG - ChannelEndPoint.fill(142) -  filled 381 SelectChannelEndPoint@25667aa3{/10.10.109.62:58152<->4040,Open,in,out,-,-,63/30000,HttpConnection}{io=0,kio=0,kro=1}
 02 Oct 2017 08:10:07,417 DEBUG - HttpConnection$SendCallback.process(657) -  org.spark_project.jetty.server.HttpConnection$SendCallback@30168c5[PROCESSING][i=null,cb=Blocker@6b618d63{null}] generate: CONTINUE (null,[p=0,l=0,c=0,r=0],true)@COMPLETING
-02 Oct 2017 08:10:07,417 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=381,c=16384,r=381]={<<<GET /static/log-v...: max-age=0\r\n\r\n>>>age=0\r\n\r\nrol: max...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
+02 Oct 2017 08:10:07,417 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=381,c=16384,r=381]={<<<GET /static/log-vertex...: max-age=0\r\n\r\n>>>age=0\r\n\r\nrol: max...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
 02 Oct 2017 08:10:07,418 DEBUG - HttpConnection$SendCallback.process(657) -  org.spark_project.jetty.server.HttpConnection$SendCallback@30168c5[PROCESSING][i=null,cb=Blocker@6b618d63{null}] generate: DONE (null,[p=0,l=0,c=0,r=0],true)@END
 02 Oct 2017 08:10:07,418 DEBUG - HttpParser.setState(1587) -  START --> SPACE1
 02 Oct 2017 08:10:07,418 DEBUG - HttpParser.setState(1587) -  SPACE1 --> URI
@@ -7164,7 +7164,7 @@ Please instead use:
 02 Oct 2017 08:10:07,480 DEBUG - HttpChannel.handle(448) -  HttpChannelOverHttp@4315d7ec{r=13,c=false,a=IDLE,uri=} handle exit, result COMPLETE
 02 Oct 2017 08:10:07,480 DEBUG - ChannelEndPoint.fill(142) -  filled 0 SelectChannelEndPoint@472a5bd1{/10.10.109.62:58154<->4040,Open,in,out,-,-,1/30000,HttpConnection}{io=0,kio=0,kro=1}
 02 Oct 2017 08:10:07,480 DEBUG - ChannelEndPoint.fill(142) -  filled 0 SelectChannelEndPoint@472a5bd1{/10.10.109.62:58154<->4040,Open,in,out,-,-,1/30000,HttpConnection}{io=0,kio=0,kro=1}
-02 Oct 2017 08:10:07,481 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=0,c=16384,r=0]={<<<>>>GET /static/log-v...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
+02 Oct 2017 08:10:07,481 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=0,c=16384,r=0]={<<<>>>GET /static/log-vertex...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
 02 Oct 2017 08:10:07,481 DEBUG - AbstractConnection.fillInterested(128) -  fillInterested HttpConnection@22ba04e8[FILLING,SelectChannelEndPoint@472a5bd1{/10.10.109.62:58154<->4040,Open,in,out,-,-,2/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@4315d7ec{r=13,c=false,a=IDLE,uri=}]
 02 Oct 2017 08:10:07,481 DEBUG - AbstractConnection.next(275) -  FILLING-->FILLING_FILL_INTERESTED HttpConnection@22ba04e8[FILLING_FILL_INTERESTED,SelectChannelEndPoint@472a5bd1{/10.10.109.62:58154<->4040,Open,in,out,-,-,2/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@4315d7ec{r=13,c=false,a=IDLE,uri=}]
 02 Oct 2017 08:10:07,481 DEBUG - AbstractConnection.next(275) -  FILLING_FILL_INTERESTED-->FILL_INTERESTED HttpConnection@22ba04e8[FILL_INTERESTED,SelectChannelEndPoint@472a5bd1{/10.10.109.62:58154<->4040,Open,in,out,-,-,2/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@4315d7ec{r=13,c=false,a=IDLE,uri=}]
@@ -8396,7 +8396,7 @@ Please instead use:
 02 Oct 2017 08:10:08,321 DEBUG - SelectorManager$ManagedSelector.select(600) -  Selector loop waiting on select
 02 Oct 2017 08:10:08,321 DEBUG - HttpConnection.onFillable(207) -  HttpConnection@1b50e151[FILLING,SelectChannelEndPoint@25667aa3{/10.10.109.62:58152<->4040,Open,in,out,-,-,51/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@3e960660{r=29,c=false,a=IDLE,uri=}] onFillable HttpChannelState@54ec2ffc{s=IDLE i=true a=null}
 02 Oct 2017 08:10:08,321 DEBUG - ChannelEndPoint.fill(142) -  filled 381 SelectChannelEndPoint@25667aa3{/10.10.109.62:58152<->4040,Open,in,out,-,-,51/30000,HttpConnection}{io=0,kio=0,kro=1}
-02 Oct 2017 08:10:08,321 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@3c171822[p=0,l=381,c=16384,r=381]={<<<GET /static/log-v...: max-age=0\r\n\r\n>>>age=0\r\n\r\nax-age=0...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
+02 Oct 2017 08:10:08,321 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@3c171822[p=0,l=381,c=16384,r=381]={<<<GET /static/log-vertex...: max-age=0\r\n\r\n>>>age=0\r\n\r\nax-age=0...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
 02 Oct 2017 08:10:08,321 DEBUG - HttpParser.setState(1587) -  START --> SPACE1
 02 Oct 2017 08:10:08,321 DEBUG - HttpParser.setState(1587) -  SPACE1 --> URI
 02 Oct 2017 08:10:08,321 DEBUG - HttpParser.setState(1587) -  URI --> SPACE2
@@ -9973,7 +9973,7 @@ Please instead use:
 02 Oct 2017 08:10:09,206 DEBUG - SelectorManager$ManagedSelector.runChange(526) -  Running change org.spark_project.jetty.io.SelectChannelEndPoint$1@42046de1
 02 Oct 2017 08:10:09,207 DEBUG - ChannelEndPoint.fill(142) -  filled 381 SelectChannelEndPoint@3280563c{/10.10.109.62:58156<->4040,Open,in,out,-,-,69/30000,HttpConnection}{io=0,kio=0,kro=1}
 02 Oct 2017 08:10:09,207 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@1b199328[p=0,l=386,c=16384,r=386]={<<<GET /static/timel...: max-age=0\r\n\r\n>>>ge=0\r\n\r\n max-age=...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
-02 Oct 2017 08:10:09,207 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=381,c=16384,r=381]={<<<GET /static/log-v...: max-age=0\r\n\r\n>>>x-age=0\r\n\r\nl: max...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
+02 Oct 2017 08:10:09,207 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=381,c=16384,r=381]={<<<GET /static/log-vertex...: max-age=0\r\n\r\n>>>x-age=0\r\n\r\nl: max...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
 02 Oct 2017 08:10:09,207 DEBUG - HttpParser.setState(1587) -  START --> SPACE1
 02 Oct 2017 08:10:09,207 DEBUG - SelectorManager$ManagedSelector.select(600) -  Selector loop waiting on select
 02 Oct 2017 08:10:09,208 DEBUG - HttpParser.setState(1587) -  SPACE1 --> URI
@@ -10335,7 +10335,7 @@ Please instead use:
 02 Oct 2017 08:10:09,271 DEBUG - HttpChannel.handle(448) -  HttpChannelOverHttp@4315d7ec{r=19,c=false,a=IDLE,uri=} handle exit, result COMPLETE
 02 Oct 2017 08:10:09,271 DEBUG - ChannelEndPoint.fill(142) -  filled 0 SelectChannelEndPoint@472a5bd1{/10.10.109.62:58154<->4040,Open,in,out,-,-,2/30000,HttpConnection}{io=0,kio=0,kro=1}
 02 Oct 2017 08:10:09,271 DEBUG - ChannelEndPoint.fill(142) -  filled 0 SelectChannelEndPoint@472a5bd1{/10.10.109.62:58154<->4040,Open,in,out,-,-,2/30000,HttpConnection}{io=0,kio=0,kro=1}
-02 Oct 2017 08:10:09,271 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=0,c=16384,r=0]={<<<>>>GET /static/log-v...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
+02 Oct 2017 08:10:09,271 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=0,c=16384,r=0]={<<<>>>GET /static/log-vertex...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
 02 Oct 2017 08:10:09,271 DEBUG - AbstractConnection.fillInterested(128) -  fillInterested HttpConnection@22ba04e8[FILLING,SelectChannelEndPoint@472a5bd1{/10.10.109.62:58154<->4040,Open,in,out,-,-,2/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@4315d7ec{r=19,c=false,a=IDLE,uri=}]
 02 Oct 2017 08:10:09,271 DEBUG - AbstractConnection.next(275) -  FILLING-->FILLING_FILL_INTERESTED HttpConnection@22ba04e8[FILLING_FILL_INTERESTED,SelectChannelEndPoint@472a5bd1{/10.10.109.62:58154<->4040,Open,in,out,-,-,2/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@4315d7ec{r=19,c=false,a=IDLE,uri=}]
 02 Oct 2017 08:10:09,271 DEBUG - AbstractConnection.next(275) -  FILLING_FILL_INTERESTED-->FILL_INTERESTED HttpConnection@22ba04e8[FILL_INTERESTED,SelectChannelEndPoint@472a5bd1{/10.10.109.62:58154<->4040,Open,in,out,-,-,2/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@4315d7ec{r=19,c=false,a=IDLE,uri=}]
@@ -10422,7 +10422,7 @@ Please instead use:
 02 Oct 2017 08:10:09,293 DEBUG - Server.handle(502) -  RESPONSE /static/spark-dag-viz.css  304 handled=true
 02 Oct 2017 08:10:09,292 DEBUG - HttpParser.setState(1587) -  HEADER_IN_VALUE --> HEADER
 02 Oct 2017 08:10:09,293 DEBUG - HttpChannelState.unhandle(289) -  HttpChannelState@7a5f4036{s=DISPATCHED i=true a=null} unhandle DISPATCHED
-02 Oct 2017 08:10:09,293 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=0,c=16384,r=0]={<<<>>>GET /static/log-v...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
+02 Oct 2017 08:10:09,293 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=0,c=16384,r=0]={<<<>>>GET /static/log-vertex...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
 02 Oct 2017 08:10:09,293 DEBUG - HttpConnection$SendCallback.process(657) -  org.spark_project.jetty.server.HttpConnection$SendCallback@60de29bb[PROCESSING][i=null,cb=Blocker@f1d6f4{null}] generate: CONTINUE (null,[p=0,l=0,c=0,r=0],true)@COMPLETING
 02 Oct 2017 08:10:09,293 DEBUG - HttpConnection$SendCallback.process(657) -  org.spark_project.jetty.server.HttpConnection$SendCallback@60de29bb[PROCESSING][i=null,cb=Blocker@f1d6f4{null}] generate: DONE (null,[p=0,l=0,c=0,r=0],true)@END
 02 Oct 2017 08:10:09,293 DEBUG - HttpParser.setState(1587) -  HEADER --> HEADER_IN_VALUE
@@ -10564,7 +10564,7 @@ Please instead use:
 02 Oct 2017 08:10:09,326 DEBUG - HttpChannel.handle(448) -  HttpChannelOverHttp@36bfc4b4{r=18,c=false,a=IDLE,uri=} handle exit, result COMPLETE
 02 Oct 2017 08:10:09,326 DEBUG - ChannelEndPoint.fill(142) -  filled 0 SelectChannelEndPoint@3280563c{/10.10.109.62:58156<->4040,Open,in,out,-,-,1/30000,HttpConnection}{io=0,kio=0,kro=1}
 02 Oct 2017 08:10:09,326 DEBUG - ChannelEndPoint.fill(142) -  filled 0 SelectChannelEndPoint@3280563c{/10.10.109.62:58156<->4040,Open,in,out,-,-,1/30000,HttpConnection}{io=0,kio=0,kro=1}
-02 Oct 2017 08:10:09,326 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=0,c=16384,r=0]={<<<>>>GET /static/log-v...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
+02 Oct 2017 08:10:09,326 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=0,c=16384,r=0]={<<<>>>GET /static/log-vertex...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
 02 Oct 2017 08:10:09,326 DEBUG - AbstractConnection.fillInterested(128) -  fillInterested HttpConnection@7285f43b[FILLING,SelectChannelEndPoint@3280563c{/10.10.109.62:58156<->4040,Open,in,out,-,-,1/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@36bfc4b4{r=18,c=false,a=IDLE,uri=}]
 02 Oct 2017 08:10:09,326 DEBUG - AbstractConnection.next(275) -  FILLING-->FILLING_FILL_INTERESTED HttpConnection@7285f43b[FILLING_FILL_INTERESTED,SelectChannelEndPoint@3280563c{/10.10.109.62:58156<->4040,Open,in,out,-,-,1/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@36bfc4b4{r=18,c=false,a=IDLE,uri=}]
 02 Oct 2017 08:10:09,327 DEBUG - AbstractConnection.next(275) -  FILLING_FILL_INTERESTED-->FILL_INTERESTED HttpConnection@7285f43b[FILL_INTERESTED,SelectChannelEndPoint@3280563c{/10.10.109.62:58156<->4040,Open,in,out,-,-,2/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@36bfc4b4{r=18,c=false,a=IDLE,uri=}]
@@ -10804,7 +10804,7 @@ Please instead use:
 02 Oct 2017 08:10:12,666 DEBUG - HttpChannel.handle(448) -  HttpChannelOverHttp@3e960660{r=40,c=false,a=IDLE,uri=} handle exit, result COMPLETE
 02 Oct 2017 08:10:12,666 DEBUG - ChannelEndPoint.fill(142) -  filled 0 SelectChannelEndPoint@25667aa3{/10.10.109.62:58152<->4040,Open,in,out,-,-,1/30000,HttpConnection}{io=0,kio=0,kro=1}
 02 Oct 2017 08:10:12,666 DEBUG - ChannelEndPoint.fill(142) -  filled 0 SelectChannelEndPoint@25667aa3{/10.10.109.62:58152<->4040,Open,in,out,-,-,1/30000,HttpConnection}{io=0,kio=0,kro=1}
-02 Oct 2017 08:10:12,666 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=0,c=16384,r=0]={<<<>>>GET /static/log-v...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
+02 Oct 2017 08:10:12,666 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@6e1d55c4[p=0,l=0,c=16384,r=0]={<<<>>>GET /static/log-vertex...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
 02 Oct 2017 08:10:12,666 DEBUG - AbstractConnection.fillInterested(128) -  fillInterested HttpConnection@1b50e151[FILLING,SelectChannelEndPoint@25667aa3{/10.10.109.62:58152<->4040,Open,in,out,-,-,1/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@3e960660{r=40,c=false,a=IDLE,uri=}]
 02 Oct 2017 08:10:12,666 DEBUG - AbstractConnection.next(275) -  FILLING-->FILLING_FILL_INTERESTED HttpConnection@1b50e151[FILLING_FILL_INTERESTED,SelectChannelEndPoint@25667aa3{/10.10.109.62:58152<->4040,Open,in,out,-,-,1/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@3e960660{r=40,c=false,a=IDLE,uri=}]
 02 Oct 2017 08:10:12,666 DEBUG - AbstractConnection.next(275) -  FILLING_FILL_INTERESTED-->FILL_INTERESTED HttpConnection@1b50e151[FILL_INTERESTED,SelectChannelEndPoint@25667aa3{/10.10.109.62:58152<->4040,Open,in,out,-,-,1/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@3e960660{r=40,c=false,a=IDLE,uri=}]
@@ -11611,7 +11611,7 @@ Please instead use:
 02 Oct 2017 08:10:12,885 DEBUG - SelectorManager$ManagedSelector.select(600) -  Selector loop waiting on select
 02 Oct 2017 08:10:12,885 DEBUG - HttpConnection.onFillable(207) -  HttpConnection@1b50e151[FILLING,SelectChannelEndPoint@25667aa3{/10.10.109.62:58152<->4040,Open,in,out,-,-,40/30000,HttpConnection}{io=0,kio=0,kro=1}][p=HttpParser{s=START,0 of -1},g=HttpGenerator{s=START},c=HttpChannelOverHttp@3e960660{r=42,c=false,a=IDLE,uri=}] onFillable HttpChannelState@54ec2ffc{s=IDLE i=true a=null}
 02 Oct 2017 08:10:12,885 DEBUG - ChannelEndPoint.fill(142) -  filled 372 SelectChannelEndPoint@25667aa3{/10.10.109.62:58152<->4040,Open,in,out,-,-,40/30000,HttpConnection}{io=0,kio=0,kro=1}
-02 Oct 2017 08:10:12,885 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@3c171822[p=0,l=372,c=16384,r=372]={<<<GET /static/log-v...: max-age=0\r\n\r\n>>>age=0\r\n\r\n\r\n\r\n\r\n\r\n...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
+02 Oct 2017 08:10:12,885 DEBUG - HttpParser.parseNext(1232) -  parseNext s=START HeapByteBuffer@3c171822[p=0,l=372,c=16384,r=372]={<<<GET /static/log-vertex...: max-age=0\r\n\r\n>>>age=0\r\n\r\n\r\n\r\n\r\n\r\n...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}
 02 Oct 2017 08:10:12,885 DEBUG - HttpParser.setState(1587) -  START --> SPACE1
 02 Oct 2017 08:10:12,885 DEBUG - HttpParser.setState(1587) -  SPACE1 --> URI
 02 Oct 2017 08:10:12,885 DEBUG - HttpParser.setState(1587) -  URI --> SPACE2

@@ -143,7 +143,7 @@ public class SeqMethod1 extends SequentialBase {
             for(int j = 0 ; j < uNeighbors.size() ; j += 2) {
                 int v = uNeighbors.get(j);
                 int uv = uNeighbors.get(j + 1);
-                // iterate over neighbors of v
+                // iterate over neighbors of vertex
                 List<Integer> vNeighbors = neighbors[v];
                 for(int k = 0 ; k < vNeighbors.size() ; k += 2) {
                     int w = vNeighbors.get(k);

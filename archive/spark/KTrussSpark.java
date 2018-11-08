@@ -40,8 +40,8 @@ public class KTrussSpark extends KTruss {
                 int u = cVal[0];
                 Tuple2<Integer, Integer> uv = new Tuple2<>(u, v);
 
-                // The intersection determines triangles which u and v are two of their vertices.
-                // Always generate and edge (u, v) such that u < v.
+                // The intersection determines triangles which u and vertex are two of their vertices.
+                // Always generate and edge (u, vertex) such that u < vertex.
                 int fi = 1;
                 int ci = 1;
                 while (fi < fVal.length && ci < cVal.length) {
@@ -85,7 +85,7 @@ public class KTrussSpark extends KTruss {
                 int[] set = new int[META_LEN + list.size()];
                 set[0] = list.size();  // support of edge
                 set[1] = offsetW + sw;  // exclusive max offset of w
-                set[2] = offsetV + sv;  // exclusive max offset of v
+                set[2] = offsetV + sv;  // exclusive max offset of vertex
                 set[3] = offsetU + su;  // exclusive max offset of u
 
                 for (Tuple2<Integer, Byte> v : list) {

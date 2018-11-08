@@ -96,11 +96,11 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
 //            pRandom.increment(p);
 //            partitions[i] = p;
 //            pIndex[i] = pSizes[p]++;
-//            for (int v : fonls[i]) {
-//                if (fl[v] == 0 || partitions[v] != 0)
+//            for (int vertex : fonls[i]) {
+//                if (fl[vertex] == 0 || partitions[vertex] != 0)
 //                    continue;
-//                partitions[v] = p;
-//                pIndex[v] = pSizes[p]++;
+//                partitions[vertex] = p;
+//                pIndex[vertex] = pSizes[p]++;
 //                pRandom.increment(p);
 //            }
 //        }
@@ -154,7 +154,7 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
                         int v = fonl[j];
                         int[] vNeighbors = fonls[v];
 
-                        // intersection on u neighbors and v neighbors
+                        // intersection on u neighbors and vertex neighbors
                         int f = j + 1, vn = 0;
                         while (f < fl[u] && vn < fl[v]) {
                             if (fonl[f] == vNeighbors[vn]) {

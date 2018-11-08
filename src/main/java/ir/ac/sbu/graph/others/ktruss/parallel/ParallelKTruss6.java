@@ -137,7 +137,7 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
 
                         long uv = (long) u << 32 | v & 0xFFFFFFFFL;
 
-                        // intersection on u neighbors and v neighbors
+                        // intersection on u neighbors and vertex neighbors
                         int uwIndex = vIndex + 1, vwIndex = 0;
 
                         while (uwIndex < flen[u] && vwIndex < flen[v]) {

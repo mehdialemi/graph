@@ -52,7 +52,7 @@ object KTrussPregel {
         // Third getOrCreate a new ir.ac.sbu.graph with new edges and previous vertices
 
         // Set degree of each vertex in the property.
-        val graphVD = inputGraph.outerJoinVertices(inputGraph.degrees)((vid, v, deg) => deg)
+        val graphVD = inputGraph.outerJoinVertices(inputGraph.degrees)((vid, vertex, deg) => deg)
 
         // Find new edges with correct direction. A direction from a lower degree node to a higher degree node.
         val newEdges = graphVD.triplets.map { et =>
@@ -117,9 +117,9 @@ object KTrussPregel {
             })
 
             val edgeUpdated = edgeCount.mapTriplets(t => t.srcAttr.getOrElse(t.dstId, 0)).subgraph(e => e.attr >=
-              support, (vid, v) => true)
+              support, (vid, vertex) => true)
 
-            val newGraph = edgeUpdated.mapVertices((vId, v) => 0)
+            val newGraph = edgeUpdated.mapVertices((vId, vertex) => 0)
               .partitionBy(PartitionStrategy.CanonicalRandomVertexCut)
               .persist(StorageLevel.MEMORY_AND_DISK)
 

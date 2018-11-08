@@ -62,9 +62,8 @@ public class MaxKTrussTSet extends SparkApp {
 
         JavaPairRDD<Integer, int[]> candidates = triangle.createCandidates(fonl);
 
-        int partitionNum = Math.max(minPartitions, fonl.getNumPartitions());
-
         JavaPairRDD<Edge, int[]> tSet = createTSet(fonl, candidates);
+        int partitionNum = tSet.getNumPartitions();
 
         Map<Integer, JavaRDD<Edge>> eTrussMap = new HashMap <>();
 
@@ -83,7 +82,7 @@ public class MaxKTrussTSet extends SparkApp {
 
             final int support = minSup - 1;
             JavaRDD <Edge> kTruss = result._1;
-            kTruss.checkpoint();
+//            kTruss.checkpoint();
 
             eTrussMap.put(support, kTruss);
 
@@ -127,12 +126,6 @@ public class MaxKTrussTSet extends SparkApp {
 
         JavaRDD<Edge> eTruss = conf.getSc().parallelize(new ArrayList <>());
 
-//        JavaPairRDD <Edge, int[]> kCoreInvalid = invalidByKCore(tSet, minSup);
-
-        // Detect invalid edges by comparing the size of triangle vertex set
-//        JavaPairRDD<Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup).cache();
-//        invalids = invalids.fullOuterJoin(kCoreInvalid).mapValues(v -> v._1.isPresent() ? v._1.get() : v._2.get());
-
         Queue<JavaPairRDD<Edge, int[]>> tSetQueue = new LinkedList<>();
         tSetQueue.add(tSet);
 
@@ -149,13 +142,15 @@ public class MaxKTrussTSet extends SparkApp {
                 log("check pointing tSet", t, System.currentTimeMillis());
             }
             JavaPairRDD<Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup).cache();
-            long invalidCount = invalids.count();
+            JavaRDD <Edge> edges = invalids.keys().cache();
+            long invalidCount = edges.count();
 
             // If no invalid edge is found then the program terminates
             if (invalidCount == 0) {
                 break;
             }
-            eTruss = eTruss.union(invalids.map(kv -> kv._1));
+
+            eTruss = eTruss.union(edges);
 //
 //            if (tSetQueue.size() > 1)
 //                tSetQueue.remove().unpersist();
@@ -234,7 +229,7 @@ public class MaxKTrussTSet extends SparkApp {
                             set[offsetV + vLen] = set[i];
                             vLen ++;
                         }
-                        set[2] = offsetV + vLen; // exclusive index of v
+                        set[2] = offsetV + vLen; // exclusive index of vertex
 
                         int offsetU = set[2];
                         int uLen = 0;
@@ -261,7 +256,7 @@ public class MaxKTrussTSet extends SparkApp {
             tSetQueue.add(tSet);
         }
 
-        return new Tuple2<>(eTruss, tSet);
+        return new Tuple2<>(eTruss, tSet.repartition(partitionNum).cache());
     }
 
     private JavaPairRDD<Edge, int[]> createTSet(JavaPairRDD<Integer, int[]> fonl,
@@ -279,8 +274,8 @@ public class MaxKTrussTSet extends SparkApp {
                 int u = cVal[0];
                 Edge uv = new Edge(u, v);
 
-                // The intersection determines triangles which u and v are two of their vertices.
-                // Always generate and edge (u, v) such that u < v.
+                // The intersection determines triangles which u and vertex are two of their vertices.
+                // Always generate and edge (u, vertex) such that u < vertex.
                 int fi = 1;
                 int ci = 1;
                 while (fi < fVal.length && ci < cVal.length) {
@@ -310,9 +305,9 @@ public class MaxKTrussTSet extends SparkApp {
                     int sw = 0, sv = 0, su = 0;
                     for (VertexByte value : values) {
                         list.add(value);
-                        if (value.b == W_UVW)
+                        if (value.sign == W_UVW)
                             sw++;
-                        else if (value.b  == V_UVW)
+                        else if (value.sign == V_UVW)
                             sv++;
                         else
                             su++;
@@ -324,16 +319,16 @@ public class MaxKTrussTSet extends SparkApp {
                     int[] set = new int[META_LEN + list.size()];
                     set[0] = list.size();  // support of edge
                     set[1] = offsetW + sw;  // exclusive max offset of w
-                    set[2] = offsetV + sv;  // exclusive max offset of v
+                    set[2] = offsetV + sv;  // exclusive max offset of vertex
                     set[3] = offsetU + su;  // exclusive max offset of u
 
                     for (VertexByte vb : list) {
-                        if (vb.b == W_UVW)
-                            set[offsetW++] = vb.v;
-                        else if (vb.b == V_UVW)
-                            set[offsetV++] = vb.v;
+                        if (vb.sign == W_UVW)
+                            set[offsetW++] = vb.vertex;
+                        else if (vb.sign == V_UVW)
+                            set[offsetV++] = vb.vertex;
                         else
-                            set[offsetU++] = vb.v;
+                            set[offsetU++] = vb.vertex;
                     }
 
                     return set;

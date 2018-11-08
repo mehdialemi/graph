@@ -104,7 +104,7 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
 
                             int uwIndex = uvIndex + 1, vwIndex = 0;
 
-                            // intersection on u neighbors and v neighbors
+                            // intersection on u neighbors and vertex neighbors
                             while (uwIndex < fLens[u] && vwIndex < fLens[v]) {
                                 if (uNeighbors[uwIndex] == vNeighbors[vwIndex]) {
                                     edgeSup[uNeighborsEdges[uvIndex]].incrementAndGet();

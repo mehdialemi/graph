@@ -147,8 +147,8 @@ public class KTrussTSet2 extends SparkApp {
                 else
                     uv = new Edge(v, u);
 
-                // The intersection determines triangles which u and v are two of their vertices.
-                // Always generate and edge (u, v) such that u < v.
+                // The intersection determines triangles which u and vertex are two of their vertices.
+                // Always generate and edge (u, vertex) such that u < vertex.
                 int fi = 1;
                 int ci = 1;
                 while (fi < fVal.length && ci < cVal.length) {

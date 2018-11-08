@@ -31,7 +31,7 @@ object GraphIndexer {
 
         val labelCount = labelMap.map(t => t._2).countByValue
         val labelCountMap = sc.broadcast(labelCount)
-        val graph = inputGraph.outerJoinVertices(inputGraph.degrees)((vid, v, degree) => degree).cache()
+        val graph = inputGraph.outerJoinVertices(inputGraph.degrees)((vid, vertex, degree) => degree).cache()
         inputGraph.unpersist()
 
         val labelCountGraph = graph.outerJoinVertices(labelMap)((vid, degree, label) => {

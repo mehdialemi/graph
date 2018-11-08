@@ -64,12 +64,12 @@ public class KTrussSparkUpdateList {
             for (int[] cVal : t._2._1) {
                 int u = cVal[0];
 
-                // The intersection determines triangles which u and v are two of their vertices.
+                // The intersection determines triangles which u and vertex are two of their vertices.
                 IntList wList = GraphUtils.sortedIntersectionTest(fVal, 1, cVal, 1);
                 if (wList == null)
                     continue;
 
-                // Always generate and edge (u, v) such that u < v.
+                // Always generate and edge (u, vertex) such that u < vertex.
                 Tuple2<Integer, Integer> uv;
                 if (u < v)
                     uv = new Tuple2<>(u, v);

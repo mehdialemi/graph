@@ -95,7 +95,7 @@ public class KTrussSparkTriangleSet {
                 if (wList.isEmpty())
                     continue;
 
-                // TODO use min1 and min2 as u and v and others should be sorted
+                // TODO use min1 and min2 as u and vertex and others should be sorted
                 int[] wArray = new int[wList.size() + 1];
                 wArray[0] = v;
                 for (int i = 0; i < wList.size(); i++) {

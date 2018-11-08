@@ -136,7 +136,7 @@ public class TriangleParallel {
                         int v = (int) (ve >> 32);
                         int uv = (int) ve;
 
-                        // iterate over neighbors of v
+                        // iterate over neighbors of vertex
                         List<Long> vNeighbors = neighbors[v];
                         for (int k = 0; k < vNeighbors.size(); k++) {
                             long we = vNeighbors.get(k);

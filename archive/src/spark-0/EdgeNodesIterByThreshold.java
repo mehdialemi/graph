@@ -150,7 +150,7 @@ public class EdgeNodesIterByThreshold {
 
                 toRemoveEdges = toRemoveEdges.union(newEdgeNodes.filter(t -> !t._2._1).mapValues(t -> t._2));
 //                log("Step (" + step + "), toRemove Edges: " +
-//                    toRemoveEdges.map(t -> t._2.size()).reduce((a, b) -> a + b));
+//                    toRemoveEdges.map(t -> t._2.size()).reduce((a, sign) -> a + sign));
 
                 JavaPairRDD<Tuple2<Long, Long>, List<Long>> nextEdgeNodes =
                     newEdgeNodes.filter(t -> t._2._1).mapValues(t -> t._2).cache();

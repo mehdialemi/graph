@@ -281,8 +281,8 @@ public class MaxKTrussTSetSubSet extends SparkApp {
                 int u = cVal[0];
                 Edge uv = new Edge(u, v);
 
-                // The intersection determines triangles which u and v are two of their vertices.
-                // Always generate and edge (u, v) such that u < v.
+                // The intersection determines triangles which u and vertex are two of their vertices.
+                // Always generate and edge (u, vertex) such that u < vertex.
                 int fi = 1;
                 int ci = 1;
                 while (fi < fVal.length && ci < cVal.length) {
@@ -312,9 +312,9 @@ public class MaxKTrussTSetSubSet extends SparkApp {
                     int sw = 0, sv = 0, su = 0;
                     for (VertexByte value : values) {
                         list.add(value);
-                        if (value.b == W_UVW)
+                        if (value.sign == W_UVW)
                             sw++;
-                        else if (value.b  == V_UVW)
+                        else if (value.sign == V_UVW)
                             sv++;
                         else
                             su++;
@@ -326,16 +326,16 @@ public class MaxKTrussTSetSubSet extends SparkApp {
                     int[] set = new int[META_LEN + list.size()];
                     set[0] = list.size();  // support of edge
                     set[1] = offsetW + sw;  // exclusive max offset of w
-                    set[2] = offsetV + sv;  // exclusive max offset of v
+                    set[2] = offsetV + sv;  // exclusive max offset of vertex
                     set[3] = offsetU + su;  // exclusive max offset of u
 
                     for (VertexByte vb : list) {
-                        if (vb.b == W_UVW)
-                            set[offsetW++] = vb.v;
-                        else if (vb.b == V_UVW)
-                            set[offsetV++] = vb.v;
+                        if (vb.sign == W_UVW)
+                            set[offsetW++] = vb.vertex;
+                        else if (vb.sign == V_UVW)
+                            set[offsetV++] = vb.vertex;
                         else
-                            set[offsetU++] = vb.v;
+                            set[offsetU++] = vb.vertex;
                     }
 
                     return set;

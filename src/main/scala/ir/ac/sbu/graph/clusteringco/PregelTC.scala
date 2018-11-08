@@ -41,7 +41,7 @@ object PregelTC {
         // Third getOrCreate a new ir.ac.sbu.graph with new edges and previous vertices
 
         // Set degree of each vertex in the property.
-        val graphVD = inputGraph.outerJoinVertices(inputGraph.degrees)((vid, v, deg) => deg)
+        val graphVD = inputGraph.outerJoinVertices(inputGraph.degrees)((vid, vertex, deg) => deg)
 
         // Find new edges with correct direction. A direction from a lower degree node to a higher degree node.
         val newEdges = graphVD.triplets.map { et =>
@@ -83,7 +83,7 @@ object PregelTC {
         // a triangle through it.
         val tCount = graphWithOutlinks.vertices.join(message).flatMap { case (vid, (n, msg)) =>
             msg.map(ids => (n.intersect(ids._2))).filter(_.size > 0)
-        }.map(t => t.size).reduce((a, b) => a + b)
+        }.map(t => t.size).reduce((a, sign) => a + sign)
 
         OutUtils.printOutputTC(tCount)
 
