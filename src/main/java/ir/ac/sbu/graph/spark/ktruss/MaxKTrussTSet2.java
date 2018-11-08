@@ -69,7 +69,7 @@ public class MaxKTrussTSet2 extends SparkApp {
 
         int k = 4;
         long totalInvalids = 0;
-        JavaPairRDD<Edge, Integer> maxTruss = conf.getSc().parallelizePairs(new ArrayList <>());
+        JavaPairRDD <Edge, Integer> maxTruss = conf.getSc().parallelizePairs(new ArrayList <>());
         maxTruss = maxTruss.repartition(partitionNum);
 
         while (totalInvalids < count) {
@@ -162,16 +162,42 @@ public class MaxKTrussTSet2 extends SparkApp {
                             if (iSet.size() == 0)
                                 return set;
 
-                            for (int i = META_LEN; i < set.length; i++) {
-                                if (set[i] == INVALID)
+                            int i = META_LEN;
+                            int offsetW = META_LEN;
+                            int wLen = 0;
+                            for (; i < set[1]; i++) {
+                                if (set[i] == INVALID || iSet.contains(set[i]))
                                     continue;
-                                if (iSet.contains(set[i])) {
-                                    set[0]--;
-                                    set[i] = INVALID;
-                                }
+                                set[offsetW + wLen] = set[i];
+                                wLen++;
                             }
+                            set[1] = offsetW + wLen; // exclusive index of w
 
-                            return set;
+                            int offsetV = set[1];
+                            int vLen = 0;
+                            for (; i < set[2]; i++) {
+                                if (set[i] == INVALID || iSet.contains(set[i]))
+                                    continue;
+                                set[offsetV + vLen] = set[i];
+                                vLen++;
+                            }
+                            set[2] = offsetV + vLen; // exclusive index of vertex
+
+                            int offsetU = set[2];
+                            int uLen = 0;
+                            for (; i < set[3]; i++) {
+                                if (set[i] == INVALID || iSet.contains(set[i]))
+                                    continue;
+                                set[offsetU + uLen] = set[i];
+                                uLen++;
+                            }
+                            set[3] = offsetU + uLen; // exclusive index of u
+
+                            set[0] = wLen + vLen + uLen;
+
+                            int[] value = new int[META_LEN + set[0]];
+                            System.arraycopy(set, 0, value, 0, value.length);
+                            return value;
                         }).persist(StorageLevel.MEMORY_ONLY());
 //                tSetQueue.add(tSet);
             }
@@ -283,7 +309,7 @@ public class MaxKTrussTSet2 extends SparkApp {
         Map <Integer, Long> kCounts = maxTruss.map(kv -> kv._2).countByValue();
 
         int edgeCount = 0;
-        SortedMap<Integer, Long> sortedMap = new TreeMap <>(kCounts);
+        SortedMap <Integer, Long> sortedMap = new TreeMap <>(kCounts);
         for (Map.Entry <Integer, Long> entry : sortedMap.entrySet()) {
             log("K: " + entry.getKey() + ", Count: " + entry.getValue());
             edgeCount += entry.getValue();
