@@ -204,7 +204,7 @@ public class MaxKTrussTSet2 extends SparkApp {
             }
 
             long t2 = System.currentTimeMillis();
-            log("MinSup: " + minSup + ", MinSupInvalids: " + minSupInvalids +
+            log("Support: " + maxSupport + ", MinSupInvalids: " + minSupInvalids +
                     ", Total Invalids: " + totalInvalids, t1, t2);
             k++;
         }
