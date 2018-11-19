@@ -80,7 +80,7 @@ public class SeqMethod3 extends SequentialBase {
         DataOutputBuffer out1 = new DataOutputBuffer();
         DataOutputBuffer out2 = new DataOutputBuffer();
         byte[][] fonlCN = new byte[length][];  // fonl common neighbors
-        byte[][] fonlVS = new byte[length][];  // fonl vertex size
+        byte[][] fonlVS = new byte[length][];  // fonl vertex support
 
         for (int u = 0 ; u < length ; u ++) {
             if (fl[u] < 2)

@@ -191,7 +191,7 @@ public class KTrussSparkTriangleSet {
                 int[] tKey = f._2._2;
                 long e = (long) f._1._1 << 32 | f._1._2 & 0xFFFFFFFFL;
                 List<Tuple2<Integer, Long>> list = new ArrayList<>(tKey.length);
-                // skip sup which is in index 0
+                // skip support which is in index 0
                 for (int i = 1; i < tKey.length; i++) {
                     list.add(new Tuple2<>(tKey[i], e));
                 }
@@ -285,7 +285,7 @@ public class KTrussSparkTriangleSet {
                     int newSup = prevSupIterator.next() - sumSup;
                     if (newSup < 0)
                         newSup = 0;
-//                        throw new RuntimeException("new sup < 0");
+//                        throw new RuntimeException("new support < 0");
                     return Arrays.asList(new Tuple2<>(t._1, newSup)).iterator();
                 }).cache();
 

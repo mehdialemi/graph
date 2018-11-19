@@ -78,12 +78,12 @@ public class MyDataInput implements DataInput {
     @Override
     public byte readByte() throws IOException {
         if (li >= bytesList.size())
-            throw new ArrayIndexOutOfBoundsException("li = " + li + " bytesList.size = " + bytesList.size());
+            throw new ArrayIndexOutOfBoundsException("li = " + li + " bytesList.support = " + bytesList.size());
         byte[] bytes = bytesList.get(li);
         if (bi >= bytes.length) {
             if (li == (bytesList.size() - 1))
                 throw new ArrayIndexOutOfBoundsException("bi = " + bi + " bytes.length = " + bi +
-                    "li = " + li + " bytesList.size = " + bytesList.size());
+                    "li = " + li + " bytesList.support = " + bytesList.size());
             else {
                 bytes = bytesList.get(++li);
                 bi = 0;

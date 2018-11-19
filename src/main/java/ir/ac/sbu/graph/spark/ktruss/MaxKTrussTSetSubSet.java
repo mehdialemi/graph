@@ -103,7 +103,7 @@ public class MaxKTrussTSetSubSet extends SparkApp {
                         break;
                     }
                 }
-                log("minSup: " + minSup + ", maxSup: " + maxSup);
+                log("minSup: " + minSup + ", support: " + maxSup);
                 freezedSubTSet = subTSet;
                 freezedSubTSet.checkpoint();
             }

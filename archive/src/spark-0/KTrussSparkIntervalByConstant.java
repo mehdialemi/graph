@@ -120,7 +120,7 @@ public class KTrussSparkIntervalByConstant {
 
         while (!stop) {
             final int maxSup = minSup + constant;
-            log("iteration: " + ++iteration + ", maxSup: " + maxSup + ", minSup: " + minSup);
+            log("iteration: " + ++iteration + ", support: " + maxSup + ", minSup: " + minSup);
 
             JavaPairRDD<Tuple2<Integer, Integer>, IntSet> partialEdgeVertices = edgeVertices.filter(e -> e._2.size() < maxSup)
                 .partitionBy(partitioner).cache();

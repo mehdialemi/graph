@@ -223,7 +223,7 @@ public class PartitioningUtils {
                 }
             }
 
-            // find target findPartition => the smallest size findPartition with maximum maxScore
+            // find target findPartition => the smallest support findPartition with maximum maxScore
             for (int pIndex = 0; pIndex < pScores.length; pIndex++) {
                 if (pIndex == targetPartition)
                     continue;

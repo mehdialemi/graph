@@ -203,7 +203,7 @@ public class PowerPartitioning extends SparkApp {
                                     out.add(new Tuple2<>(vertex, pNumbers[index]));
                                 }
                             }
-                            System.out.println("out size: " + out.size());
+                            System.out.println("out support: " + out.size());
                             return out.iterator();
                         });
 
@@ -236,7 +236,7 @@ public class PowerPartitioning extends SparkApp {
      * Determine the partition nums of some vertices determined as agents and specifies the vertices to
      * be as the next agents which are allowed to send their partition num to their neighbors
      *
-     * @param pSizeBroadcast Desired size of
+     * @param pSizeBroadcast Desired support of
      * @param agents         Vertices having assigned a partition num and are allowed to send their
      *                       partition num to their neighbors
      */
@@ -293,8 +293,8 @@ public class PowerPartitioning extends SparkApp {
 //            PInfo pInfo = pInfoBroadcast.getValue();
 //            final int[] sorted = pInfo.sortedDegCounts;
 //
-//            // If number of nodes in the partition is larger than the specified partition size then decrease
-//            // it by the ratio of (current partition size) / (number of nodes in the current partition)
+//            // If number of nodes in the partition is larger than the specified partition support then decrease
+//            // it by the ratio of (current partition support) / (number of nodes in the current partition)
 //            Integer partitionSize = pSizeBroadcast.getValue();
 //
 //            // Number of assigned nodes to the current partition
@@ -377,7 +377,7 @@ public class PowerPartitioning extends SparkApp {
 
         PowerPartitioning partitioning = new PowerPartitioning(neighborList, 10);
         final JavaPairRDD<Integer, Integer> partitions = partitioning.getPartitions(2);
-        System.out.println("partition size: " + partitions.count());
+        System.out.println("partition support: " + partitions.count());
 
         List<Tuple2<Integer, Integer>> partitionList = partitions
                 .mapToPair(kv -> new Tuple2<>(kv._2, 1))

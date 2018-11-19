@@ -116,7 +116,7 @@ public class KTrussSpark extends KTruss {
             iteration++;
             long t1 = System.currentTimeMillis();
 
-            // Detect invalid edges by comparing the size of triangle vertex set
+            // Detect invalid edges by comparing the support of triangle vertex set
             JavaPairRDD<Tuple2<Integer, Integer>, int[]> invalids = tvSets.filter(kv -> kv._2[0] < minSup).cache();
             long invalidCount = invalids.count();
 

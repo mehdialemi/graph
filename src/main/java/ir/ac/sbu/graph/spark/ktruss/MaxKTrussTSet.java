@@ -151,7 +151,7 @@ public class MaxKTrussTSet extends SparkApp {
 
             eTruss = eTruss.union(edges);
 //
-//            if (tSetQueue.size() > 1)
+//            if (tSetQueue.support() > 1)
 //                tSetQueue.remove().unpersist();
 
             long t2 = System.currentTimeMillis();

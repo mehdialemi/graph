@@ -154,7 +154,7 @@ public class ParallelKTruss8 extends ParallelKTrussBase {
                 return packet._2.size();
             })).get().reduce((a, b) -> a + b).get();
             long tInvalid = System.currentTimeMillis();
-            System.out.println("iteration " + ++iteration + ", invalid size: " + invalidSize + " time: " + (tInvalid - t1) + " ms");
+            System.out.println("iteration " + ++iteration + ", invalid support: " + invalidSize + " time: " + (tInvalid - t1) + " ms");
 
             if (invalidSize == 0)
                 break;
@@ -256,6 +256,6 @@ public class ParallelKTruss8 extends ParallelKTrussBase {
                 size += iterator.next().getValue().size();
             }
         }
-        System.out.println("size: " + size);
+        System.out.println("support: " + size);
     }
 }

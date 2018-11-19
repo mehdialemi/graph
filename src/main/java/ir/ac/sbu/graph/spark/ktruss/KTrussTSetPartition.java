@@ -151,7 +151,7 @@ public class KTrussTSetPartition extends SparkApp {
 
             long t1 = System.currentTimeMillis();
 
-            // Detect invalid edges by comparing the size of triangle vertex set
+            // Detect invalid edges by comparing the support of triangle vertex set
             JavaPairRDD <EdgeSup, int[]> invalids = tSet.filter(kv -> kv._1.sup < minSup).cache();
             long invalidCount = invalids.count();
 

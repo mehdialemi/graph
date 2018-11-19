@@ -1,16 +1,16 @@
 package ir.ac.sbu.graph.spark;
 
 import ir.ac.sbu.graph.spark.partitioning.PartitionInfoAccumulator;
-import ir.ac.sbu.graph.types.Edge;
-import ir.ac.sbu.graph.types.VertexByte;
-import ir.ac.sbu.graph.types.VertexDeg;
+import ir.ac.sbu.graph.types.*;
 import ir.ac.sbu.graph.utils.Log;
+import it.unimi.dsi.fastutil.ints.*;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 
 import java.io.File;
+import java.util.*;
 
 /**
  * Configuration for spark applications
@@ -55,8 +55,12 @@ public class SparkAppConf {
         sparkConf.set("spark.driver.maxResultSize", "9g");
 //        sparkConf.set("spark.kryoserializer.buffer.max", "256m");
         sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-        sparkConf.registerKryoClasses(new Class[] {int[].class, VertexDeg.class, PartitionInfoAccumulator.class,
-                Edge.class, VertexByte.class});
+        sparkConf.registerKryoClasses(new Class[] {int[].class, TSetValue.class, VertexDeg.class, PartitionInfoAccumulator.class,
+                Edge.class, VertexByte.class, UEdge.class, IntList.class, IntCollection.class, Collection.class,
+                List.class, Iterable.class, Comparable.class, IntIterable.class, Map.class, Map.Entry.class,
+                HashMap.class, AbstractMap.class, Cloneable.class, IntSet.class, IntOpenHashSet.class,
+                IntCollection.class, Set.class, AbstractIntSet.class, AbstractIntCollection.class
+        });
 
         sc = new JavaSparkContext(sparkConf);
         Log.log(appName);

@@ -81,7 +81,7 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
 
         long tFonl = System.currentTimeMillis();
         System.out.println("construct fonl in " + (tFonl - tEdgeCount) + " ms");
-        System.out.println("max fonl size: " + maxFSize);
+        System.out.println("max fonl support: " + maxFSize);
 
         batchSelector = new AtomicInteger(0);
         forkJoinPool.submit(() -> IntStream.range(0, threads).parallel().forEach(partition -> {

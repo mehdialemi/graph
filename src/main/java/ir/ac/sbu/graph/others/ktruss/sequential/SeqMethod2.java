@@ -34,7 +34,7 @@ public class SeqMethod2 extends SequentialBase {
             }
             long t2 = System.currentTimeMillis();
 
-            System.out.println("invalid size: " + invalids.size() + " duration: " + (t2 - t1) + " ms");
+            System.out.println("invalid support: " + invalids.size() + " duration: " + (t2 - t1) + " ms");
             if (invalids.size() == 0)
                 break;
 

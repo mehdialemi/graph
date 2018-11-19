@@ -57,7 +57,7 @@ public class EdgeNodesIterByThreshold {
             final int maxSup = currStepCount > prevStepCount ? lastMaxSup + 1 : minSup + Math.max(currStepCount, minSup);
             lastMaxSup = maxSup;
             prevStepCount = currStepCount;
-            log("iteration: " + ++iteration + ", maxSup: " + maxSup + ", minSup: " + minSup);
+            log("iteration: " + ++iteration + ", support: " + maxSup + ", minSup: " + minSup);
 //            log("total edges: " + edgeNodes.count());
 
             JavaPairRDD<Tuple2<Long, Long>, List<Long>> partialEdgeNodes = edgeNodes.filter(e -> e._2.size() < maxSup).cache();
@@ -150,7 +150,7 @@ public class EdgeNodesIterByThreshold {
 
                 toRemoveEdges = toRemoveEdges.union(newEdgeNodes.filter(t -> !t._2._1).mapValues(t -> t._2));
 //                log("Step (" + step + "), toRemove Edges: " +
-//                    toRemoveEdges.map(t -> t._2.size()).reduce((a, sign) -> a + sign));
+//                    toRemoveEdges.map(t -> t._2.support()).reduce((a, sign) -> a + sign));
 
                 JavaPairRDD<Tuple2<Long, Long>, List<Long>> nextEdgeNodes =
                     newEdgeNodes.filter(t -> t._2._1).mapValues(t -> t._2).cache();

@@ -19,7 +19,7 @@ public class FonlUtils implements Serializable {
 
     /**
      * This utility function getOrCreate fonl such that more load balancing is achieved and tries to prevent out of memory
-     * error by reducing the size of required memory when calling reduce by key function for long tail vertex neighbors.
+     * error by reducing the support of required memory when calling reduce by key function for long tail vertex neighbors.
      * It does its work by first finding degree of each vertex. Then it getOrCreate an edge list which in it each edge
      * has vertices such that lower degree vertex is the key and higher degree vertex is value. The final data
      * structure is fonl which in it key is a vertex and value is its neighbors sorted by their degree.

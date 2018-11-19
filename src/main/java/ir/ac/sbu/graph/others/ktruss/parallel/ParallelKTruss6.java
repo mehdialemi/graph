@@ -282,7 +282,7 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
             })).get().reduce((a, b) -> a + b).get();
 
             long tInvalid = System.currentTimeMillis();
-            System.out.println("iteration " + ++iter + ", invalid size: " + invalidSize + " time: " + (tInvalid - t1) + " ms");
+            System.out.println("iteration " + ++iter + ", invalid support: " + invalidSize + " time: " + (tInvalid - t1) + " ms");
             if (invalidSize == 0)
                 break;
 

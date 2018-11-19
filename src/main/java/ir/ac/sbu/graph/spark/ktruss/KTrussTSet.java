@@ -79,7 +79,7 @@ public class KTrussTSet extends SparkApp {
                 fonl.unpersist();
             }
 
-            // Detect invalid edges by comparing the size of triangle vertex set
+            // Detect invalid edges by comparing the support of triangle vertex set
             JavaPairRDD<Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup).cache();
             long invalidCount = invalids.count();
 

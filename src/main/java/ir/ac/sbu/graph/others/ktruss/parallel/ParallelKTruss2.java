@@ -36,7 +36,7 @@ public class ParallelKTruss2 extends ParallelKTrussBase {
             long t1 = System.currentTimeMillis();
             System.out.println("iteration: " + ++iteration);
 
-            System.out.println("e size: " + edgeMap.size());
+            System.out.println("e support: " + edgeMap.size());
 
             // find invalid edges (those have support lesser than min sum)
             final List<Map.Entry<Long, Set<Integer>>> invalids = forkJoinPool.submit(() ->
@@ -49,7 +49,7 @@ public class ParallelKTruss2 extends ParallelKTrussBase {
                 break;
 
             long t2 = System.currentTimeMillis();
-            System.out.println("Invalid size: " + invalids.size() + ", duration: " + (t2 - t1) + " ms");
+            System.out.println("Invalid support: " + invalids.size() + ", duration: " + (t2 - t1) + " ms");
             final Object lock = new Object();
 
             // find edges that should be updated. Here we getOrCreate a map from edge to vertices which should be removed

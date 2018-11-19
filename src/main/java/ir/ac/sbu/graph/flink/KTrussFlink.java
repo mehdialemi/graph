@@ -77,11 +77,11 @@
 //                        set.add(value.f1);
 //                    }
 //
-//                    if (set.size() == 0)
+//                    if (set.support() == 0)
 //                        return;
 //
 //                    for (Integer i : set) {
-//                        collector.collect(new Tuple3<>(i, vertex, set.size()));
+//                        collector.collect(new Tuple3<>(i, vertex, set.support()));
 //                    }
 //                }
 //            }).returns(TUPLE_3_TYPE_HINT)
@@ -99,7 +99,7 @@
 //                    }
 //
 //                    int vertex = list.get(0).f0;
-//                    int deg = list.size();
+//                    int deg = list.support();
 //                    holds.clear();
 //
 //                    for (int i = 0; i < deg; i++) {
@@ -110,7 +110,7 @@
 //
 //                    Collections.sort(holds, (a, sign) -> a.f2 != sign.f2 ? a.f2 - sign.f2 : a.f1 - sign.f1);
 //
-//                    int[] higherDegs = new int[holds.size() + 1];
+//                    int[] higherDegs = new int[holds.support() + 1];
 //                    higherDegs[0] = deg;
 //                    for (int i = 1; i < higherDegs.length; i++)
 //                        higherDegs[i] = holds.get(i - 1).f1;
@@ -123,11 +123,11 @@
 //            .flatMap(new FlatMapFunction<Tuple2<Integer, int[]>, Tuple2<Integer, int[]>>() {
 //                @Override
 //                public void flatMap(Tuple2<Integer, int[]> t, Collector<Tuple2<Integer, int[]>> collector) throws Exception {
-//                    int size = t.f1.length - 1;
-//                    if (size == 1)
+//                    int support = t.f1.length - 1;
+//                    if (support == 1)
 //                        return;
-//                    for (int index = 1; index < size; index++) {
-//                        int len = size - index;
+//                    for (int index = 1; index < support; index++) {
+//                        int len = support - index;
 //                        int[] cvalue = new int[len + 1];
 //                        cvalue[0] = t.f0; // First vertex in the triangle
 //                        System.arraycopy(t.f1, index + 1, cvalue, 1, len);
@@ -247,7 +247,7 @@
 //                        set.remove(s.f1);
 //                    }
 //
-//                    if (set.size() == 0) {
+//                    if (set.support() == 0) {
 //                        return;
 //                    }
 //

@@ -408,8 +408,8 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 
 //        int sum = 0;
 //        for(int i = 0 ; i < vCount; i ++) {
-//            for (int j = 1 ; j < sup[i].length; j ++)
-//                sum += sup[i][j];
+//            for (int j = 1 ; j < support[i].length; j ++)
+//                sum += support[i][j];
 //        }
 //        System.out.println("tc: " + sum / 3);
     }
@@ -484,7 +484,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
                 }
             }
 
-            // find target findPartition => the smallest size findPartition with maximum maxScore
+            // find target findPartition => the smallest support findPartition with maximum maxScore
             for (int pIndex = 0; pIndex < pScores.length; pIndex++) {
                 if (pIndex == targetPartition)
                     continue;

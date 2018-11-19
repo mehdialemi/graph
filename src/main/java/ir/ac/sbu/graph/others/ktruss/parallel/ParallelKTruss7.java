@@ -118,21 +118,21 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
                             long vw = (long) v << 32 | w & 0xFFFFFFFFL;
                             IntSet set = evMap[p].get(uv);
                             if (set == null) {
-                                set = new IntOpenHashSet(); // TODO set size
+                                set = new IntOpenHashSet(); // TODO set support
                                 evMap[p].put(uv, set);
                             }
                             set.add(w);
 
                             set = evMap[p].get(uw);
                             if (set == null) {
-                                set = new IntOpenHashSet(); // TODO set size
+                                set = new IntOpenHashSet(); // TODO set support
                                 evMap[p].put(uw, set);
                             }
                             set.add(v);
 
                             set = evMap[p].get(vw);
                             if (set == null) {
-                                set = new IntOpenHashSet(); // TODO set size
+                                set = new IntOpenHashSet(); // TODO set support
                                 evMap[p].put(vw, set);
                             }
                             set.add(u);
@@ -230,7 +230,7 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
             })).get().reduce((a, b) -> a + b).get();
 
             long tInvalid = System.currentTimeMillis();
-            System.out.println("iteration " + ++iteration + ", invalid size: " + invalidSize + " time: " + (tInvalid - t1) + " ms");
+            System.out.println("iteration " + ++iteration + ", invalid support: " + invalidSize + " time: " + (tInvalid - t1) + " ms");
             if (invalidSize == 0)
                 break;
 
