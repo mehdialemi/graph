@@ -1,8 +1,5 @@
 package ir.ac.sbu.graph.types;
 
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-
 public class TSetValue {
     public int support;
     public int wLast;

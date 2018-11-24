@@ -1,5 +1,6 @@
 package ir.ac.sbu.graph.spark;
 
+import ir.ac.sbu.graph.spark.ktruss.MaxTSetValue;
 import ir.ac.sbu.graph.spark.partitioning.PartitionInfoAccumulator;
 import ir.ac.sbu.graph.types.*;
 import ir.ac.sbu.graph.utils.Log;
@@ -59,7 +60,7 @@ public class SparkAppConf {
                 Edge.class, VertexByte.class, UEdge.class, IntList.class, IntCollection.class, Collection.class,
                 List.class, Iterable.class, Comparable.class, IntIterable.class, Map.class, Map.Entry.class,
                 HashMap.class, AbstractMap.class, Cloneable.class, IntSet.class, IntOpenHashSet.class,
-                IntCollection.class, Set.class, AbstractIntSet.class, AbstractIntCollection.class
+                IntCollection.class, Set.class, AbstractIntSet.class, AbstractIntCollection.class, MaxTSetValue.class
         });
 
         sc = new JavaSparkContext(sparkConf);
