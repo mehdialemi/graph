@@ -117,55 +117,57 @@ public class MaxTrussTSetRange extends SparkApp {
                             return value;
                         }
 
-                        int sum = 0;
-                        int lowSum = 0;
+                        IntSet wSet = new IntOpenHashSet(value.w);
+                        IntSet vSet = new IntOpenHashSet(value.v);
+                        IntSet uSet = new IntOpenHashSet(value.u);
                         Int2ObjectSortedMap <IntSet> sortedMap = new Int2ObjectAVLTreeMap <>();
                         for (int[] sv : values._2.get()) {
                             int support = sv[0];
-                            sum ++;
                             if (support >= value.sup) {
                                 continue;
                             }
-                            lowSum ++;
 
                             int vertex = sv[1];
-                            IntSet set = sortedMap.get(support);
-                            if (set == null) {
-                                set = new IntOpenHashSet();
-                                sortedMap.put(support, set);
+                            if (wSet.contains(vertex) || vSet.contains(vertex) || uSet.contains(vertex)) {
+                                IntSet set = sortedMap.get(support);
+                                if (set == null) {
+                                    set = new IntOpenHashSet();
+                                    sortedMap.put(support, set);
+                                }
+                                set.add(vertex);
                             }
-                            set.add(vertex);
                         }
 
                         if (sortedMap.size() == 0)
                             return value;
 
                         int eSup = value.sup;
-                        IntSet wSet = new IntOpenHashSet(value.w);
-                        IntSet vSet = new IntOpenHashSet(value.v);
-                        IntSet uSet = new IntOpenHashSet(value.u);
+
                         int removedCount = 0;
                         int pSup = 0;
 //                        eSup = Math.max(eSup, lowSum);
                         int lastUSup = 0;
-                        for (Int2ObjectMap.Entry <IntSet> entry : sortedMap.int2ObjectEntrySet()) {
-                            int uSup = entry.getIntKey();
-                            IntSet set = entry.getValue();
-                            int removed = 0;
 
+                        IntSet lastWSet = new IntOpenHashSet();
+                        IntSet lastVSet = new IntOpenHashSet();
+                        IntSet lastUSet = new IntOpenHashSet();
+                        int uSup = 0;
+                        for (Int2ObjectMap.Entry <IntSet> entry : sortedMap.int2ObjectEntrySet()) {
+                            lastWSet.clear();
+                            lastVSet.clear();
+                            lastUSet.clear();
+                            uSup = entry.getIntKey();
+                            IntSet set = entry.getValue();
+                            int removed = set.size();
 
                             for (int v : set) {
-                                if (wSet.remove(v))
-                                    removed++;
-                                else if (vSet.remove(v))
-                                    removed++;
-                                else if (uSet.remove(v))
-                                    removed++;
-                            }
-
-                            if (removed == 0) {
-                                lastUSup = uSup;
-                                continue;
+                                if (wSet.remove(v)) {
+                                    lastWSet.add(v);
+                                } else if (vSet.remove(v)) {
+                                    lastVSet.add(v);
+                                } else if (uSet.remove(v)) {
+                                    lastUSet.add(v);
+                                }
                             }
 
                             if (eSup <= uSup) {
@@ -187,22 +189,28 @@ public class MaxTrussTSetRange extends SparkApp {
                             lastUSup = uSup;
                         }
 
-                        if (removedCount == 0) {
-                            return value;
+                        value.vSize -= removedCount;
+
+                        if (eSup == uSup) {
+                            wSet.addAll(lastWSet);
+                            vSet.addAll(lastVSet);
+                            uSet.addAll(lastUSet);
                         }
 
-                        eSup = Math.max(eSup, lastUSup);
+//                        eSup = Math.max(eSup, lastUSup);
+
+
+
 
                         value.updated = true;
-                        value.sup = Math.max(eSup, value.sup - removedCount);
+//                        value.sup = Math.max(eSup, value.sup - removedCount);
+                        value.sup = eSup;
                         if (value.w.length > wSet.size())
                             value.w = wSet.toIntArray();
                         if (value.v.length > vSet.size())
                             value.v = vSet.toIntArray();
                         if (value.u.length > uSet.size())
                             value.u = uSet.toIntArray();
-
-                        value.vSize -= removedCount;
 
                         return value;
                     }).persist(StorageLevel.MEMORY_AND_DISK());

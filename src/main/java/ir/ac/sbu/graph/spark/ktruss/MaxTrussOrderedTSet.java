@@ -67,17 +67,13 @@ public class MaxTrussOrderedTSet extends SparkApp {
 //                        int[] nSupV1 = new int[]{sup, -e.v1};
 //                        int[] nSupV2 = new int[]{sup, -e.v2};
                         for (int v : kv._2._2) {
-                            if (v < 0) {
-                                v = -v;
+//                            if (v < 0) {
+//                                v = -v;
+//                                out.add(new Tuple2 <>(new Edge(e.v1, v), supV2));
+//                            } else {
                                 out.add(new Tuple2 <>(new Edge(e.v1, v), supV2));
-//                                out.add(new Tuple2 <>(new Edge(v, e.v1), supV2));
-////                                out.add(new Tuple2 <>(new Edge(v, e.v1), nSupV2));
-////                                out.add(new Tuple2 <>(new Edge(v, e.v2), nSupV1));
-////                                out.add(new Tuple2 <>(new Edge(e.v2, v), nSupV1));
-                            } else {
-                                out.add(new Tuple2 <>(new Edge(e.v1, v), supV2));
-                                out.add(new Tuple2 <>(new Edge(e.v2, v), supV1));
-                            }
+//                                out.add(new Tuple2 <>(new Edge(e.v2, v), supV1));
+//                            }
                         }
                         return out.iterator();
                     }).groupByKey(numPartitions);
@@ -93,98 +89,54 @@ public class MaxTrussOrderedTSet extends SparkApp {
 
             oTSet = oTSet.leftOuterJoin(update).mapValues(values -> {
                 int eSup = Math.abs(values._1._1);
-                IntSet vSet = new IntOpenHashSet();
-                for (int v : values._1._2) {
-                    if (v < 0)
-                        continue;
-                    vSet.add(v);
-                }
+//                IntSet vSet = new IntOpenHashSet();
+//                for (int v : values._1._2) {
+//                    if (v < 0)
+//                        continue;
+//                    vSet.add(v);
+//                }
 
                 if (!values._2.isPresent()) {
-                    if (values._1._1 < 0)
-                        return new Tuple2 <>(eSup, vSet.toIntArray());
-                    return values._1;
+//                    if (values._1._1 < 0)
+//                        return new Tuple2 <>(eSup, vSet.toIntArray());
+                    return new Tuple2 <>(eSup, values._1._2);
                 }
 
                 int prevSup = eSup;
                 Int2IntAVLTreeMap ascSupCount = new Int2IntAVLTreeMap();
 
 
-                IntSet uSet = new IntOpenHashSet();
-//                Int2ObjectSortedMap <IntSet> supVertexMap = new Int2ObjectAVLTreeMap <>();
                 for (int[] sv : values._2.get()) {
                     int uSup = Math.abs(sv[0]);
-                    int v = sv[1];
-//                    IntSet set = supVertexMap.get(uSup);
-//                    if (set == null) {
-//                        set = new IntOpenHashSet();
-//                        supVertexMap.put(uSup, set);
-//                    }
 
                     if (uSup >= eSup) {
-                        vSet.add(-v);
                         continue;
                     }
-
-//                    v.remove(v);
-//                    u.add(v);
-//
-//                    if (uSup > eSup) {
-////                        if (!v.contains(-v))
-////                        v.add(v);
-////                        u.add(-v);
-//                        continue;
-//                    }
                     ascSupCount.addTo(uSup, 1);
                 }
 
                 if (ascSupCount.size() == 0)
-                    return new Tuple2 <>(eSup, vSet.toIntArray());
-//
-//                Int2IntAVLTreeMap desSupCount2 = new Int2IntAVLTreeMap((a, b) -> b - a);
-//                int sum = 0;
-//                for (Int2IntMap.Entry entry : ascSupCount.int2IntEntrySet()) {
-//                    sum += entry.getIntValue();
-//                    desSupCount2.put(entry.getIntKey(), sum);
-//                }
+                    return new Tuple2 <>(eSup, values._1._2);
 
                 int uSup;
-                int lastSup = 0;
+                int num = 0;
                 for (Int2IntMap.Entry entry : ascSupCount.int2IntEntrySet()) {
+                    num ++;
                     uSup = entry.getIntKey();
                     int count = entry.getValue();
-
-                    if (eSup <= uSup)
-                        break;
-
-//                    v.removeAll(set);
                     int newSup = eSup - count;
-
                     if (newSup <= uSup) {
-//                        if (newSup < uSup && lastSup > 0)
-//                            eSup = lastSup;
-//                        else
-                        eSup = uSup;
-//                        if (lastSup == 0) {
-//                            eSup = uSup;
-//                        } else if (newSup > lastSup)
-//                            eSup = newSup;
-//                        else
-//                            eSup = lastSup;
+                        if (num == 1)
+                            eSup = uSup;
                         break;
                     }
-
                     eSup = newSup;
-                    lastSup = uSup;
-//                    IntSet iSet = supVertexMap.get(uSup);
-//                    u.removeAll(iSet);
                 }
 
                 if (eSup < prevSup) {
-//                    v.addAll(u);
-                    return new Tuple2 <>(-eSup, vSet.toIntArray());
+                    return new Tuple2 <>(-eSup, values._1._2);
                 }
-                return new Tuple2 <>(prevSup, vSet.toIntArray());
+                return new Tuple2 <>(prevSup, values._1._2);
             }).cache();
 
             printKCount(oTSet.mapValues(v -> Math.abs(v._1)));
