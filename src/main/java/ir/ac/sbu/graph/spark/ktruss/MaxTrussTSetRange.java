@@ -79,11 +79,15 @@ public class MaxTrussTSetRange extends SparkApp {
                 maxSup = max;
                 maxIteration = Integer.MAX_VALUE;
             } else {
-                if (updates > maxUpdates / 10) {
-                    maxSup *= 2;
+                int ratio = maxUpdates / updates;
+                if (ratio == 1) {
+                    maxSup ++;
+                } else if (ratio < 10) {
+                    maxSup *= ratio;
                 } else {
                     maxSup = max;
                 }
+
                 if (maxSup >= max) {
                     maxIteration = Integer.MAX_VALUE;
                     maxSup = max;
