@@ -94,7 +94,11 @@ public class MaxTrussTSetRange extends SparkApp {
                         .mapValues(v -> v.sup)
                         .persist(StorageLevel.DISK_ONLY());
                 long excludeCount = exclude.count();
+
                 if (excludeCount > 0) {
+                    if (kCount == 0)
+                        maxIteration ++;
+
                     maxTruss = maxTruss.union(exclude);
                     tSet = result._2.filter(kv -> kv._2.sup > min || kv._2.updated)
                             .cache();
@@ -104,6 +108,7 @@ public class MaxTrussTSetRange extends SparkApp {
                     break;
                 }
 
+                maxIteration = 1;
                 kCount = 0;
                 minSup ++;
 
