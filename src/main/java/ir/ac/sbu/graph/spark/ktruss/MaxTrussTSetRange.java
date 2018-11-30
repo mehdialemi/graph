@@ -30,6 +30,7 @@ public class MaxTrussTSetRange extends SparkApp {
 
     private final NeighborList neighborList;
     private final KCoreConf kCoreConf;
+    public static final MaxTSetValue VALUE_SUP_1 = new MaxTSetValue(1);
 
     public MaxTrussTSetRange(NeighborList neighborList, SparkAppConf conf) throws URISyntaxException {
         super(neighborList);
@@ -45,7 +46,7 @@ public class MaxTrussTSetRange extends SparkApp {
 
     }
 
-    public JavaPairRDD <Edge, Integer> explore() {
+    public JavaPairRDD <Edge, Integer> explore(int minPartitions, int maxTruss) {
 
         KCore kCore = new KCore(neighborList, kCoreConf);
 
@@ -53,23 +54,58 @@ public class MaxTrussTSetRange extends SparkApp {
 
         JavaPairRDD <Integer, int[]> fonl = triangle.getOrCreateFonl();
 
+        int numPartitions = fonl.getNumPartitions();
+        numPartitions = Math.max(numPartitions * 5, minPartitions);
         JavaPairRDD <Integer, int[]> candidates = triangle.createCandidates(fonl);
 
-        JavaPairRDD <Edge, MaxTSetValue> tSet = createTSet(fonl, candidates);
+        JavaPairRDD <Edge, MaxTSetValue> tSet = createTSet(fonl, candidates, numPartitions);
 
-        JavaPairRDD <Edge, MaxTSetValue> rdd = find(tSet, 3);
+        int max = maxTruss + 1;
+        int maxUpdates = 0;
+        int maxIteration = 2;
+        for (int maxSup = 2 ; maxSup <= max; ) {
+            Tuple2 <Integer, JavaPairRDD <Edge, MaxTSetValue>> result = find(tSet, maxSup, Math.max(maxIteration, 1));
+            Integer updates = result._1;
+            if (updates > maxUpdates) {
+                maxUpdates = updates;
+                maxIteration ++;
+            } else {
+                maxIteration --;
+            }
 
-        return rdd.mapValues(v -> v.sup).reduceByKey(Math::max);
+            if (updates == 0) {
+                if (maxSup == max)
+                    break;
+                maxSup = max;
+                maxIteration = Integer.MAX_VALUE;
+            } else {
+                if (updates > maxUpdates / 10) {
+                    maxSup *= 2;
+                } else {
+                    maxSup = max;
+                }
+                if (maxSup >= max) {
+                    maxIteration = Integer.MAX_VALUE;
+                    maxSup = max;
+                }
+            }
+            tSet = result._2;
+        }
+
+        return tSet.mapValues(v -> v.sup);
     }
 
-
-    private JavaPairRDD <Edge, MaxTSetValue> find(JavaPairRDD <Edge, MaxTSetValue> tSet, int maxSup) {
+    private Tuple2<Integer, JavaPairRDD <Edge, MaxTSetValue>> find(JavaPairRDD <Edge, MaxTSetValue> tSet, int maxSup, int maxIterations) {
 
         int numPartitions = tSet.getNumPartitions();
         int iteration = 0;
 
+        int allUpdates = 0;
         while (true) {
             iteration++;
+            if (iteration > maxIterations)
+                break;
+
             long t1 = System.currentTimeMillis();
 
             JavaPairRDD <Edge, MaxTSetValue> filtered = tSet.filter(kv ->
@@ -110,8 +146,9 @@ public class MaxTrussTSetRange extends SparkApp {
             }).groupByKey(numPartitions);
 
             long count = update.count();
+            allUpdates += count;
             long t2 = System.currentTimeMillis();
-            log("iteration: " + iteration + ", updateCount: " + count, t1, t2);
+            log("maxSup: " + maxSup + ", iteration: " + iteration + ", updateCount: " + count, t1, t2);
             if (count == 0)
                 break;
 
@@ -120,8 +157,14 @@ public class MaxTrussTSetRange extends SparkApp {
                     .mapValues(values -> {
                         MaxTSetValue value = values._1;
 
+                        if (value.sup == 1) {
+                            return VALUE_SUP_1;
+                        }
+
                         Optional <Iterable <int[]>> right = values._2;
-                        value.updated = false;
+                        if (value.sup < maxSup)
+                            value.updated = false;
+
                         if (!right.isPresent()) {
                             return value;
                         }
@@ -192,7 +235,6 @@ public class MaxTrussTSetRange extends SparkApp {
                                 sup = uSup;
                                 break;
                             }
-                            // sup = uSup;
                             sup = sum;
                         }
 
@@ -200,35 +242,17 @@ public class MaxTrussTSetRange extends SparkApp {
                             value.sup = sup;
                             value.updated = true;
                         }
-//
-//                        for (int i = 0; i < value.kw.length; i++) {
-//                            if (value.kw[i] <= sup)
-//                                continue;
-//                            value.kw[i] = sup;
-//                        }
-//                        for (int i = 0; i < value.kv.length; i++) {
-//                            if (value.kv[i] <= sup)
-//                                continue;
-//                            value.kv[i] = sup;
-//                        }
-//                        for (int i = 0; i < value.ku.length; i++) {
-//                            if (value.ku[i] <= sup)
-//                                continue;
-//                            value.ku[i] = sup;
-//                        }
-
                         return value;
                     }).persist(StorageLevel.MEMORY_AND_DISK());
-
-            printKCount(tSet.mapValues(v -> v.sup));
         }
 
-        return tSet;
+        return new Tuple2 <>(allUpdates, tSet);
     }
 
     private JavaPairRDD <Edge, MaxTSetValue> createTSet(JavaPairRDD <Integer, int[]> fonl,
-                                                        JavaPairRDD <Integer, int[]> candidates) {
-        int partitionNum = fonl.getNumPartitions();
+                                                        JavaPairRDD <Integer, int[]> candidates,
+                                                        int partitionNum) {
+
         // Generate kv such that key is an edge and value is its triangle vertices.
         JavaPairRDD <Edge, MaxTSetValue> tSet = candidates.cogroup(fonl)
                 .flatMapToPair(t -> {
@@ -244,7 +268,7 @@ public class MaxTrussTSetRange extends SparkApp {
                         // The intersection determines triangles which u and vertex are two of their vertices.
                         // Always generate and edge (u, vertex) such that u < vertex.
                         int fi = 1;
-                        int ci = 1;
+                        int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ci = 1;
                         while (fi < fVal.length && ci < cVal.length) {
                             if (fVal[fi] < cVal[ci])
                                 fi++;
@@ -266,7 +290,7 @@ public class MaxTrussTSetRange extends SparkApp {
                     }
 
                     return output.iterator();
-                }).groupByKey(partitionNum * 2)
+                }).groupByKey(partitionNum)
                 .mapValues(values -> {
                     IntSortedSet wSet = new IntAVLTreeSet();
                     IntSortedSet vSet = new IntAVLTreeSet();
@@ -319,12 +343,12 @@ public class MaxTrussTSetRange extends SparkApp {
             }
         };
         conf.init();
-
+        int minPartitions = argumentReader.nextInt(10);
         EdgeLoader edgeLoader = new EdgeLoader(conf);
         NeighborList neighborList = new NeighborList(edgeLoader);
 
         MaxTrussTSetRange kTrussTSet = new MaxTrussTSetRange(neighborList, conf);
-        JavaPairRDD <Edge, Integer> truss = kTrussTSet.explore();
+        JavaPairRDD <Edge, Integer> truss = kTrussTSet.explore(minPartitions, 100000);
         long t2 = System.currentTimeMillis();
         log("KTruss edge count: " + truss.count(), t1, t2);
 
