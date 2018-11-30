@@ -15,6 +15,7 @@ import scala.Tuple2;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static ir.ac.sbu.graph.utils.Log.log;
 
@@ -30,7 +31,7 @@ public class MaxTrussTSetRange extends SparkApp {
 
     private final NeighborList neighborList;
     private final KCoreConf kCoreConf;
-    public static final MaxTSetValue VALUE_SUP_1 = new MaxTSetValue(1);
+    private final AtomicInteger totalIterations = new AtomicInteger(0);
 
     public MaxTrussTSetRange(NeighborList neighborList, SparkAppConf conf) throws URISyntaxException {
         super(neighborList);
@@ -46,7 +47,7 @@ public class MaxTrussTSetRange extends SparkApp {
 
     }
 
-    public JavaPairRDD <Edge, Integer> explore(int minPartitions, int maxTruss) {
+    public JavaPairRDD <Edge, Integer> explore(int minPartitions, int maxK) {
 
         KCore kCore = new KCore(neighborList, kCoreConf);
 
@@ -59,97 +60,123 @@ public class MaxTrussTSetRange extends SparkApp {
         JavaPairRDD <Integer, int[]> candidates = triangle.createCandidates(fonl);
 
         JavaPairRDD <Edge, MaxTSetValue> tSet = createTSet(fonl, candidates, numPartitions);
-
-        int max = maxTruss + 1;
+        JavaPairRDD <Edge, Integer> maxTruss = conf.getSc().parallelizePairs(new ArrayList <>());
+        int max = maxK + 1;
         int maxUpdates = 0;
         int maxIteration = 2;
-        for (int maxSup = 2 ; maxSup <= max; ) {
-            Tuple2 <Integer, JavaPairRDD <Edge, MaxTSetValue>> result = find(tSet, maxSup, Math.max(maxIteration, 1));
+        int minSup = 1;
+        int kCount = 0;
+        for (int maxSup = 2; maxSup <= max; ) {
+            Tuple2 <Integer, JavaPairRDD <Edge, MaxTSetValue>> result = find(tSet, maxSup, maxIteration);
+
             Integer updates = result._1;
             if (updates > maxUpdates) {
                 maxUpdates = updates;
-                maxIteration ++;
-            } else {
-                maxIteration --;
             }
 
-            if (updates == 0) {
-                if (maxSup == max)
-                    break;
-                maxSup = max;
-                maxIteration = Integer.MAX_VALUE;
-            } else {
+            if (updates == 0)
+                break;
+
+            if (maxSup < max) {
                 int ratio = maxUpdates / updates;
-                if (ratio == 1) {
-                    maxSup ++;
-                } else if (ratio < 10) {
+                if (ratio < 10) {
+                    int sum = Math.max(1, ratio);
+                    maxSup += sum;
+                } else if (ratio < 50) {
                     maxSup *= 2;
                 } else {
                     maxSup = max;
                 }
-
-                if (maxSup >= max) {
-                    maxIteration = Integer.MAX_VALUE;
-                    maxSup = max;
-                }
             }
-            tSet = result._2;
+
+            if (maxSup >= max) {
+                maxSup = max;
+                maxIteration += 5;
+            }
+
+            final int min = minSup;
+            JavaPairRDD <Edge, Integer> exclude = result._2.filter(kv -> !kv._2.updated && kv._2.sup <= min)
+                    .mapValues(v -> v.sup)
+                    .persist(StorageLevel.DISK_ONLY());
+
+            long excludeCount = exclude.count();
+            maxTruss = maxTruss.union(exclude);
+
+            if (excludeCount > 0) {
+                tSet = result._2.filter(kv -> kv._2.sup > min || kv._2.updated)
+                        .cache();
+                kCount += excludeCount;
+            } else {
+                tSet = result._2;
+                minSup++;
+                kCount = 0;
+                continue;
+            }
+
+            log("minSup: " + minSup + ", kCount: " + kCount + ", exclude count: " + excludeCount);
         }
 
-        return tSet.mapValues(v -> v.sup);
+        maxTruss = maxTruss.union(tSet.mapValues(v -> v.sup).persist(StorageLevel.DISK_ONLY()));
+
+        return maxTruss;
     }
 
-    private Tuple2<Integer, JavaPairRDD <Edge, MaxTSetValue>> find(JavaPairRDD <Edge, MaxTSetValue> tSet, int maxSup, int maxIterations) {
+    private Tuple2 <Integer, JavaPairRDD <Edge, MaxTSetValue>> find(JavaPairRDD <Edge, MaxTSetValue> tSet, int maxSup,
+                                                                    int maxIteration) {
 
         int numPartitions = tSet.getNumPartitions();
         int iteration = 0;
 
         int allUpdates = 0;
-        while (true) {
+        while (iteration < maxIteration) {
             iteration++;
-            if (iteration > maxIterations)
-                break;
+
+            if (totalIterations.incrementAndGet() % 50 == 0) {
+                tSet.checkpoint();
+            }
 
             long t1 = System.currentTimeMillis();
 
-            JavaPairRDD <Edge, MaxTSetValue> filtered = tSet.filter(kv ->
-                    kv._2.updated && kv._2.sup < maxSup);
+            JavaPairRDD <Edge, Iterable <int[]>> update = tSet
+                    .filter(kv -> kv._2.updated && kv._2.sup < maxSup)
+                    .flatMapToPair(kv -> {
+                        Edge e = kv._1;
+                        List <Tuple2 <Edge, int[]>> out = new ArrayList <>();
+                        MaxTSetValue value = kv._2;
 
-            JavaPairRDD <Edge, Iterable <int[]>> update = filtered.flatMapToPair(kv -> {
-                Edge e = kv._1;
-                List <Tuple2 <Edge, int[]>> out = new ArrayList <>();
-                MaxTSetValue value = kv._2;
+                        int[] sv2 = new int[]{value.sup, e.v2};
+                        int[] sv1 = new int[]{value.sup, e.v1};
+                        for (int i = 0; i < value.w.length; i++) {
+                            if (value.kw[i] < value.sup)
+                                continue;
+                            int w = value.w[i];
+                            out.add(new Tuple2 <>(new Edge(e.v1, w), sv2));
+                            out.add(new Tuple2 <>(new Edge(e.v2, w), sv1));
+                        }
 
-                int[] sv2 = new int[]{value.sup, e.v2};
-                int[] sv1 = new int[]{value.sup, e.v1};
-                for (int i = 0; i < value.w.length; i++) {
-                    if (value.kw[i] < value.sup)
-                        continue;
-                    int w = value.w[i];
-                    out.add(new Tuple2 <>(new Edge(e.v1, w), sv2));
-                    out.add(new Tuple2 <>(new Edge(e.v2, w), sv1));
-                }
+                        for (int i = 0; i < value.v.length; i++) {
+                            if (value.kv[i] < value.sup)
+                                continue;
+                            int v = value.v[i];
+                            out.add(new Tuple2 <>(new Edge(e.v1, v), sv2));
+                            out.add(new Tuple2 <>(new Edge(v, e.v2), sv1));
+                        }
 
-                for (int i = 0; i < value.v.length; i++) {
-                    if (value.kv[i] < value.sup)
-                        continue;
-                    int v = value.v[i];
-                    out.add(new Tuple2 <>(new Edge(e.v1, v), sv2));
-                    out.add(new Tuple2 <>(new Edge(v, e.v2), sv1));
-                }
+                        for (int i = 0; i < value.u.length; i++) {
+                            if (value.ku[i] < value.sup)
+                                continue;
+                            int u = value.u[i];
+                            out.add(new Tuple2 <>(new Edge(u, e.v1), sv2));
+                            out.add(new Tuple2 <>(new Edge(u, e.v2), sv1));
+                        }
 
-                for (int i = 0; i < value.u.length; i++) {
-                    if (value.ku[i] < value.sup)
-                        continue;
-                    int u = value.u[i];
-                    out.add(new Tuple2 <>(new Edge(u, e.v1), sv2));
-                    out.add(new Tuple2 <>(new Edge(u, e.v2), sv1));
-                }
-
-                return out.iterator();
-            }).groupByKey(numPartitions);
+                        return out.iterator();
+                    })
+                    .groupByKey(numPartitions)
+                    .cache();
 
             long count = update.count();
+
             allUpdates += count;
             long t2 = System.currentTimeMillis();
             log("maxSup: " + maxSup + ", iteration: " + iteration + ", updateCount: " + count, t1, t2);
@@ -161,13 +188,10 @@ public class MaxTrussTSetRange extends SparkApp {
                     .mapValues(values -> {
                         MaxTSetValue value = values._1;
 
-                        if (value.sup == 1) {
-                            return VALUE_SUP_1;
-                        }
-
                         Optional <Iterable <int[]>> right = values._2;
-                        if (value.sup < maxSup)
+                        if (value.sup < maxSup) {
                             value.updated = false;
+                        }
 
                         if (!right.isPresent()) {
                             return value;
@@ -186,8 +210,9 @@ public class MaxTrussTSetRange extends SparkApp {
                                 updateMap.put(vertex, support);
                         }
 
-                        if (updateMap.size() == 0)
+                        if (updateMap.size() == 0) {
                             return value;
+                        }
 
                         for (Int2IntMap.Entry entry : updateMap.int2IntEntrySet()) {
                             int vertex = entry.getIntKey();
@@ -247,9 +272,9 @@ public class MaxTrussTSetRange extends SparkApp {
                             value.updated = true;
                         }
                         return value;
-                    }).persist(StorageLevel.MEMORY_AND_DISK());
+                    }).cache();
         }
-
+++
         return new Tuple2 <>(allUpdates, tSet);
     }
 
@@ -272,7 +297,7 @@ public class MaxTrussTSetRange extends SparkApp {
                         // The intersection determines triangles which u and vertex are two of their vertices.
                         // Always generate and edge (u, vertex) such that u < vertex.
                         int fi = 1;
-                        int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ci = 1;
+                        int ci = 1;
                         while (fi < fVal.length && ci < cVal.length) {
                             if (fVal[fi] < cVal[ci])
                                 fi++;
@@ -343,11 +368,11 @@ public class MaxTrussTSetRange extends SparkApp {
         SparkAppConf conf = new SparkAppConf(argumentReader) {
             @Override
             protected String createAppName() {
-                return "MaxKTrussTSet-" + super.createAppName();
+                return "MaxTrussTSetRange-" + super.createAppName();
             }
         };
         conf.init();
-        int minPartitions = argumentReader.nextInt(10);
+        int minPartitions = argumentReader.nextInt(2);
         EdgeLoader edgeLoader = new EdgeLoader(conf);
         NeighborList neighborList = new NeighborList(edgeLoader);
 

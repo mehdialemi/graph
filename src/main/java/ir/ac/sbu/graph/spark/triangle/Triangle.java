@@ -28,7 +28,7 @@ public class Triangle extends SparkApp {
 
     public JavaPairRDD<Integer, int[]> getOrCreateFonl() {
         if (fonl == null)
-            fonl = createFonl(P_MULTIPLIER).persist(StorageLevel.MEMORY_AND_DISK_2());
+            fonl = createFonl(1).persist(StorageLevel.MEMORY_AND_DISK_2());
         return fonl;
     }
 

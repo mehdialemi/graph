@@ -9,8 +9,4 @@ public class MaxTSetValue {
     public int[] u;
     public int[] ku;
     public boolean updated;
-
-    public MaxTSetValue() {}
-
-    public MaxTSetValue(int sup) { this.sup = sup; }
 }
