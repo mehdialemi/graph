@@ -63,9 +63,10 @@ public class MaxTrussTSetRange extends SparkApp {
         JavaPairRDD <Edge, Integer> maxTruss = conf.getSc().parallelizePairs(new ArrayList <>());
         int max = maxK + 1;
         int maxUpdates = 0;
-        int maxIteration = 2;
+        int maxIteration = 1;
         int minSup = 1;
         int kCount = 0;
+        long maxExcluded = 0;
         for (int maxSup = 2; maxSup <= max; ) {
             Tuple2 <Integer, JavaPairRDD <Edge, MaxTSetValue>> result = find(tSet, maxSup, maxIteration);
 
@@ -77,23 +78,6 @@ public class MaxTrussTSetRange extends SparkApp {
             if (updates == 0)
                 break;
 
-            if (maxSup < max) {
-                int ratio = maxUpdates / updates;
-                if (ratio < 10) {
-                    int sum = Math.max(1, ratio);
-                    maxSup += sum;
-                } else if (ratio < 50) {
-                    maxSup *= 2;
-                } else {
-                    maxSup = max;
-                }
-            }
-
-            if (maxSup >= max) {
-                maxSup = max;
-                maxIteration += 5;
-            }
-
             final int min = minSup;
             JavaPairRDD <Edge, Integer> exclude = result._2.filter(kv -> !kv._2.updated && kv._2.sup <= min)
                     .mapValues(v -> v.sup)
@@ -102,15 +86,40 @@ public class MaxTrussTSetRange extends SparkApp {
             long excludeCount = exclude.count();
             maxTruss = maxTruss.union(exclude);
 
+            int ratio = maxUpdates / updates;
             if (excludeCount > 0) {
                 tSet = result._2.filter(kv -> kv._2.sup > min || kv._2.updated)
                         .cache();
                 kCount += excludeCount;
+                ratio = 1;
             } else {
                 tSet = result._2;
                 minSup++;
                 kCount = 0;
-                continue;
+            }
+
+            if (maxSup < max) {
+                if (ratio < 10) {
+                    int sum = Math.max(1, ratio);
+                    maxSup += sum;
+                } else if (ratio < 100) {
+                    maxSup *= 2;
+                } else {
+                    maxSup = max;
+                }
+            }
+
+            if (maxSup >= max) {
+                maxSup = max;
+                if (maxExcluded < excludeCount)
+                    maxExcluded = excludeCount;
+
+                if (excludeCount == 0)
+                    maxIteration += 5;
+                else {
+                    int r = (int) maxExcluded / (int) excludeCount;
+                    maxIteration = Math.max(5, r);
+                }
             }
 
             log("minSup: " + minSup + ", kCount: " + kCount + ", exclude count: " + excludeCount);
