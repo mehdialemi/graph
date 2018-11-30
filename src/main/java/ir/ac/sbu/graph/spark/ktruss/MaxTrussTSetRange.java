@@ -274,7 +274,7 @@ public class MaxTrussTSetRange extends SparkApp {
                         return value;
                     }).cache();
         }
-++
+
         return new Tuple2 <>(allUpdates, tSet);
     }
 
