@@ -52,101 +52,156 @@ public class MaxTrussOrderedTSet extends SparkApp {
 
         JavaPairRDD <Integer, int[]> candidates = triangle.createCandidates(fonl);
 
-        JavaPairRDD <Edge, Tuple2 <Integer, int[]>> oTSet = createOrderedTSet(fonl, candidates);
+        JavaPairRDD <Edge, OTSetValue> oTSet = createOrderedTSet(fonl, candidates);
         int numPartitions = oTSet.getNumPartitions();
 
+        long maxUpdates = 2;
+        long updateCount = 1;
         while (true) {
+            final int iteration = iterations.incrementAndGet();
+            if (iteration % 20 == 0)
+                oTSet.checkpoint();
+
+
             long t1 = System.currentTimeMillis();
-            JavaPairRDD <Edge, Iterable <int[]>> update = oTSet.filter(kv -> kv._2._1 < 0)
+            JavaPairRDD <Edge, Iterable <int[]>> supUpdates = oTSet.filter(kv -> kv._2.support < 0 && !kv._2.disabled)
                     .flatMapToPair(kv -> {
                         Edge e = kv._1;
-                        int sup = -kv._2._1;
+                        OTSetValue oTSetValue = kv._2;
+                        int sup = -oTSetValue.support;
                         List <Tuple2 <Edge, int[]>> out = new ArrayList <>();
                         int[] supV1 = new int[]{sup, e.v1};
                         int[] supV2 = new int[]{sup, e.v2};
-//                        int[] nSupV1 = new int[]{sup, -e.v1};
-//                        int[] nSupV2 = new int[]{sup, -e.v2};
-                        for (int v : kv._2._2) {
-//                            if (v < 0) {
-//                                v = -v;
-//                                out.add(new Tuple2 <>(new Edge(e.v1, v), supV2));
-//                            } else {
-                                out.add(new Tuple2 <>(new Edge(e.v1, v), supV2));
-//                                out.add(new Tuple2 <>(new Edge(e.v2, v), supV1));
-//                            }
+                        for (int v : oTSetValue.vertices) {
+                            out.add(new Tuple2 <>(new Edge(e.v1, v), supV2));
+                            // TODO check to remove this
+//                            out.add(new Tuple2 <>(new Edge(e.v2, v), supV1));
                         }
                         return out.iterator();
                     }).groupByKey(numPartitions);
-            long updateCount = update.count();
+            updateCount = supUpdates.count();
             long t2 = System.currentTimeMillis();
-            int iteration = iterations.incrementAndGet();
+
             log("iteration: " + iteration + ", updateCount: " + updateCount, t1, t2);
             if (updateCount == 0)
                 break;
 
-            if (iteration % 20 == 0)
-                oTSet.checkpoint();
+            if (updateCount > maxUpdates)
+                maxUpdates = updateCount;
 
-            oTSet = oTSet.leftOuterJoin(update).mapValues(values -> {
-                int eSup = Math.abs(values._1._1);
-//                IntSet vSet = new IntOpenHashSet();
-//                for (int v : values._1._2) {
-//                    if (v < 0)
-//                        continue;
-//                    vSet.add(v);
-//                }
 
-                if (!values._2.isPresent()) {
-//                    if (values._1._1 < 0)
-//                        return new Tuple2 <>(eSup, vSet.toIntArray());
-                    return new Tuple2 <>(eSup, values._1._2);
+
+            oTSet = oTSet.leftOuterJoin(supUpdates).mapValues(values -> {
+                OTSetValue otSetValue = values._1;
+                int eSup = Math.abs(otSetValue.support);
+                otSetValue.support = eSup;
+                if (!values._2.isPresent() || otSetValue.disabled) {
+                    return otSetValue;
                 }
 
                 int prevSup = eSup;
-                Int2IntAVLTreeMap ascSupCount = new Int2IntAVLTreeMap();
-
-
+                Int2IntMap map = new Int2IntOpenHashMap();
                 for (int[] sv : values._2.get()) {
                     int uSup = Math.abs(sv[0]);
+                    int vertex = sv[1];
 
                     if (uSup >= eSup) {
                         continue;
                     }
+
+                    map.putIfAbsent(vertex, uSup);
+                    map.computeIfPresent(vertex, (k, v) -> Math.min(v, uSup));
+
+                }
+
+                Int2IntAVLTreeMap ascSupCount = new Int2IntAVLTreeMap();
+                for (Map.Entry <Integer, Integer> entry : map.entrySet()) {
+                    int uSup = entry.getValue();
                     ascSupCount.addTo(uSup, 1);
                 }
 
                 if (ascSupCount.size() == 0)
-                    return new Tuple2 <>(eSup, values._1._2);
+                    return otSetValue;
 
                 int uSup;
                 int num = 0;
+                int pSup = 0;
                 for (Int2IntMap.Entry entry : ascSupCount.int2IntEntrySet()) {
-                    num ++;
+                    num++;
                     uSup = entry.getIntKey();
                     int count = entry.getValue();
                     int newSup = eSup - count;
                     if (newSup <= uSup) {
                         if (num == 1)
                             eSup = uSup;
+                        if (eSup < pSup)
+                            eSup = pSup;
                         break;
                     }
                     eSup = newSup;
+                    pSup = eSup;
                 }
+
+                if (otSetValue.support == 1)
+                    otSetValue.disabled = true;
 
                 if (eSup < prevSup) {
-                    return new Tuple2 <>(-eSup, values._1._2);
+                    otSetValue.support = -eSup;
                 }
-                return new Tuple2 <>(prevSup, values._1._2);
+                return otSetValue;
+            }).cache();
+            // rebuild oTSet
+            JavaPairRDD <Edge, Iterable <int[]>> valueUpdates = oTSet.flatMapToPair(kv -> {
+                OTSetValue otSetValue = kv._2;
+                List <Tuple2 <Edge, int[]>> out = new ArrayList <>();
+                if (otSetValue.disabled)
+                    return out.iterator();
+
+                int sup = Math.abs(otSetValue.support);
+                Edge e = kv._1;
+
+                int[] supV1 = new int[]{sup, e.v1};
+                int[] supV2 = new int[]{sup, e.v2};
+                for (int v : otSetValue.vertices) {
+                    out.add(new Tuple2 <>(new Edge(e.v1, v), supV2));
+                    out.add(new Tuple2 <>(new Edge(e.v2, v), supV1));
+                }
+                return out.iterator();
+            }).groupByKey(numPartitions);
+
+            oTSet = oTSet.leftOuterJoin(valueUpdates).mapValues(values -> {
+                OTSetValue otSetValue = values._1;
+                int eSup = Math.abs(otSetValue.support);
+                if (!values._2.isPresent() || otSetValue.disabled) {
+                    return otSetValue;
+                }
+
+                IntSet set = new IntOpenHashSet(otSetValue.vertices);
+                for (int[] sv : values._2.get()) {
+                    int uSup = Math.abs(sv[0]);
+                    int vertex = sv[1];
+
+                    if (uSup < eSup) {
+                        set.remove(vertex);
+                        continue;
+                    } else {
+                        otSetValue.support = -eSup;
+                        set.add(vertex);
+                    }
+                }
+
+                otSetValue.vertices = set.toIntArray();
+                return otSetValue;
             }).cache();
 
-            printKCount(oTSet.mapValues(v -> Math.abs(v._1)));
+            printKCount(oTSet.mapValues(v -> Math.abs(v.support)));
         }
 
-        return oTSet.mapValues(v -> Math.abs(v._1));
+        return oTSet.mapValues(v -> Math.abs(v.support));
     }
 
 
-    private JavaPairRDD <Edge, Tuple2 <Integer, int[]>> createOrderedTSet(JavaPairRDD <Integer, int[]> fonl,
+    private JavaPairRDD <Edge, OTSetValue> createOrderedTSet(JavaPairRDD <Integer, int[]> fonl,
                                                                           JavaPairRDD <Integer, int[]> candidates) {
         int partitionNum = fonl.getNumPartitions();
         // Generate kv such that key is an edge and value is its triangle vertices.
@@ -197,7 +252,11 @@ public class MaxTrussOrderedTSet extends SparkApp {
                         if (value != 0)
                             set.add(value);
                     }
-                    return new Tuple2 <>(-sup, set.toIntArray());
+                    OTSetValue oTSetValue = new OTSetValue();
+                    oTSetValue.disabled = false;
+                    oTSetValue.support = -sup;
+                    oTSetValue.vertices = set.toIntArray();
+                    return oTSetValue;
                 }).persist(StorageLevel.DISK_ONLY());
     }
 

@@ -5,7 +5,6 @@ import ir.ac.sbu.graph.spark.kcore.KCore;
 import ir.ac.sbu.graph.spark.kcore.KCoreConf;
 import ir.ac.sbu.graph.spark.triangle.Triangle;
 import ir.ac.sbu.graph.types.Edge;
-import ir.ac.sbu.graph.types.TSetValue;
 import ir.ac.sbu.graph.types.VertexByte;
 import it.unimi.dsi.fastutil.ints.*;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -69,48 +68,42 @@ public class MaxTrussTSetRange extends SparkApp {
         int numPartitions = tSet.getNumPartitions();
         int iteration = 0;
 
-        JavaPairRDD <Edge, Integer> truss = conf.getSc().parallelizePairs(new ArrayList <>());
-
         while (true) {
             iteration++;
             long t1 = System.currentTimeMillis();
-//            JavaPairRDD <Edge, Integer> finalized = tSet.filter(kv -> kv._2.vSize == 0)
-//                    .mapValues(v -> v.sup)
-//                    .persist(StorageLevel.DISK_ONLY());
-//            truss = truss.union(finalized);
 
             JavaPairRDD <Edge, MaxTSetValue> filtered = tSet.filter(kv ->
-                    kv._2.updated && kv._2.vSize > 0 && kv._2.sup < maxSup);
+                    kv._2.updated && kv._2.sup < maxSup);
 
             JavaPairRDD <Edge, Iterable <int[]>> update = filtered.flatMapToPair(kv -> {
                 Edge e = kv._1;
                 List <Tuple2 <Edge, int[]>> out = new ArrayList <>();
-                List<MaxTSetValue> values = new ArrayList <>();
                 MaxTSetValue value = kv._2;
-                values.add(value);
-                if (value.lowTSetValues != null) {
-                    for (MaxTSetValue lowTSetValue : value.lowTSetValues) {
-                        if (lowTSetValue.updated) {
-                            values.add(lowTSetValue);
-                        }
-                    }
+
+                int[] sv2 = new int[]{value.sup, e.v2};
+                int[] sv1 = new int[]{value.sup, e.v1};
+                for (int i = 0; i < value.w.length; i++) {
+                    if (value.kw[i] < value.sup)
+                        continue;
+                    int w = value.w[i];
+                    out.add(new Tuple2 <>(new Edge(e.v1, w), sv2));
+                    out.add(new Tuple2 <>(new Edge(e.v2, w), sv1));
                 }
 
-                for (MaxTSetValue maxTSetValue : values) {
-                    int[] sv2 = new int[]{maxTSetValue.sup, e.v2};
-                    int[] sv1 = new int[]{maxTSetValue.sup, e.v1};
-                    for (int w : value.w) {
-                        out.add(new Tuple2 <>(new Edge(e.v1, w), sv2));
-                        out.add(new Tuple2 <>(new Edge(e.v2, w), sv1));
-                    }
-                    for (int v : value.v) {
-                        out.add(new Tuple2 <>(new Edge(e.v1, v), sv2));
-                        out.add(new Tuple2 <>(new Edge(v, e.v2), sv1));
-                    }
-                    for (int u : value.u) {
-                        out.add(new Tuple2 <>(new Edge(u, e.v1), sv2));
-                        out.add(new Tuple2 <>(new Edge(u, e.v2), sv1));
-                    }
+                for (int i = 0; i < value.v.length; i++) {
+                    if (value.kv[i] < value.sup)
+                        continue;
+                    int v = value.v[i];
+                    out.add(new Tuple2 <>(new Edge(e.v1, v), sv2));
+                    out.add(new Tuple2 <>(new Edge(v, e.v2), sv1));
+                }
+
+                for (int i = 0; i < value.u.length; i++) {
+                    if (value.ku[i] < value.sup)
+                        continue;
+                    int u = value.u[i];
+                    out.add(new Tuple2 <>(new Edge(u, e.v1), sv2));
+                    out.add(new Tuple2 <>(new Edge(u, e.v2), sv1));
                 }
 
                 return out.iterator();
@@ -123,181 +116,111 @@ public class MaxTrussTSetRange extends SparkApp {
                 break;
 
             tSet = tSet
-//                    .filter(kv -> kv._2.vSize > 0)
                     .leftOuterJoin(update)
                     .mapValues(values -> {
-                        List<Tuple2<Edge, MaxTSetValue>> out = new ArrayList <>();
-//                        Edge edge = kv._1;
-//                        Tuple2 <MaxTSetValue, Optional <Iterable <int[]>>> values = kv._2;
-                        MaxTSetValue tSetValue = values._1;
+                        MaxTSetValue value = values._1;
 
                         Optional <Iterable <int[]>> right = values._2;
-                        tSetValue.updated = false;
-                        if (tSetValue.vSize == 0 || !right.isPresent()) {
-                            if (tSetValue.lowTSetValues != null)
-                                for (MaxTSetValue lowTSetValue : tSetValue.lowTSetValues) {
-                                    lowTSetValue.updated = false;
-                                }
-                            return tSetValue;
+                        value.updated = false;
+                        if (!right.isPresent()) {
+                            return value;
                         }
 
-                        IntSet wSet = new IntOpenHashSet(tSetValue.w);
-                        IntSet vSet = new IntOpenHashSet(tSetValue.v);
-                        IntSet uSet = new IntOpenHashSet(tSetValue.u);
-                        Int2ObjectSortedMap <IntSet> sortedMap = new Int2ObjectAVLTreeMap <>();
+                        Int2IntMap updateMap = new Int2IntOpenHashMap();
                         for (int[] sv : values._2.get()) {
                             int support = sv[0];
-                            if (support > tSetValue.sup) {
+                            if (support >= value.sup) {
                                 continue;
                             }
 
                             int vertex = sv[1];
-                            if (wSet.contains(vertex) || vSet.contains(vertex) || uSet.contains(vertex)) {
-                                IntSet set = sortedMap.get(support);
-                                if (set == null) {
-                                    set = new IntOpenHashSet();
-                                    sortedMap.put(support, set);
-                                }
-                                set.add(vertex);
+                            int sup = updateMap.getOrDefault(vertex, Integer.MAX_VALUE);
+                            if (support < sup)
+                                updateMap.put(vertex, support);
+                        }
+
+                        if (updateMap.size() == 0)
+                            return value;
+
+                        for (Int2IntMap.Entry entry : updateMap.int2IntEntrySet()) {
+                            int vertex = entry.getIntKey();
+                            int support = entry.getIntValue();
+                            int index;
+                            if ((index = Arrays.binarySearch(value.w, vertex)) >= 0) {
+                                value.kw[index] = support;
+                            } else if ((index = Arrays.binarySearch(value.v, vertex)) >= 0) {
+                                value.kv[index] = support;
+                            } else if ((index = Arrays.binarySearch(value.u, vertex)) >= 0) {
+                                value.ku[index] = support;
                             }
                         }
 
-                        if (sortedMap.size() == 0) {
-                            return tSetValue;
+                        Int2IntAVLTreeMap sortedMap = new Int2IntAVLTreeMap(Comparator.comparingInt(a -> -a));
+                        // find max sup after value.sup
+                        int supCount = 0;
+                        for (int k : value.kw) {
+                            if (k < value.sup)
+                                sortedMap.addTo(k, 1);
+                            else
+                                supCount++;
+                        }
+                        for (int k : value.kv) {
+                            if (k < value.sup)
+                                sortedMap.addTo(k, 1);
+                            else
+                                supCount++;
+                        }
+                        for (int k : value.ku) {
+                            if (k < value.sup)
+                                sortedMap.addTo(k, 1);
+                            else
+                                supCount++;
                         }
 
-                        int eSup = tSetValue.sup;
+                        int sum = supCount;
+                        int sup = sum;
 
-                        int removedCount = 0;
-                        int pSup = 0;
+                        for (Int2IntMap.Entry entry : sortedMap.int2IntEntrySet()) {
+                            int uSup = entry.getIntKey();
 
-                        IntSet lastWSet = new IntOpenHashSet();
-                        IntSet lastVSet = new IntOpenHashSet();
-                        IntSet lastUSet = new IntOpenHashSet();
-                        int uSup = 0;
-                        List<MaxTSetValue> others = new ArrayList <>();
-                        for (Int2ObjectMap.Entry <IntSet> entry : sortedMap.int2ObjectEntrySet()) {
-                            lastWSet.clear();
-                            lastVSet.clear();
-                            lastUSet.clear();
-                            uSup = entry.getIntKey();
-                            IntSet set = entry.getValue();
-                            int removed = set.size();
-
-                            for (int v : set) {
-                                if (wSet.remove(v)) {
-                                    lastWSet.add(v);
-                                } else if (vSet.remove(v)) {
-                                    lastVSet.add(v);
-                                } else if (uSet.remove(v)) {
-                                    lastUSet.add(v);
-                                }
-                            }
-
-                            if (eSup <= uSup) {
-                                if (pSup == 0)
-                                    eSup = uSup;
+                            if (uSup <= sum) {
                                 break;
                             }
 
-                            removedCount += removed;
-                            eSup -= removed;
-                            if (eSup <= uSup) {
-                                if (pSup > 0 && eSup < uSup) {
-                                    eSup = pSup;
-                                } else {
-                                    eSup = uSup;
-                                    MaxTSetValue maxTSetValue = new MaxTSetValue();
-                                    maxTSetValue.sup = uSup;
-                                    maxTSetValue.w = lastWSet.toIntArray();
-                                    maxTSetValue.v = lastVSet.toIntArray();
-                                    maxTSetValue.u = lastUSet.toIntArray();
-                                    maxTSetValue.vSize = removed;
-                                    maxTSetValue.updated = false;
-                                    others.add(maxTSetValue);
-                                }
+                            sum = sum + entry.getIntValue();
+                            if (uSup <= sum) {
+                                sup = uSup;
                                 break;
                             }
-                            pSup = eSup;
-
-                            MaxTSetValue maxTSetValue = new MaxTSetValue();
-                            maxTSetValue.sup = uSup;
-                            maxTSetValue.w = lastWSet.toIntArray();
-                            maxTSetValue.v = lastVSet.toIntArray();
-                            maxTSetValue.u = lastUSet.toIntArray();
-                            maxTSetValue.vSize = removed;
-                            maxTSetValue.updated = false;
-                            others.add(maxTSetValue);
+                            // sup = uSup;
+                            sup = sum;
                         }
 
-                        if (eSup == uSup) {
-                            wSet.addAll(lastWSet);
-                            vSet.addAll(lastVSet);
-                            uSet.addAll(lastUSet);
+                        if (sup < value.sup) {
+                            value.sup = sup;
+                            value.updated = true;
                         }
+//
+//                        for (int i = 0; i < value.kw.length; i++) {
+//                            if (value.kw[i] <= sup)
+//                                continue;
+//                            value.kw[i] = sup;
+//                        }
+//                        for (int i = 0; i < value.kv.length; i++) {
+//                            if (value.kv[i] <= sup)
+//                                continue;
+//                            value.kv[i] = sup;
+//                        }
+//                        for (int i = 0; i < value.ku.length; i++) {
+//                            if (value.ku[i] <= sup)
+//                                continue;
+//                            value.ku[i] = sup;
+//                        }
 
-                        tSetValue.vSize -= removedCount;
-
-                        tSetValue.sup = eSup;
-                        if (tSetValue.w.length > wSet.size())
-                            tSetValue.w = wSet.toIntArray();
-                        if (tSetValue.v.length > vSet.size())
-                            tSetValue.v = vSet.toIntArray();
-                        if (tSetValue.u.length > uSet.size())
-                            tSetValue.u = uSet.toIntArray();
-
-                        if (others.size() > 0) {
-                            if (tSetValue.lowTSetValues == null)
-                                tSetValue.lowTSetValues = others;
-                            else {
-                                tSetValue.lowTSetValues.add(tSetValue);
-                                for (MaxTSetValue tValue : tSetValue.lowTSetValues) {
-                                    boolean merged = false;
-                                    int index = 0;
-                                    for (int i = 0; i < others.size(); i++) {
-                                        MaxTSetValue oValue = others.get(i);
-                                        if (oValue.sup == tValue.sup) {
-                                            IntSet set = new IntOpenHashSet(tValue.w);
-                                            set.addAll(new IntOpenHashSet(oValue.w));
-                                            tValue.w = set.toIntArray();
-
-                                            set = new IntOpenHashSet(tValue.v);
-                                            set.addAll(new IntOpenHashSet(oValue.v));
-                                            tValue.v = set.toIntArray();
-
-                                            set = new IntOpenHashSet(tValue.u);
-                                            set.addAll(new IntOpenHashSet(oValue.u));
-                                            tValue.u = set.toIntArray();
-                                            tValue.vSize = tValue.w.length + tValue.v.length + tValue.u.length;
-                                            merged = true;
-                                            index = i;
-                                            break;
-                                        }
-                                        tValue.updated = false;
-                                    }
-                                    if (merged)
-                                        others.remove(index);
-                                }
-                                tSetValue.lowTSetValues.addAll(others);
-                                tSetValue.lowTSetValues.remove(tSetValue);
-                            }
-                        }
-
-                        if (tSetValue.lowTSetValues != null) {
-                            for (MaxTSetValue tValue : tSetValue.lowTSetValues) {
-                                if (tValue.sup >= tSetValue.sup) {
-                                    tValue.updated = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        tSetValue.updated = true;
-
-                        return tSetValue;
+                        return value;
                     }).persist(StorageLevel.MEMORY_AND_DISK());
 
-            printKCount(tSet.mapValues(v -> v.sup).reduceByKey((a, b) -> Math.max(a, b)));
+            printKCount(tSet.mapValues(v -> v.sup));
         }
 
         return tSet;
@@ -345,9 +268,9 @@ public class MaxTrussTSetRange extends SparkApp {
                     return output.iterator();
                 }).groupByKey(partitionNum * 2)
                 .mapValues(values -> {
-                    IntSet wSet = new IntOpenHashSet();
-                    IntSet vSet = new IntOpenHashSet();
-                    IntSet uSet = new IntOpenHashSet();
+                    IntSortedSet wSet = new IntAVLTreeSet();
+                    IntSortedSet vSet = new IntAVLTreeSet();
+                    IntSortedSet uSet = new IntAVLTreeSet();
                     int sup = 0;
                     for (VertexByte value : values) {
                         if (value.sign == W_UVW)
@@ -361,10 +284,24 @@ public class MaxTrussTSetRange extends SparkApp {
                     MaxTSetValue value = new MaxTSetValue();
                     value.sup = sup;
                     value.w = wSet.toIntArray();
+                    value.kw = new int[value.w.length];
+                    for (int i = 0; i < value.kw.length; i++) {
+                        value.kw[i] = sup;
+                    }
+
                     value.v = vSet.toIntArray();
+                    value.kv = new int[value.v.length];
+                    for (int i = 0; i < value.kv.length; i++) {
+                        value.kv[i] = sup;
+                    }
+
                     value.u = uSet.toIntArray();
+                    value.ku = new int[value.u.length];
+                    for (int i = 0; i < value.ku.length; i++) {
+                        value.ku[i] = sup;
+                    }
+
                     value.updated = true;
-                    value.vSize = sup;
                     return value;
                 }).persist(StorageLevel.DISK_ONLY()); // Use disk too because this RDD often is very large
 
@@ -391,7 +328,7 @@ public class MaxTrussTSetRange extends SparkApp {
         long t2 = System.currentTimeMillis();
         log("KTruss edge count: " + truss.count(), t1, t2);
 
-        printKCount(truss);
+        printKCount(truss, 1000);
 
         kTrussTSet.close();
     }
