@@ -63,7 +63,7 @@ public class MaxTrussTSetRange extends SparkApp {
         JavaPairRDD <Edge, Integer> maxTruss = conf.getSc().parallelizePairs(new ArrayList <>());
         int max = maxK + 1;
         int maxUpdates = 0;
-        int maxIteration = 1;
+        int maxIteration = 2;
         int minSup = 1;
         int kCount = 0;
         long maxExcluded = 0;
