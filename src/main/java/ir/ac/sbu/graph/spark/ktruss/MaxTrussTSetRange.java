@@ -67,6 +67,8 @@ public class MaxTrussTSetRange extends SparkApp {
         int minSup = 1;
         int kCount = 0;
         long maxExcluded = 0;
+        long t1 = System.currentTimeMillis();
+        long duration = 0;
         for (int maxSup = 2; maxSup <= max; ) {
             Tuple2 <Integer, JavaPairRDD <Edge, MaxTSetValue>> result = find(tSet, maxSup, maxIteration);
 
@@ -78,51 +80,47 @@ public class MaxTrussTSetRange extends SparkApp {
             if (updates == 0)
                 break;
 
-            final int min = minSup;
-            JavaPairRDD <Edge, Integer> exclude = result._2.filter(kv -> !kv._2.updated && kv._2.sup <= min)
-                    .mapValues(v -> v.sup)
-                    .persist(StorageLevel.DISK_ONLY());
 
-            long excludeCount = exclude.count();
-            maxTruss = maxTruss.union(exclude);
-
-            int ratio = maxUpdates / updates;
-            if (excludeCount > 0) {
-                tSet = result._2.filter(kv -> kv._2.sup > min || kv._2.updated)
-                        .cache();
-                kCount += excludeCount;
-                ratio = 1;
-            } else {
-                tSet = result._2;
-                minSup++;
-                kCount = 0;
+            int addToSup = 0;
+            if (maxUpdates != updates) {
+                addToSup = Math.max(1, (maxUpdates/ updates));
             }
 
-            if (maxSup < max) {
-                if (ratio < 10) {
-                    int sum = Math.max(1, ratio);
-                    maxSup += sum;
-                } else if (ratio < 100) {
-                    maxSup *= 2;
-                } else {
-                    maxSup = max;
+            long t2;
+            JavaPairRDD <Edge, Integer> exclude;
+            while(true) {
+                final int min = minSup;
+                exclude = result._2.filter(kv -> !kv._2.updated && kv._2.sup <= min)
+                        .mapValues(v -> v.sup)
+                        .persist(StorageLevel.DISK_ONLY());
+                long excludeCount = exclude.count();
+                if (excludeCount > 0) {
+                    maxTruss = maxTruss.union(exclude);
+                    tSet = result._2.filter(kv -> kv._2.sup > min || kv._2.updated)
+                            .cache();
+                    kCount += excludeCount;
+
+                    addToSup = Math.min(addToSup, 1);
+                    break;
                 }
+
+                kCount = 0;
+                minSup ++;
+
+                maxSup += Math.min(addToSup * 2, maxSup);
             }
+
+            maxSup += addToSup;
 
             if (maxSup >= max) {
+                maxIteration += 5;
                 maxSup = max;
-                if (maxExcluded < excludeCount)
-                    maxExcluded = excludeCount;
-
-                if (excludeCount == 0)
-                    maxIteration += 5;
-                else {
-                    int r = (int) maxExcluded / (int) excludeCount;
-                    maxIteration = Math.max(5, r);
-                }
             }
 
-            log("minSup: " + minSup + ", kCount: " + kCount + ", exclude count: " + excludeCount);
+            t2 = System.currentTimeMillis();
+            duration = t2 - t1;
+            t1 = t2;
+            log("minSup: " + minSup + ", kCount: " + kCount, duration);
         }
 
         maxTruss = maxTruss.union(tSet.mapValues(v -> v.sup).persist(StorageLevel.DISK_ONLY()));
