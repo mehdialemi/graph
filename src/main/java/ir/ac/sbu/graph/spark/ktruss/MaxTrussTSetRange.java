@@ -103,7 +103,7 @@ public class MaxTrussTSetRange extends SparkApp {
                     int sum = Math.max(1, ratio);
                     maxSup += sum;
                 } else if (ratio < 100) {
-                    maxSup *= 2;
+                    maxSup *= Math.min(5, ratio / 5);
                 } else {
                     maxSup = max;
                 }
