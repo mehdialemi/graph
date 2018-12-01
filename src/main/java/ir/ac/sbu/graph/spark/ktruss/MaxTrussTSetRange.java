@@ -62,13 +62,12 @@ public class MaxTrussTSetRange extends SparkApp {
         JavaPairRDD <Edge, MaxTSetValue> tSet = createTSet(fonl, candidates, numPartitions);
         JavaPairRDD <Edge, Integer> maxTruss = conf.getSc().parallelizePairs(new ArrayList <>());
         int max = maxK + 1;
-        int maxUpdates = 0;
         int maxIteration = 2;
         int minSup = 1;
         int kCount = 0;
         int filterCount = 0;
-        long prevDuration = 0;
         boolean filter = true;
+        int prevUpdateCount = 0;
         for (int maxSup = 2; maxSup <= max; ) {
             long t1 = System.currentTimeMillis();
             Tuple2 <Integer, JavaPairRDD <Edge, MaxTSetValue>> result = find(tSet, maxSup, maxIteration);
@@ -76,16 +75,15 @@ public class MaxTrussTSetRange extends SparkApp {
             filterCount += maxIteration;
             if (filterCount > 10)
                 filter = true;
-            Integer updates = result._1;
-            if (updates > maxUpdates) {
-                maxUpdates = updates;
-            }
+            Integer updateCount = result._1;
 
-            if (updates == 0) {
+            if (updateCount == 0) {
                 break;
             }
 
-            int ratio = maxUpdates / updates;
+            prevUpdateCount = prevUpdateCount == 0 ? updateCount : prevUpdateCount;
+            int updateChangeRation = updateCount / prevUpdateCount;
+            prevUpdateCount = updateCount;
 
             if (filter) {
                 filter = false;
@@ -102,7 +100,6 @@ public class MaxTrussTSetRange extends SparkApp {
                     tSet = result._2.filter(kv -> kv._2.sup > min || kv._2.updated)
                             .persist(StorageLevel.MEMORY_AND_DISK());
                     kCount += excludeCount;
-                    ratio = 1;
                 } else {
                     tSet = result._2;
                     minSup++;
@@ -121,18 +118,19 @@ public class MaxTrussTSetRange extends SparkApp {
             } else {
 
                 int addToMaxSup = 0;
-                if (ratio < 2 && duration > prevDuration) {
-                    maxIteration++;
-                } else {
+                if (updateChangeRation < 1) {
                     maxIteration = Math.max(1, maxIteration - 1);
-                    addToMaxSup = Math.min(maxSup / 2, ratio / 10 * maxSup);
+
+                    if (maxIteration == 1)
+                        addToMaxSup = maxSup / 2;
+                    else
+                        addToMaxSup = 1;
+                } else {
+                    maxIteration ++;
                 }
-
                 maxSup += addToMaxSup;
-
                 maxSup = Math.min(maxSup, max);
             }
-            prevDuration = duration;
 
             log("minSup: " + minSup + ", kCount: " + kCount, duration);
         }
