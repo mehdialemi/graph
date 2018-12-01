@@ -82,7 +82,7 @@ public class MaxTrussTSetRange extends SparkApp {
             }
 
             prevUpdateCount = prevUpdateCount == 0 ? updateCount : prevUpdateCount;
-            int updateChangeRation = updateCount / prevUpdateCount;
+            float updateChangeRation = updateCount / (float) prevUpdateCount;
             prevUpdateCount = updateCount;
 
             if (filter) {
@@ -118,13 +118,14 @@ public class MaxTrussTSetRange extends SparkApp {
             } else {
 
                 int addToMaxSup = 0;
-                if (updateChangeRation < 1) {
+                if (updateChangeRation < 1.0f) {
                     maxIteration = Math.max(1, maxIteration - 1);
 
                     if (maxIteration == 1)
                         addToMaxSup = maxSup / 2;
-                    else
-                        addToMaxSup = 1;
+                    else {
+                        addToMaxSup = (int) Math.ceil(1 / updateChangeRation);
+                    }
                 } else {
                     maxIteration ++;
                 }
