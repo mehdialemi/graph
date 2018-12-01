@@ -65,18 +65,14 @@ public class MaxTrussTSetRange extends SparkApp {
         int maxIteration = 2;
         int minSup = 1;
         int kCount = 0;
-        int filterCount = 0;
-        boolean filter = true;
+        int filterCount = 10;
         int prevUpdateCount = 0;
+
         for (int maxSup = 2; maxSup <= max; ) {
             long t1 = System.currentTimeMillis();
             Tuple2 <Integer, JavaPairRDD <Edge, MaxTSetValue>> result = find(tSet, maxSup, maxIteration);
 
-            filterCount += maxIteration;
-            if (filterCount > 10)
-                filter = true;
             Integer updateCount = result._1;
-
             if (updateCount == 0) {
                 break;
             }
@@ -85,8 +81,7 @@ public class MaxTrussTSetRange extends SparkApp {
             float updateChangeRation = updateCount / (float) prevUpdateCount;
             prevUpdateCount = updateCount;
 
-            if (filter) {
-                filter = false;
+            if (filterCount >= 10) {
                 filterCount = 0;
                 final int min = minSup;
                 JavaPairRDD <Edge, Integer> exclude = result._2.filter(kv -> !kv._2.updated && kv._2.sup <= min)
@@ -104,7 +99,7 @@ public class MaxTrussTSetRange extends SparkApp {
                     tSet = result._2;
                     minSup++;
                     kCount = 0;
-                    filter = true;
+                    filterCount = 10;
                 }
             } else {
                 tSet = result._2;
@@ -124,7 +119,7 @@ public class MaxTrussTSetRange extends SparkApp {
                     if (maxIteration == 1)
                         addToMaxSup = maxSup / 2;
                     else {
-                        addToMaxSup = (int) Math.ceil(1 / updateChangeRation);
+                        addToMaxSup = Math.min(maxSup / 2, (int) Math.ceil(1 / updateChangeRation));
                     }
                 } else {
                     maxIteration ++;
@@ -132,8 +127,8 @@ public class MaxTrussTSetRange extends SparkApp {
                 maxSup += addToMaxSup;
                 maxSup = Math.min(maxSup, max);
             }
-
-            log("minSup: " + minSup + ", kCount: " + kCount, duration);
+            filterCount += maxIteration;
+            log("minSup: " + minSup + ", kCount: " + kCount + ", filterCount: " + filterCount, duration);
         }
 
         maxTruss = maxTruss.union(tSet.mapValues(v -> v.sup).persist(StorageLevel.DISK_ONLY()));
