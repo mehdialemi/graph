@@ -66,63 +66,75 @@ public class MaxTrussTSetRange extends SparkApp {
         int maxIteration = 2;
         int minSup = 1;
         int kCount = 0;
-        long maxExcluded = 0;
+        int filterCount = 0;
+        long prevDuration = 0;
+        boolean filter = true;
         for (int maxSup = 2; maxSup <= max; ) {
+            long t1 = System.currentTimeMillis();
             Tuple2 <Integer, JavaPairRDD <Edge, MaxTSetValue>> result = find(tSet, maxSup, maxIteration);
 
+            filterCount += maxIteration;
+            if (filterCount > 10)
+                filter = true;
             Integer updates = result._1;
             if (updates > maxUpdates) {
                 maxUpdates = updates;
             }
 
-            if (updates == 0)
+            if (updates == 0) {
                 break;
-
-            final int min = minSup;
-            JavaPairRDD <Edge, Integer> exclude = result._2.filter(kv -> !kv._2.updated && kv._2.sup <= min)
-                    .mapValues(v -> v.sup)
-                    .persist(StorageLevel.DISK_ONLY());
-
-            long excludeCount = exclude.count();
-            maxTruss = maxTruss.union(exclude);
+            }
 
             int ratio = maxUpdates / updates;
-            if (excludeCount > 0) {
-                tSet = result._2.filter(kv -> kv._2.sup > min || kv._2.updated)
-                        .cache();
-                kCount += excludeCount;
-                ratio = 1;
+
+            if (filter) {
+                filter = false;
+                filterCount = 0;
+                final int min = minSup;
+                JavaPairRDD <Edge, Integer> exclude = result._2.filter(kv -> !kv._2.updated && kv._2.sup <= min)
+                        .mapValues(v -> v.sup)
+                        .persist(StorageLevel.DISK_ONLY());
+
+                long excludeCount = exclude.count();
+                maxTruss = maxTruss.union(exclude);
+
+                if (excludeCount > 0) {
+                    tSet = result._2.filter(kv -> kv._2.sup > min || kv._2.updated)
+                            .persist(StorageLevel.MEMORY_AND_DISK());
+                    kCount += excludeCount;
+                    ratio = 1;
+                } else {
+                    tSet = result._2;
+                    minSup++;
+                    kCount = 0;
+                    filter = true;
+                }
             } else {
                 tSet = result._2;
-                minSup++;
-                kCount = 0;
             }
 
-            if (maxSup < max) {
-                if (ratio < 10) {
-                    int sum = Math.max(1, ratio);
-                    maxSup += sum;
-                } else if (ratio < 100) {
-                    maxSup *= Math.min(5, ratio / 5);
-                } else {
-                    maxSup = max;
-                }
-            }
-
+            long t2 = System.currentTimeMillis();
+            long duration = t2 - t1;
             if (maxSup >= max) {
                 maxSup = max;
-                if (maxExcluded < excludeCount)
-                    maxExcluded = excludeCount;
+                maxIteration++;
+            } else {
 
-                if (excludeCount == 0)
-                    maxIteration += 5;
-                else {
-                    int r = (int) maxExcluded / (int) excludeCount;
-                    maxIteration = Math.max(5, r);
+                int addToMaxSup = 0;
+                if (ratio < 2 && duration > prevDuration) {
+                    maxIteration++;
+                } else {
+                    maxIteration = Math.max(1, maxIteration - 1);
+                    addToMaxSup = Math.min(maxSup / 2, ratio / 10 * maxSup);
                 }
-            }
 
-            log("minSup: " + minSup + ", kCount: " + kCount + ", exclude count: " + excludeCount);
+                maxSup += addToMaxSup;
+
+                maxSup = Math.min(maxSup, max);
+            }
+            prevDuration = duration;
+
+            log("minSup: " + minSup + ", kCount: " + kCount, duration);
         }
 
         maxTruss = maxTruss.union(tSet.mapValues(v -> v.sup).persist(StorageLevel.DISK_ONLY()));
@@ -281,7 +293,7 @@ public class MaxTrussTSetRange extends SparkApp {
                             value.updated = true;
                         }
                         return value;
-                    }).cache();
+                    }).persist(StorageLevel.MEMORY_AND_DISK());
         }
 
         return new Tuple2 <>(allUpdates, tSet);
