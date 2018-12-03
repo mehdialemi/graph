@@ -424,7 +424,7 @@ public class MaxTrussTSetRange extends SparkApp {
         int sum = 0;
         for (Map.Entry <Integer, Long> entry : sortedMap.entrySet()) {
             sum += entry.getValue();
-            if (count++ > size) {
+            if (++count > size) {
                 continue;
             }
             log("K: " + entry.getKey() + ", entry: " + entry.getValue());
