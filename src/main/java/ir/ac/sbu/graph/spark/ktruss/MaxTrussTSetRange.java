@@ -48,7 +48,7 @@ public class MaxTrussTSetRange extends SparkApp {
     }
 
     public JavaPairRDD <Edge, Integer> explore(int minPartitions, int maxK) {
-
+        log("maxK: " + maxK);
         KCore kCore = new KCore(neighborList, kCoreConf);
 
         Triangle triangle = new Triangle(kCore);
