@@ -74,7 +74,7 @@ public class MaxTrussTSetRange extends SparkApp {
         int checkKTrussCounter = kTrussMaxCounter;
 
         int maxSup = 2;
-        while (true) {
+        while (minSup <= max) {
             long t1 = System.currentTimeMillis();
             long minUpdateCount = (long) (maxUpdateRatio * currentEdgeCount);
             Tuple2 <Integer, JavaPairRDD <Edge, MaxTSetValue>> result = find(tSet, maxSup, maxIteration, minUpdateCount);
@@ -112,7 +112,7 @@ public class MaxTrussTSetRange extends SparkApp {
                             break;
                         kCount = 0;
                     }
-                } while (true);
+                } while (minSup <= max);
             }
 
             float updateRatio = 0.0f;
