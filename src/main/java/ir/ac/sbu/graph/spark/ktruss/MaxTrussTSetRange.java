@@ -108,6 +108,11 @@ public class MaxTrussTSetRange extends SparkApp {
                         break;
                     } else {
                         minSup++;
+                        if (minSup == max && maxSup < max) {
+                            minSup --;
+                            maxSup = max;
+                            break;
+                        }
                         if (minSup > maxSup)
                             break;
                         kCount = 0;
@@ -118,7 +123,7 @@ public class MaxTrussTSetRange extends SparkApp {
             float updateRatio = 0.0f;
             int m = 0;
             float ratio = 0.0f;
-            if (currentEdgeCount > minEdgeCount) {
+            if (maxSup != max && currentEdgeCount > minEdgeCount) {
                 updateRatio = updateCount / (float) edgeCount;
                 ratio = updateRatio / maxUpdateRatio;
                 m = (int) Math.ceil(Math.sqrt(1 / ratio));
