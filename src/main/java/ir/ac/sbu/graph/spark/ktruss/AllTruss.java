@@ -5,11 +5,8 @@ import ir.ac.sbu.graph.spark.EdgeLoader;
 import ir.ac.sbu.graph.spark.NeighborList;
 import ir.ac.sbu.graph.spark.SparkApp;
 import ir.ac.sbu.graph.spark.kcore.KCore;
-import ir.ac.sbu.graph.spark.kcore.KCoreConf;
 import ir.ac.sbu.graph.spark.triangle.Triangle;
 import ir.ac.sbu.graph.types.Edge;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -35,142 +32,110 @@ public class AllTruss extends SparkApp {
     public static final int CHECKPOINT_ITERATION = 50;
 
     private final NeighborList neighborList;
-    private final KCoreConf kCoreConf;
+    private final int k;
     private KTrussConf ktConf;
 
     public AllTruss(NeighborList neighborList, KTrussConf ktConf) throws URISyntaxException {
         super(neighborList);
         this.neighborList = neighborList;
-        String master = conf.getSc().master();
-        this.conf.getSc().setCheckpointDir("/tmp/checkpoint");
-        kCoreConf = new KCoreConf(conf, 2, 1000);
-        if (master.contains("local")) {
+        this.k = ktConf.getKt();
+        this.ktConf = ktConf;
+        String master = ktConf.getSc().master();
+        if (master.contains("local"))
             return;
-        }
-        String masterHost = new URI(conf.getSc().master()).getHost();
-        this.conf.getSc().setCheckpointDir("hdfs://" + masterHost + "/shared/checkpoint");
+        String masterHost = new URI(ktConf.getSc().master()).getHost();
+        this.ktConf.getSc().setCheckpointDir("hdfs://" + masterHost + "/shared/checkpoint");
     }
 
     public JavaPairRDD <Edge, Integer> generate() {
 
-        KCore kCore = new KCore(neighborList, kCoreConf);
+        KCore kCore = new KCore(neighborList, ktConf);
 
         Triangle triangle = new Triangle(kCore);
 
-        JavaPairRDD <Integer, int[]> fonl = triangle.getOrCreateFonl();
+        JavaPairRDD<Integer, int[]> fonl = triangle.getOrCreateFonl();
 
-        JavaPairRDD <Integer, int[]> candidates = triangle.createCandidates(fonl);
+        JavaPairRDD<Integer, int[]> candidates = triangle.createCandidates(fonl);
 
         int partitionNum = fonl.getNumPartitions();
-        JavaPairRDD <Edge, Tuple2 <Integer, Integer>>  fTriangles = conf.getSc().parallelizePairs(new ArrayList <>());
 
-        JavaPairRDD <Edge, Integer> triangles = createTriangles(fonl, candidates).repartition(partitionNum).cache();
+        JavaPairRDD <Edge, Integer> triangles = createTriangles(fonl, candidates).cache();
 
-        while (true) {
-            JavaPairRDD <Edge, Edge> edgeTriangles = triangles.flatMapToPair(kv -> {
-                Edge e = kv._1;
-                List <Tuple2 <Edge, Edge>> out = new ArrayList <>();
-                out.add(new Tuple2 <>(new Edge(e.v1, kv._2), e));
-                out.add(new Tuple2 <>(new Edge(e.v2, kv._2), e));
-                out.add(new Tuple2 <>(e, e));
-                return out.iterator();
-            });
-
-            JavaPairRDD <Edge, Tuple2 <Integer, Boolean>> triangleSupState = edgeTriangles.groupByKey().flatMapToPair(kv -> {
-
-                Set <Edge> set = new TreeSet <>((e1, e2) -> e1.equals(e2) ? 0 : 1);
-                int sup = 0;
-                for (Edge tEdge : kv._2) {
-                    set.add(tEdge);
-                    sup ++;
-                }
-                List <Tuple2 <Edge, Integer>> out = new ArrayList <>();
-                for (Edge edge : set) {
-                    out.add(new Tuple2 <>(edge, sup));
-                }
-                return out.iterator();
-            }).groupByKey(partitionNum).mapValues(values -> {
-                int min = 0;
-                boolean same = true;
-                for (Integer support : values) {
-                    if (min == 0) {
-                        min = support;
-                        continue;
-                    }
-
-                    if (support < min) {
-                        min = support;
-                        same = false;
-                    }
-                }
-                return new Tuple2 <>(min, same);
-            }).cache();
-
-            JavaPairRDD <Edge, Tuple2 <Tuple2 <Integer, Boolean>, Integer>> result = triangleSupState.join(triangles);
-
-            JavaPairRDD <Edge, Tuple2 <Integer, Integer>> exclude = result.filter(kv -> kv._2._1._2)
-                    .mapValues(values -> new Tuple2 <>(values._1._1, values._2))
-                    .repartition(partitionNum)
-                    .cache(); // sup, w
-
-            fTriangles = fTriangles.union(exclude);
-
-            triangles = triangles.subtractByKey(exclude).cache();
-
-            long count = triangles.count();
-            log("count: " + count);
-            if (count == 0)
-                break;
-        }
-
-        return fTriangles.flatMapToPair(kv -> {
+        JavaPairRDD <Edge, Edge> edges = triangles.flatMapToPair(kv -> {
             Edge e = kv._1;
-
-            int sup = kv._2._1;
-            int w = kv._2._2;
-            List <Tuple2 <Edge, Integer>> out = new ArrayList <>();
-            out.add(new Tuple2 <>(new Edge(e.v1, w), sup));
-            out.add(new Tuple2 <>(new Edge(e.v2, w), sup));
-            out.add(new Tuple2 <>(e, sup));
+            List <Tuple2 <Edge, Edge>> out = new ArrayList <>();
+            out.add(new Tuple2 <>(new Edge(e.v1, kv._2), e));
+            out.add(new Tuple2 <>(new Edge(e.v2, kv._2), e));
+            out.add(new Tuple2 <>(e, e));
             return out.iterator();
-        }).reduceByKey(Math::max);
+        });
+
+        JavaPairRDD <Edge, Integer> tSup = edges.groupByKey().flatMapToPair(kv -> {
+            Map<Tuple2<Integer, Integer>, Integer> map = new HashMap <>();
+            int sup = 0;
+            for (Edge tEdge : kv._2) {
+                map.compute(new Tuple2<>(tEdge.v1, tEdge.v2), (k, v) -> v == null ? 1 : v + 1);
+                sup ++;
+            }
+
+            List <Tuple2 <Edge, Integer>> out = new ArrayList <>();
+
+            for (Map.Entry <Tuple2 <Integer, Integer>, Integer> entry : map.entrySet()) {
+                out.add(new Tuple2 <>(new Edge(entry.getKey()._1, entry.getKey()._2), sup));
+            }
+
+            return out.iterator();
+        }).reduceByKey(Math::min).cache();
+
+        return tSup;
+//        return tSup.join(triangles).flatMapToPair(kv -> {
+//            Edge e = kv._1;
+//            int sup = kv._2._1;
+//            int w = kv._2._2;
+//            List <Tuple2 <Edge, Integer>> out = new ArrayList <>();
+//            out.add(new Tuple2 <>(new Edge(e.v1, w), sup));
+//            out.add(new Tuple2 <>(new Edge(e.v2, w), sup));
+//            out.add(new Tuple2 <>(e, sup));
+//            return out.iterator();
+//        }).reduceByKey(Math::max);
+
     }
 
-    private JavaPairRDD <Edge, Integer> createTriangles(JavaPairRDD <Integer, int[]> fonl,
-                                                        JavaPairRDD <Integer, int[]> candidates) {
+    private JavaPairRDD<Edge, Integer> createTriangles(JavaPairRDD<Integer, int[]> fonl,
+                                                JavaPairRDD<Integer, int[]> candidates) {
         return candidates.cogroup(fonl)
                 .flatMapToPair(t -> {
-                    int[] fVal = t._2._2.iterator().next();
-                    Arrays.sort(fVal, 1, fVal.length);
-                    int v = t._1;
+            int[] fVal = t._2._2.iterator().next();
+            Arrays.sort(fVal, 1, fVal.length);
+            int v = t._1;
 
-                    List <Tuple2 <Edge, Integer>> output = new ArrayList <>();
-                    for (int[] cVal : t._2._1) {
-                        int u = cVal[0];
-                        Edge uv = new Edge(u, v);
+            List<Tuple2<Edge, Integer>> output = new ArrayList<>();
+            for (int[] cVal : t._2._1) {
+                int u = cVal[0];
+                Edge uv = new Edge(u, v);
 
-                        // The intersection determines triangles which u and vertex are two of their vertices.
-                        // Always generate and edge (u, vertex) such that u < vertex.
-                        int fi = 1;
-                        int ci = 1;
-                        while (fi < fVal.length && ci < cVal.length) {
-                            if (fVal[fi] < cVal[ci])
-                                fi++;
-                            else if (fVal[fi] > cVal[ci])
-                                ci++;
-                            else {
-                                int w = fVal[fi];
+                // The intersection determines triangles which u and vertex are two of their vertices.
+                // Always generate and edge (u, vertex) such that u < vertex.
+                int fi = 1;
+                int ci = 1;
+                while (fi < fVal.length && ci < cVal.length) {
+                    if (fVal[fi] < cVal[ci])
+                        fi++;
+                    else if (fVal[fi] > cVal[ci])
+                        ci++;
+                    else {
+                        int w = fVal[fi];
 
-                                output.add(new Tuple2 <>(uv, w));
+                        output.add(new Tuple2<>(uv, w));
 
-                                fi++;
-                                ci++;
-                            }
-                        }
+                        fi++;
+                        ci++;
                     }
+                }
+            }
 
-                    return output.iterator();
-                });
+            return output.iterator();
+        });
     }
 
     public static void main(String[] args) throws URISyntaxException {

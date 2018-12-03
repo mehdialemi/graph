@@ -28,7 +28,6 @@ public class MaxTrussTSetRange extends SparkApp {
     private static final byte W_UVW = (byte) 0;
     private static final byte V_UVW = (byte) 1;
     private static final byte U_UVW = (byte) 2;
-
     private final NeighborList neighborList;
     private final KCoreConf kCoreConf;
     private final AtomicInteger totalIterations = new AtomicInteger(0);
@@ -61,79 +60,85 @@ public class MaxTrussTSetRange extends SparkApp {
 
         JavaPairRDD <Edge, MaxTSetValue> tSet = createTSet(fonl, candidates, numPartitions);
         JavaPairRDD <Edge, Integer> maxTruss = conf.getSc().parallelizePairs(new ArrayList <>());
-//        long count = tSet.count();
-//        long trussCount = 0;
+        long currentEdgeCount = tSet.count();
+        long edgeCount = currentEdgeCount;
+
         int max = maxK + 1;
         int maxIteration = 2;
         int minSup = 1;
         int kCount = 0;
-        int filterCount = 10;
-        int prevUpdateCount = 0;
 
-        for (int maxSup = 2; maxSup <= max; ) {
+        int kTrussMaxCounter = 10;
+        float maxUpdateRatio = 0.1f;
+        long minEdgeCount = (long) (currentEdgeCount * maxUpdateRatio);
+        int checkKTrussCounter = kTrussMaxCounter;
+
+        int maxSup = 2;
+        while (true) {
             long t1 = System.currentTimeMillis();
-            Tuple2 <Integer, JavaPairRDD <Edge, MaxTSetValue>> result = find(tSet, maxSup, maxIteration);
+            long minUpdateCount = (long) (maxUpdateRatio * currentEdgeCount);
+            Tuple2 <Integer, JavaPairRDD <Edge, MaxTSetValue>> result = find(tSet, maxSup, maxIteration, minUpdateCount);
 
             Integer updateCount = result._1;
+            tSet = result._2;
+
             if (updateCount == 0) {
-                break;
+                if (maxSup == max)
+                    break;
+                maxSup = max;
+                continue;
             }
 
-            prevUpdateCount = prevUpdateCount == 0 ? updateCount : prevUpdateCount;
-            float updateChangeRation = updateCount / (float) prevUpdateCount;
-            prevUpdateCount = updateCount;
+            if (checkKTrussCounter >= kTrussMaxCounter) {
+                checkKTrussCounter = 0;
+                do {
+                    final int min = minSup;
+                    JavaPairRDD <Edge, Integer> kTruss = tSet.filter(kv -> !kv._2.updated && kv._2.sup <= min)
+                            .mapValues(v -> v.sup)
+                            .persist(StorageLevel.DISK_ONLY());
 
-            if (filterCount >= 10) {
-                filterCount = 0;
-                final int min = minSup;
-                JavaPairRDD <Edge, Integer> exclude = result._2.filter(kv -> !kv._2.updated && kv._2.sup <= min)
-                        .mapValues(v -> v.sup)
-                        .persist(StorageLevel.DISK_ONLY());
+                    long kTrussCount = kTruss.count();
+                    currentEdgeCount -= kTrussCount;
+                    maxTruss = maxTruss.union(kTruss);
 
-                long excludeCount = exclude.count();
-                maxTruss = maxTruss.union(exclude);
+                    if (kTrussCount > 0) {
+                        tSet = tSet.filter(kv -> kv._2.sup > min || kv._2.updated)
+                                .persist(StorageLevel.MEMORY_AND_DISK());
+                        kCount += kTrussCount;
+                        break;
+                    } else {
+                        minSup++;
+                        if (minSup > maxSup)
+                            break;
+                        kCount = 0;
+                    }
+                } while (true);
+            }
 
-                if (excludeCount > 0) {
-                    tSet = result._2.filter(kv -> kv._2.sup > min || kv._2.updated)
-                            .persist(StorageLevel.MEMORY_AND_DISK());
-                    kCount += excludeCount;
-//                    trussCount += excludeCount;
-                } else {
-                    tSet = result._2;
-                    minSup++;
-                    kCount = 0;
-                    filterCount = 10;
-                }
+            float updateRatio = 0.0f;
+            int m = 0;
+            float ratio = 0.0f;
+            if (currentEdgeCount > minEdgeCount) {
+                updateRatio = updateCount / (float) edgeCount;
+                ratio = updateRatio / maxUpdateRatio;
+                m = (int) Math.ceil(Math.sqrt(1 / ratio));
+                maxSup *= m;
+                maxIteration += ratio >= 1 ? -1 : 1;
+
+                maxIteration = Math.max(1, maxIteration);
+                maxSup = Math.min(max, maxSup);
             } else {
-                tSet = result._2;
+                maxSup = max;
+                maxIteration ++;
             }
-
             long t2 = System.currentTimeMillis();
             long duration = t2 - t1;
-            if (maxSup >= max) {
-                maxSup = max;
-                maxIteration = Integer.MAX_VALUE;
-            } else {
-//                float remaining = trussCount / (float) count;
-//                float r = (count - updateCount) / (float) count;
 
-                int addToMaxSup = 0;
-                if (updateChangeRation < 1.0f) {
-                    maxIteration = Math.max(1, maxIteration - 1);
-
-                    if (maxIteration == 1)
-                        addToMaxSup = maxSup / 2;
-                    else {
-                        addToMaxSup = Math.min(maxSup / 2, (int) Math.ceil(1 / updateChangeRation));
-                    }
-                } else {
-                    maxIteration ++;
-                }
-                maxSup += addToMaxSup;
-                maxSup = Math.min(maxSup, max);
-            }
-            filterCount += maxIteration;
-            log("minSup: " + minSup + ", kCount: " + kCount + ", filterCount: " + filterCount, duration);
+            checkKTrussCounter += maxIteration;
+            log("minSup: " + minSup + ", kCount: " + kCount + ", checkKTrussCounter: " + checkKTrussCounter +
+                            ", currentEdgeCount: " + currentEdgeCount + ", updateRatio: " + updateRatio + ", ratio: " + ratio +
+                            ", maxIteration: " + maxIteration + ", m: " + m
+                    , duration);
         }
 
         maxTruss = maxTruss.union(tSet.mapValues(v -> v.sup).persist(StorageLevel.DISK_ONLY()));
@@ -142,7 +147,7 @@ public class MaxTrussTSetRange extends SparkApp {
     }
 
     private Tuple2 <Integer, JavaPairRDD <Edge, MaxTSetValue>> find(JavaPairRDD <Edge, MaxTSetValue> tSet, int maxSup,
-                                                                    int maxIteration) {
+                                                                    int maxIteration, long minUpdateCount) {
 
         int numPartitions = tSet.getNumPartitions();
         int iteration = 0;
@@ -199,8 +204,9 @@ public class MaxTrussTSetRange extends SparkApp {
 
             allUpdates += count;
             long t2 = System.currentTimeMillis();
-            log("maxSup: " + maxSup + ", iteration: " + iteration + ", updateCount: " + count, t1, t2);
-            if (count == 0)
+            log("maxSup: " + maxSup + ", iteration: " + iteration + ", updateCount: " + count +
+                    ", minUpdateCount: " + minUpdateCount, t1, t2);
+            if (count <= minUpdateCount)
                 break;
 
             tSet = tSet
@@ -393,7 +399,7 @@ public class MaxTrussTSetRange extends SparkApp {
         };
         conf.init();
         int minPartitions = argumentReader.nextInt(2);
-        int maxK = argumentReader.nextInt(1000);
+        int maxK = argumentReader.nextInt(100000);
         EdgeLoader edgeLoader = new EdgeLoader(conf);
         NeighborList neighborList = new NeighborList(edgeLoader);
 
