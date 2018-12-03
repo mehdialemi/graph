@@ -408,7 +408,7 @@ public class MaxTrussTSetRange extends SparkApp {
         long t2 = System.currentTimeMillis();
         log("KTruss edge count: " + truss.count(), t1, t2);
 
-        printKCount(truss, 1000);
+        printKCount(truss, maxK);
 
         kTrussTSet.close();
     }
