@@ -5,7 +5,7 @@ import ir.ac.sbu.graph.spark.kcore.KCore;
 import ir.ac.sbu.graph.spark.kcore.KCoreConf;
 import ir.ac.sbu.graph.spark.triangle.Triangle;
 import ir.ac.sbu.graph.types.Edge;
-import ir.ac.sbu.graph.types.VertexByte;
+import ir.ac.sbu.graph.types.OrderedVertex;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -268,7 +268,7 @@ public class MaxKTrussTSet extends SparkApp {
             Arrays.sort(fVal, 1, fVal.length);
             int v = t._1;
 
-            List<Tuple2<Edge, VertexByte>> output = new ArrayList<>();
+            List<Tuple2<Edge, OrderedVertex>> output = new ArrayList<>();
             for (int[] cVal : t._2._1) {
                 int u = cVal[0];
                 Edge uv = new Edge(u, v);
@@ -287,9 +287,9 @@ public class MaxKTrussTSet extends SparkApp {
                         Edge uw = new Edge(u, w);
                         Edge vw = new Edge(v, w);
 
-                        output.add(new Tuple2<>(uv, new VertexByte(w, W_UVW)));
-                        output.add(new Tuple2<>(uw, new VertexByte(v, V_UVW)));
-                        output.add(new Tuple2<>(vw, new VertexByte(u, U_UVW)));
+                        output.add(new Tuple2<>(uv, new OrderedVertex(w, W_UVW)));
+                        output.add(new Tuple2<>(uw, new OrderedVertex(v, V_UVW)));
+                        output.add(new Tuple2<>(vw, new OrderedVertex(u, U_UVW)));
 
                         fi++;
                         ci++;
@@ -300,9 +300,9 @@ public class MaxKTrussTSet extends SparkApp {
             return output.iterator();
         }).groupByKey(partitionNum * 2)
                 .mapValues(values -> {
-                    List<VertexByte> list = new ArrayList<>();
+                    List<OrderedVertex> list = new ArrayList<>();
                     int sw = 0, sv = 0, su = 0;
-                    for (VertexByte value : values) {
+                    for (OrderedVertex value : values) {
                         list.add(value);
                         if (value.sign == W_UVW)
                             sw++;
@@ -321,7 +321,7 @@ public class MaxKTrussTSet extends SparkApp {
                     set[2] = offsetV + sv;  // exclusive max offset of vertex
                     set[3] = offsetU + su;  // exclusive max offset of u
 
-                    for (VertexByte vb : list) {
+                    for (OrderedVertex vb : list) {
                         if (vb.sign == W_UVW)
                             set[offsetW++] = vb.vertex;
                         else if (vb.sign == V_UVW)

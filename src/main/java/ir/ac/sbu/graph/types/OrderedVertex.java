@@ -3,14 +3,14 @@ package ir.ac.sbu.graph.types;
 /**
  * Add a vertex and a byte together
  */
-public class VertexByte {
+public class OrderedVertex {
 
     public int vertex;
     public byte sign;
 
-    public VertexByte() { }
+    public OrderedVertex() { }
 
-    public VertexByte(int vertex, byte sign) {
+    public OrderedVertex(int vertex, byte sign) {
         this.vertex = vertex;
         this.sign = sign;
     }

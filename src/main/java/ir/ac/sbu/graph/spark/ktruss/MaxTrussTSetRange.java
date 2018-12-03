@@ -5,7 +5,7 @@ import ir.ac.sbu.graph.spark.kcore.KCore;
 import ir.ac.sbu.graph.spark.kcore.KCoreConf;
 import ir.ac.sbu.graph.spark.triangle.Triangle;
 import ir.ac.sbu.graph.types.Edge;
-import ir.ac.sbu.graph.types.VertexByte;
+import ir.ac.sbu.graph.types.OrderedVertex;
 import it.unimi.dsi.fastutil.ints.*;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.Optional;
@@ -315,7 +315,7 @@ public class MaxTrussTSetRange extends SparkApp {
                     Arrays.sort(fVal, 1, fVal.length);
                     int v = t._1;
 
-                    List <Tuple2 <Edge, VertexByte>> output = new ArrayList <>();
+                    List <Tuple2 <Edge, OrderedVertex>> output = new ArrayList <>();
                     for (int[] cVal : t._2._1) {
                         int u = cVal[0];
                         Edge uv = new Edge(u, v);
@@ -334,9 +334,9 @@ public class MaxTrussTSetRange extends SparkApp {
                                 Edge uw = new Edge(u, w);
                                 Edge vw = new Edge(v, w);
 
-                                output.add(new Tuple2 <>(uv, new VertexByte(w, W_UVW)));
-                                output.add(new Tuple2 <>(uw, new VertexByte(v, V_UVW)));
-                                output.add(new Tuple2 <>(vw, new VertexByte(u, U_UVW)));
+                                output.add(new Tuple2 <>(uv, new OrderedVertex(w, W_UVW)));
+                                output.add(new Tuple2 <>(uw, new OrderedVertex(v, V_UVW)));
+                                output.add(new Tuple2 <>(vw, new OrderedVertex(u, U_UVW)));
 
                                 fi++;
                                 ci++;
@@ -351,7 +351,7 @@ public class MaxTrussTSetRange extends SparkApp {
                     IntSortedSet vSet = new IntAVLTreeSet();
                     IntSortedSet uSet = new IntAVLTreeSet();
                     int sup = 0;
-                    for (VertexByte value : values) {
+                    for (OrderedVertex value : values) {
                         if (value.sign == W_UVW)
                             wSet.add(value.vertex);
                         else if (value.sign == V_UVW)
