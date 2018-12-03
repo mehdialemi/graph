@@ -61,6 +61,8 @@ public class MaxTrussTSetRange extends SparkApp {
 
         JavaPairRDD <Edge, MaxTSetValue> tSet = createTSet(fonl, candidates, numPartitions);
         JavaPairRDD <Edge, Integer> maxTruss = conf.getSc().parallelizePairs(new ArrayList <>());
+//        long count = tSet.count();
+//        long trussCount = 0;
         int max = maxK + 1;
         int maxIteration = 2;
         int minSup = 1;
@@ -95,6 +97,7 @@ public class MaxTrussTSetRange extends SparkApp {
                     tSet = result._2.filter(kv -> kv._2.sup > min || kv._2.updated)
                             .persist(StorageLevel.MEMORY_AND_DISK());
                     kCount += excludeCount;
+//                    trussCount += excludeCount;
                 } else {
                     tSet = result._2;
                     minSup++;
@@ -109,8 +112,10 @@ public class MaxTrussTSetRange extends SparkApp {
             long duration = t2 - t1;
             if (maxSup >= max) {
                 maxSup = max;
-                maxIteration = 5;
+                maxIteration = Integer.MAX_VALUE;
             } else {
+//                float remaining = trussCount / (float) count;
+//                float r = (count - updateCount) / (float) count;
 
                 int addToMaxSup = 0;
                 if (updateChangeRation < 1.0f) {
@@ -388,11 +393,12 @@ public class MaxTrussTSetRange extends SparkApp {
         };
         conf.init();
         int minPartitions = argumentReader.nextInt(2);
+        int maxK = argumentReader.nextInt(1000);
         EdgeLoader edgeLoader = new EdgeLoader(conf);
         NeighborList neighborList = new NeighborList(edgeLoader);
 
         MaxTrussTSetRange kTrussTSet = new MaxTrussTSetRange(neighborList, conf);
-        JavaPairRDD <Edge, Integer> truss = kTrussTSet.explore(minPartitions, 100000);
+        JavaPairRDD <Edge, Integer> truss = kTrussTSet.explore(minPartitions, maxK);
         long t2 = System.currentTimeMillis();
         log("KTruss edge count: " + truss.count(), t1, t2);
 
