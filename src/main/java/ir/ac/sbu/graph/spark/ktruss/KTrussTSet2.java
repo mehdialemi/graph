@@ -71,7 +71,7 @@ public class KTrussTSet2 extends SparkApp {
 
         long edgeCount = tSet.count();
         int fCount = 0;
-        while (fCount < edgeCount || min <= max) {
+        while (fCount < edgeCount && min <= max) {
             final int minSup = min;
             int minCount = 0;
             JavaPairRDD <Edge, Integer> eSup = tSet.mapValues(v -> v[0]).cache();
@@ -80,11 +80,13 @@ public class KTrussTSet2 extends SparkApp {
                     .mapValues(val -> val._1 - val._2.orElse(EMPTY_ARRAY).length)
                     .filter(kv -> kv._2 == minSup)
                     .persist(StorageLevel.MEMORY_AND_DISK());
-            for (int iter = 0; iter < ktConf.getKtMaxIter(); iter++) {
+            int iter = 0;
+            while (true){
+                iter ++;
 
                 long t1 = System.currentTimeMillis();
 
-                if ((iter + 1) % CHECKPOINT_ITERATION == 0) {
+                if (iter % CHECKPOINT_ITERATION == 0) {
                     tSet.checkpoint();
                 }
 
@@ -157,6 +159,9 @@ public class KTrussTSet2 extends SparkApp {
                         ", invalid edge count: " + invalidCount + ", newUpdates count: " + nCount;
                 log(msg, t2 - t1);
             }
+            if (min > max)
+                break;
+
             processed = processed.subtractByKey(fSup).cache();
             tSet = tSet.subtractByKey(fSup).cache();
         }
@@ -255,7 +260,7 @@ public class KTrussTSet2 extends SparkApp {
         };
         conf.init();
         int min = argumentReader.nextInt(1);
-        int max = argumentReader.nextInt(100000);
+        int max = argumentReader.nextInt(1);
         EdgeLoader edgeLoader = new EdgeLoader(conf);
         NeighborList neighborList = new NeighborList(edgeLoader);
 
