@@ -27,12 +27,12 @@ public class KCore extends NeighborList {
         super(neighborList);
         String master = conf.getSc().master();
         this.conf.getSc().setCheckpointDir("/tmp/checkpoint");
-
+        this.kConf = kConf;
         neighborQueue = new LinkedList<>();
         if (master.contains("local")) {
             return;
         }
-        this.kConf = kConf;String masterHost = new URI(conf.getSc().master()).getHost();
+        String masterHost = new URI(conf.getSc().master()).getHost();
         this.conf.getSc().setCheckpointDir("hdfs://" + masterHost + "/shared/checkpoint");
 
     }
