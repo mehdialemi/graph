@@ -26,16 +26,24 @@ public class MaxCore extends SparkApp {
         JavaPairRDD <Integer, int[]> neighbors = neighborList.getOrCreate();
         int partitions = neighbors.getNumPartitions() * 5;
         int k = 2;
+        int step = 10;
         while(true) {
-            neighbors = kCore.getK(neighbors, k)
-                    .repartition(partitions)
-                    .persist(StorageLevel.DISK_ONLY());
-            neighbors.checkpoint();
-            long count = neighbors.count();
-            log("k: " + k + ", neighbors: " + count);
-            if (count == 0)
-                break;
-            k ++;
+            JavaPairRDD <Integer, int[]> neighbors2 = kCore.getK(neighbors, k);
+
+            long count = neighbors2.count();
+            if (count == 0) {
+                k -= step;
+                if(step == 1)
+                    break;
+                step = 1;
+                neighbors = neighbors.repartition(partitions).cache();
+                log("k: " + k + ", neighbors: " + count + ", step: " + step);
+            } else {
+                neighbors = neighbors2.repartition(partitions)
+                        .persist(StorageLevel.DISK_ONLY());
+                log("k: " + k + ", neighbors: " + count);
+                k += step;
+            }
         }
     }
 
