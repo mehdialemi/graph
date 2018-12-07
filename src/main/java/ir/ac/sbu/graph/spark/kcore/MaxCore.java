@@ -23,12 +23,11 @@ public class MaxCore extends SparkApp {
         this.kCore = kCore;
     }
 
-    public void printKStats(NeighborList neighborList, int startK) {
-
+    public void printKStats(NeighborList neighborList, int startK, int step) {
+        log("startK: " + startK + ", step: " + step);
         JavaPairRDD <Integer, int[]> neighbors = neighborList.getOrCreate();
         int partitions = neighbors.getNumPartitions() * 5;
         int k = startK;
-        int step = 50;
 
         while(true) {
             JavaPairRDD <Integer, int[]> neighbors2 = kCore.getK(neighbors, k);
@@ -53,20 +52,21 @@ public class MaxCore extends SparkApp {
     }
 
     public static void main(String[] args) throws URISyntaxException {
-        KCoreConf kConf = new KCoreConf(new ArgumentReader(args), true) {
+        ArgumentReader argumentReader = new ArgumentReader(args);
+        KCoreConf kConf = new KCoreConf(argumentReader, true) {
             @Override
             protected String createAppName() {
                 return "KCore-" + super.createAppName();
             }
         };
         kConf.init();
-
+        int step = argumentReader.nextInt(10);
         EdgeLoader edgeLoader = new EdgeLoader(kConf);
         NeighborList neighborList = new NeighborList(edgeLoader);
         KCore kCore = new KCore(neighborList, kConf);
 
         MaxCore maxCore = new MaxCore(kCore);
-        maxCore.printKStats(neighborList, kConf.kc);
+        maxCore.printKStats(neighborList, kConf.kc, step);
         kCore.close();
     }
 }
