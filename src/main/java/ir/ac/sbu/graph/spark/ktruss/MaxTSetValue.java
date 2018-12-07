@@ -8,5 +8,7 @@ public class MaxTSetValue {
     public int[] kv;
     public int[] u;
     public int[] ku;
+    public long removeTracker;
     public boolean updated;
+    public boolean remove;
 }
