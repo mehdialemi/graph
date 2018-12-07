@@ -21,11 +21,11 @@ public class MaxCore extends SparkApp {
         this.kCore = kCore;
     }
 
-    public void printKStats(NeighborList neighborList) {
+    public void printKStats(NeighborList neighborList, int startK) {
 
         JavaPairRDD <Integer, int[]> neighbors = neighborList.getOrCreate();
         int partitions = neighbors.getNumPartitions() * 5;
-        int k = 2;
+        int k = startK;
         int step = 10;
         while(true) {
             JavaPairRDD <Integer, int[]> neighbors2 = kCore.getK(neighbors, k);
@@ -61,7 +61,7 @@ public class MaxCore extends SparkApp {
         KCore kCore = new KCore(neighborList, kConf);
 
         MaxCore maxCore = new MaxCore(kCore);
-        maxCore.printKStats(neighborList);
+        maxCore.printKStats(neighborList, kConf.kc);
         kCore.close();
     }
 }
