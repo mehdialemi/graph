@@ -46,7 +46,7 @@ public class MaxTrussTSetRange extends SparkApp {
 
     }
 
-    public JavaPairRDD <Edge, Integer> explore(int minPartitions, int maxK) {
+    public JavaPairRDD <Edge, Integer> explore(int minPartitions, int maxK) throws URISyntaxException {
         log("maxK: " + maxK);
         KCore kCore = new KCore(neighborList, kCoreConf);
 
