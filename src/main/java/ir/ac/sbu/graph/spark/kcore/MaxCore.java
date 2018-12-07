@@ -24,7 +24,7 @@ public class MaxCore extends SparkApp {
     public void printKStats(NeighborList neighborList) {
 
         JavaPairRDD <Integer, int[]> neighbors = neighborList.getOrCreate();
-        int partitions = neighbors.getNumPartitions();
+        int partitions = neighbors.getNumPartitions() * 5;
         int k = 2;
         while(true) {
             neighbors = kCore.getK(neighbors, k)
