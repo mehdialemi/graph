@@ -30,6 +30,7 @@ public class MaxCore extends SparkApp {
             neighbors = kCore.getK(neighbors, k)
                     .repartition(partitions)
                     .persist(StorageLevel.DISK_ONLY());
+            neighbors.checkpoint();
             long count = neighbors.count();
             log("k: " + k + ", neighbors: " + count);
             if (count == 0)
@@ -54,6 +55,5 @@ public class MaxCore extends SparkApp {
         MaxCore maxCore = new MaxCore(kCore);
         maxCore.printKStats(neighborList);
         kCore.close();
-        maxCore.close();
     }
 }
