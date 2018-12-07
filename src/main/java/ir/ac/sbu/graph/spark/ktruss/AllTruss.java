@@ -47,7 +47,7 @@ public class AllTruss extends SparkApp {
         this.ktConf.getSc().setCheckpointDir("hdfs://" + masterHost + "/shared/checkpoint");
     }
 
-    public JavaPairRDD <Edge, Integer> generate() {
+    public JavaPairRDD <Edge, Integer> generate() throws URISyntaxException {
 
         KCore kCore = new KCore(neighborList, ktConf);
 
