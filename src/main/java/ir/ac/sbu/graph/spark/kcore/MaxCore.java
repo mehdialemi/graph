@@ -39,7 +39,12 @@ public class MaxCore extends SparkApp {
     }
 
     public static void main(String[] args) {
-        KCoreConf kConf = new KCoreConf(new ArgumentReader(args), true);
+        KCoreConf kConf = new KCoreConf(new ArgumentReader(args), true) {
+            @Override
+            protected String createAppName() {
+                return "KCore-" + super.createAppName();
+            }
+        };
         kConf.init();
 
         EdgeLoader edgeLoader = new EdgeLoader(kConf);
