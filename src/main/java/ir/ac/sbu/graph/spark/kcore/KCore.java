@@ -9,6 +9,8 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import scala.Tuple2;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 
 import static ir.ac.sbu.graph.utils.Log.log;
@@ -21,10 +23,18 @@ public class KCore extends NeighborList {
     private KCoreConf kConf;
     private Queue<JavaPairRDD<Integer, int[]>> neighborQueue;
 
-    public KCore(NeighborList neighborList, KCoreConf kConf) {
+    public KCore(NeighborList neighborList, KCoreConf kConf) throws URISyntaxException {
         super(neighborList);
-        this.kConf = kConf;
+        String master = conf.getSc().master();
+        this.conf.getSc().setCheckpointDir("/tmp/checkpoint");
+
         neighborQueue = new LinkedList<>();
+        if (master.contains("local")) {
+            return;
+        }
+        this.kConf = kConf;String masterHost = new URI(conf.getSc().master()).getHost();
+        this.conf.getSc().setCheckpointDir("hdfs://" + masterHost + "/shared/checkpoint");
+
     }
 
     public KCore(JavaRDD<Edge> rdd, KCoreConf kConf) {
@@ -59,6 +69,9 @@ public class KCore extends NeighborList {
 
         for (int iter = 0; iter < kConf.getKcMaxIter(); iter ++ ) {
             long t1 = System.currentTimeMillis();
+
+            if ((iter + 1)% 50 == 0)
+                neighbors.checkpoint();
 
             JavaPairRDD<Integer, int[]> invalids = neighbors.filter(nl -> nl._2.length < k).cache();
             long count = invalids.count();
@@ -111,7 +124,7 @@ public class KCore extends NeighborList {
         return neighbors;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws URISyntaxException {
         long t1 = System.currentTimeMillis();
         KCoreConf kConf = new KCoreConf(new ArgumentReader(args), true);
         kConf.init();
