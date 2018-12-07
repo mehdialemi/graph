@@ -39,17 +39,24 @@ public class KCore extends NeighborList {
         }
     }
 
+    public JavaPairRDD<Integer, int[]> getK(JavaPairRDD<Integer, int[]> neighbors, int k) {
+        return perform(neighbors, k);
+    }
+
     @Override
     public JavaPairRDD<Integer, int[]> getOrCreate() {
 
         JavaPairRDD<Integer, int[]> neighbors = super.getOrCreate();
+        return perform(neighbors, kConf.getKc());
+    }
+
+    private JavaPairRDD <Integer, int[]> perform(JavaPairRDD <Integer, int[]> neighbors, int k) {
         if (kConf.getKcMaxIter() < 1) {
             return neighbors;
         }
 
         neighborQueue.add(neighbors);
 
-        final int k = kConf.getKc();
         for (int iter = 0; iter < kConf.getKcMaxIter(); iter ++ ) {
             long t1 = System.currentTimeMillis();
 
