@@ -54,5 +54,6 @@ public class MaxCore extends SparkApp {
         MaxCore maxCore = new MaxCore(kCore);
         maxCore.printKStats(neighborList);
         kCore.close();
+        maxCore.close();
     }
 }
