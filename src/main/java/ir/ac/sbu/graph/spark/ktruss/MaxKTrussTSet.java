@@ -52,7 +52,7 @@ public class MaxKTrussTSet extends SparkApp {
 
     }
 
-    public Map<Integer, JavaRDD<Edge>> explore(float consumptionRatio, int minPartitions) {
+    public Map<Integer, JavaRDD<Edge>> explore(float consumptionRatio, int minPartitions) throws URISyntaxException {
 
         KCore kCore = new KCore(neighborList, kCoreConf);
 

@@ -48,7 +48,7 @@ public class KTrussTSet extends SparkApp {
         this.ktConf.getSc().setCheckpointDir("hdfs://" + masterHost + "/shared/checkpoint");
     }
 
-    public JavaPairRDD<Edge, int[]> generate() {
+    public JavaPairRDD<Edge, int[]> generate() throws URISyntaxException {
 
         KCore kCore = new KCore(neighborList, ktConf);
 
