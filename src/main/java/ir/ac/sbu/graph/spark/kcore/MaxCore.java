@@ -7,6 +7,8 @@ import ir.ac.sbu.graph.spark.SparkApp;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.storage.StorageLevel;
 
+import java.net.URISyntaxException;
+
 import static ir.ac.sbu.graph.utils.Log.log;
 
 /**
@@ -47,7 +49,7 @@ public class MaxCore extends SparkApp {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws URISyntaxException {
         KCoreConf kConf = new KCoreConf(new ArgumentReader(args), true) {
             @Override
             protected String createAppName() {
