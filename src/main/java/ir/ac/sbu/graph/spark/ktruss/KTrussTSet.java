@@ -242,7 +242,7 @@ public class KTrussTSet extends SparkApp {
                     }
 
                     return set;
-                }).persist(StorageLevel.DISK_ONLY()); // Use disk too because this RDD often is very large
+                }).persist(StorageLevel.MEMORY_AND_DISK()); // Use disk too because this RDD often is very large
 
         return tSet;
     }
