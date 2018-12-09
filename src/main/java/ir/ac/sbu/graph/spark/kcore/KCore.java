@@ -137,7 +137,7 @@ public class KCore extends NeighborList {
         if (neighborQueue.size() > 1)
             neighborQueue.remove().unpersist();
 
-        NumberFormat nf = new DecimalFormat("##.##");
+        NumberFormat nf = new DecimalFormat("##.####");
         double invRatio = invalidCount / (double) vCount;
         double kciRatio = firstInvalids / (double) invalidCount;
         double kctRatio = firstDuration / (double) allDurations;
