@@ -53,8 +53,8 @@ public class AnalyzeResultsRestClient {
                 String[] split = application.getName().split("-");
                 try {
                     int k = Integer.parseInt(split[1]);
-                    if (!(k == 4 || k == 40 || k == 80 || k == 160))
-                        continue;
+//                    if (!(k == 4 || k == 40 || k == 80 || k == 160))
+//                        continue;
                 } catch (Exception e) {
                     continue;
                 }
