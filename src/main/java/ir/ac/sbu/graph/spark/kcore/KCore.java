@@ -88,9 +88,11 @@ public class KCore extends NeighborList {
             invalidCount += count;
             long t2 = System.currentTimeMillis();
             long duration = t2 - t1;
+            if (iter == 0) {
+                firstInvalids = count;
+            }
             if (iter == 1) {
                 firstDuration = duration;
-                firstInvalids = count;
             }
             allDurations += duration;
             log("K-core, invalids: " + count, duration);
