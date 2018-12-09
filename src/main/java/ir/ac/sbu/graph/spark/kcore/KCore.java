@@ -57,7 +57,7 @@ public class KCore extends NeighborList {
     public JavaPairRDD<Integer, int[]> getOrCreate() {
 
         JavaPairRDD<Integer, int[]> neighbors = super.getOrCreate();
-        log("vertex count: " + neighbors.count());
+
         return perform(neighbors, kConf.getKc());
     }
 
@@ -65,12 +65,10 @@ public class KCore extends NeighborList {
         if (kConf.getKcMaxIter() < 1) {
             return neighbors;
         }
-
+        long t1 = System.currentTimeMillis();
         neighborQueue.add(neighbors);
-
+        log("vertex count: " + neighbors.count());
         for (int iter = 0; iter < kConf.getKcMaxIter(); iter ++ ) {
-            long t1 = System.currentTimeMillis();
-
             if ((iter + 1)% 50 == 0)
                 neighbors.checkpoint();
 
@@ -117,6 +115,7 @@ public class KCore extends NeighborList {
                 neighborQueue.remove().unpersist();
 
             neighborQueue.add(neighbors);
+            t1 = System.currentTimeMillis();
         }
 
         if (neighborQueue.size() > 1)
