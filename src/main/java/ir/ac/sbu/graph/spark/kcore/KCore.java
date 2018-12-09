@@ -70,12 +70,12 @@ public class KCore extends NeighborList {
         long t1 = System.currentTimeMillis();
         neighborQueue.add(neighbors);
         long invalidCount = 0;
-        long vCount = neighbors.count();
+//        long vCount = neighbors.count();
         long firstDuration = 0;
         long firstInvalids = 0;
         long allDurations = 0;
         int iterations = 0;
-        log("vertex count: " + vCount);
+//        log("vertex count: " + vCount);
         for (int iter = 0; iter < kConf.getKcMaxIter(); iter ++ ) {
             if ((iter + 1)% 50 == 0)
                 neighbors.checkpoint();
@@ -138,10 +138,11 @@ public class KCore extends NeighborList {
             neighborQueue.remove().unpersist();
 
         NumberFormat nf = new DecimalFormat("##.####");
-        double invRatio = invalidCount / (double) vCount;
+//        double invRatio = invalidCount / (double) vCount;
         double kciRatio = firstInvalids / (double) invalidCount;
         double kctRatio = firstDuration / (double) allDurations;
-        log("iterations: " + iterations + ", invRatio: " + nf.format(invRatio) +
+        log("iterations: " + iterations +
+//                ", invRatio: " + nf.format(invRatio) +
                 ", kci: " + nf.format(kciRatio) + ", kct: " + nf.format(kctRatio));
 
         return neighbors;
