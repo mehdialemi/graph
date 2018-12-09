@@ -88,7 +88,7 @@ public class KCore extends NeighborList {
             invalidCount += count;
             long t2 = System.currentTimeMillis();
             long duration = t2 - t1;
-            if (iter == 0) {
+            if (iter == 1) {
                 firstDuration = duration;
                 firstInvalids = count;
             }
@@ -134,7 +134,6 @@ public class KCore extends NeighborList {
                 neighborQueue.remove().unpersist();
 
             neighborQueue.add(neighbors);
-
         }
 
         if (neighborQueue.size() > 1)
