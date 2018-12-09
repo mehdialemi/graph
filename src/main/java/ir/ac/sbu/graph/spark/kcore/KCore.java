@@ -67,6 +67,7 @@ public class KCore extends NeighborList {
         }
         long t1 = System.currentTimeMillis();
         neighborQueue.add(neighbors);
+        long invalidCount = 0;
         log("vertex count: " + neighbors.count());
         for (int iter = 0; iter < kConf.getKcMaxIter(); iter ++ ) {
             if ((iter + 1)% 50 == 0)
@@ -74,10 +75,11 @@ public class KCore extends NeighborList {
 
             JavaPairRDD<Integer, int[]> invalids = neighbors.filter(nl -> nl._2.length < k).cache();
             long count = invalids.count();
+            invalidCount += count;
             long t2 = System.currentTimeMillis();
             log("K-core, invalids: " + count, t1, t2);
 
-            if (invalids.count() == 0)
+            if (count == 0)
                 break;
 
             JavaPairRDD<Integer, Iterable<Integer>> invUpdate = invalids
@@ -121,6 +123,7 @@ public class KCore extends NeighborList {
         if (neighborQueue.size() > 1)
             neighborQueue.remove().unpersist();
 
+        log("Invalid count: " + invalidCount);
         return neighbors;
     }
 
