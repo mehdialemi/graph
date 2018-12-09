@@ -11,6 +11,8 @@ import scala.Tuple2;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 
 import static ir.ac.sbu.graph.utils.Log.log;
@@ -68,7 +70,12 @@ public class KCore extends NeighborList {
         long t1 = System.currentTimeMillis();
         neighborQueue.add(neighbors);
         long invalidCount = 0;
-        log("vertex count: " + neighbors.count());
+        long vCount = neighbors.count();
+        long firstDuration = 0;
+        long firstInvalids = 0;
+        long allDurations = 0;
+        int iterations = 0;
+        log("vertex count: " + vCount);
         for (int iter = 0; iter < kConf.getKcMaxIter(); iter ++ ) {
             if ((iter + 1)% 50 == 0)
                 neighbors.checkpoint();
@@ -77,11 +84,18 @@ public class KCore extends NeighborList {
             long count = invalids.count();
             invalidCount += count;
             long t2 = System.currentTimeMillis();
-            log("K-core, invalids: " + count, t1, t2);
+            long duration = t2 - t1;
+            if (iter == 0) {
+                firstDuration = duration;
+                firstInvalids = count;
+            }
+            allDurations += duration;
+            log("K-core, invalids: " + count, duration);
 
             if (count == 0)
                 break;
 
+            iterations = iter + 1;
             JavaPairRDD<Integer, Iterable<Integer>> invUpdate = invalids
                     .flatMapToPair(nl -> {
                         List<Tuple2<Integer, Integer>> out = new ArrayList<>(nl._2.length);
@@ -123,7 +137,13 @@ public class KCore extends NeighborList {
         if (neighborQueue.size() > 1)
             neighborQueue.remove().unpersist();
 
-        log("Invalid count: " + invalidCount);
+        NumberFormat nf = new DecimalFormat("##.##");
+        double invRatio = invalidCount / (double) vCount;
+        double kciRatio = firstInvalids / (double) invalidCount;
+        double kctRatio = firstDuration / (double) allDurations;
+        log("iterations: " + iterations + ", invRatio: " + nf.format(invRatio) +
+                ", kci: " + nf.format(kciRatio) + ", kct: " + nf.format(kctRatio));
+
         return neighbors;
     }
 
