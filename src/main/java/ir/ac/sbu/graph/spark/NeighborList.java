@@ -35,8 +35,9 @@ public class NeighborList extends SparkApp {
 
     public JavaPairRDD<Integer, int[]> getOrCreate() {
         if (neighbors == null) {
+            long t1 = System.currentTimeMillis()
             JavaPairRDD<Integer, Integer> edges = edgeLoader.create();
-            log("edge count: " + edges.count());
+            log("edge count: " + edges.count(), t1, System.currentTimeMillis());
             neighbors = createNeighbors(edges);
         }
         return neighbors;
