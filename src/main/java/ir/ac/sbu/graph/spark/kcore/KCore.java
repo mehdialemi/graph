@@ -64,7 +64,7 @@ public class KCore extends NeighborList {
         if (kConf.getKcMaxIter() < 1) {
             return neighbors;
         }
-
+        int numPartitions = neighbors.getNumPartitions();
         neighborQueue.add(neighbors);
 
         for (int iter = 0; iter < kConf.getKcMaxIter(); iter ++ ) {
@@ -89,7 +89,7 @@ public class KCore extends NeighborList {
                             out.add(new Tuple2<>(v, nl._1));
                         }
                         return out.iterator();
-                    }).groupByKey(conf.getPartitionNum());
+                    }).groupByKey(numPartitions);
 
             neighbors = neighbors.filter(nl -> nl._2.length >= k)
                     .leftOuterJoin(invUpdate)
