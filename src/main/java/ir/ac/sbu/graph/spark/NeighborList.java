@@ -7,6 +7,8 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import scala.Tuple2;
 
+import static ir.ac.sbu.graph.utils.Log.log;
+
 /**
  * Create and maintain neighbor list such that each item is a key-value which key is vertex id and
  * value is neighbor list
@@ -34,6 +36,7 @@ public class NeighborList extends SparkApp {
     public JavaPairRDD<Integer, int[]> getOrCreate() {
         if (neighbors == null) {
             JavaPairRDD<Integer, Integer> edges = edgeLoader.create();
+            log("edge count: " + edges.count());
             neighbors = createNeighbors(edges);
         }
         return neighbors;
