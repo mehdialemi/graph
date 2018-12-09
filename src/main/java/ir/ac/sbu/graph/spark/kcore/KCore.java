@@ -57,6 +57,7 @@ public class KCore extends NeighborList {
     public JavaPairRDD<Integer, int[]> getOrCreate() {
 
         JavaPairRDD<Integer, int[]> neighbors = super.getOrCreate();
+        log("vertex count: " + neighbors.count());
         return perform(neighbors, kConf.getKc());
     }
 
