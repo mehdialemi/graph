@@ -92,6 +92,9 @@ public class MaxTrussTSetRange extends SparkApp {
             if (checkKTrussCounter >= kTrussMaxCounter) {
                 checkKTrussCounter = 0;
                 do {
+                    if (totalIterations.incrementAndGet() % 50 == 0)
+                        tSet.checkpoint();
+
                     final int min = minSup;
                     JavaPairRDD <Edge, Integer> kTruss = tSet.filter(kv -> !kv._2.updated && kv._2.sup <= min)
                             .mapValues(v -> v.sup)
