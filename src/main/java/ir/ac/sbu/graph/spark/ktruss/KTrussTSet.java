@@ -61,9 +61,9 @@ public class KTrussTSet extends SparkApp {
 
         JavaPairRDD<Integer, int[]> candidates = triangle.createCandidates(fonl);
 
-        int partitionNum = fonl.getNumPartitions();
 
         JavaPairRDD<Edge, int[]> tSet = createTSet(fonl, candidates);
+        int partitionNum = tSet.getNumPartitions();
         final int minSup = k - 2;
         Queue<JavaPairRDD<Edge, int[]>> tSetQueue = new LinkedList<>();
         tSetQueue.add(tSet);
@@ -175,7 +175,7 @@ public class KTrussTSet extends SparkApp {
 
     private JavaPairRDD<Edge, int[]> createTSet(JavaPairRDD<Integer, int[]> fonl,
                                                 JavaPairRDD<Integer, int[]> candidates) {
-        int partitionNum = fonl.getNumPartitions();
+        int partitionNum = fonl.getNumPartitions() * 2;
         // Generate kv such that key is an edge and value is its triangle vertices.
         JavaPairRDD<Edge, int[]> tSet = candidates.cogroup(fonl)
                 .flatMapToPair(t -> {
@@ -213,7 +213,7 @@ public class KTrussTSet extends SparkApp {
             }
 
             return output.iterator();
-        }).groupByKey(partitionNum * 2)
+        }).groupByKey(partitionNum)
                 .mapValues(values -> {
                     List<OrderedVertex> list = new ArrayList<>();
                     int sw = 0, sv = 0, su = 0;
