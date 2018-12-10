@@ -41,7 +41,7 @@ public class EdgeLoader extends SparkApp {
             return list.iterator();
         });
 
-        conf.setPartitionNum(input.getNumPartitions());
+        conf.setPartitionNum(input.getNumPartitions() * 2);
 
         return result;
     }

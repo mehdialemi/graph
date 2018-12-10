@@ -175,7 +175,7 @@ public class KTrussTSet extends SparkApp {
 
     private JavaPairRDD<Edge, int[]> createTSet(JavaPairRDD<Integer, int[]> fonl,
                                                 JavaPairRDD<Integer, int[]> candidates) {
-        int partitionNum = fonl.getNumPartitions() * 2;
+        int partitionNum = fonl.getNumPartitions();
         // Generate kv such that key is an edge and value is its triangle vertices.
         JavaPairRDD<Edge, int[]> tSet = candidates.cogroup(fonl)
                 .flatMapToPair(t -> {
