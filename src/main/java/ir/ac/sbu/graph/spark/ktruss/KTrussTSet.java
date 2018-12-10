@@ -129,7 +129,7 @@ public class KTrussTSet extends SparkApp {
                 }
 
                 return out.iterator();
-            }).groupByKey(partitionNum).cache();
+            }).groupByKey(partitionNum);
 
             // Remove the invalid vertices from the triangle vertex set of each remaining (valid) edge.
             tSet = tSet.filter(kv -> kv._2[0] >= minSup).leftOuterJoin(invUpdates)
