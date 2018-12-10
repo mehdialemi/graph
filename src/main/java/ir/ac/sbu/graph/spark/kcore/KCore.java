@@ -79,8 +79,7 @@ public class KCore extends NeighborList {
             if ((iter + 1) % 50 == 0)
                 neighbors.checkpoint();
 
-            JavaPairRDD <Integer, int[]> invalids = neighbors.filter(nl -> nl._2.length < k)
-                    .persist(StorageLevel.MEMORY_AND_DISK());
+            JavaPairRDD <Integer, int[]> invalids = neighbors.filter(nl -> nl._2.length < k).cache();
             long count = invalids.count();
             invalidCount += count;
             long t2 = System.currentTimeMillis();
@@ -127,7 +126,7 @@ public class KCore extends NeighborList {
                         }
 
                         return nSet.toIntArray();
-                    }).persist(StorageLevel.MEMORY_AND_DISK());
+                    }).cache();
         }
 
         NumberFormat nf = new DecimalFormat("##.####");
