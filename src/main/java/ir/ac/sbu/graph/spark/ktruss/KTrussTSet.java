@@ -78,7 +78,6 @@ public class KTrussTSet extends SparkApp {
             }
 
             if (iter == 1) {
-                kCore.unpersist();
                 fonl.unpersist();
             }
 
