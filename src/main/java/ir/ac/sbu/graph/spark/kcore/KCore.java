@@ -133,12 +133,13 @@ public class KCore extends NeighborList {
         double invRatio = invalidCount / (double) vCount;
         double kciRatio = firstInvalids / (double) invalidCount;
         double kctRatio = firstDuration / (double) allDurations;
+        long nCount = neighbors.count();
         log("K: " + k + "\nnumIterations: " + iterations + "\ninvRatio: " + nf.format(invRatio) +
                 "\nkci: " + nf.format(kciRatio) + "\nkct: " + nf.format(kctRatio) +
                 "\ninvalids: " + invalidCount + "\nvCount: " + vCount +
-                "\nkcore duration: " + allDurations);
+                "\nkcore duration: " + allDurations + ", neighbors new count: " + nCount);
 
-        return neighbors.repartition(numPartitions).cache();
+        return neighbors;
     }
 
     public static void main(String[] args) throws URISyntaxException {
