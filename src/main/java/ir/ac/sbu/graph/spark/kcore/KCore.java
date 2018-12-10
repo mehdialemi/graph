@@ -23,14 +23,14 @@ import static ir.ac.sbu.graph.utils.Log.log;
 public class KCore extends NeighborList {
 
     private KCoreConf kConf;
-    private Queue<JavaPairRDD<Integer, int[]>> neighborQueue;
+    private Queue <JavaPairRDD <Integer, int[]>> neighborQueue;
 
     public KCore(NeighborList neighborList, KCoreConf kConf) throws URISyntaxException {
         super(neighborList);
         String master = conf.getSc().master();
         this.conf.getSc().setCheckpointDir("/tmp/checkpoint");
         this.kConf = kConf;
-        neighborQueue = new LinkedList<>();
+        neighborQueue = new LinkedList <>();
         if (master.contains("local")) {
             return;
         }
@@ -39,26 +39,26 @@ public class KCore extends NeighborList {
 
     }
 
-    public KCore(JavaRDD<Edge> rdd, KCoreConf kConf) {
+    public KCore(JavaRDD <Edge> rdd, KCoreConf kConf) {
         super(kConf, rdd);
         this.kConf = kConf;
-        neighborQueue = new LinkedList<>();
+        neighborQueue = new LinkedList <>();
     }
 
     public void unpersist() {
-        for (JavaPairRDD<Integer, int[]> rdd : neighborQueue) {
+        for (JavaPairRDD <Integer, int[]> rdd : neighborQueue) {
             rdd.unpersist();
         }
     }
 
-    public JavaPairRDD<Integer, int[]> getK(JavaPairRDD<Integer, int[]> neighbors, int k) {
+    public JavaPairRDD <Integer, int[]> getK(JavaPairRDD <Integer, int[]> neighbors, int k) {
         return perform(neighbors, k);
     }
 
     @Override
-    public JavaPairRDD<Integer, int[]> getOrCreate() {
+    public JavaPairRDD <Integer, int[]> getOrCreate() {
 
-        JavaPairRDD<Integer, int[]> neighbors = super.getOrCreate();
+        JavaPairRDD <Integer, int[]> neighbors = super.getOrCreate();
 
         return perform(neighbors, kConf.getKc());
     }
@@ -78,12 +78,12 @@ public class KCore extends NeighborList {
         long allDurations = 0;
         int iterations = 0;
         log("vertex count: " + vCount);
-        for (int iter = 0; iter < kConf.getKcMaxIter(); iter ++ ) {
+        for (int iter = 0; iter < kConf.getKcMaxIter(); iter++) {
             t1 = System.currentTimeMillis();
-            if ((iter + 1)% 50 == 0)
+            if ((iter + 1) % 50 == 0)
                 neighbors.checkpoint();
 
-            JavaPairRDD<Integer, int[]> invalids = neighbors.filter(nl -> nl._2.length < k).cache();
+            JavaPairRDD <Integer, int[]> invalids = neighbors.filter(nl -> nl._2.length < k).cache();
             long count = invalids.count();
             invalidCount += count;
             long t2 = System.currentTimeMillis();
@@ -101,12 +101,12 @@ public class KCore extends NeighborList {
                 break;
 
             iterations = iter + 1;
-            JavaPairRDD<Integer, Iterable<Integer>> invUpdate = invalids
+            JavaPairRDD <Integer, Iterable <Integer>> invUpdate = invalids
                     .flatMapToPair(nl -> {
-                        List<Tuple2<Integer, Integer>> out = new ArrayList<>(nl._2.length);
+                        List <Tuple2 <Integer, Integer>> out = new ArrayList <>(nl._2.length);
 
                         for (int v : nl._2) {
-                            out.add(new Tuple2<>(v, nl._1));
+                            out.add(new Tuple2 <>(v, nl._1));
                         }
                         return out.iterator();
                     }).groupByKey(conf.getPartitionNum());
@@ -130,7 +130,7 @@ public class KCore extends NeighborList {
                         }
 
                         return nSet.toIntArray();
-            }).cache();
+                    }).cache();
 
             if (neighborQueue.size() > 1)
                 neighborQueue.remove().unpersist();
@@ -145,10 +145,10 @@ public class KCore extends NeighborList {
         double invRatio = invalidCount / (double) vCount;
         double kciRatio = firstInvalids / (double) invalidCount;
         double kctRatio = firstDuration / (double) allDurations;
-        log("iterations: " + iterations + ", invRatio: " + nf.format(invRatio) +
-                ", kci: " + nf.format(kciRatio) + ", kct: " + nf.format(kctRatio)+
-                ", invalids: " + invalidCount + ", vCount: " + vCount +
-                ", kcore duration: " + allDurations);
+        log("K: " + k + "\nnumIterations: " + iterations + "\ninvRatio: " + nf.format(invRatio) +
+                "\nkci: " + nf.format(kciRatio) + "\nkct: " + nf.format(kctRatio) +
+                "\ninvalids: " + invalidCount + "\nvCount: " + vCount +
+                "\nkcore duration: " + allDurations);
 
         return neighbors;
     }
@@ -162,7 +162,7 @@ public class KCore extends NeighborList {
         NeighborList neighborList = new NeighborList(edgeLoader);
 
         KCore kCore = new KCore(neighborList, kConf);
-        JavaPairRDD<Integer, int[]> kCoreSubGraph = kCore.getOrCreate();
+        JavaPairRDD <Integer, int[]> kCoreSubGraph = kCore.getOrCreate();
         long t2 = System.currentTimeMillis();
         log("KCore vertex count: " + kCoreSubGraph.count(), t1, t2);
 
