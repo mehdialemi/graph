@@ -163,8 +163,8 @@ public class KCore extends NeighborList {
 
         KCore kCore = new KCore(neighborList, kConf);
         JavaPairRDD<Integer, int[]> kCoreSubGraph = kCore.getOrCreate();
-
-        log("KCore vertex count: " + kCoreSubGraph.count(), t1, System.currentTimeMillis());
+        long t2 = System.currentTimeMillis();
+        log("KCore vertex count: " + kCoreSubGraph.count(), t1, t2);
 
         kCore.close();
     }
