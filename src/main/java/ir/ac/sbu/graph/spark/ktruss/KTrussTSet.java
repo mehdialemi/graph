@@ -1,6 +1,9 @@
 package ir.ac.sbu.graph.spark.ktruss;
 
-import ir.ac.sbu.graph.spark.*;
+import ir.ac.sbu.graph.spark.ArgumentReader;
+import ir.ac.sbu.graph.spark.EdgeLoader;
+import ir.ac.sbu.graph.spark.NeighborList;
+import ir.ac.sbu.graph.spark.SparkApp;
 import ir.ac.sbu.graph.spark.kcore.KCore;
 import ir.ac.sbu.graph.spark.triangle.Triangle;
 import ir.ac.sbu.graph.types.Edge;
@@ -60,18 +63,14 @@ public class KTrussTSet extends SparkApp {
 
         int partitionNum = fonl.getNumPartitions();
 
-        long t1 = System.currentTimeMillis();
         JavaPairRDD<Edge, int[]> tSet = createTSet(fonl, candidates);
-        long tSetCount = tSet.count();
-        long tSetDuration = System.currentTimeMillis() - t1;
-        log("tSet count: " + tSetCount, tSetDuration);
         final int minSup = k - 2;
         Queue<JavaPairRDD<Edge, int[]>> tSetQueue = new LinkedList<>();
         tSetQueue.add(tSet);
         long kTrussDuration = 0;
         for (int iter = 0; iter < ktConf.getKtMaxIter(); iter ++) {
 
-            t1 = System.currentTimeMillis();
+            long t1 = System.currentTimeMillis();
 
             if ((iter + 1 ) % CHECKPOINT_ITERATION == 0) {
                 tSet.checkpoint();
@@ -170,7 +169,7 @@ public class KTrussTSet extends SparkApp {
             tSetQueue.add(tSet);
         }
 
-        log("tSet duration: " + tSetDuration + ", kTruss duration: " + kTrussDuration);
+        log("kTruss duration: " + kTrussDuration);
         return tSet;
     }
 
