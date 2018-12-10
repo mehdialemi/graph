@@ -23,14 +23,12 @@ import static ir.ac.sbu.graph.utils.Log.log;
 public class KCore extends NeighborList {
 
     private KCoreConf kConf;
-    private Queue <JavaPairRDD <Integer, int[]>> neighborQueue;
 
     public KCore(NeighborList neighborList, KCoreConf kConf) throws URISyntaxException {
         super(neighborList);
         String master = conf.getSc().master();
         this.conf.getSc().setCheckpointDir("/tmp/checkpoint");
         this.kConf = kConf;
-        neighborQueue = new LinkedList <>();
         if (master.contains("local")) {
             return;
         }
@@ -42,14 +40,8 @@ public class KCore extends NeighborList {
     public KCore(JavaRDD <Edge> rdd, KCoreConf kConf) {
         super(kConf, rdd);
         this.kConf = kConf;
-        neighborQueue = new LinkedList <>();
     }
 
-    public void unpersist() {
-        for (JavaPairRDD <Integer, int[]> rdd : neighborQueue) {
-            rdd.unpersist();
-        }
-    }
 
     public JavaPairRDD <Integer, int[]> getK(JavaPairRDD <Integer, int[]> neighbors, int k) {
         return perform(neighbors, k);
@@ -67,7 +59,6 @@ public class KCore extends NeighborList {
         log("kcore iteration: " + kConf.getKcMaxIter() );
 
         long t1 = System.currentTimeMillis();
-        neighborQueue.add(neighbors);
         long invalidCount = 0;
         long vCount = neighbors.count();
         long neighborDuration = System.currentTimeMillis() - t1;
@@ -135,15 +126,7 @@ public class KCore extends NeighborList {
 
                         return nSet.toIntArray();
                     }).cache();
-
-            if (neighborQueue.size() > 1)
-                neighborQueue.remove().unpersist();
-
-            neighborQueue.add(neighbors);
         }
-
-        if (neighborQueue.size() > 1)
-            neighborQueue.remove().unpersist();
 
         NumberFormat nf = new DecimalFormat("##.####");
         double invRatio = invalidCount / (double) vCount;
