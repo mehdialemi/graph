@@ -147,7 +147,8 @@ public class KCore extends NeighborList {
         double kctRatio = firstDuration / (double) allDurations;
         log("iterations: " + iterations + ", invRatio: " + nf.format(invRatio) +
                 ", kci: " + nf.format(kciRatio) + ", kct: " + nf.format(kctRatio)+
-                ", invalids: " + invalidCount + ", vCount: " + vCount);
+                ", invalids: " + invalidCount + ", vCount: " + vCount +
+                ", kcore duration: " + allDurations);
 
         return neighbors;
     }
