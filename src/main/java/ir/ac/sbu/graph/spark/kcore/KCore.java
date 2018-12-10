@@ -65,9 +65,6 @@ public class KCore extends NeighborList {
 
     private JavaPairRDD <Integer, int[]> perform(JavaPairRDD <Integer, int[]> neighbors, int k) {
         log("kcore iteration: " + kConf.getKcMaxIter() );
-        if (kConf.getKcMaxIter() < 1) {
-            return neighbors;
-        }
 
         long t1 = System.currentTimeMillis();
         neighborQueue.add(neighbors);
@@ -75,6 +72,11 @@ public class KCore extends NeighborList {
         long vCount = neighbors.count();
         long neighborDuration = System.currentTimeMillis() - t1;
         log("vCount: " + vCount, neighborDuration);
+
+        if (kConf.getKcMaxIter() < 1) {
+            return neighbors;
+        }
+
         long firstDuration = 0;
         long firstInvalids = 0;
         long allDurations = 0;
