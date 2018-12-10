@@ -7,6 +7,7 @@ import ir.ac.sbu.graph.types.Edge;
 import it.unimi.dsi.fastutil.ints.*;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.net.URI;
@@ -57,7 +58,7 @@ public class KCore extends NeighborList {
 
     private JavaPairRDD <Integer, int[]> perform(JavaPairRDD <Integer, int[]> neighbors, int k) {
         log("kcore iteration: " + kConf.getKcMaxIter() );
-
+        int numPartitions = neighbors.getNumPartitions();
         long t1 = System.currentTimeMillis();
         long invalidCount = 0;
         long vCount = neighbors.count();
@@ -137,7 +138,7 @@ public class KCore extends NeighborList {
                 "\ninvalids: " + invalidCount + "\nvCount: " + vCount +
                 "\nkcore duration: " + allDurations);
 
-        return neighbors;
+        return neighbors.repartition(numPartitions).cache();
     }
 
     public static void main(String[] args) throws URISyntaxException {
