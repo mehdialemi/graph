@@ -60,15 +60,18 @@ public class KTrussTSet extends SparkApp {
 
         int partitionNum = fonl.getNumPartitions();
 
+        long t1 = System.currentTimeMillis();
         JavaPairRDD<Edge, int[]> tSet = createTSet(fonl, candidates);
-
+        long tSetCount = tSet.count();
+        long tSetDuration = System.currentTimeMillis() - t1;
+        log("tSet count: " + tSetCount, tSetDuration);
         final int minSup = k - 2;
         Queue<JavaPairRDD<Edge, int[]>> tSetQueue = new LinkedList<>();
         tSetQueue.add(tSet);
-
+        long kTrussDuration = 0;
         for (int iter = 0; iter < ktConf.getKtMaxIter(); iter ++) {
 
-            long t1 = System.currentTimeMillis();
+            t1 = System.currentTimeMillis();
 
             if ((iter + 1 ) % CHECKPOINT_ITERATION == 0) {
                 tSet.checkpoint();
@@ -94,7 +97,9 @@ public class KTrussTSet extends SparkApp {
 
             long t2 = System.currentTimeMillis();
             String msg = "iteration: " + (iter + 1) + ", invalid edge count: " + invalidCount;
-            log(msg, t2 - t1);
+            long iterDuration = t2 - t1;
+            kTrussDuration += iterDuration;
+            log(msg, iterDuration);
 
             // The edges in the key part of invalids key-values should be removed. So, we detect other
             // edges of their involved triangle from their triangle vertex set. Here, we determine the
@@ -166,6 +171,7 @@ public class KTrussTSet extends SparkApp {
             tSetQueue.add(tSet);
         }
 
+        log("tSet duration: " + tSetDuration + ", kTruss duration: " + kTrussDuration);
         return tSet;
     }
 
@@ -259,7 +265,8 @@ public class KTrussTSet extends SparkApp {
 
         KTrussTSet kTrussTSet = new KTrussTSet(neighborList, ktConf);
         JavaPairRDD<Edge, int[]> subgraph = kTrussTSet.generate();
-        log("KTruss edge count: " + subgraph.count(), t1, System.currentTimeMillis());
+        long t2 = System.currentTimeMillis();
+        log("KTruss edge count: " + subgraph.count(), t1, t2);
 
         kTrussTSet.close();
     }
