@@ -63,9 +63,10 @@ public class KTrussTSet extends SparkApp {
 
         int pm = (int) Math.max(2, kCore.getEdgeCount() / kCore.getVertexCount());
         int numPartitions = conf.getPartitionNum() * pm;
+        log("numPartitions: " + numPartitions + ", pm: " + pm +
+                ", edges: " + kCore.getEdgeCount() + ", vertices: " + kCore.getVertexCount());
 
         JavaPairRDD<Edge, int[]> tSet = createTSet(fonl, candidates, numPartitions);
-        int partitionNum = tSet.getNumPartitions();
         final int minSup = k - 2;
         Queue<JavaPairRDD<Edge, int[]>> tSetQueue = new LinkedList<>();
         tSetQueue.add(tSet);
@@ -131,7 +132,7 @@ public class KTrussTSet extends SparkApp {
                 }
 
                 return out.iterator();
-            }).groupByKey(partitionNum);
+            }).groupByKey(numPartitions);
 
             // Remove the invalid vertices from the triangle vertex set of each remaining (valid) edge.
             tSet = tSet.filter(kv -> kv._2[0] >= minSup).leftOuterJoin(invUpdates)
