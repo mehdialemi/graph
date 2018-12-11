@@ -17,6 +17,8 @@ public class NeighborList extends SparkApp {
 
     private EdgeLoader edgeLoader;
     private JavaPairRDD<Integer, int[]> neighbors;
+    private long edgeCount;
+    private long vertexCount;
 
     public NeighborList(NeighborList neighborList) {
         this(neighborList.edgeLoader);
@@ -37,7 +39,8 @@ public class NeighborList extends SparkApp {
         if (neighbors == null) {
             long t1 = System.currentTimeMillis();
             JavaPairRDD<Integer, Integer> edges = edgeLoader.create();
-            log("edge count: " + edges.count(), t1, System.currentTimeMillis());
+            this.edgeCount = edges.count();
+            log("edge count: " + edgeCount, t1, System.currentTimeMillis());
             neighbors = createNeighbors(edges);
         }
         return neighbors;
@@ -57,5 +60,21 @@ public class NeighborList extends SparkApp {
         return getOrCreate()
                 .map(kv -> kv._2.length)
                 .reduce((a, b) -> a + b) / 2;
+    }
+
+    public long getEdgeCount() {
+        return edgeCount;
+    }
+
+    public void setEdgeCount(long edgeCount) {
+        this.edgeCount = edgeCount;
+    }
+
+    public long getVertexCount() {
+        return vertexCount;
+    }
+
+    public void setVertexCount(long vertexCount) {
+        this.vertexCount = vertexCount;
     }
 }

@@ -58,10 +58,10 @@ public class KCore extends NeighborList {
 
     private JavaPairRDD <Integer, int[]> perform(JavaPairRDD <Integer, int[]> neighbors, int k) {
         log("kcore iteration: " + kConf.getKcMaxIter() );
-        int numPartitions = neighbors.getNumPartitions();
         long t1 = System.currentTimeMillis();
         long invalidCount = 0;
         long vCount = neighbors.count();
+        setVertexCount(vCount);
         long neighborDuration = System.currentTimeMillis() - t1;
         log("vCount: " + vCount, neighborDuration);
 
