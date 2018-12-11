@@ -58,11 +58,11 @@ public class KTrussTSet extends SparkApp {
         Triangle triangle = new Triangle(kCore);
 
         JavaPairRDD<Integer, int[]> fonl = triangle.getOrCreateFonl();
-
-        JavaPairRDD<Integer, int[]> candidates = triangle.createCandidates(fonl);
-
         int pm = (int) Math.max(2, kCore.getEdgeCount() / kCore.getVertexCount());
         int numPartitions = conf.getPartitionNum() * Math.min(10, pm);
+
+        JavaPairRDD<Integer, int[]> candidates = triangle.createCandidates(fonl.repartition(numPartitions));
+
         log("numPartitions: " + numPartitions + ", pm: " + pm +
                 ", edges: " + kCore.getEdgeCount() + ", vertices: " + kCore.getVertexCount());
 
