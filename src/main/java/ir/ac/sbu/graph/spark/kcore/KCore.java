@@ -43,7 +43,6 @@ public class KCore extends NeighborList {
         this.kConf = kConf;
     }
 
-
     public JavaPairRDD <Integer, int[]> getK(JavaPairRDD <Integer, int[]> neighbors, int k) {
         return perform(neighbors, k);
     }
