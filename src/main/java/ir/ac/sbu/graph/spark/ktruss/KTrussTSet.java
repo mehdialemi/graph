@@ -8,10 +8,10 @@ import ir.ac.sbu.graph.spark.kcore.KCore;
 import ir.ac.sbu.graph.spark.triangle.Triangle;
 import ir.ac.sbu.graph.types.Edge;
 import ir.ac.sbu.graph.types.VSign;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
@@ -51,8 +51,7 @@ public class KTrussTSet extends SparkApp {
         this.ktConf.getSc().setCheckpointDir("hdfs://" + masterHost + "/shared/checkpoint");
     }
 
-    public JavaPairRDD <Edge, int[]> generate() throws URISyntaxException {
-
+    public JavaPairRDD <Edge, int[]> genTSet() throws URISyntaxException {
         KCore kCore = new KCore(neighborList, ktConf);
 
         Triangle triangle = new Triangle(kCore);
@@ -61,7 +60,12 @@ public class KTrussTSet extends SparkApp {
 
         JavaPairRDD <Integer, int[]> candidates = triangle.createCandidates(fonl);
 
-        JavaPairRDD <Edge, int[]> tSet = createTSet(fonl, candidates);
+        return createTSet(fonl, candidates);
+    }
+
+    public JavaPairRDD <Edge, int[]> generate() throws URISyntaxException {
+
+        JavaPairRDD <Edge, int[]> tSet = genTSet();
         int numPartitions = tSet.getNumPartitions();
 
         final int minSup = k - 2;
@@ -75,10 +79,6 @@ public class KTrussTSet extends SparkApp {
 
             if ((iter + 1) % CHECKPOINT_ITERATION == 0) {
                 tSet.checkpoint();
-            }
-
-            if (iter == 1) {
-                fonl.unpersist();
             }
 
             // Detect invalid edges by comparing the support of triangle vertex set
@@ -180,7 +180,10 @@ public class KTrussTSet extends SparkApp {
                                                  JavaPairRDD <Integer, int[]> candidates) {
         // Generate kv such that key is an edge and value is its triangle vertices.
         return candidates.cogroup(fonl).mapPartitionsToPair(p -> {
-            Map <Edge, List <VSign>> map = new HashMap <>();
+            Map<Edge, IntList> wMap = new HashMap <>();
+            Map<Edge, IntList> vMap = new HashMap <>();
+            Map<Edge, IntList> uMap = new HashMap <>();
+
             while (p.hasNext()) {
                 Tuple2 <Integer, Tuple2 <Iterable <int[]>, Iterable <int[]>>> t = p.next();
                 int[] fVal = t._2._2.iterator().next();
@@ -204,58 +207,43 @@ public class KTrussTSet extends SparkApp {
                             int w = fVal[fi];
                             Edge uw = new Edge(u, w);
                             Edge vw = new Edge(v, w);
-
-                            List <VSign> list = map.computeIfAbsent(uv, k1 -> new ArrayList <>());
-                            list.add(new VSign(w, W_UVW));
-
-                            list = map.computeIfAbsent(uw, k1 -> new ArrayList <>());
-                            list.add(new VSign(v, V_UVW));
-
-                            list = map.computeIfAbsent(vw, k1 -> new ArrayList <>());
-                            list.add(new VSign(u, U_UVW));
-
+                            wMap.computeIfAbsent(uv, k -> new IntArrayList()).add(w);
+                            vMap.computeIfAbsent(uw, k -> new IntArrayList()).add(v);
+                            uMap.computeIfAbsent(vw, k -> new IntArrayList()).add(u);
                             fi++;
                             ci++;
                         }
                     }
                 }
             }
-
-            List <Tuple2 <Edge, Tuple2 <int[], byte[]>>> out = new ArrayList <>();
-            for (Map.Entry <Edge, List <VSign>> entry : map.entrySet()) {
-                Edge edge = entry.getKey();
-                List <VSign> value = entry.getValue();
-                int[] vertices = new int[value.size()];
-                byte[] signs = new byte[value.size()];
-                for (int i = 0; i < value.size(); i++) {
-                    VSign VSign = value.get(i);
-                    vertices[i] = VSign.vertex;
-                    signs[i] = VSign.sign;
-                }
-                out.add(new Tuple2 <>(edge, new Tuple2 <>(vertices, signs)));
-            }
+            List <Tuple2 <Edge, int[]>> out = new ArrayList <>();
+            fillOutput(wMap, vMap, uMap, out);
+            fillOutput(vMap, wMap, uMap, out);
+            fillOutput(uMap, wMap, vMap, out);
 
             return out.iterator();
         }).groupByKey()
                 .mapValues(values -> {
                     int sw = 0, sv = 0, su = 0;
                     List <VSign> list = new ArrayList <>();
-                    for (Tuple2 <int[], byte[]> value : values) {
-                        int[] vertices = value._1;
-                        byte[] signs = value._2;
-                        for (int i = 0; i < vertices.length; i++) {
-                            list.add(new VSign(vertices[i], signs[i]));
-                            switch (signs[i]) {
-                                case W_UVW:
-                                    sw++;
-                                    break;
-                                case V_UVW:
-                                    sv++;
-                                    break;
-                                case U_UVW:
-                                    su++;
-                                    break;
-                            }
+                    for (int[] value : values) {
+                        int wSize = value[0];
+                        sw += wSize;
+                        int offset = 1;
+                        for(; offset < wSize; offset ++) {
+                            list.add(new VSign(value[offset], W_UVW));
+                        }
+
+                        int vSize = value[offset];
+                        sv += vSize;
+                        for(; offset < vSize; offset ++) {
+                            list.add(new VSign(value[offset], V_UVW));
+                        }
+
+                        int uSize = value[offset];
+                        su += uSize;
+                        for(; offset < uSize; offset ++) {
+                            list.add(new VSign(value[offset], U_UVW));
                         }
                     }
 
@@ -279,6 +267,26 @@ public class KTrussTSet extends SparkApp {
 
                     return set;
                 }).persist(StorageLevel.MEMORY_AND_DISK());
+    }
+
+    private static void fillOutput(Map <Edge, IntList> wMap, Map <Edge, IntList> vMap, Map <Edge, IntList> uMap, List <Tuple2 <Edge, int[]>> out) {
+        for (Edge edge : wMap.keySet()) {
+            IntList outList = new IntArrayList();
+
+            IntList wList = wMap.get(edge);
+            outList.add(wList.size());
+            outList.addAll(wList);
+
+            IntList vList = vMap.remove(edge);
+            outList.add(vList.size());
+            outList.addAll(vList);
+
+            IntList uList = uMap.remove(edge);
+            outList.add(uList.size());
+            outList.addAll(uList);
+
+            out.add(new Tuple2 <>(edge, outList.toIntArray()));
+        }
     }
 
     public static void main(String[] args) throws URISyntaxException {
