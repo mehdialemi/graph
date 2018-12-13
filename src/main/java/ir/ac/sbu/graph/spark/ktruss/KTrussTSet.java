@@ -65,7 +65,11 @@ public class KTrussTSet extends SparkApp {
 
     public JavaPairRDD <Edge, int[]> generate() throws URISyntaxException {
 
+        long t1TSet = System.currentTimeMillis();
         JavaPairRDD <Edge, int[]> tSet = genTSet();
+        long t2TSet = System.currentTimeMillis();
+        log("tSet count: " + tSet.count(), t1TSet, t2TSet);
+
         int numPartitions = tSet.getNumPartitions();
 
         final int minSup = k - 2;
