@@ -269,21 +269,29 @@ public class KTrussTSet extends SparkApp {
                 }).persist(StorageLevel.MEMORY_AND_DISK());
     }
 
-    private static void fillOutput(Map <Edge, IntList> wMap, Map <Edge, IntList> vMap, Map <Edge, IntList> uMap, List <Tuple2 <Edge, int[]>> out) {
-        for (Edge edge : wMap.keySet()) {
+    private static void fillOutput(Map <Edge, IntList> map1, Map <Edge, IntList> map2, Map <Edge, IntList> map3, List <Tuple2 <Edge, int[]>> out) {
+        for (Edge edge : map1.keySet()) {
             IntList outList = new IntArrayList();
 
-            IntList wList = wMap.get(edge);
-            outList.add(wList.size());
-            outList.addAll(wList);
+            IntList list1 = map1.get(edge);
+            outList.add(list1.size());
+            outList.addAll(list1);
 
-            IntList vList = vMap.remove(edge);
-            outList.add(vList.size());
-            outList.addAll(vList);
+            IntList list2 = map2.remove(edge);
+            if (list2 != null) {
+                outList.add(list2.size());
+                outList.addAll(list2);
+            } else {
+                outList.add(0);
+            }
 
-            IntList uList = uMap.remove(edge);
-            outList.add(uList.size());
-            outList.addAll(uList);
+            IntList list3 = map3.remove(edge);
+            if (list3 != null) {
+                outList.add(list3.size());
+                outList.addAll(list3);
+            } else {
+                outList.add(0);
+            }
 
             out.add(new Tuple2 <>(edge, outList.toIntArray()));
         }
