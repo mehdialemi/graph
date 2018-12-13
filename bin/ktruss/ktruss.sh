@@ -10,7 +10,7 @@ function ktruss {
 }
 #
 echo "youtube" > bin/inputs
-ktruss 17 40
+ktruss 19 40
 #
 echo "cit-patents" > bin/inputs
 ktruss 36 102
