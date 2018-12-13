@@ -22,6 +22,6 @@ function ktruss {
 ##
 echo "friendster" > bin/inputs
 ktruss 39   492
-#
-#echo "twitter" > bin/inputs
-#ktruss 1998 1157
+
+echo "twitter" > bin/inputs
+ktruss 1998 1157
