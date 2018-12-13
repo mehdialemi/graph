@@ -216,10 +216,47 @@ public class KTrussTSet extends SparkApp {
                     }
                 }
             }
-            List <Tuple2 <Edge, int[]>> out = new ArrayList <>();
-            fillOutput(wMap, vMap, uMap, out);
-            fillOutput(vMap, wMap, uMap, out);
-            fillOutput(uMap, wMap, vMap, out);
+
+            Set<Edge> edges = new TreeSet <>((e1, e2) ->  {
+                int diff = e1.v1 - e2.v1;
+                if (diff != 0)
+                    return diff;
+                return e1.v2 - e2.v2;
+            });
+
+            edges.addAll(wMap.keySet());
+            edges.addAll(vMap.keySet());
+            edges.addAll(uMap.keySet());
+            List<Tuple2<Edge, int[]>> out = new ArrayList <>();
+            for (Edge edge : edges) {
+                IntList outList = new IntArrayList();
+
+                IntList wList = wMap.get(edge);
+                if (wList == null)
+                    outList.add(0);
+                else {
+                    outList.add(wList.size());
+                    outList.addAll(wList);
+                }
+
+                IntList vList = vMap.get(edge);
+                if (vList == null)
+                    outList.add(0);
+                else {
+                    outList.add(vList.size());
+                    outList.addAll(vList);
+                }
+
+                IntList uList = uMap.get(edge);
+                if (uList == null)
+                    outList.add(0);
+                else {
+                    outList.add(uList.size());
+                    outList.addAll(uList);
+                }
+
+                out.add(new Tuple2 <>(edge, outList.toIntArray()));
+            }
 
             return out.iterator();
         }).groupByKey()
@@ -227,23 +264,29 @@ public class KTrussTSet extends SparkApp {
                     int sw = 0, sv = 0, su = 0;
                     List <VSign> list = new ArrayList <>();
                     for (int[] value : values) {
-                        int wSize = value[0];
+                        int offset = 0;
+                        int wSize = value[offset ++];
                         sw += wSize;
-                        int offset = 1;
-                        for(; offset < wSize; offset ++) {
-                            list.add(new VSign(value[offset], W_UVW));
+                        int i = 0;
+                        while (i < wSize) {
+                            list.add(new VSign(value[offset ++], W_UVW));
+                            i ++;
                         }
 
-                        int vSize = value[offset];
+                        int vSize = value[offset ++];
                         sv += vSize;
-                        for(; offset < vSize; offset ++) {
-                            list.add(new VSign(value[offset], V_UVW));
+                        i = 0;
+                        while (i < vSize) {
+                            list.add(new VSign(value[offset ++], V_UVW));
+                            i ++;
                         }
 
-                        int uSize = value[offset];
+                        int uSize = value[offset ++];
                         su += uSize;
-                        for(; offset < uSize; offset ++) {
-                            list.add(new VSign(value[offset], U_UVW));
+                        i = 0;
+                        while (i < uSize) {
+                            list.add(new VSign(value[offset ++], U_UVW));
+                            i ++;
                         }
                     }
 
@@ -269,33 +312,6 @@ public class KTrussTSet extends SparkApp {
                 }).persist(StorageLevel.MEMORY_AND_DISK());
     }
 
-    private static void fillOutput(Map <Edge, IntList> map1, Map <Edge, IntList> map2, Map <Edge, IntList> map3, List <Tuple2 <Edge, int[]>> out) {
-        for (Edge edge : map1.keySet()) {
-            IntList outList = new IntArrayList();
-
-            IntList list1 = map1.get(edge);
-            outList.add(list1.size());
-            outList.addAll(list1);
-
-            IntList list2 = map2.remove(edge);
-            if (list2 != null) {
-                outList.add(list2.size());
-                outList.addAll(list2);
-            } else {
-                outList.add(0);
-            }
-
-            IntList list3 = map3.remove(edge);
-            if (list3 != null) {
-                outList.add(list3.size());
-                outList.addAll(list3);
-            } else {
-                outList.add(0);
-            }
-
-            out.add(new Tuple2 <>(edge, outList.toIntArray()));
-        }
-    }
 
     public static void main(String[] args) throws URISyntaxException {
 //        Logger.getLogger("org.apache.spar").setLevel(Level.INFO);
