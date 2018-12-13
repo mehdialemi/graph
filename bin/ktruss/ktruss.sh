@@ -10,19 +10,19 @@ function ktruss {
 }
 
 echo "youtube" > bin/inputs
-ktruss 17 60
+ktruss 17 40
 
 echo "cit-patents" > bin/inputs
-ktruss 36 120
+ktruss 36 40
 
 echo "soc-liveJournal" > bin/inputs
-ktruss 362 360
+ktruss 362 500
 
 echo "orkut" > bin/inputs
-ktruss 78  480
+ktruss 78  1000
 
 echo "friendster" > bin/inputs
-ktruss 39   1200
+ktruss 39   1500
 
 echo "twitter" > bin/inputs
-ktruss 1998 3600
+ktruss 1998 5000
