@@ -62,10 +62,6 @@ public class KCore extends NeighborList {
         log("kcore iteration: " + kConf.getKcMaxIter() );
         long invalidCount = 0;
 
-        if (kConf.getKcMaxIter() < 1) {
-            return neighbors;
-        }
-
         long firstDuration = 0;
         long firstInvalids = 0;
         long allDurations = 0;
