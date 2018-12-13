@@ -13,21 +13,21 @@ echo "youtube" > bin/inputs
 ktruss 17 40
 #
 echo "cit-patents" > bin/inputs
-ktruss 36 40
+ktruss 36 102
 
 echo "soc-liveJournal" > bin/inputs
-ktruss  362 500
-ktruss  4   500
-ktruss  40  500
-ktruss  80  500
-ktruss  160 500
+ktruss  362 330
+ktruss  4   330
+ktruss  40  330
+ktruss  80  330
+ktruss  160 330
 
-#
-#echo "orkut" > bin/inputs
-#ktruss 78  1000
-#
-#echo "friendster" > bin/inputs
-#ktruss 39   1500
+
+echo "orkut" > bin/inputs
+ktruss 78  530
+
+echo "friendster" > bin/inputs
+ktruss 39   984
 
 echo "twitter" > bin/inputs
-ktruss 1998 5000
+ktruss 1998 5790
