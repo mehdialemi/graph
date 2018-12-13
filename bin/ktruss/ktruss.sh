@@ -9,10 +9,10 @@ function ktruss {
     bin/run-spark.sh "ir.ac.sbu.graph.spark.ktruss.KTrussTSet" $CONF_FILE 120 $p 0 $k 100
 }
 echo "youtube2" > bin/inputs
-ktruss 19 12
+ktruss 19 20
 #
 echo "cit-patents" > bin/inputs
-ktruss 36 68
+ktruss 36 34
 #
 echo "soc-liveJournal" > bin/inputs
 ktruss  362 132
@@ -24,4 +24,4 @@ echo "friendster" > bin/inputs
 ktruss 39   492
 
 echo "twitter2" > bin/inputs
-ktruss 1998 2314
+ktruss 1998 1157
