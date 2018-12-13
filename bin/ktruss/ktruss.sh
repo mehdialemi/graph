@@ -8,20 +8,20 @@ function ktruss {
     bin/run-spark.sh "ir.ac.sbu.graph.spark.ktruss.KTrussTSet" $CONF_FILE 120 $p 5 $k 100
     bin/run-spark.sh "ir.ac.sbu.graph.spark.ktruss.KTrussTSet" $CONF_FILE 120 $p 0 $k 100
 }
-#echo "youtube" > bin/inputs
-#ktruss 19 40
+echo "youtube2" > bin/inputs
+ktruss 19 12
 #
-#echo "cit-patents" > bin/inputs
-#ktruss 36 102
+echo "cit-patents" > bin/inputs
+ktruss 36 68
 #
-#echo "soc-liveJournal" > bin/inputs
-#ktruss  362 330
+echo "soc-liveJournal" > bin/inputs
+ktruss  362 132
 #
-#echo "orkut" > bin/inputs
-#ktruss 78  530
+echo "orkut" > bin/inputs
+ktruss 78  159
 #
-#echo "friendster" > bin/inputs
-#ktruss 39   984
+echo "friendster" > bin/inputs
+ktruss 39   492
 
-echo "twitter" > bin/inputs
-ktruss 1998 5790
+echo "twitter2" > bin/inputs
+ktruss 1998 2314
