@@ -17,11 +17,11 @@ ktruss  4   34
 ktruss  36  34
 ##
 echo "soc-liveJournal" > bin/inputs
-ktruss  4 132
-ktruss  40 132
-ktruss  80 132
-ktruss  160 132
-ktruss  362 132
+ktruss  4 100
+ktruss  40 100
+ktruss  80 100
+ktruss  160 100
+ktruss  362 100
 ##
 echo "orkut" > bin/inputs
 ktruss  4   159
