@@ -121,7 +121,7 @@ public class Triangle extends SparkApp {
                     }
 
                     return output.iterator();
-                });
+                }).repartition(conf.getPartitionNum());
     }
 
     public JavaPairRDD<Integer, Integer> createVertexTC() {

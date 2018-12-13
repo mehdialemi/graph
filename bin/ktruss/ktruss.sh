@@ -19,7 +19,7 @@ echo "soc-liveJournal" > bin/inputs
 ktruss 362 360
 
 echo "orkut" > bin/inputs
-ktruss 75  480
+ktruss 78  480
 
 echo "friendster" > bin/inputs
 ktruss 39   1200
