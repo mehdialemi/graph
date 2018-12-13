@@ -3,28 +3,26 @@
 CONF_FILE="$PWD/bin/ktruss/ktruss.conf"
 
 function ktruss {
-    kValues=("$@")
-    for k in "${kValues[@]}"
-    do
-        bin/run-spark.sh "ir.ac.sbu.graph.spark.ktruss.KTrussTSet" $CONF_FILE 120 1000 $k 100
-        bin/run-spark.sh "ir.ac.sbu.graph.spark.ktruss.KTrussTSet" $CONF_FILE 120 0 $k 100
-    done
+    k=$1
+    p=$2
+    bin/run-spark.sh "ir.ac.sbu.graph.spark.ktruss.KTrussTSet" $CONF_FILE 120 $p 5 $k 100
+    bin/run-spark.sh "ir.ac.sbu.graph.spark.ktruss.KTrussTSet" $CONF_FILE 120 $p 0 $k 100
 }
 
 echo "youtube" > bin/inputs
-ktruss {4,17}
+ktruss 17 60
 
 echo "cit-patents" > bin/inputs
-ktruss {4,36}
+ktruss 36 120
 
 echo "soc-liveJournal" > bin/inputs
-ktruss {4,40,80,160,362}
+ktruss 362 360
 
 echo "orkut" > bin/inputs
-ktruss {4,40,75}
+ktruss 75  480
 
 echo "friendster" > bin/inputs
-ktruss {4,40,129}
+ktruss 39   1200
 
 echo "twitter" > bin/inputs
-ktruss {4,40,80,160,1998}
+ktruss 1998 3600

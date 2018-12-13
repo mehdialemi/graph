@@ -4,17 +4,20 @@ import ir.ac.sbu.graph.spark.ArgumentReader;
 import ir.ac.sbu.graph.spark.EdgeLoader;
 import ir.ac.sbu.graph.spark.NeighborList;
 import ir.ac.sbu.graph.types.Edge;
-import it.unimi.dsi.fastutil.ints.*;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static ir.ac.sbu.graph.utils.Log.log;
 
@@ -57,12 +60,7 @@ public class KCore extends NeighborList {
 
     private JavaPairRDD <Integer, int[]> perform(JavaPairRDD <Integer, int[]> neighbors, int k) {
         log("kcore iteration: " + kConf.getKcMaxIter() );
-        long t1 = System.currentTimeMillis();
         long invalidCount = 0;
-        long vCount = neighbors.count();
-        setVertexCount(vCount);
-        long neighborDuration = System.currentTimeMillis() - t1;
-        log("vCount: " + vCount, neighborDuration);
 
         if (kConf.getKcMaxIter() < 1) {
             return neighbors;
@@ -72,9 +70,8 @@ public class KCore extends NeighborList {
         long firstInvalids = 0;
         long allDurations = 0;
         int iterations = 0;
-        log("vertex count: " + vCount);
         for (int iter = 0; iter < kConf.getKcMaxIter(); iter++) {
-            t1 = System.currentTimeMillis();
+            long t1 = System.currentTimeMillis();
             if ((iter + 1) % 50 == 0)
                 neighbors.checkpoint();
 
@@ -129,13 +126,13 @@ public class KCore extends NeighborList {
         }
 
         NumberFormat nf = new DecimalFormat("##.####");
-        double invRatio = invalidCount / (double) vCount;
+        double invRatio = invalidCount / (double) this.getVertexCount();
         double kciRatio = firstInvalids / (double) invalidCount;
         double kctRatio = firstDuration / (double) allDurations;
         long nCount = neighbors.count();
         log("K: " + k + "\nnumIterations: " + iterations + "\ninvRatio: " + nf.format(invRatio) +
                 "\nkci: " + nf.format(kciRatio) + "\nkct: " + nf.format(kctRatio) +
-                "\ninvalids: " + invalidCount + "\nvCount: " + vCount +
+                "\ninvalids: " + invalidCount + "\nvCount: " + this.getVertexCount() +
                 "\nkcore duration: " + allDurations + ", neighbors new count: " + nCount);
 
         return neighbors;

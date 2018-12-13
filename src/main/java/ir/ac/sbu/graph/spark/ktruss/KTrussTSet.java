@@ -58,15 +58,12 @@ public class KTrussTSet extends SparkApp {
         Triangle triangle = new Triangle(kCore);
 
         JavaPairRDD<Integer, int[]> fonl = triangle.getOrCreateFonl();
-        int pm = (int) Math.max(2, kCore.getEdgeCount() / kCore.getVertexCount());
-        int numPartitions = conf.getPartitionNum() * Math.min(10, pm);
 
-        JavaPairRDD<Integer, int[]> candidates = triangle.createCandidates(fonl.repartition(numPartitions));
+        JavaPairRDD<Integer, int[]> candidates = triangle.createCandidates(fonl);
 
-        log("numPartitions: " + numPartitions + ", pm: " + pm +
-                ", edges: " + kCore.getEdgeCount() + ", vertices: " + kCore.getVertexCount());
+        JavaPairRDD<Edge, int[]> tSet = createTSet(fonl, candidates);
+        int numPartitions = tSet.getNumPartitions();
 
-        JavaPairRDD<Edge, int[]> tSet = createTSet(fonl, candidates, numPartitions);
         final int minSup = k - 2;
         Queue<JavaPairRDD<Edge, int[]>> tSetQueue = new LinkedList<>();
         tSetQueue.add(tSet);
@@ -177,7 +174,7 @@ public class KTrussTSet extends SparkApp {
     }
 
     private JavaPairRDD<Edge, int[]> createTSet(JavaPairRDD<Integer, int[]> fonl,
-                                                JavaPairRDD<Integer, int[]> candidates, int numPartitions) {
+                                                JavaPairRDD<Integer, int[]> candidates) {
         // Generate kv such that key is an edge and value is its triangle vertices.
         JavaPairRDD<Edge, int[]> tSet = candidates.cogroup(fonl)
                 .flatMapToPair(t -> {

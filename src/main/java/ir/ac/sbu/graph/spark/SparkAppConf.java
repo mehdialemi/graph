@@ -29,6 +29,7 @@ public class SparkAppConf {
     public SparkAppConf (ArgumentReader argumentReader) {
         inputPath = argumentReader.nextString("/home/mehdi/graph-data/com-youtube.ungraph.txt");
         cores = argumentReader.nextInt(2);
+        partitionNum = argumentReader.nextInt(4);
     }
 
     protected String createAppName() {

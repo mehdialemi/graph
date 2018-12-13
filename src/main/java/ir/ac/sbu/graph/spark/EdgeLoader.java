@@ -19,7 +19,7 @@ public class EdgeLoader extends SparkApp {
     }
 
     public JavaPairRDD<Integer, Integer> create() {
-        JavaRDD<String> input = conf.getSc().textFile(conf.getInputPath());
+        JavaRDD<String> input = conf.getSc().textFile(conf.getInputPath(), conf.getPartitionNum());
 
         JavaPairRDD<Integer, Integer> result = input.flatMapToPair(line -> {
             if (line.startsWith("#"))
@@ -40,8 +40,6 @@ public class EdgeLoader extends SparkApp {
             list.add(new Tuple2<>(e2, e1));
             return list.iterator();
         });
-
-        conf.setPartitionNum(input.getNumPartitions());
 
         return result;
     }
