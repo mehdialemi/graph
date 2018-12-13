@@ -73,8 +73,8 @@ public class KTrussTSet extends SparkApp {
         int numPartitions = tSet.getNumPartitions();
 
         final int minSup = k - 2;
-        Queue <JavaPairRDD <Edge, int[]>> tSetQueue = new LinkedList <>();
-        tSetQueue.add(tSet);
+//        Queue <JavaPairRDD <Edge, int[]>> tSetQueue = new LinkedList <>();
+//        tSetQueue.add(tSet);
         long kTrussDuration = 0;
         int invalidsCount = 0;
         for (int iter = 0; iter < ktConf.getKtMaxIter(); iter++) {
@@ -96,9 +96,8 @@ public class KTrussTSet extends SparkApp {
 
             invalidsCount += invalidCount;
 
-            if (tSetQueue.size() > 1)
-                tSetQueue.remove().unpersist();
-
+//            if (tSetQueue.size() > 1)
+//                tSetQueue.remove().unpersist();
 
             long t2 = System.currentTimeMillis();
             String msg = "iteration: " + (iter + 1) + ", invalid edge count: " + invalidCount;
@@ -172,8 +171,8 @@ public class KTrussTSet extends SparkApp {
                     }).filter(kv -> kv._2 != null)
                     .persist(StorageLevel.MEMORY_AND_DISK());
 
-            invalids.unpersist();
-            tSetQueue.add(tSet);
+//            invalids.unpersist();
+//            tSetQueue.add(tSet);
         }
 
         log("kTruss duration: " + kTrussDuration + ", invalids: " + invalidsCount);

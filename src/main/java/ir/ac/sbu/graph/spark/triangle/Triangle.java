@@ -46,8 +46,7 @@ public class Triangle extends SparkApp {
     }
 
     public JavaPairRDD<Integer, int[]> createFonl() {
-        JavaPairRDD<Integer, int[]> neighborList = this.neighborList.getOrCreate();
-        return neighborList.flatMapToPair(t -> {
+        return this.neighborList.getOrCreate().flatMapToPair(t -> {
             int deg = t._2.length;
             if (deg == 0)
                 return Collections.emptyIterator();
