@@ -17,11 +17,6 @@ ktruss 36 102
 
 echo "soc-liveJournal" > bin/inputs
 ktruss  362 330
-ktruss  4   330
-ktruss  40  330
-ktruss  80  330
-ktruss  160 330
-
 
 echo "orkut" > bin/inputs
 ktruss 78  530
