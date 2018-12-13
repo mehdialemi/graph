@@ -259,7 +259,7 @@ public class KTrussTSet extends SparkApp {
             }
 
             return out.iterator();
-        }).groupByKey()
+        }, false).groupByKey()
                 .mapValues(values -> {
                     int sw = 0, sv = 0, su = 0;
                     List <VSign> list = new ArrayList <>();
