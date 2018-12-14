@@ -51,24 +51,10 @@ public class KTrussTSet extends SparkApp {
         this.ktConf.getSc().setCheckpointDir("hdfs://" + masterHost + "/shared/checkpoint");
     }
 
-    public JavaPairRDD <Edge, int[]> genTSet() throws URISyntaxException {
-        KCore kCore = new KCore(neighborList, ktConf);
-        JavaPairRDD <Integer, int[]> kcNeighbors = kCore.perform(neighborList.getOrCreate(), ktConf.getKc());
-
-        Triangle triangle = new Triangle(this, kcNeighbors);
-
-        JavaPairRDD <Integer, int[]> fonl = triangle.createFonl(kcNeighbors);
-        log("fonl count: " + fonl.count());
-
-        JavaPairRDD <Integer, int[]> candidates = triangle.createCandidates(fonl);
-
-        return createTSet(fonl, candidates);
-    }
-
     public JavaPairRDD <Edge, int[]> generate() throws URISyntaxException {
 
         long t1TSet = System.currentTimeMillis();
-        JavaPairRDD <Edge, int[]> tSet = genTSet();
+        JavaPairRDD <Edge, int[]> tSet = createTSet();
         long t2TSet = System.currentTimeMillis();
         log("tSet count: " + tSet.count(), t1TSet, t2TSet);
 
@@ -177,8 +163,17 @@ public class KTrussTSet extends SparkApp {
         return tSet;
     }
 
-    private JavaPairRDD <Edge, int[]> createTSet(JavaPairRDD <Integer, int[]> fonl,
-                                                 JavaPairRDD <Integer, int[]> candidates) {
+    protected JavaPairRDD <Edge, int[]> createTSet() throws URISyntaxException {
+        KCore kCore = new KCore(neighborList, ktConf);
+        JavaPairRDD <Integer, int[]> kcNeighbors = kCore.perform(neighborList.getOrCreate(), ktConf.getKc());
+
+        Triangle triangle = new Triangle(this);
+
+        JavaPairRDD <Integer, int[]> fonl = triangle.createFonl(kcNeighbors);
+        log("fonl count: " + fonl.count());
+
+        JavaPairRDD <Integer, int[]> candidates = triangle.createCandidates(fonl);
+
         // Generate kv such that key is an edge and value is its triangle vertices.
         return candidates.cogroup(fonl, fonl.getNumPartitions()).mapPartitionsToPair(p -> {
             Map <Edge, IntList> wMap = new HashMap <>();

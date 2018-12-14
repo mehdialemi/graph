@@ -23,6 +23,10 @@ public class Triangle extends SparkApp {
         this.neighborList = neighborList;
     }
 
+    public Triangle(SparkApp sparkApp) {
+        this(sparkApp, null);
+    }
+
     public JavaPairRDD<Integer, int[]> getOrCreateFonl() {
         if (fonl == null)
             fonl = createFonl().persist(StorageLevel.MEMORY_AND_DISK_2());

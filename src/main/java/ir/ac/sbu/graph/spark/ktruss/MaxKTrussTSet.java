@@ -36,7 +36,7 @@ public class MaxKTrussTSet extends KTrussTSet {
 
     public Map<Integer, JavaRDD<Edge>> decompose(float consumptionRatio) throws URISyntaxException {
 
-        JavaPairRDD<Edge, int[]> tSet = genTSet();
+        JavaPairRDD<Edge, int[]> tSet = createTSet();
         int partitionNum = tSet.getNumPartitions();
 
         Map<Integer, JavaRDD<Edge>> eTrussMap = new HashMap <>();
