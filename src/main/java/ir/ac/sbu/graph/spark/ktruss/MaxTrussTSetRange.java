@@ -50,7 +50,7 @@ public class MaxTrussTSetRange extends SparkApp {
         log("maxK: " + maxK);
         KCore kCore = new KCore(neighborList, kCoreConf);
 
-        Triangle triangle = new Triangle(kCore);
+        Triangle triangle = new Triangle(this, kCore.getOrCreate());
 
         JavaPairRDD <Integer, int[]> fonl = triangle.getOrCreateFonl();
 
