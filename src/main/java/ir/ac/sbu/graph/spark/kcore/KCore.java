@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.net.URI;
@@ -53,10 +54,10 @@ public class KCore extends NeighborList {
     }
 
     public JavaPairRDD <Integer, int[]> perform(JavaPairRDD <Integer, int[]> neighbors, int k) {
-        log("kcore iteration: " + kConf.getKcMaxIter() );
+        log("kcore iteration: " + kConf.getKcMaxIter());
 
         long t1 = System.currentTimeMillis();
-        neighborQueue.add(neighbors);
+//        neighborQueue.add(neighbors);
         long invalidCount = 0;
 //        long vCount = neighbors.count();
         long neighborDuration = System.currentTimeMillis() - t1;
@@ -125,14 +126,14 @@ public class KCore extends NeighborList {
                         return nSet.toIntArray();
                     }).cache();
 
-            if (neighborQueue.size() > 1)
-                neighborQueue.remove().unpersist();
+//            if (neighborQueue.size() > 1)
+//                neighborQueue.remove().unpersist();
 
-            neighborQueue.add(neighbors);
+//            neighborQueue.add(neighbors);
         }
 
-        if (neighborQueue.size() > 1)
-            neighborQueue.remove().unpersist();
+//        if (neighborQueue.size() > 1)
+//            neighborQueue.remove().unpersist();
 //
 //        NumberFormat nf = new DecimalFormat("##.####");
 //        double invRatio = invalidCount / (double) vCount;
@@ -143,7 +144,7 @@ public class KCore extends NeighborList {
 //                "\ninvalids: " + invalidCount + "\nvCount: " + vCount +
 //                "\nkcore duration: " + allDurations);
 
-        return neighbors;
+        return neighbors.repartition(conf.getPartitionNum()).persist(StorageLevel.MEMORY_AND_DISK());
     }
 
     public static void main(String[] args) throws URISyntaxException {
