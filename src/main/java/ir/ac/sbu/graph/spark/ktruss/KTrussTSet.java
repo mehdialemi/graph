@@ -174,7 +174,6 @@ public class KTrussTSet extends SparkApp {
         Triangle triangle = new Triangle(this);
 
         JavaPairRDD <Integer, int[]> fonl = triangle.createFonl(kcNeighbors);
-        log("fonl count: " + fonl.count());
 
         JavaPairRDD <Integer, int[]> candidates = fonl.filter(t -> t._2.length > 2)
                 .repartition(conf.getPartitionNum() * 5)// Select vertices having more than 2 items in their values
