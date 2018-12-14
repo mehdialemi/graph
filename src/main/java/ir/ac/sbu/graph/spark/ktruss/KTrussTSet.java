@@ -87,30 +87,13 @@ public class KTrussTSet extends SparkApp {
             if ((iter + 1) % CHECKPOINT_ITERATION == 0) {
                 tSet.checkpoint();
             }
-
-            // Detect invalid edges by comparing the support of triangle vertex set
-            JavaPairRDD <Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup).cache();
-            long invalidCount = invalids.count();
-
-            // If no invalid edge is found then the program terminates
-            if (invalidCount == 0) {
-                break;
-            }
-
-            invalidsCount += invalidCount;
-
             if (tSetQueue.size() > 1)
                 tSetQueue.remove().unpersist();
             if (invQueue.size() > 1)
                 invQueue.remove().unpersist();
 
-            invQueue.add(invalids);
-
-            long t2 = System.currentTimeMillis();
-            String msg = "iteration: " + (iter + 1) + ", invalid edge count: " + invalidCount;
-            long iterDuration = t2 - t1;
-            kTrussDuration += iterDuration;
-            log(msg, iterDuration);
+            // Detect invalid edges by comparing the support of triangle vertex set
+            JavaPairRDD <Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup);
 
             // The edges in the key part of invalids key-values should be removed. So, we detect other
             // edges of their involved triangle from their triangle vertex set. Here, we determine the
@@ -143,6 +126,16 @@ public class KTrussTSet extends SparkApp {
 
                 return out.iterator();
             }).groupByKey(numPartitions);
+
+            long count = invUpdates.count();
+            if (count == 0)
+                break;
+
+            long t2 = System.currentTimeMillis();
+            String msg = "iteration: " + (iter + 1) + ", invalid update count: " + count;
+            long iterDuration = t2 - t1;
+            kTrussDuration += iterDuration;
+            log(msg, iterDuration);
 
             // Remove the invalid vertices from the triangle vertex set of each remaining (valid) edge.
             tSet = tSet.filter(kv -> kv._2[0] >= minSup).leftOuterJoin(invUpdates)
