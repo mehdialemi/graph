@@ -1,6 +1,5 @@
 package ir.ac.sbu.graph.spark.triangle;
 
-import ir.ac.sbu.graph.spark.NeighborList;
 import ir.ac.sbu.graph.spark.SparkApp;
 import ir.ac.sbu.graph.types.VertexDeg;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -14,15 +13,14 @@ import java.util.*;
  */
 public class Triangle extends SparkApp {
 
-    private final NeighborList neighborList;
+    private final JavaPairRDD<Integer, int[]> neighborList;
     private JavaPairRDD<Integer, int[]> fonl;
     private JavaPairRDD<Integer, int[]> candidates;
     private JavaPairRDD<Integer, Integer> vertexTC;
 
-    public Triangle(NeighborList neighborList) {
-        super(neighborList);
+    public Triangle(SparkApp sparkApp, JavaPairRDD<Integer, int[]> neighborList) {
+        super(sparkApp);
         this.neighborList = neighborList;
-        conf.getSparkConf().registerKryoClasses(new Class[] {VertexDeg.class, int[].class});
     }
 
     public JavaPairRDD<Integer, int[]> getOrCreateFonl() {
@@ -46,7 +44,7 @@ public class Triangle extends SparkApp {
     }
 
     public JavaPairRDD<Integer, int[]> createFonl() {
-        return this.neighborList.getOrCreate().flatMapToPair(t -> {
+        return this.neighborList.flatMapToPair(t -> {
             int deg = t._2.length;
             if (deg == 0)
                 return Collections.emptyIterator();

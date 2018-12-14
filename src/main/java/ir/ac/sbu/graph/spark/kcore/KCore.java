@@ -47,10 +47,7 @@ public class KCore extends NeighborList {
 
     @Override
     public JavaPairRDD <Integer, int[]> getOrCreate() {
-
-        JavaPairRDD <Integer, int[]> neighbors = super.getOrCreate();
-
-        super.neighbors = perform(neighbors, kConf.getKc());
+        super.neighbors = perform(super.getOrCreate(), kConf.getKc());
         return neighbors;
     }
 
