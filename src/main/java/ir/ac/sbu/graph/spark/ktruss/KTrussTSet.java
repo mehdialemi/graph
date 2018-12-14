@@ -58,6 +58,7 @@ public class KTrussTSet extends SparkApp {
         Triangle triangle = new Triangle(this, kcNeighbors);
 
         JavaPairRDD <Integer, int[]> fonl = triangle.createFonl(kcNeighbors);
+        log("fonl count: " + fonl.count());
 
         JavaPairRDD <Integer, int[]> candidates = triangle.createCandidates(fonl);
 
