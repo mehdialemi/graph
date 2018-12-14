@@ -53,11 +53,7 @@ public class KTrussTSet extends SparkApp {
 
     public JavaPairRDD <Edge, int[]> generate() throws URISyntaxException {
 
-//        long t1TSet = System.currentTimeMillis();
         JavaPairRDD <Edge, int[]> tSet = createTSet();
-//        long t2TSet = System.currentTimeMillis();
-//        log("tSet count: " + tSet.count(), t1TSet, t2TSet);
-
         int numPartitions = tSet.getNumPartitions();
 
         final int minSup = k - 2;
@@ -73,54 +69,63 @@ public class KTrussTSet extends SparkApp {
             if ((iter + 1) % CHECKPOINT_ITERATION == 0) {
                 tSet.checkpoint();
             }
+
+            // Detect invalid edges by comparing the support of triangle vertex set
+            JavaPairRDD <Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup).cache();
+            long invalidCount = invalids.count();
+
+            // If no invalid edge is found then the program terminates
+            if (invalidCount == 0) {
+                break;
+            }
+
+            invalidsCount += invalidCount;
+
             if (tSetQueue.size() > 1)
                 tSetQueue.remove().unpersist();
             if (invQueue.size() > 1)
                 invQueue.remove().unpersist();
 
-            // Detect invalid edges by comparing the support of triangle vertex set
-            // The edges in the key part of invalids key-values should be removed. So, we detect other
-            // edges of their involved triangle from their triangle vertex set. Here, we determine the
-            // vertices which should be removed from the triangle vertex set related to the other edges.
-            JavaPairRDD <Edge, Iterable <Integer>> invUpdates = tSet.filter(kv -> kv._2[0] < minSup)
-                    .flatMapToPair(kv -> {
-                        int i = META_LEN;
 
-                        Edge e = kv._1;
-                        List <Tuple2 <Edge, Integer>> out = new ArrayList <>();
-                        for (; i < kv._2[1]; i++) {
-                            if (kv._2[i] == INVALID)
-                                continue;
-                            out.add(new Tuple2 <>(new Edge(e.v1, kv._2[i]), e.v2));
-                            out.add(new Tuple2 <>(new Edge(e.v2, kv._2[i]), e.v1));
-                        }
-
-                        for (; i < kv._2[2]; i++) {
-                            if (kv._2[i] == INVALID)
-                                continue;
-                            out.add(new Tuple2 <>(new Edge(e.v1, kv._2[i]), e.v2));
-                            out.add(new Tuple2 <>(new Edge(kv._2[i], e.v2), e.v1));
-                        }
-
-                        for (; i < kv._2[3]; i++) {
-                            if (kv._2[i] == INVALID)
-                                continue;
-                            out.add(new Tuple2 <>(new Edge(kv._2[i], e.v1), e.v2));
-                            out.add(new Tuple2 <>(new Edge(kv._2[i], e.v2), e.v1));
-                        }
-
-                        return out.iterator();
-                    }).groupByKey(numPartitions).cache();
-
-            long count = invUpdates.count();
-            if (count == 0)
-                break;
+            invQueue.add(invalids);
 
             long t2 = System.currentTimeMillis();
-            String msg = "iteration: " + (iter + 1) + ", invalid update count: " + count;
+            String msg = "iteration: " + (iter + 1) + ", invalid edge count: " + invalidCount;
             long iterDuration = t2 - t1;
             kTrussDuration += iterDuration;
             log(msg, iterDuration);
+
+            // The edges in the key part of invalids key-values should be removed. So, we detect other
+            // edges of their involved triangle from their triangle vertex set. Here, we determine the
+            // vertices which should be removed from the triangle vertex set related to the other edges.
+            JavaPairRDD <Edge, Iterable <Integer>> invUpdates = invalids.flatMapToPair(kv -> {
+                int i = META_LEN;
+
+                Edge e = kv._1;
+                List <Tuple2 <Edge, Integer>> out = new ArrayList <>();
+                for (; i < kv._2[1]; i++) {
+                    if (kv._2[i] == INVALID)
+                        continue;
+                    out.add(new Tuple2 <>(new Edge(e.v1, kv._2[i]), e.v2));
+                    out.add(new Tuple2 <>(new Edge(e.v2, kv._2[i]), e.v1));
+                }
+
+                for (; i < kv._2[2]; i++) {
+                    if (kv._2[i] == INVALID)
+                        continue;
+                    out.add(new Tuple2 <>(new Edge(e.v1, kv._2[i]), e.v2));
+                    out.add(new Tuple2 <>(new Edge(kv._2[i], e.v2), e.v1));
+                }
+
+                for (; i < kv._2[3]; i++) {
+                    if (kv._2[i] == INVALID)
+                        continue;
+                    out.add(new Tuple2 <>(new Edge(kv._2[i], e.v1), e.v2));
+                    out.add(new Tuple2 <>(new Edge(kv._2[i], e.v2), e.v1));
+                }
+
+                return out.iterator();
+            }).groupByKey(numPartitions);
 
             // Remove the invalid vertices from the triangle vertex set of each remaining (valid) edge.
             tSet = tSet.filter(kv -> kv._2[0] >= minSup).leftOuterJoin(invUpdates)
