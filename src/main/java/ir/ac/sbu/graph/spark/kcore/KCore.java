@@ -121,16 +121,6 @@ public class KCore extends NeighborList {
                     }).cache();
         }
 
-        NumberFormat nf = new DecimalFormat("##.####");
-        double invRatio = invalidCount / (double) this.getVertexCount();
-        double kciRatio = firstInvalids / (double) invalidCount;
-        double kctRatio = firstDuration / (double) allDurations;
-        long nCount = neighbors.count();
-        log("K: " + k + "\nnumIterations: " + iterations + "\ninvRatio: " + nf.format(invRatio) +
-                "\nkci: " + nf.format(kciRatio) + "\nkct: " + nf.format(kctRatio) +
-                "\ninvalids: " + invalidCount + "\nvCount: " + this.getVertexCount() +
-                "\nkcore duration: " + allDurations + ", neighbors new count: " + nCount);
-
         return neighbors;
     }
 
