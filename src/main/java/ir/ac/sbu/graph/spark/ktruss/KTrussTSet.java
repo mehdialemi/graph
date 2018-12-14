@@ -205,61 +205,112 @@ public class KTrussTSet extends SparkApp {
                     return output.iterator();
                 });
 
-        // Generate kv such that key is an edge and value is its triangle vertices.
-        return fonl.cogroup(candidates, conf.getPartitionNum() * 5)
-                .flatMapToPair(t -> {
+        return fonl.cogroup(candidates, conf.getPartitionNum() * 20).mapPartitionsToPair(partitions -> {
+            Map <Edge, Tuple2 <IntList, ByteList>> map = new HashMap <>();
+            while (partitions.hasNext()) {
+                Tuple2 <Integer, Tuple2 <Iterable <int[]>, Iterable <int[]>>> t = partitions.next();
+                int[] fVal = t._2._1.iterator().next();
+                Arrays.sort(fVal, 1, fVal.length);
+                int v = t._1;
+                for (int[] cVal : t._2._2) {
+                    int u = cVal[0];
+                    Edge uv = new Edge(u, v);
 
-                    int[] fVal = t._2._1.iterator().next();
-                    Arrays.sort(fVal, 1, fVal.length);
-                    int v = t._1;
+                    // The intersection determines triangles which u and vertex are two of their vertices.
+                    // Always generate and edge (u, vertex) such that u < vertex.
+                    int fi = 1;
+                    int ci = 1;
+                    while (fi < fVal.length && ci < cVal.length) {
+                        if (fVal[fi] < cVal[ci])
+                            fi++;
+                        else if (fVal[fi] > cVal[ci])
+                            ci++;
+                        else {
+                            int w = fVal[fi];
+                            Edge uw = new Edge(u, w);
+                            Edge vw = new Edge(v, w);
+                            Tuple2 <IntList, ByteList> tuple;
 
-                    Map <Edge, Tuple2 <IntList, ByteList>> map = new HashMap <>();
+                            tuple = map.computeIfAbsent(uv, k -> new Tuple2 <>(new IntArrayList(), new ByteArrayList()));
+                            tuple._1.add(w);
+                            tuple._2.add(W_SIGN);
 
-                    for (int[] cVal : t._2._2) {
-                        int u = cVal[0];
-                        Edge uv = new Edge(u, v);
+                            tuple = map.computeIfAbsent(uw, k -> new Tuple2 <>(new IntArrayList(), new ByteArrayList()));
+                            tuple._1.add(v);
+                            tuple._2.add(V_SIGN);
 
-                        // The intersection determines triangles which u and vertex are two of their vertices.
-                        // Always generate and edge (u, vertex) such that u < vertex.
-                        int fi = 1;
-                        int ci = 1;
-                        while (fi < fVal.length && ci < cVal.length) {
-                            if (fVal[fi] < cVal[ci])
-                                fi++;
-                            else if (fVal[fi] > cVal[ci])
-                                ci++;
-                            else {
-                                int w = fVal[fi];
-                                Edge uw = new Edge(u, w);
-                                Edge vw = new Edge(v, w);
-                                Tuple2 <IntList, ByteList> tuple;
+                            tuple = map.computeIfAbsent(vw, k -> new Tuple2 <>(new IntArrayList(), new ByteArrayList()));
+                            tuple._1.add(u);
+                            tuple._2.add(U_SIGN);
 
-                                tuple = map.computeIfAbsent(uv, k -> new Tuple2 <>(new IntArrayList(), new ByteArrayList()));
-                                tuple._1.add(w);
-                                tuple._2.add(W_SIGN);
-
-                                tuple = map.computeIfAbsent(uw, k -> new Tuple2 <>(new IntArrayList(), new ByteArrayList()));
-                                tuple._1.add(v);
-                                tuple._2.add(V_SIGN);
-
-                                tuple = map.computeIfAbsent(vw, k -> new Tuple2 <>(new IntArrayList(), new ByteArrayList()));
-                                tuple._1.add(u);
-                                tuple._2.add(U_SIGN);
-
-                                fi++;
-                                ci++;
-                            }
+                            fi++;
+                            ci++;
                         }
                     }
-
-                    return map.entrySet()
-                            .stream()
-                            .map(entry -> new Tuple2 <>(
-                                    entry.getKey(),
-                                    new Tuple2 <>(entry.getValue()._1.toIntArray(), entry.getValue()._2.toByteArray()))
-                            ).iterator();
-
-                }).groupByKey()
+                }
+            }
+            return map.entrySet()
+                    .stream()
+                    .map(entry -> new Tuple2 <>(
+                            entry.getKey(),
+                            new Tuple2 <>(entry.getValue()._1.toIntArray(), entry.getValue()._2.toByteArray()))
+                    ).iterator();
+        })
+//        return fonl.cogroup(candidates, conf.getPartitionNum() * 5)
+//                .flatMapToPair(t -> {
+//
+//                    int[] fVal = t._2._1.iterator().next();
+//                    Arrays.sort(fVal, 1, fVal.length);
+//                    int v = t._1;
+//
+//                    Map <Edge, Tuple2 <IntList, ByteList>> map = new HashMap <>();
+//
+//                    for (int[] cVal : t._2._2) {
+//                        int u = cVal[0];
+//                        Edge uv = new Edge(u, v);
+//
+//                        // The intersection determines triangles which u and vertex are two of their vertices.
+//                        // Always generate and edge (u, vertex) such that u < vertex.
+//                        int fi = 1;
+//                        int ci = 1;
+//                        while (fi < fVal.length && ci < cVal.length) {
+//                            if (fVal[fi] < cVal[ci])
+//                                fi++;
+//                            else if (fVal[fi] > cVal[ci])
+//                                ci++;
+//                            else {
+//                                int w = fVal[fi];
+//                                Edge uw = new Edge(u, w);
+//                                Edge vw = new Edge(v, w);
+//                                Tuple2 <IntList, ByteList> tuple;
+//
+//                                tuple = map.computeIfAbsent(uv, k -> new Tuple2 <>(new IntArrayList(), new ByteArrayList()));
+//                                tuple._1.add(w);
+//                                tuple._2.add(W_SIGN);
+//
+//                                tuple = map.computeIfAbsent(uw, k -> new Tuple2 <>(new IntArrayList(), new ByteArrayList()));
+//                                tuple._1.add(v);
+//                                tuple._2.add(V_SIGN);
+//
+//                                tuple = map.computeIfAbsent(vw, k -> new Tuple2 <>(new IntArrayList(), new ByteArrayList()));
+//                                tuple._1.add(u);
+//                                tuple._2.add(U_SIGN);
+//
+//                                fi++;
+//                                ci++;
+//                            }
+//                        }
+//                    }
+//
+//                    return map.entrySet()
+//                            .stream()
+//                            .map(entry -> new Tuple2 <>(
+//                                    entry.getKey(),
+//                                    new Tuple2 <>(entry.getValue()._1.toIntArray(), entry.getValue()._2.toByteArray()))
+//                            ).iterator();
+//
+//                })
+            .groupByKey()
                 .mapValues(values -> {
                     IntList wList = new IntArrayList();
                     IntList vList = new IntArrayList();
