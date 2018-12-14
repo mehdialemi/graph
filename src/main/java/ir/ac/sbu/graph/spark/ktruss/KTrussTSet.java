@@ -196,7 +196,7 @@ public class KTrussTSet extends SparkApp {
                     }
 
                     return output.iterator();
-                }).groupByKey(conf.getPartitionNum());
+                }).groupByKey(conf.getPartitionNum()).cache();
 
         log("candidates count: " + candidates.count());
         // Generate kv such that key is an edge and value is its triangle vertices.
