@@ -64,25 +64,7 @@ public class KCore extends NeighborList {
             if ((iter + 1) % 50 == 0)
                 neighbors.checkpoint();
 
-            JavaPairRDD <Integer, int[]> invalids = neighbors.filter(nl -> nl._2.length < k).cache();
-            long count = invalids.count();
-            invalidCount += count;
-            long t2 = System.currentTimeMillis();
-            long duration = t2 - t1;
-            if (iter == 0) {
-                firstInvalids = count;
-            }
-            if (iter == 1) {
-                firstDuration = duration;
-            }
-            allDurations += duration;
-            log("K-core, invalids: " + count, duration);
-
-            if (count == 0)
-                break;
-
-            iterations = iter + 1;
-            JavaPairRDD <Integer, Iterable <Integer>> invUpdate = invalids
+            JavaPairRDD <Integer, Iterable <Integer>> invUpdate = neighbors.filter(nl -> nl._2.length < k)
                     .flatMapToPair(nl -> {
                         List <Tuple2 <Integer, Integer>> out = new ArrayList <>(nl._2.length);
 
@@ -91,6 +73,14 @@ public class KCore extends NeighborList {
                         }
                         return out.iterator();
                     }).groupByKey(conf.getPartitionNum());
+
+            long count = invUpdate.count();
+            if (count == 0) {
+                break;
+            }
+            long t2 = System.currentTimeMillis();
+            long duration = t2 - t1;
+            log("K-core, updates: " + count, duration);
 
             neighbors = neighbors.filter(nl -> nl._2.length >= k)
                     .leftOuterJoin(invUpdate)
