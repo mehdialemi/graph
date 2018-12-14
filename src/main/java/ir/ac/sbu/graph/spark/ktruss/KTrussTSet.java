@@ -196,7 +196,7 @@ public class KTrussTSet extends SparkApp {
                     return output.iterator();
                 }).groupByKey(fonl.getNumPartitions()).cache();
 
-//        log("candidates count: " + candidates.count());
+        log("candidates count: " + candidates.count());
         // Generate kv such that key is an edge and value is its triangle vertices.
         return fonl.join(candidates)
                 .flatMapToPair(t -> {
