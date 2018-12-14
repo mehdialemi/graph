@@ -53,13 +53,14 @@ public class KTrussTSet extends SparkApp {
 
     public JavaPairRDD <Edge, int[]> genTSet() throws URISyntaxException {
         KCore kCore = new KCore(neighborList, ktConf);
-        JavaPairRDD <Integer, int[]> kcNeighbors = kCore.getOrCreate();
+        JavaPairRDD <Integer, int[]> kcNeighbors = kCore.perform(neighborList.getOrCreate(), ktConf.getKc());
 
         Triangle triangle = new Triangle(this, kcNeighbors);
 
-        JavaPairRDD <Integer, int[]> fonl = triangle.getOrCreateFonl();
+        JavaPairRDD <Integer, int[]> fonl = triangle.createFonl(kcNeighbors).cache();
 
-        JavaPairRDD <Integer, int[]> candidates = triangle.createCandidates(fonl);
+        JavaPairRDD <Integer, int[]> candidates = triangle.createCandidates(fonl)
+                .repartition(ktConf.getPartitionNum());
 
         return createTSet(fonl, candidates);
     }

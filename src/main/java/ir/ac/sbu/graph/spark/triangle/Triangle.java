@@ -43,8 +43,8 @@ public class Triangle extends SparkApp {
         return vertexTC;
     }
 
-    public JavaPairRDD<Integer, int[]> createFonl() {
-        return this.neighborList.flatMapToPair(t -> {
+    public JavaPairRDD<Integer, int[]> createFonl(JavaPairRDD<Integer, int[]> neighbors) {
+        return neighbors.flatMapToPair(t -> {
             int deg = t._2.length;
             if (deg == 0)
                 return Collections.emptyIterator();
@@ -92,6 +92,10 @@ public class Triangle extends SparkApp {
 
             return new Tuple2<>(v._1, higherDegs);
         });
+    }
+
+    public JavaPairRDD<Integer, int[]> createFonl() {
+        return createFonl(this.neighborList);
     }
 
     public JavaPairRDD<Integer, int[]> createCandidates(JavaPairRDD<Integer, int[]> fonl) {

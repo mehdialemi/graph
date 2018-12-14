@@ -47,11 +47,10 @@ public class KCore extends NeighborList {
 
     @Override
     public JavaPairRDD <Integer, int[]> getOrCreate() {
-        super.neighbors = perform(super.getOrCreate(), kConf.getKc());
-        return neighbors;
+        return perform(super.getOrCreate(), kConf.getKc());
     }
 
-    private JavaPairRDD <Integer, int[]> perform(JavaPairRDD <Integer, int[]> neighbors, int k) {
+    public JavaPairRDD <Integer, int[]> perform(JavaPairRDD <Integer, int[]> neighbors, int k) {
         log("kcore iteration: " + kConf.getKcMaxIter() );
         long invalidCount = 0;
 
