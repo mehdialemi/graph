@@ -124,7 +124,7 @@ public class KTrussTSet extends SparkApp {
                         }
 
                         return out.iterator();
-                    }).groupByKey(numPartitions);
+                    }).groupByKey(numPartitions).cache();
 
             long count = invUpdates.count();
             if (count == 0)
