@@ -180,7 +180,7 @@ public class KTrussTSet extends SparkApp {
     private JavaPairRDD <Edge, int[]> createTSet(JavaPairRDD <Integer, int[]> fonl,
                                                  JavaPairRDD <Integer, int[]> candidates) {
         // Generate kv such that key is an edge and value is its triangle vertices.
-        return candidates.cogroup(fonl).mapPartitionsToPair(p -> {
+        return candidates.cogroup(fonl, fonl.getNumPartitions()).mapPartitionsToPair(p -> {
             Map <Edge, IntList> wMap = new HashMap <>();
             Map <Edge, IntList> vMap = new HashMap <>();
             Map <Edge, IntList> uMap = new HashMap <>();
