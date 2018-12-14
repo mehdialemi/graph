@@ -91,7 +91,7 @@ public class Triangle extends SparkApp {
                 higherDegs[i] = list.get(i - 1).vertex;
 
             return new Tuple2<>(v._1, higherDegs);
-        });
+        }).cache();
     }
 
     public JavaPairRDD<Integer, int[]> createFonl() {
@@ -120,7 +120,7 @@ public class Triangle extends SparkApp {
                     }
 
                     return output.iterator();
-                });
+                }).repartition(conf.getPartitionNum()).cache();
     }
 
     public JavaPairRDD<Integer, Integer> createVertexTC() {
