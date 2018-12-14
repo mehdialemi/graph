@@ -41,11 +41,6 @@ public class KCore extends NeighborList {
 
     }
 
-    public KCore(JavaRDD <Edge> rdd, KCoreConf kConf) {
-        super(kConf, rdd);
-        this.kConf = kConf;
-    }
-
     public JavaPairRDD <Integer, int[]> getK(JavaPairRDD <Integer, int[]> neighbors, int k) {
         return perform(neighbors, k);
     }
@@ -55,7 +50,8 @@ public class KCore extends NeighborList {
 
         JavaPairRDD <Integer, int[]> neighbors = super.getOrCreate();
 
-        return perform(neighbors, kConf.getKc());
+        super.neighbors = perform(neighbors, kConf.getKc());
+        return neighbors;
     }
 
     private JavaPairRDD <Integer, int[]> perform(JavaPairRDD <Integer, int[]> neighbors, int k) {

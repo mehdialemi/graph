@@ -16,7 +16,7 @@ import static ir.ac.sbu.graph.utils.Log.log;
 public class NeighborList extends SparkApp {
 
     private EdgeLoader edgeLoader;
-    private JavaPairRDD<Integer, int[]> neighbors;
+    protected JavaPairRDD<Integer, int[]> neighbors;
     private long edgeCount;
     private long vertexCount;
 
@@ -29,26 +29,12 @@ public class NeighborList extends SparkApp {
         this.edgeLoader = edgeLoader;
     }
 
-    public NeighborList(SparkAppConf conf, JavaRDD<Edge> rdd) {
-        super(conf);
-        JavaPairRDD<Integer, Integer> edges = rdd.mapToPair(t -> new Tuple2 <>(t.v1, t.v2));
-        neighbors = createNeighbors(edges);
-    }
-
     public JavaPairRDD<Integer, int[]> getOrCreate() {
         if (neighbors == null) {
             JavaPairRDD <Integer, Integer> edges = edgeLoader.create();
-            long t1 = System.currentTimeMillis();
-            edgeCount = edges.count();
-            long t2 = System.currentTimeMillis();
-            log("edges: " + edgeCount, t1, t2);
             neighbors = createNeighbors(edges);
-            vertexCount = neighbors.count();
-            long t3 = System.currentTimeMillis();
-            log("vertices: " + vertexCount, t2, t3);
-
         }
-        return neighbors.repartition(conf.getPartitionNum());
+        return neighbors;
     }
 
     private JavaPairRDD <Integer, int[]> createNeighbors(JavaPairRDD <Integer, Integer> edges) {
