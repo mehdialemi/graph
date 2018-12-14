@@ -205,7 +205,7 @@ public class KTrussTSet extends SparkApp {
                     return output.iterator();
                 });
 
-        return fonl.cogroup(candidates, conf.getPartitionNum() * 20).mapPartitionsToPair(partitions -> {
+        return fonl.cogroup(candidates, conf.getPartitionNum() * 10).mapPartitionsToPair(partitions -> {
             Map <Edge, Tuple2 <IntList, ByteList>> map = new HashMap <>();
             while (partitions.hasNext()) {
                 Tuple2 <Integer, Tuple2 <Iterable <int[]>, Iterable <int[]>>> t = partitions.next();
