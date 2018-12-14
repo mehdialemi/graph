@@ -93,39 +93,38 @@ public class KTrussTSet extends SparkApp {
                 invQueue.remove().unpersist();
 
             // Detect invalid edges by comparing the support of triangle vertex set
-            JavaPairRDD <Edge, int[]> invalids = tSet.filter(kv -> kv._2[0] < minSup);
-
             // The edges in the key part of invalids key-values should be removed. So, we detect other
             // edges of their involved triangle from their triangle vertex set. Here, we determine the
             // vertices which should be removed from the triangle vertex set related to the other edges.
-            JavaPairRDD <Edge, Iterable <Integer>> invUpdates = invalids.flatMapToPair(kv -> {
-                int i = META_LEN;
+            JavaPairRDD <Edge, Iterable <Integer>> invUpdates = tSet.filter(kv -> kv._2[0] < minSup)
+                    .flatMapToPair(kv -> {
+                        int i = META_LEN;
 
-                Edge e = kv._1;
-                List <Tuple2 <Edge, Integer>> out = new ArrayList <>();
-                for (; i < kv._2[1]; i++) {
-                    if (kv._2[i] == INVALID)
-                        continue;
-                    out.add(new Tuple2 <>(new Edge(e.v1, kv._2[i]), e.v2));
-                    out.add(new Tuple2 <>(new Edge(e.v2, kv._2[i]), e.v1));
-                }
+                        Edge e = kv._1;
+                        List <Tuple2 <Edge, Integer>> out = new ArrayList <>();
+                        for (; i < kv._2[1]; i++) {
+                            if (kv._2[i] == INVALID)
+                                continue;
+                            out.add(new Tuple2 <>(new Edge(e.v1, kv._2[i]), e.v2));
+                            out.add(new Tuple2 <>(new Edge(e.v2, kv._2[i]), e.v1));
+                        }
 
-                for (; i < kv._2[2]; i++) {
-                    if (kv._2[i] == INVALID)
-                        continue;
-                    out.add(new Tuple2 <>(new Edge(e.v1, kv._2[i]), e.v2));
-                    out.add(new Tuple2 <>(new Edge(kv._2[i], e.v2), e.v1));
-                }
+                        for (; i < kv._2[2]; i++) {
+                            if (kv._2[i] == INVALID)
+                                continue;
+                            out.add(new Tuple2 <>(new Edge(e.v1, kv._2[i]), e.v2));
+                            out.add(new Tuple2 <>(new Edge(kv._2[i], e.v2), e.v1));
+                        }
 
-                for (; i < kv._2[3]; i++) {
-                    if (kv._2[i] == INVALID)
-                        continue;
-                    out.add(new Tuple2 <>(new Edge(kv._2[i], e.v1), e.v2));
-                    out.add(new Tuple2 <>(new Edge(kv._2[i], e.v2), e.v1));
-                }
+                        for (; i < kv._2[3]; i++) {
+                            if (kv._2[i] == INVALID)
+                                continue;
+                            out.add(new Tuple2 <>(new Edge(kv._2[i], e.v1), e.v2));
+                            out.add(new Tuple2 <>(new Edge(kv._2[i], e.v2), e.v1));
+                        }
 
-                return out.iterator();
-            }).groupByKey(numPartitions);
+                        return out.iterator();
+                    }).groupByKey(numPartitions);
 
             long count = invUpdates.count();
             if (count == 0)
@@ -182,9 +181,9 @@ public class KTrussTSet extends SparkApp {
                                                  JavaPairRDD <Integer, int[]> candidates) {
         // Generate kv such that key is an edge and value is its triangle vertices.
         return candidates.cogroup(fonl).mapPartitionsToPair(p -> {
-            Map<Edge, IntList> wMap = new HashMap <>();
-            Map<Edge, IntList> vMap = new HashMap <>();
-            Map<Edge, IntList> uMap = new HashMap <>();
+            Map <Edge, IntList> wMap = new HashMap <>();
+            Map <Edge, IntList> vMap = new HashMap <>();
+            Map <Edge, IntList> uMap = new HashMap <>();
 
             while (p.hasNext()) {
                 Tuple2 <Integer, Tuple2 <Iterable <int[]>, Iterable <int[]>>> t = p.next();
@@ -219,7 +218,7 @@ public class KTrussTSet extends SparkApp {
                 }
             }
 
-            Set<Edge> edges = new TreeSet <>((e1, e2) ->  {
+            Set <Edge> edges = new TreeSet <>((e1, e2) -> {
                 int diff = e1.v1 - e2.v1;
                 if (diff != 0)
                     return diff;
@@ -229,7 +228,7 @@ public class KTrussTSet extends SparkApp {
             edges.addAll(wMap.keySet());
             edges.addAll(vMap.keySet());
             edges.addAll(uMap.keySet());
-            List<Tuple2<Edge, int[]>> out = new ArrayList <>();
+            List <Tuple2 <Edge, int[]>> out = new ArrayList <>();
             for (Edge edge : edges) {
                 IntList outList = new IntArrayList();
 
@@ -267,28 +266,28 @@ public class KTrussTSet extends SparkApp {
                     List <VSign> list = new ArrayList <>();
                     for (int[] value : values) {
                         int offset = 0;
-                        int wSize = value[offset ++];
+                        int wSize = value[offset++];
                         sw += wSize;
                         int i = 0;
                         while (i < wSize) {
-                            list.add(new VSign(value[offset ++], W_UVW));
-                            i ++;
+                            list.add(new VSign(value[offset++], W_UVW));
+                            i++;
                         }
 
-                        int vSize = value[offset ++];
+                        int vSize = value[offset++];
                         sv += vSize;
                         i = 0;
                         while (i < vSize) {
-                            list.add(new VSign(value[offset ++], V_UVW));
-                            i ++;
+                            list.add(new VSign(value[offset++], V_UVW));
+                            i++;
                         }
 
-                        int uSize = value[offset ++];
+                        int uSize = value[offset++];
                         su += uSize;
                         i = 0;
                         while (i < uSize) {
-                            list.add(new VSign(value[offset ++], U_UVW));
-                            i ++;
+                            list.add(new VSign(value[offset++], U_UVW));
+                            i++;
                         }
                     }
 
