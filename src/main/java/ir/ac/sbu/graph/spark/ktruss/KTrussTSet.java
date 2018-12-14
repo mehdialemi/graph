@@ -203,7 +203,7 @@ public class KTrussTSet extends SparkApp {
                 });
 
         // Generate kv such that key is an edge and value is its triangle vertices.
-        return fonl.cogroup(candidates)
+        return fonl.cogroup(candidates, fonl.getNumPartitions())
                 .flatMapToPair(t -> {
 
                     int[] fVal = t._2._1.iterator().next();
