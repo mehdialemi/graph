@@ -8,6 +8,9 @@ import ir.ac.sbu.graph.spark.kcore.KCore;
 import ir.ac.sbu.graph.spark.triangle.Triangle;
 import ir.ac.sbu.graph.types.Edge;
 import ir.ac.sbu.graph.types.VSign;
+import it.unimi.dsi.fastutil.bytes.ByteArrayList;
+import it.unimi.dsi.fastutil.bytes.ByteList;
+import it.unimi.dsi.fastutil.bytes.ByteOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -210,7 +213,7 @@ public class KTrussTSet extends SparkApp {
                     Arrays.sort(fVal, 1, fVal.length);
                     int v = t._1;
 
-                    Map <Edge, List <VSign>> map = new HashMap <>();
+                    Map <Edge, Tuple2 <IntList, ByteList>> map = new HashMap <>();
 
                     for (int[] cVal : t._2._2) {
                         int u = cVal[0];
@@ -229,10 +232,19 @@ public class KTrussTSet extends SparkApp {
                                 int w = fVal[fi];
                                 Edge uw = new Edge(u, w);
                                 Edge vw = new Edge(v, w);
+                                Tuple2 <IntList, ByteList> tuple;
 
-                                map.computeIfAbsent(uv, k -> new ArrayList <>()).add(new VSign(w, W_SIGN));
-                                map.computeIfAbsent(uw, k -> new ArrayList <>()).add(new VSign(v, V_SIGN));
-                                map.computeIfAbsent(vw, k -> new ArrayList <>()).add(new VSign(u, U_SIGN));
+                                tuple = map.computeIfAbsent(uv, k -> new Tuple2 <>(new IntArrayList(), new ByteArrayList()));
+                                tuple._1.add(w);
+                                tuple._2.add(W_SIGN);
+
+                                tuple = map.computeIfAbsent(uw, k -> new Tuple2 <>(new IntArrayList(), new ByteArrayList()));
+                                tuple._1.add(v);
+                                tuple._2.add(V_SIGN);
+
+                                tuple = map.computeIfAbsent(vw, k -> new Tuple2 <>(new IntArrayList(), new ByteArrayList()));
+                                tuple._1.add(u);
+                                tuple._2.add(U_SIGN);
 
                                 fi++;
                                 ci++;
@@ -242,18 +254,10 @@ public class KTrussTSet extends SparkApp {
 
                     return map.entrySet()
                             .stream()
-                            .map(entry -> {
-                                List <VSign> value = entry.getValue();
-                                int[] vertices = new int[value.size()];
-                                byte[] signs = new byte[value.size()];
-                                for (int i = 0; i < value.size(); i++) {
-                                    VSign vSign = value.get(i);
-                                    vertices[i] = vSign.vertex;
-                                    signs[i] = vSign.sign;
-                                }
-                                return new Tuple2 <>(entry.getKey(), new Tuple2<>(vertices, signs));
-                            })
-                            .iterator();
+                            .map(entry -> new Tuple2 <>(
+                                    entry.getKey(),
+                                    new Tuple2 <>(entry.getValue()._1.toIntArray(), entry.getValue()._2.toByteArray()))
+                            ).iterator();
 
                 }).groupByKey()
                 .mapValues(values -> {
@@ -266,9 +270,15 @@ public class KTrussTSet extends SparkApp {
                         byte[] signs = value._2;
                         for (int i = 0; i < vertices.length; i++) {
                             switch (signs[i]) {
-                                case W_SIGN: wList.add(vertices[i]); break;
-                                case V_SIGN: vList.add(vertices[i]); break;
-                                case U_SIGN: uList.add(vertices[i]); break;
+                                case W_SIGN:
+                                    wList.add(vertices[i]);
+                                    break;
+                                case V_SIGN:
+                                    vList.add(vertices[i]);
+                                    break;
+                                case U_SIGN:
+                                    uList.add(vertices[i]);
+                                    break;
                             }
                         }
                     }
