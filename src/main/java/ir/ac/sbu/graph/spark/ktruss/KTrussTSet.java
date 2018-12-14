@@ -8,8 +8,6 @@ import ir.ac.sbu.graph.spark.kcore.KCore;
 import ir.ac.sbu.graph.spark.triangle.Triangle;
 import ir.ac.sbu.graph.types.Edge;
 import ir.ac.sbu.graph.types.VSign;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -198,120 +196,57 @@ public class KTrussTSet extends SparkApp {
                     return output.iterator();
                 }).groupByKey(fonl.getNumPartitions()).cache();
 
-        log("candidates count: " + candidates.count());
+//        log("candidates count: " + candidates.count());
         // Generate kv such that key is an edge and value is its triangle vertices.
         return fonl.join(candidates)
-                .mapPartitionsToPair(p -> {
-                    Map <Edge, IntList> wMap = new HashMap <>();
-                    Map <Edge, IntList> vMap = new HashMap <>();
-                    Map <Edge, IntList> uMap = new HashMap <>();
-
-                    while (p.hasNext()) {
-                        Tuple2 <Integer, Tuple2 <int[], Iterable <int[]>>> t = p.next();
+                .flatMapToPair(t -> {
                         int[] fVal = t._2._1;
                         Arrays.sort(fVal, 1, fVal.length);
                         int v = t._1;
 
-                        for (int[] cVal : t._2._2) {
-                            int u = cVal[0];
-                            Edge uv = new Edge(u, v);
+                    List <Tuple2 <Edge, VSign>> output = new ArrayList <>();
+                    for (int[] cVal : t._2._2) {
+                        int u = cVal[0];
+                        Edge uv = new Edge(u, v);
 
-                            // The intersection determines triangles which u and vertex are two of their vertices.
-                            // Always generate and edge (u, vertex) such that u < vertex.
-                            int fi = 1;
-                            int ci = 1;
-                            while (fi < fVal.length && ci < cVal.length) {
-                                if (fVal[fi] < cVal[ci])
-                                    fi++;
-                                else if (fVal[fi] > cVal[ci])
-                                    ci++;
-                                else {
-                                    int w = fVal[fi];
-                                    Edge uw = new Edge(u, w);
-                                    Edge vw = new Edge(v, w);
-                                    wMap.computeIfAbsent(uv, k -> new IntArrayList()).add(w);
-                                    vMap.computeIfAbsent(uw, k -> new IntArrayList()).add(v);
-                                    uMap.computeIfAbsent(vw, k -> new IntArrayList()).add(u);
-                                    fi++;
-                                    ci++;
-                                }
+                        // The intersection determines triangles which u and vertex are two of their vertices.
+                        // Always generate and edge (u, vertex) such that u < vertex.
+                        int fi = 1;
+                        int ci = 1;
+                        while (fi < fVal.length && ci < cVal.length) {
+                            if (fVal[fi] < cVal[ci])
+                                fi++;
+                            else if (fVal[fi] > cVal[ci])
+                                ci++;
+                            else {
+                                int w = fVal[fi];
+                                Edge uw = new Edge(u, w);
+                                Edge vw = new Edge(v, w);
+
+                                output.add(new Tuple2 <>(uv, new VSign(w, W_UVW)));
+                                output.add(new Tuple2 <>(uw, new VSign(v, V_UVW)));
+                                output.add(new Tuple2 <>(vw, new VSign(u, U_UVW)));
+
+                                fi++;
+                                ci++;
                             }
                         }
                     }
 
-                    Set <Edge> edges = new TreeSet <>((e1, e2) -> {
-                        int diff = e1.v1 - e2.v1;
-                        if (diff != 0)
-                            return diff;
-                        return e1.v2 - e2.v2;
-                    });
-
-                    edges.addAll(wMap.keySet());
-                    edges.addAll(vMap.keySet());
-                    edges.addAll(uMap.keySet());
-                    List <Tuple2 <Edge, int[]>> out = new ArrayList <>();
-                    for (Edge edge : edges) {
-                        IntList outList = new IntArrayList();
-
-                        IntList wList = wMap.get(edge);
-                        if (wList == null)
-                            outList.add(0);
-                        else {
-                            outList.add(wList.size());
-                            outList.addAll(wList);
-                        }
-
-                        IntList vList = vMap.get(edge);
-                        if (vList == null)
-                            outList.add(0);
-                        else {
-                            outList.add(vList.size());
-                            outList.addAll(vList);
-                        }
-
-                        IntList uList = uMap.get(edge);
-                        if (uList == null)
-                            outList.add(0);
-                        else {
-                            outList.add(uList.size());
-                            outList.addAll(uList);
-                        }
-
-                        out.add(new Tuple2 <>(edge, outList.toIntArray()));
-                    }
-
-                    return out.iterator();
-                }, false).groupByKey()
+                    return output.iterator();
+                }).groupByKey()
                 .mapValues(values -> {
                     int sw = 0, sv = 0, su = 0;
                     List <VSign> list = new ArrayList <>();
-                    for (int[] value : values) {
-                        int offset = 0;
-                        int wSize = value[offset++];
-                        sw += wSize;
-                        int i = 0;
-                        while (i < wSize) {
-                            list.add(new VSign(value[offset++], W_UVW));
-                            i++;
-                        }
-
-                        int vSize = value[offset++];
-                        sv += vSize;
-                        i = 0;
-                        while (i < vSize) {
-                            list.add(new VSign(value[offset++], V_UVW));
-                            i++;
-                        }
-
-                        int uSize = value[offset++];
-                        su += uSize;
-                        i = 0;
-                        while (i < uSize) {
-                            list.add(new VSign(value[offset++], U_UVW));
-                            i++;
-                        }
+                    for (VSign value : values) {
+                        list.add(value);
+                        if (value.sign == W_UVW)
+                            sw ++;
+                        else if (value.sign == V_UVW)
+                            sv ++;
+                        else
+                            su ++;
                     }
-
                     int offsetW = META_LEN;
                     int offsetV = sw + META_LEN;
                     int offsetU = sw + sv + META_LEN;

@@ -46,17 +46,19 @@ public class MaxTrussTSetRange extends SparkApp {
 
     }
 
-    public JavaPairRDD <Edge, Integer> explore(int maxK) throws URISyntaxException {
+    public JavaPairRDD <Edge, Integer> explore(int minPartitions, int maxK) throws URISyntaxException {
         log("maxK: " + maxK);
         KCore kCore = new KCore(neighborList, kCoreConf);
 
-        Triangle triangle = new Triangle(this, kCore.getOrCreate());
+        Triangle triangle = new Triangle(kCore);
 
         JavaPairRDD <Integer, int[]> fonl = triangle.getOrCreateFonl();
 
+        int numPartitions = fonl.getNumPartitions();
+        numPartitions = Math.max(numPartitions * 5, minPartitions);
         JavaPairRDD <Integer, int[]> candidates = triangle.createCandidates(fonl);
 
-        JavaPairRDD <Edge, MaxTSetValue> tSet = createTSet(fonl, candidates);
+        JavaPairRDD <Edge, MaxTSetValue> tSet = createTSet(fonl, candidates, numPartitions);
         JavaPairRDD <Edge, Integer> maxTruss = conf.getSc().parallelizePairs(new ArrayList <>());
         long currentEdgeCount = tSet.count();
         long edgeCount = currentEdgeCount;
@@ -110,7 +112,7 @@ public class MaxTrussTSetRange extends SparkApp {
                     } else {
                         minSup++;
                         if (minSup == max && maxSup != edgeCount) {
-                            minSup--;
+                            minSup --;
                             maxSup = edgeCount;
                             break;
                         }
@@ -135,7 +137,7 @@ public class MaxTrussTSetRange extends SparkApp {
                 maxSup = Math.min(max, maxSup);
             } else {
                 maxSup = edgeCount;
-                maxIteration++;
+                maxIteration ++;
             }
             long t2 = System.currentTimeMillis();
             long duration = t2 - t1;
@@ -152,9 +154,8 @@ public class MaxTrussTSetRange extends SparkApp {
         return maxTruss;
     }
 
-    private Tuple2 <Integer, JavaPairRDD <Edge, MaxTSetValue>> find(JavaPairRDD <Edge, MaxTSetValue> tSet,
-                                                                    long maxSup, int maxIteration,
-                                                                    long minUpdateCount) {
+    private Tuple2 <Integer, JavaPairRDD <Edge, MaxTSetValue>> find(JavaPairRDD <Edge, MaxTSetValue> tSet, long maxSup,
+                                                                    int maxIteration, long minUpdateCount) {
 
         int numPartitions = tSet.getNumPartitions();
         int iteration = 0;
@@ -312,91 +313,61 @@ public class MaxTrussTSetRange extends SparkApp {
     }
 
     private JavaPairRDD <Edge, MaxTSetValue> createTSet(JavaPairRDD <Integer, int[]> fonl,
-                                                        JavaPairRDD <Integer, int[]> candidates) {
+                                                        JavaPairRDD <Integer, int[]> candidates,
+                                                        int partitionNum) {
 
         // Generate kv such that key is an edge and value is its triangle vertices.
         JavaPairRDD <Edge, MaxTSetValue> tSet = candidates.cogroup(fonl)
-                .mapPartitionsToPair(p -> {
-                    Map <Edge, List <VSign>> map = new HashMap <>();
-                    while (p.hasNext()) {
-                        Tuple2 <Integer, Tuple2 <Iterable <int[]>, Iterable <int[]>>> t = p.next();
-                        int[] fVal = t._2._2.iterator().next();
-                        Arrays.sort(fVal, 1, fVal.length);
-                        int v = t._1;
+                .flatMapToPair(t -> {
+                    int[] fVal = t._2._2.iterator().next();
+                    Arrays.sort(fVal, 1, fVal.length);
+                    int v = t._1;
 
-                        for (int[] cVal : t._2._1) {
-                            int u = cVal[0];
-                            Edge uv = new Edge(u, v);
+                    List <Tuple2 <Edge, VSign>> output = new ArrayList <>();
+                    for (int[] cVal : t._2._1) {
+                        int u = cVal[0];
+                        Edge uv = new Edge(u, v);
 
-                            // The intersection determines triangles which u and vertex are two of their vertices.
-                            // Always generate and edge (u, vertex) such that u < vertex.
-                            int fi = 1;
-                            int ci = 1;
-                            while (fi < fVal.length && ci < cVal.length) {
-                                if (fVal[fi] < cVal[ci])
-                                    fi++;
-                                else if (fVal[fi] > cVal[ci])
-                                    ci++;
-                                else {
-                                    int w = fVal[fi];
-                                    Edge uw = new Edge(u, w);
-                                    Edge vw = new Edge(v, w);
+                        // The intersection determines triangles which u and vertex are two of their vertices.
+                        // Always generate and edge (u, vertex) such that u < vertex.
+                        int fi = 1;
+                        int ci = 1;
+                        while (fi < fVal.length && ci < cVal.length) {
+                            if (fVal[fi] < cVal[ci])
+                                fi++;
+                            else if (fVal[fi] > cVal[ci])
+                                ci++;
+                            else {
+                                int w = fVal[fi];
+                                Edge uw = new Edge(u, w);
+                                Edge vw = new Edge(v, w);
 
-                                    List <VSign> list = map.computeIfAbsent(uv, k1 -> new ArrayList <>());
-                                    list.add(new VSign(w, W_UVW));
+                                output.add(new Tuple2 <>(uv, new VSign(w, W_UVW)));
+                                output.add(new Tuple2 <>(uw, new VSign(v, V_UVW)));
+                                output.add(new Tuple2 <>(vw, new VSign(u, U_UVW)));
 
-                                    list = map.computeIfAbsent(uw, k1 -> new ArrayList <>());
-                                    list.add(new VSign(v, V_UVW));
-
-                                    list = map.computeIfAbsent(vw, k1 -> new ArrayList <>());
-                                    list.add(new VSign(u, U_UVW));
-
-                                    fi++;
-                                    ci++;
-                                }
+                                fi++;
+                                ci++;
                             }
                         }
                     }
 
-                    List <Tuple2 <Edge, Tuple2 <int[], byte[]>>> out = new ArrayList <>();
-                    for (Map.Entry <Edge, List <VSign>> entry : map.entrySet()) {
-                        Edge edge = entry.getKey();
-                        List <VSign> value = entry.getValue();
-                        int[] vertices = new int[value.size()];
-                        byte[] signs = new byte[value.size()];
-                        for (int i = 0; i < value.size(); i++) {
-                            VSign VSign = value.get(i);
-                            vertices[i] = VSign.vertex;
-                            signs[i] = VSign.sign;
-                        }
-                        out.add(new Tuple2 <>(edge, new Tuple2 <>(vertices, signs)));
-                    }
-
-                    return out.iterator();
-                }).groupByKey()
+                    return output.iterator();
+                }).groupByKey(partitionNum)
                 .mapValues(values -> {
                     IntSortedSet wSet = new IntAVLTreeSet();
                     IntSortedSet vSet = new IntAVLTreeSet();
                     IntSortedSet uSet = new IntAVLTreeSet();
                     int sup = 0;
-                    for (Tuple2 <int[], byte[]> value : values) {
-                        int[] vertices = value._1;
-                        byte[] signs = value._2;
-                        for (int i = 0; i < vertices.length; i++) {
-                            switch (signs[i]) {
-                                case W_UVW:
-                                    wSet.add(vertices[i]);
-                                    break;
-                                case V_UVW:
-                                    vSet.add(vertices[i]);
-                                    break;
-                                case U_UVW:
-                                    uSet.add(vertices[i]);
-                                    break;
-                            }
-                        }
+                    for (VSign value : values) {
+                        if (value.sign == W_UVW)
+                            wSet.add(value.vertex);
+                        else if (value.sign == V_UVW)
+                            vSet.add(value.vertex);
+                        else
+                            uSet.add(value.vertex);
+                        sup++;
                     }
-
                     MaxTSetValue value = new MaxTSetValue();
                     value.sup = sup;
                     value.w = wSet.toIntArray();
@@ -435,18 +406,23 @@ public class MaxTrussTSetRange extends SparkApp {
             }
         };
         conf.init();
+        int minPartitions = argumentReader.nextInt(2);
         int maxK = argumentReader.nextInt(100000);
         EdgeLoader edgeLoader = new EdgeLoader(conf);
         NeighborList neighborList = new NeighborList(edgeLoader);
 
         MaxTrussTSetRange kTrussTSet = new MaxTrussTSetRange(neighborList, conf);
-        JavaPairRDD <Edge, Integer> truss = kTrussTSet.explore(maxK);
+        JavaPairRDD <Edge, Integer> truss = kTrussTSet.explore(minPartitions, maxK);
         long t2 = System.currentTimeMillis();
         log("KTruss edge count: " + truss.count(), t1, t2);
 
         printKCount(truss, maxK);
 
         kTrussTSet.close();
+    }
+
+    private static void printKCount(JavaPairRDD <Edge, Integer> truss) {
+        printKCount(truss, 5);
     }
 
     private static void printKCount(JavaPairRDD <Edge, Integer> truss, int size) {
