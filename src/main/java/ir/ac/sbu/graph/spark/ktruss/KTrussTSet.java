@@ -168,6 +168,7 @@ public class KTrussTSet extends SparkApp {
         long t1 = System.currentTimeMillis();
         JavaPairRDD <Integer, int[]> neighbors = neighborList.getOrCreate();
         log("neighbors count: " + neighbors.count(), t1, System.currentTimeMillis());
+
         JavaPairRDD <Integer, int[]> kcNeighbors = kCore.perform(neighbors, ktConf.getKc());
 
         Triangle triangle = new Triangle(this);
@@ -175,7 +176,8 @@ public class KTrussTSet extends SparkApp {
         JavaPairRDD <Integer, int[]> fonl = triangle.createFonl(kcNeighbors);
         log("fonl count: " + fonl.count());
 
-        JavaPairRDD <Integer, int[]> candidates = fonl.filter(t -> t._2.length > 2) // Select vertices having more than 2 items in their values
+        JavaPairRDD <Integer, int[]> candidates = fonl.filter(t -> t._2.length > 2)
+                .repartition(conf.getPartitionNum() * 5)// Select vertices having more than 2 items in their values
                 .flatMapToPair(t -> {
 
                     int size = t._2.length - 1; // one is for the first index holding node's degree
@@ -199,7 +201,7 @@ public class KTrussTSet extends SparkApp {
                 });
 
         // Generate kv such that key is an edge and value is its triangle vertices.
-        return candidates.cogroup(fonl, fonl.getNumPartitions() * 5)
+        return candidates.cogroup(fonl)
                 .mapPartitionsToPair(p -> {
                     Map <Edge, IntList> wMap = new HashMap <>();
                     Map <Edge, IntList> vMap = new HashMap <>();
