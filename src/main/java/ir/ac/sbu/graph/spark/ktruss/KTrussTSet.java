@@ -180,8 +180,8 @@ public class KTrussTSet extends SparkApp {
                     if (size == 1)
                         return Collections.emptyIterator();
 
-                    List<Tuple2<Integer, int[]>> output;
-                    output = new ArrayList<>(size);
+                    List <Tuple2 <Integer, int[]>> output;
+                    output = new ArrayList <>(size);
 
                     for (int index = 1; index < size; index++) {
                         int len = size - index;
@@ -189,94 +189,95 @@ public class KTrussTSet extends SparkApp {
                         cvalue[0] = t._1; // First vertex in the triangle
                         System.arraycopy(t._2, index + 1, cvalue, 1, len);
                         Arrays.sort(cvalue, 1, cvalue.length); // quickSort to comfort with fonl
-                        output.add(new Tuple2<>(t._2[index], cvalue));
+                        output.add(new Tuple2 <>(t._2[index], cvalue));
                     }
 
                     return output.iterator();
                 });
 
         // Generate kv such that key is an edge and value is its triangle vertices.
-        return candidates.cogroup(fonl, fonl.getNumPartitions() * 5).mapPartitionsToPair(p -> {
-            Map <Edge, IntList> wMap = new HashMap <>();
-            Map <Edge, IntList> vMap = new HashMap <>();
-            Map <Edge, IntList> uMap = new HashMap <>();
+        return candidates.cogroup(fonl, fonl.getNumPartitions() * 5)
+                .mapPartitionsToPair(p -> {
+                    Map <Edge, IntList> wMap = new HashMap <>();
+                    Map <Edge, IntList> vMap = new HashMap <>();
+                    Map <Edge, IntList> uMap = new HashMap <>();
 
-            while (p.hasNext()) {
-                Tuple2 <Integer, Tuple2 <Iterable <int[]>, Iterable <int[]>>> t = p.next();
-                int[] fVal = t._2._2.iterator().next();
-                Arrays.sort(fVal, 1, fVal.length);
-                int v = t._1;
+                    while (p.hasNext()) {
+                        Tuple2 <Integer, Tuple2 <Iterable <int[]>, Iterable <int[]>>> t = p.next();
+                        int[] fVal = t._2._2.iterator().next();
+                        Arrays.sort(fVal, 1, fVal.length);
+                        int v = t._1;
 
-                for (int[] cVal : t._2._1) {
-                    int u = cVal[0];
-                    Edge uv = new Edge(u, v);
+                        for (int[] cVal : t._2._1) {
+                            int u = cVal[0];
+                            Edge uv = new Edge(u, v);
 
-                    // The intersection determines triangles which u and vertex are two of their vertices.
-                    // Always generate and edge (u, vertex) such that u < vertex.
-                    int fi = 1;
-                    int ci = 1;
-                    while (fi < fVal.length && ci < cVal.length) {
-                        if (fVal[fi] < cVal[ci])
-                            fi++;
-                        else if (fVal[fi] > cVal[ci])
-                            ci++;
-                        else {
-                            int w = fVal[fi];
-                            Edge uw = new Edge(u, w);
-                            Edge vw = new Edge(v, w);
-                            wMap.computeIfAbsent(uv, k -> new IntArrayList()).add(w);
-                            vMap.computeIfAbsent(uw, k -> new IntArrayList()).add(v);
-                            uMap.computeIfAbsent(vw, k -> new IntArrayList()).add(u);
-                            fi++;
-                            ci++;
+                            // The intersection determines triangles which u and vertex are two of their vertices.
+                            // Always generate and edge (u, vertex) such that u < vertex.
+                            int fi = 1;
+                            int ci = 1;
+                            while (fi < fVal.length && ci < cVal.length) {
+                                if (fVal[fi] < cVal[ci])
+                                    fi++;
+                                else if (fVal[fi] > cVal[ci])
+                                    ci++;
+                                else {
+                                    int w = fVal[fi];
+                                    Edge uw = new Edge(u, w);
+                                    Edge vw = new Edge(v, w);
+                                    wMap.computeIfAbsent(uv, k -> new IntArrayList()).add(w);
+                                    vMap.computeIfAbsent(uw, k -> new IntArrayList()).add(v);
+                                    uMap.computeIfAbsent(vw, k -> new IntArrayList()).add(u);
+                                    fi++;
+                                    ci++;
+                                }
+                            }
                         }
                     }
-                }
-            }
 
-            Set <Edge> edges = new TreeSet <>((e1, e2) -> {
-                int diff = e1.v1 - e2.v1;
-                if (diff != 0)
-                    return diff;
-                return e1.v2 - e2.v2;
-            });
+                    Set <Edge> edges = new TreeSet <>((e1, e2) -> {
+                        int diff = e1.v1 - e2.v1;
+                        if (diff != 0)
+                            return diff;
+                        return e1.v2 - e2.v2;
+                    });
 
-            edges.addAll(wMap.keySet());
-            edges.addAll(vMap.keySet());
-            edges.addAll(uMap.keySet());
-            List <Tuple2 <Edge, int[]>> out = new ArrayList <>();
-            for (Edge edge : edges) {
-                IntList outList = new IntArrayList();
+                    edges.addAll(wMap.keySet());
+                    edges.addAll(vMap.keySet());
+                    edges.addAll(uMap.keySet());
+                    List <Tuple2 <Edge, int[]>> out = new ArrayList <>();
+                    for (Edge edge : edges) {
+                        IntList outList = new IntArrayList();
 
-                IntList wList = wMap.get(edge);
-                if (wList == null)
-                    outList.add(0);
-                else {
-                    outList.add(wList.size());
-                    outList.addAll(wList);
-                }
+                        IntList wList = wMap.get(edge);
+                        if (wList == null)
+                            outList.add(0);
+                        else {
+                            outList.add(wList.size());
+                            outList.addAll(wList);
+                        }
 
-                IntList vList = vMap.get(edge);
-                if (vList == null)
-                    outList.add(0);
-                else {
-                    outList.add(vList.size());
-                    outList.addAll(vList);
-                }
+                        IntList vList = vMap.get(edge);
+                        if (vList == null)
+                            outList.add(0);
+                        else {
+                            outList.add(vList.size());
+                            outList.addAll(vList);
+                        }
 
-                IntList uList = uMap.get(edge);
-                if (uList == null)
-                    outList.add(0);
-                else {
-                    outList.add(uList.size());
-                    outList.addAll(uList);
-                }
+                        IntList uList = uMap.get(edge);
+                        if (uList == null)
+                            outList.add(0);
+                        else {
+                            outList.add(uList.size());
+                            outList.addAll(uList);
+                        }
 
-                out.add(new Tuple2 <>(edge, outList.toIntArray()));
-            }
+                        out.add(new Tuple2 <>(edge, outList.toIntArray()));
+                    }
 
-            return out.iterator();
-        }, false).groupByKey()
+                    return out.iterator();
+                }, false).groupByKey()
                 .mapValues(values -> {
                     int sw = 0, sv = 0, su = 0;
                     List <VSign> list = new ArrayList <>();
