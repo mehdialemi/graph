@@ -310,7 +310,7 @@ public class KTrussTSet extends SparkApp {
 //                            ).iterator();
 //
 //                })
-            .groupByKey()
+            .groupByKey(conf.getPartitionNum() * 5)
                 .mapValues(values -> {
                     IntList wList = new IntArrayList();
                     IntList vList = new IntArrayList();
