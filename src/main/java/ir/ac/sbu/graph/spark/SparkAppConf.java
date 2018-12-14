@@ -55,7 +55,8 @@ public class SparkAppConf {
         sparkConf.set("spark.driver.maxResultSize", "9g");
 //        sparkConf.set("spark.kryoserializer.buffer.max", "256m");
         sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-        sparkConf.registerKryoClasses(new Class[] {int[].class, int[][].class, MaxTSetValue.class, TSetValue.class, VertexDeg.class, PartitionInfoAccumulator.class,
+        sparkConf.registerKryoClasses(new Class[] {int[].class, byte[].class,
+                int[][].class, MaxTSetValue.class, TSetValue.class, VertexDeg.class, PartitionInfoAccumulator.class,
                 Edge.class, VSign.class, UEdge.class, IntList.class, IntCollection.class, Collection.class,
                 List.class, Iterable.class, Comparable.class, IntIterable.class, Map.class, Map.Entry.class,
                 HashMap.class, AbstractMap.class, Cloneable.class, IntSet.class, IntOpenHashSet.class,
