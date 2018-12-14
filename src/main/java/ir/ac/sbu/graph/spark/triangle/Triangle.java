@@ -62,7 +62,7 @@ public class Triangle extends SparkApp {
             }
 
             return degreeList.iterator();
-        }).groupByKey(conf.getPartitionNum() * 5).mapToPair(v -> {
+        }).groupByKey().mapToPair(v -> {
             int degree = 0;
             // Iterate over higherIds to calculate degree of the current vertex
             if (v._2 == null)
