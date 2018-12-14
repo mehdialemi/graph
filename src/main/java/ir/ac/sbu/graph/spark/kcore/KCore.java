@@ -103,7 +103,7 @@ public class KCore extends NeighborList {
                     }).cache();
         }
 
-        log("vertex count: " + neighbors.count());
+//        log("vertex count: " + neighbors.count());
 
         return neighbors;
     }
