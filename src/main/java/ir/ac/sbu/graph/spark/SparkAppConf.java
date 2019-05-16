@@ -16,11 +16,13 @@ import java.util.*;
  */
 public class SparkAppConf {
 
-    private String inputPath;
-    private int partitionNum;
-    private SparkConf sparkConf;
-    private int cores;
-    private JavaSparkContext sc;
+    protected String inputPath;
+    protected int partitionNum;
+    protected SparkConf sparkConf;
+    protected int cores;
+    protected JavaSparkContext sc;
+
+    public SparkAppConf() {}
 
     public SparkAppConf(SparkAppConf conf) {
         this.inputPath = conf.inputPath;
@@ -55,7 +57,7 @@ public class SparkAppConf {
         sparkConf.set("spark.driver.maxResultSize", "9g");
 //        sparkConf.set("spark.kryoserializer.buffer.max", "256m");
         sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-        sparkConf.registerKryoClasses(new Class[] {int[].class, byte[].class,
+        sparkConf.registerKryoClasses(new Class[] {int[].class, byte[].class, Edge.class, VertexDeg.class,
                 int[][].class, MaxTSetValue.class, TSetValue.class, VertexDeg.class, PartitionInfoAccumulator.class,
                 Edge.class, VSign.class, UEdge.class, IntList.class, IntCollection.class, Collection.class,
                 List.class, Iterable.class, Comparable.class, IntIterable.class, Map.class, Map.Entry.class,
