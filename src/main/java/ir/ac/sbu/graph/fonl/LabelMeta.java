@@ -5,6 +5,15 @@ import java.util.Arrays;
 public class LabelMeta extends DegreeMeta {
     public String labels[];
 
+    public LabelMeta(){
+
+    }
+
+    public LabelMeta(LabelMeta labelMeta) {
+        super(labelMeta);
+        labels = labelMeta.labels;
+    }
+
     public static Fvalue <LabelMeta> emptyLabelMetaValue() {
         Fvalue<LabelMeta> fvalue = new Fvalue <>();
         fvalue.meta = new LabelMeta();

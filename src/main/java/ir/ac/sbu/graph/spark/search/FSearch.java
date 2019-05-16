@@ -7,6 +7,7 @@ import ir.ac.sbu.graph.spark.*;
 import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FSearch extends SparkApp {
@@ -29,10 +30,35 @@ public class FSearch extends SparkApp {
 
         JavaPairRDD <Integer, Fvalue <LabelMeta>> labelFonl = FonlCreator.createLabelFonl(
                 new NeighborList(edgeLoader), lables);
+
+        print(labelFonl);
+
+        JavaPairRDD <Integer, Fvalue <LabelMeta>> nodes = startNodes(labelFonl);
+
+        print(nodes);
+
+
+    }
+
+    private void print(JavaPairRDD <Integer, Fvalue <LabelMeta>> labelFonl ) {
         List <Tuple2 <Integer, Fvalue <LabelMeta>>> collect = labelFonl.collect();
         for (Tuple2 <Integer, Fvalue <LabelMeta>> t : collect) {
             System.out.println(t);
         }
+    }
+
+    private JavaPairRDD <Integer, Fvalue <LabelMeta>> startNodes(JavaPairRDD <Integer, Fvalue <LabelMeta>> labelFonl) {
+        JavaPairRDD <Integer, Iterable <Integer>> neighborMsg = labelFonl.flatMapToPair(kv -> {
+            List <Tuple2 <Integer, Integer>> list = new ArrayList <>();
+            for (int v : kv._2.fonl) {
+                list.add(new Tuple2 <>(v, kv._1));
+            }
+            return list.iterator();
+        }).groupByKey(labelFonl.getNumPartitions());
+
+        return labelFonl.leftOuterJoin(neighborMsg)
+                .filter(kv -> !kv._2._2.isPresent())
+                .mapValues(value -> value._1);
     }
 
     public static void main(String[] args) {

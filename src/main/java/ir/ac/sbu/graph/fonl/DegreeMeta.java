@@ -12,6 +12,11 @@ public class DegreeMeta extends Meta{
         this.degs = new int[fSize];
     }
 
+    public DegreeMeta(DegreeMeta degreeMeta) {
+        super(degreeMeta);
+        degs = degreeMeta.degs;
+    }
+
     public static Fvalue<DegreeMeta> createEmptyFValue() {
         Fvalue<DegreeMeta> fvalue = new Fvalue <>();
         fvalue.meta = new LabelMeta();
