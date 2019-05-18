@@ -3,6 +3,7 @@ package ir.ac.sbu.graph.fonl;
 import java.util.Arrays;
 
 public class LabelMeta extends DegreeMeta {
+    public String label;
     public String labels[];
 
     public LabelMeta(){

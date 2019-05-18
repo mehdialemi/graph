@@ -7,7 +7,7 @@ import scala.Tuple2;
 
 import java.util.*;
 
-public class FonlCreator {
+public class SparkFonlCreator {
 
     public static JavaPairRDD <Integer, Fvalue <DegreeMeta>> createDegFonl(NeighborList neighborList) {
         JavaPairRDD <Integer, int[]> neighbors = neighborList.getOrCreate();
@@ -26,7 +26,7 @@ public class FonlCreator {
             }
 
             return degreeList.iterator();
-        }).groupByKey().mapToPair(kv -> {
+        }).groupByKey(neighbors.getNumPartitions()).mapToPair(kv -> {
             int degree = 0;
             // Iterate over higherIds to calculate degree of the current vertex
             if (kv._2 == null)
@@ -67,7 +67,8 @@ public class FonlCreator {
         }).cache();
     }
 
-    public static JavaPairRDD <Integer, Fvalue <LabelMeta>> createLabelFonl(NeighborList neighborList, JavaPairRDD <Integer, String> lables) {
+    public static JavaPairRDD <Integer, Fvalue <LabelMeta>> createLabelFonl(NeighborList neighborList,
+                                                                            JavaPairRDD <Integer, String> labels) {
         JavaPairRDD <Integer, Fvalue <DegreeMeta>> degFonl = createDegFonl(neighborList);
 
         JavaPairRDD <Integer, Iterable <Tuple2 <Integer, String>>> labelMsg = degFonl.flatMapToPair(kv -> {
@@ -78,7 +79,7 @@ public class FonlCreator {
             return list.iterator();
         })
                 .groupByKey()
-                .join(lables)
+                .join(labels)
                 .flatMapToPair(kv -> {
                     List <Tuple2 <Integer, Tuple2 <Integer, String>>> list = new ArrayList <>();
                     String label = kv._2._2;
@@ -88,7 +89,7 @@ public class FonlCreator {
                     return list.iterator();
                 }).groupByKey(degFonl.getNumPartitions());
 
-        return degFonl.join(labelMsg)
+        return degFonl.join(labels).join(labelMsg)
                 .mapValues(value -> {
                     Map <Integer, String> labelMap = new HashMap <>();
                     for (Tuple2 <Integer, String> vLabel : value._2) {
@@ -96,14 +97,18 @@ public class FonlCreator {
                     }
 
                     Fvalue <LabelMeta> fvalue = new Fvalue <>();
-                    fvalue.fonl = value._1.fonl;
+                    Fvalue <DegreeMeta> dfonl = value._1._1;
+
+                    fvalue.fonl = dfonl.fonl;
                     fvalue.meta = new LabelMeta();
-                    fvalue.meta.deg = value._1.meta.deg;
-                    fvalue.meta.degs = value._1.meta.degs;
+                    fvalue.meta.label = value._1._2;
+                    fvalue.meta.deg = dfonl.meta.deg;
+                    fvalue.meta.degs = dfonl.meta.degs;
                     fvalue.meta.labels = new String[fvalue.fonl.length];
-                    for (int i = 0; i < value._1.fonl.length; i++) {
-                        fvalue.meta.labels[i] = labelMap.get(value._1.fonl[i]);
+                    for (int i = 0; i < dfonl.fonl.length; i++) {
+                        fvalue.meta.labels[i] = labelMap.get(dfonl.fonl[i]);
                     }
+
                     return fvalue;
                 }).cache();
     }
