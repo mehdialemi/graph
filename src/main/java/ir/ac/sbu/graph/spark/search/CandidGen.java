@@ -1,14 +1,13 @@
 package ir.ac.sbu.graph.spark.search;
 
 import ir.ac.sbu.graph.fonl.Fvalue;
-import ir.ac.sbu.graph.fonl.LabelFonl;
+import ir.ac.sbu.graph.fonl.SortedNeighbors;
 import ir.ac.sbu.graph.fonl.LabelMeta;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import scala.Tuple2;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,9 +15,9 @@ public class CandidGen {
 
     private final int vertex;
     private final Fvalue <LabelMeta> fvalue;
-    private final LabelFonl query;
+    private final SortedNeighbors query;
 
-    public CandidGen(int vertex, Fvalue<LabelMeta> fvalue, LabelFonl query) {
+    public CandidGen(int vertex, Fvalue<LabelMeta> fvalue, SortedNeighbors query) {
 
         this.vertex = vertex;
         this.fvalue = fvalue;

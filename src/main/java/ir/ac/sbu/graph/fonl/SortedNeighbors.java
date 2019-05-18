@@ -1,15 +1,17 @@
 package ir.ac.sbu.graph.fonl;
 
 import ir.ac.sbu.graph.spark.search.Candidate;
+import it.unimi.dsi.fastutil.ints.IntArrayFIFOQueue;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntPriorityQueue;
 
-import java.util.Arrays;
+import java.util.BitSet;
 
-public class LabelFonl extends Fonl<LabelMeta> {
+public class SortedNeighbors extends Fonl<LabelMeta> {
 
     int index = 0;
-    public LabelFonl(int vSize) {
+    public SortedNeighbors(int vSize) {
         vArray = new int[vSize];
         dArray = new int[vSize];
         fvalues = new Fvalue[vSize];
@@ -25,32 +27,27 @@ public class LabelFonl extends Fonl<LabelMeta> {
         fvalues[index ++] = fvalue;
     }
 
-    public int lowerDegIndex(int degree) {
-        int i = Arrays.binarySearch(dArray, degree);
-        if (i == -1)
-            return -1;
+    public int diameter() {
+        BitSet bitSet = new BitSet(vArray.length);
+        int d = 0;
+        IntPriorityQueue queue = new IntArrayFIFOQueue();
+        queue.enqueue(0);
+        bitSet.set(0);
+        while (queue.isEmpty()) {
+            int v = queue.dequeueInt();
+            boolean set = false;
+            for (int n : fvalues[v].fonl) {
+                if (bitSet.get(v))
+                    continue;
 
-        int index = i >= 0 ? i : -i;
-        return Math.min(index, vArray.length - 1);
-    }
+                queue.enqueue(n);
 
-    public int[] vIndexes(int hIndex, String label, Candidate candidate) {
-        IntList list = null;
-        for (int i = hIndex; i >= 0; i--) {
-            if (candidate.isNotEmpty(i))
-                continue;
-
-            if (fvalues[i].meta.label.equals(label)) {
-                if (list == null)
-                    list = new IntArrayList();
-                list.add(i);
+                if (!set)
+                    d ++;
+                set = true;
             }
         }
-
-        if (list == null)
-            return null;
-
-        return list.toIntArray();
+        return d;
     }
 
     public int[] nIndexes(int vIndex, int deg, String label, Candidate candidate) {

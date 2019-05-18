@@ -24,35 +24,22 @@ public class SPMiner extends SparkApp {
         this.edgeLoader = edgeLoader;
     }
 
-    public void search(LabelFonl query) {
+    public void search(SortedNeighbors query) {
         // load label
-        JavaPairRDD <Integer, String> lables = conf.getSc()
-                .textFile(conf.getLablePath(), conf.getPartitionNum())
-                .map(line -> line.split("\\s+"))
-                .mapToPair(split -> new Tuple2 <>(Integer.parseInt(split[0]), split[1]));
+        JavaPairRDD <Integer, String> lables = getLables();
 
-        JavaPairRDD <Integer, Fvalue <LabelMeta>> lFonl = SparkFonlCreator.createLabelFonl(
-                new NeighborList(edgeLoader), lables);
-
+        NeighborList neighborList = new NeighborList(edgeLoader);
+        JavaPairRDD <Integer, Fvalue <LabelMeta>> lFonl = SparkFonlCreator.createLabelFonl(neighborList, lables);
         printFonl(lFonl);
 
-        final Broadcast <LabelFonl> queryBroadCast = conf.getSc().broadcast(query);
+        final Broadcast <SortedNeighbors> queryBroadCast = conf.getSc().broadcast(query);
 
-        JavaPairRDD <Integer, Iterable <Candidate>> candidates = lFonl.flatMapToPair(kv -> {
-            int vertex = kv._1;
-            Fvalue <LabelMeta> fvalue = kv._2;
-            LabelFonl labelFonl = queryBroadCast.getValue();
-
-            CandidGen candidGen = new CandidGen(vertex, fvalue, labelFonl);
-            List <Tuple2 <Integer, Candidate>> newCandidates = candidGen.newCandidates();
-
-            return newCandidates.iterator();
-        }).groupByKey();
+        JavaPairRDD <Integer, Iterable <Candidate>> candidates = getCandidates(lFonl, queryBroadCast);
 
         JavaRDD<Candidate> patterns = conf.getSc().parallelize(Collections.emptyList());
 
-        while (true) {
-
+        int diameter = query.diameter();
+        for (int i = 0; i < diameter; i++) {
             long count = candidates.count();
 
             printCandidates(candidates);
@@ -61,16 +48,8 @@ public class SPMiner extends SparkApp {
             if (count == 0)
                 break;
 
-            JavaRDD <Candidate> found = candidates.flatMap(kv -> {
-                List<Candidate> list = new ArrayList <>();
-                for (Candidate candidate : kv._2) {
-                    if (candidate.isFull())
-                        list.add(candidate);
-                }
-                return list.iterator();
-            });
-
-            patterns = patterns.union(found).cache();
+            JavaRDD <Candidate> complete = getComplete(candidates);
+            patterns = patterns.union(complete).cache();
 
             printCandidates(candidates);
             printFonl(lFonl);
@@ -79,9 +58,9 @@ public class SPMiner extends SparkApp {
                     .join(lFonl)
                     .flatMapToPair(kv -> {
                         int vertex = kv._1;
-                        LabelFonl labelFonl = queryBroadCast.getValue();
+                        SortedNeighbors sortedNeighbors = queryBroadCast.getValue();
                         Fvalue <LabelMeta> fvalue = kv._2._2;
-                        CandidGen candidGen = new CandidGen(vertex, fvalue, labelFonl);
+                        CandidGen candidGen = new CandidGen(vertex, fvalue, sortedNeighbors);
                         List <Tuple2 <Integer, Candidate>> newCandidates = new ArrayList <>();
                         // Join candidates here
                         List<Candidate> list = new ArrayList <>();
@@ -92,17 +71,6 @@ public class SPMiner extends SparkApp {
                             list.add(candidate);
                             newCandidates.addAll(candidGen.newCandidates(candidate));
                         }
-
-//                        for (int i = 0; i < list.size(); i++) {
-//                            Candidate c1 = list.get(i);
-//                            for (int j = i + 1; j < list.size(); j++) {
-//                                Candidate c2 = list.get(j);
-//                                Candidate join = c1.join(c2);
-//                                if (join != null)
-//                                    newCandidates.add(new Tuple2 <>(vertex, join));
-//                            }
-//                        }
-
                         return newCandidates.iterator();
                     }).groupByKey(lFonl.getNumPartitions())
                     .persist(StorageLevel.MEMORY_AND_DISK());
@@ -110,6 +78,37 @@ public class SPMiner extends SparkApp {
 
         printCandidates(patterns.distinct());
 
+    }
+
+    private JavaRDD <Candidate> getComplete(JavaPairRDD <Integer, Iterable <Candidate>> candidates) {
+        return candidates.flatMap(kv -> {
+            List<Candidate> list = new ArrayList<>();
+            for (Candidate candidate : kv._2) {
+                if (candidate.isFull())
+                    list.add(candidate);
+            }
+            return list.iterator();
+        }).cache();
+    }
+
+    private JavaPairRDD <Integer, Iterable <Candidate>> getCandidates(JavaPairRDD <Integer, Fvalue <LabelMeta>> lFonl, Broadcast <SortedNeighbors> queryBroadCast) {
+        return lFonl.flatMapToPair(kv -> {
+            int vertex = kv._1;
+            Fvalue<LabelMeta> fvalue = kv._2;
+            SortedNeighbors sortedNeighbors = queryBroadCast.getValue();
+
+            CandidGen candidGen = new CandidGen(vertex, fvalue, sortedNeighbors);
+            List<Tuple2<Integer, Candidate>> newCandidates = candidGen.newCandidates();
+
+            return newCandidates.iterator();
+        }).groupByKey();
+    }
+
+    private JavaPairRDD <Integer, String> getLables() {
+        return conf.getSc()
+                .textFile(conf.getLablePath(), conf.getPartitionNum())
+                .map(line -> line.split("\\s+"))
+                .mapToPair(split -> new Tuple2<>(Integer.parseInt(split[0]), split[1]));
     }
 
     private void printCandidates( JavaRDD <Candidate> candidates) {
@@ -179,9 +178,9 @@ public class SPMiner extends SparkApp {
         labelMap.put(3, "C");
         labelMap.put(4, "A");
 
-        LabelFonl labelFonl = LocalFonlCreator.create(neighbors, labelMap);
+        SortedNeighbors sortedNeighbors = LocalFonlCreator.create(neighbors, labelMap);
 
-        SPMiner.search(labelFonl);
+        SPMiner.search(sortedNeighbors);
 
         SPMiner.close();
     }

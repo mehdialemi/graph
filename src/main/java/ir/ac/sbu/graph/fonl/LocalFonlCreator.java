@@ -8,7 +8,7 @@ public class LocalFonlCreator{
 
 
 
-    public static LabelFonl create(Map<Integer, List<Integer>> neighbors, Map<Integer, String> labelMap) {
+    public static SortedNeighbors create(Map<Integer, List<Integer>> neighbors, Map<Integer, String> labelMap) {
         // sort vertex by their degree
         SortedMap<VertexDeg, SortedSet<VertexDeg>> sortedMap = new TreeMap <>((o1, o2) -> {
             int result = o1.degree - o2.degree;
@@ -39,7 +39,7 @@ public class LocalFonlCreator{
             sortedMap.put(new VertexDeg(vId, degree), sortedSet);
         }
 
-        LabelFonl labelFonl = new LabelFonl(sortedMap.size());
+        SortedNeighbors sortedNeighbors = new SortedNeighbors(sortedMap.size());
 
         Map<Integer, Integer> vIndex = new HashMap <>();
         int index = 0;
@@ -70,9 +70,9 @@ public class LocalFonlCreator{
             fvalue.meta.labels = labels;
             fvalue.meta.degs = nDegs;
 
-            labelFonl.add(vertex, degree, fvalue);
+            sortedNeighbors.add(vertex, degree, fvalue);
         }
 
-        return labelFonl;
+        return sortedNeighbors;
     }
 }
