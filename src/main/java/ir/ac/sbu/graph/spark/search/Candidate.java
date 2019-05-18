@@ -14,9 +14,35 @@ public class Candidate {
         setCount = candidate.setCount;
     }
 
+    public Candidate join(Candidate candidate) {
+        boolean match = false;
+        for (int i = 0; i < vArray.length; i++) {
+            if (candidate.vArray[i] != 0) {
+                if (vArray[i] == 0)
+                    match = true;
+                else if (vArray[i] != candidate.vArray[i]) {
+                    match = false;
+                    break;
+                }
+            }
+        }
+
+        if (match) {
+            Candidate c = new Candidate(vArray.length);
+            for (int i = 0; i < vArray.length; i++) {
+                if (vArray[i] != 0) {
+                    c.set(i, vArray[i]);
+                } else {
+                    c.set(i, candidate.vArray[i]);
+                }
+            }
+            return c;
+        }
+        return null;
+    }
 
     public void set(int index, int vertex) {
-        if (vArray[index] == 0)
+        if (vArray[index] == 0 && vertex != 0)
             setCount++;
         vArray[index] = vertex;
     }
@@ -49,6 +75,32 @@ public class Candidate {
                 indexes[index++] = i;
         }
         return indexes;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return super.equals(obj);
+
+        Candidate c = (Candidate) obj;
+
+        if (setCount != c.setCount)
+            return false;
+
+        for (int i = 0; i < vArray.length; i++) {
+            if (vArray[i] != c.vArray[i])
+                return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        for (Integer i : vArray) {
+            hash += i.hashCode();
+        }
+        return hash;
     }
 
     @Override

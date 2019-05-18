@@ -70,10 +70,7 @@ public class SPMiner extends SparkApp {
                 return list.iterator();
             });
 
-            System.out.println("FOUND ******");
-            printCandidates(found);
-
-            patterns = patterns.union(found);
+            patterns = patterns.union(found).cache();
 
             printCandidates(candidates);
             printFonl(lFonl);
@@ -86,18 +83,32 @@ public class SPMiner extends SparkApp {
                         Fvalue <LabelMeta> fvalue = kv._2._2;
                         CandidGen candidGen = new CandidGen(vertex, fvalue, labelFonl);
                         List <Tuple2 <Integer, Candidate>> newCandidates = new ArrayList <>();
+                        // Join candidates here
+                        List<Candidate> list = new ArrayList <>();
                         for (Candidate candidate : kv._2._1) {
                             if (candidate.isFull())
                                 continue;
+
+                            list.add(candidate);
                             newCandidates.addAll(candidGen.newCandidates(candidate));
                         }
+
+//                        for (int i = 0; i < list.size(); i++) {
+//                            Candidate c1 = list.get(i);
+//                            for (int j = i + 1; j < list.size(); j++) {
+//                                Candidate c2 = list.get(j);
+//                                Candidate join = c1.join(c2);
+//                                if (join != null)
+//                                    newCandidates.add(new Tuple2 <>(vertex, join));
+//                            }
+//                        }
 
                         return newCandidates.iterator();
                     }).groupByKey(lFonl.getNumPartitions())
                     .persist(StorageLevel.MEMORY_AND_DISK());
         }
 
-        printCandidates(patterns);
+        printCandidates(patterns.distinct());
 
     }
 
@@ -106,8 +117,7 @@ public class SPMiner extends SparkApp {
         System.out.println("Candidate Size: " + collect.size());
 
         for (Candidate  candidate : collect) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(candidate).append(" , ");
+            System.out.println("Subgraph: " + candidate);
         }
     }
 
@@ -158,14 +168,16 @@ public class SPMiner extends SparkApp {
         SPMiner SPMiner = new SPMiner(conf, edgeLoader);
 
         Map <Integer, List <Integer>> neighbors = new HashMap <>();
-        neighbors.put(1, Arrays.asList(2, 3));
+        neighbors.put(1, Arrays.asList(2, 3, 4));
         neighbors.put(2, Arrays.asList(1, 3));
         neighbors.put(3, Arrays.asList(1, 2));
+        neighbors.put(4, Arrays.asList(1));
 
         Map <Integer, String> labelMap = new HashMap <>();
         labelMap.put(1, "A");
         labelMap.put(2, "B");
         labelMap.put(3, "C");
+        labelMap.put(4, "A");
 
         LabelFonl labelFonl = LocalFonlCreator.create(neighbors, labelMap);
 

@@ -30,8 +30,8 @@ public class LocalFonlCreator{
                 int neighborId = nIter.next();
                 int nDeg = neighbors.get(neighborId).size();
 
-                if (nDeg < degree || (nDeg == degree && neighborId < vId))
-                    continue;
+//                if (nDeg < degree || (nDeg == degree && neighborId < vId))
+//                    continue;
 
                 sortedSet.add(new VertexDeg(neighborId, nDeg));
             }
