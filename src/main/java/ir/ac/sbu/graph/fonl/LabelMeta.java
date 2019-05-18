@@ -26,6 +26,6 @@ public class LabelMeta extends DegreeMeta {
 
     @Override
     public String toString() {
-        return super.toString() + ", labels: " + Arrays.toString(labels);
+        return "Label: " + label + ", " + super.toString() + ", labels: " + Arrays.toString(labels);
     }
 }

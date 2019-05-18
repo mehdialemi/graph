@@ -89,10 +89,10 @@ public class SparkFonlCreator {
                     return list.iterator();
                 }).groupByKey(degFonl.getNumPartitions());
 
-        return degFonl.join(labels).join(labelMsg)
+        return degFonl.join(labels).leftOuterJoin(labelMsg)
                 .mapValues(value -> {
                     Map <Integer, String> labelMap = new HashMap <>();
-                    for (Tuple2 <Integer, String> vLabel : value._2) {
+                    for (Tuple2 <Integer, String> vLabel : value._2.orElse(Collections.emptyList())) {
                         labelMap.put(vLabel._1, vLabel._2);
                     }
 

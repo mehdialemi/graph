@@ -44,7 +44,7 @@ public class LocalFonlCreator{
         Map<Integer, Integer> vIndex = new HashMap <>();
         int index = 0;
         for (VertexDeg key : sortedMap.keySet()) {
-            vIndex.put(key.vertex, index);
+            vIndex.put(key.vertex, index ++);
         }
 
         for (Map.Entry <VertexDeg, SortedSet <VertexDeg>> entry : sortedMap.entrySet()) {
@@ -64,9 +64,11 @@ public class LocalFonlCreator{
 
             Fvalue<LabelMeta> fvalue = new Fvalue <>();
             fvalue.fonl = nIndex;
+            fvalue.meta = new LabelMeta();
             fvalue.meta.deg = degree;
             fvalue.meta.label = labelMap.get(vertex);
             fvalue.meta.labels = labels;
+            fvalue.meta.degs = nDegs;
 
             labelFonl.add(vertex, degree, fvalue);
         }

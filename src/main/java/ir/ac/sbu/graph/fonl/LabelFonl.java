@@ -1,5 +1,6 @@
 package ir.ac.sbu.graph.fonl;
 
+import ir.ac.sbu.graph.spark.search.Candidate;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 
@@ -10,6 +11,7 @@ public class LabelFonl extends Fonl<LabelMeta> {
     int index = 0;
     public LabelFonl(int vSize) {
         vArray = new int[vSize];
+        dArray = new int[vSize];
         fvalues = new Fvalue[vSize];
     }
 
@@ -25,18 +27,19 @@ public class LabelFonl extends Fonl<LabelMeta> {
 
     public int lowerDegIndex(int degree) {
         int i = Arrays.binarySearch(dArray, degree);
-        if (i >= 0)
-            return i;
+        if (i == -1)
+            return -1;
 
-        if (i < -1)
-            return -i;
-
-        return -1;
+        int index = i >= 0 ? i : -i;
+        return Math.min(index, vArray.length - 1);
     }
 
-    public int[] vIndexes(int hIndex, String label) {
+    public int[] vIndexes(int hIndex, String label, Candidate candidate) {
         IntList list = null;
         for (int i = hIndex; i >= 0; i--) {
+            if (candidate.isNotEmpty(i))
+                continue;
+
             if (fvalues[i].meta.label.equals(label)) {
                 if (list == null)
                     list = new IntArrayList();
@@ -50,18 +53,23 @@ public class LabelFonl extends Fonl<LabelMeta> {
         return list.toIntArray();
     }
 
-    public int[] nIndexes(int vIndex, int deg, String label) {
-        int i = Arrays.binarySearch(fvalues[vIndex].meta.degs, deg);
-        if (i == -1)
-            return null;
-        int index = i >= 0 ? i + 1 : -i;
-
+    public int[] nIndexes(int vIndex, int deg, String label, Candidate candidate) {
         IntList list = null;
-        for (int j = 0; j < index; j++) {
-            if (fvalues[vIndex].meta.labels[j].equals(label)) {
+        int[] fonl = fvalues[vIndex].fonl;
+        LabelMeta meta = fvalues[vIndex].meta;
+
+        for (int i = 0; i < fonl.length; i++) {
+            if (meta.degs[i] > deg)
+                break;
+
+            if (candidate.isNotEmpty(fonl[i]))
+                continue;
+
+            if (meta.labels[i].equals(label)) {
                 if (list == null)
                     list = new IntArrayList();
-                list.add(fvalues[vIndex].fonl[j]);
+
+                list.add(fonl[i]);
             }
         }
 
