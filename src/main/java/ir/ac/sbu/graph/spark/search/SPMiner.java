@@ -83,7 +83,7 @@ public class SPMiner extends SparkApp {
             System.out.println("Distinct Candidates");
             print(distincts);
 
-            JavaPairRDD <Integer, Iterable <Candidate[]>> suggest = distincts.join(lFonl).flatMapToPair(kv -> {
+            candidateList = distincts.join(lFonl).flatMapToPair(kv -> {
                 int vertex = kv._1;
 
                 SONL SONL = queryBroadCast.getValue();
