@@ -45,7 +45,7 @@ public class SeqMethod3 extends SequentialBase {
 
         // Construct fonls and fonlCN
         int[][] fonls = new int[length][];
-        int[] fl = new int[length];  // Fonl Length
+        int[] fl = new int[length];  // LocalFonl Length
 
         // Initialize neighbors array
         for(int i = 0; i < length; i ++)

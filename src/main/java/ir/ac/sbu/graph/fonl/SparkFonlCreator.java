@@ -1,7 +1,9 @@
 package ir.ac.sbu.graph.fonl;
 
 import ir.ac.sbu.graph.spark.NeighborList;
+import ir.ac.sbu.graph.types.Edge;
 import ir.ac.sbu.graph.types.VertexDeg;
+import org.apache.commons.collections.iterators.CollatingIterator;
 import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
 
@@ -114,5 +116,72 @@ public class SparkFonlCreator {
 
                     return fvalue;
                 }).cache();
+    }
+
+    public JavaPairRDD<Integer, int[]> createCandidates(JavaPairRDD <Integer, Fvalue <LabelMeta>>  labelFonl) {
+        return labelFonl.filter(t -> t._2.fonl.length > 2) // Select vertices having more than 2 items in their values
+                .flatMapToPair(t -> {
+
+                    int[] ifonl = t._2.ifonl;
+                    int size = ifonl.length - 1; // one is for the first index holding node's degree
+
+                    if (size == 1)
+                        return Collections.emptyIterator();
+
+                    List<Tuple2<Integer, int[]>> output;
+                    output = new ArrayList<>(size);
+
+                    for (int index = 0; index < size; index++) {
+                        int cVertex = ifonl[index];
+                        int len = size - index;
+                        int[] cValue = new int[len + 1];
+                        cValue[0] = t._1; // First vertex in the triangle
+                        System.arraycopy(ifonl, index + 1, cValue, 1, len);
+                        output.add(new Tuple2<>(cVertex, cValue));
+                    }
+
+                    return output.iterator();
+                });
+    }
+
+    public static JavaPairRDD <Integer, Fvalue <TriangleMeta>> createLabelTriangles(JavaPairRDD <Integer, Fvalue <LabelMeta>>  labelFonl) {
+        JavaPairRDD <Integer, int[]> candidates = createCandidates(labelFonl);
+        JavaPairRDD <Integer, Iterable <Edge[]>> tEdges = candidates.join(labelFonl).flatMapToPair(kv -> {
+            int[] cArray = kv._2._1;
+            Fvalue <LabelMeta> lFValue = kv._2._2;
+
+            int fVertex = cArray[0];
+            List <Edge> list = new ArrayList <>();
+            int vertex = kv._1;
+            for (int i = 1; i < cArray.length; i++) {
+                int r = Arrays.binarySearch(lFValue.ifonl, cArray[i]);
+                if (r < 0)
+                    continue;
+
+                list.add(new Edge(vertex, cArray[i]));
+            }
+
+            if (list.isEmpty())
+                return Collections.emptyIterator();
+
+            return Collections.singleton(new Tuple2 <>(fVertex, list.toArray(new Edge[0]))).iterator();
+        }).groupByKey(labelFonl.getNumPartitions());
+
+        JavaPairRDD <Integer, Fvalue <TriangleMeta>> triangleFonl = labelFonl.leftOuterJoin(tEdges).mapValues(v -> {
+
+            Fvalue <TriangleMeta> fvalue = new Fvalue <>();
+            fvalue.meta = new TriangleMeta(v._1.meta);
+            fvalue.ifonl = v._1.ifonl;
+            fvalue.fonl = v._1.fonl;
+            for (Edge[] edges : v._2.orElse(CollatingIterator::new)) {
+                for (Edge edge : edges) {
+                    fvalue.meta.edges.add(edge);
+                }
+            }
+
+            return fvalue;
+        }).cache();
+
+        return triangleFonl;
     }
 }

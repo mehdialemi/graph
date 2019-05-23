@@ -32,7 +32,7 @@ public class FonlHobGCC {
         if (args.length == 0)
             conf.setMaster("local[2]");
 
-        GraphUtils.setAppName(conf, "Fonl-GCC-Deg", partition, inputPath);
+        GraphUtils.setAppName(conf, "LocalFonl-GCC-Deg", partition, inputPath);
         conf.registerKryoClasses(new Class[]{GraphUtils.class, GraphUtils.VertexDegree.class, long[].class,
             Map.class, HashMap.class});
         JavaSparkContext sc = new JavaSparkContext(conf);

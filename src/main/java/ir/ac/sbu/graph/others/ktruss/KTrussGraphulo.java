@@ -61,7 +61,7 @@
 //        if (conn.tableOperations().exists(tableName)) {
 //            conn.tableOperations().delete(tableName);
 //        }
-//        conn.tableOperations().create(tableName);
+//        conn.tableOperations().createSonl(tableName);
 //        if (splits != null)
 //            conn.tableOperations().addSplits(tableName, splits);
 //

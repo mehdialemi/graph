@@ -34,7 +34,7 @@ public class FonlDegLCC {
         SparkConf conf = new SparkConf();
         if (args.length == 0)
             conf.setMaster("local[2]");
-        GraphUtils.setAppName(conf, "Fonl-LCC-Deg", partition, inputPath);
+        GraphUtils.setAppName(conf, "LocalFonl-LCC-Deg", partition, inputPath);
         conf.registerKryoClasses(new Class[] {GraphUtils.class, GraphUtils.VertexDegree.class, long[].class});
         JavaSparkContext sc = new JavaSparkContext(conf);
 

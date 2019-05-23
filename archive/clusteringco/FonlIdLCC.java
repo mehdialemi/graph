@@ -35,7 +35,7 @@ public class FonlIdLCC {
         SparkConf conf = new SparkConf();
         if (args == null || args.length == 0)
             conf.setMaster("local[2]");
-        GraphUtils.setAppName(conf, "Fonl-LCC-Id", partition, inputPath);
+        GraphUtils.setAppName(conf, "LocalFonl-LCC-Id", partition, inputPath);
         conf.registerKryoClasses(new Class[]{GraphUtils.CandidateState.class, int[].class});
         JavaSparkContext sc = new JavaSparkContext(conf);
 

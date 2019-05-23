@@ -64,7 +64,7 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
 
         // Construct fonls and fonlCN
         final int[][] fonls = new int[vCount][];
-        final int[] fl = new int[vCount];  // Fonl Length
+        final int[] fl = new int[vCount];  // LocalFonl Length
 
         // Initialize neighbors arrayList
         for (int i = 0; i < vCount; i++) {

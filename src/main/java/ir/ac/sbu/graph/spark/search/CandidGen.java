@@ -2,7 +2,7 @@ package ir.ac.sbu.graph.spark.search;
 
 import ir.ac.sbu.graph.fonl.Fvalue;
 import ir.ac.sbu.graph.fonl.LabelMeta;
-import ir.ac.sbu.graph.fonl.SONL;
+import ir.ac.sbu.graph.fonl.Sonl;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 
@@ -15,9 +15,9 @@ public class CandidGen {
 
     private final int vertex;
     private final Fvalue <LabelMeta> fvalue;
-    private final SONL query;
+    private final Sonl query;
 
-    public CandidGen(int vertex, Fvalue <LabelMeta> fvalue, SONL query) {
+    public CandidGen(int vertex, Fvalue <LabelMeta> fvalue, Sonl query) {
 
         this.vertex = vertex;
         this.fvalue = fvalue;
@@ -83,8 +83,8 @@ public class CandidGen {
 //                    if (candidate.canExtend(query.dsnArray[idx], fvalue)) {
 //                    IntList intList = new IntArrayList();
 //                    for (int idx2 : query.isnArray[idx]) {
-//                        if(candidate.vArray[idx2] != 0) {
-//                            intList.add(candidate.vArray[idx2]);
+//                        if(candidate.vIndex[idx2] != 0) {
+//                            intList.add(candidate.vIndex[idx2]);
 //                        }
 //                    }
 
@@ -101,6 +101,15 @@ public class CandidGen {
     }
 
     public static void addToMap(int kVertex, Candidate candidate, Map <Integer, Set <Candidate>> map) {
+        map.compute(kVertex, (k, v) -> {
+            if (v == null)
+                v = new HashSet <>();
+            v.add(candidate);
+            return v;
+        });
+    }
+
+    public static void addToMap(int kVertex, int vVertex, Candidate candidate, Map <Integer, Set <Candidate>> map) {
         map.compute(kVertex, (k, v) -> {
             if (v == null)
                 v = new HashSet <>();

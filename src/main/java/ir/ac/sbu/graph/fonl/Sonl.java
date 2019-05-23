@@ -10,7 +10,7 @@ import java.util.BitSet;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class SONL implements Serializable {
+public class Sonl implements Serializable {
 
     private int index = 0;
     public int[] vArray;
@@ -19,7 +19,7 @@ public class SONL implements Serializable {
     public int[][] dsnArray;
     public int[][] isnArray;
 
-    SONL(int vSize) {
+    Sonl(int vSize) {
         vArray = new int[vSize];
         dArray = new int[vSize];
         labels = new String[vSize];
@@ -48,15 +48,21 @@ public class SONL implements Serializable {
         index ++;
     }
 
-    public int neighborIndex(int idx, int[] vArray) {
-        for (int v : vArray) {
-            if (v == 0)
+    public int[] neighborIndex(int idx, int[] vArray, int[] orders) {
+        IntList neighbors = new IntArrayList();
+        for (int order : orders) {
+            if (order == 0)
+                break;
+            int neighbor = vArray[order];
+            int result = Arrays.binarySearch(isnArray[idx], neighbor);
+            if (result < 0)
                 continue;
-            int result = Arrays.binarySearch(isnArray[idx], v);
-            if (result >= 0)
-                return result;
+            neighbors.add(neighbor);
         }
-        return -1;
+
+        if (neighbors.isEmpty())
+            return null;
+        return neighbors.toIntArray();
     }
 
     public int diameter() {

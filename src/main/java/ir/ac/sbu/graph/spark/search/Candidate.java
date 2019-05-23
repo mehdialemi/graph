@@ -2,44 +2,49 @@ package ir.ac.sbu.graph.spark.search;
 
 import ir.ac.sbu.graph.fonl.Fvalue;
 import ir.ac.sbu.graph.fonl.LabelMeta;
-import ir.ac.sbu.graph.fonl.SONL;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
+import ir.ac.sbu.graph.fonl.Sonl;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import scala.Tuple2;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class Candidate implements Serializable {
     private int src;
     public final int[] vArray;
+    public final int[] orders;
+
+    public int checkCount = 0;
     private int setCount = 0;
-    public int[] checkIndexes;
+    public int checkVertex = 0;
     boolean subSet = false;
     boolean duplicate = false;
 
     public Candidate(int src, int size) {
         this.src = src;
         vArray = new int[size];
+        orders = new int[size];
     }
 
     public Candidate(Candidate candidate) {
         this.src = candidate.src;
         vArray = new int[candidate.vArray.length];
         System.arraycopy(candidate.vArray, 0, vArray, 0, vArray.length);
+        orders = new int[candidate.vArray.length];
+        System.arraycopy(candidate.orders, 0, orders, 0, orders.length);
         setCount = candidate.setCount;
     }
 
     public void resetMeta() {
         subSet = false;
         duplicate = false;
-        checkIndexes = null;
+//        checkIndexes = null;
     }
 
-    public int[] getCheckIndexes() {
-        return checkIndexes;
-    }
+//    public int[] getCheckIndexes() {
+//        return checkIndexes;
+//    }
 
     public boolean isSubSet() {
         return subSet;
@@ -49,7 +54,7 @@ public class Candidate implements Serializable {
         return duplicate;
     }
 
-    public List <Candidate> complement(Candidate other, SONL sonl) {
+    public Map <Candidate, List <Tuple2 <Integer, Integer>>> complement(Candidate other, Sonl sonl) {
         if (subSet || duplicate)
             return null;
 
@@ -89,90 +94,128 @@ public class Candidate implements Serializable {
 
         Candidate c1 = null;
         Candidate c2 = null;
-        IntList c1Check = null;
-        IntList c2Check = null;
+        IntSet o1 = null;
+        IntSet o2 = null;
+        Map<Candidate, List<Tuple2<Integer, Integer>>> map = new HashMap <>();
+        TreeSet<Tuple2<Integer, Integer>> tree = new TreeSet <>(Comparator.comparingInt(ts -> ts._1));
+
         for (int i = 0; i < vArray.length; i++) {
+
             if (vArray[i] != other.vArray[i]) {
                 if (vArray[i] != 0) {
 
                     if (c2 == null)
                         c2 = new Candidate(other);
 
-                    int checkIdx = sonl.neighborIndex(i, other.vArray);
-                    if (checkIdx >= 0) {
-                        if (c2Check == null)
-                            c2Check = new IntArrayList();
-                        c2Check.add(checkIdx);
+                    tree.clear();
+                    for (int idx : sonl.isnArray[i]) {
+                        if (c2.vArray[idx] != 0) {
+//                            if (o2 == null)
+//                                o2 = new IntOpenHashSet();
+//                            o2.add(c2.orders[idx]);
+                            tree.add(new Tuple2 <>(c2.orders[idx], c2.vArray[idx]));
+                        }
                     }
+
+                    int v = -1;
+                    int w = -1;
+                    if (tree.size() == 1) {
+                        v = tree.first()._2;
+                        map.computeIfAbsent(c2, candidate -> new ArrayList <>()).add(new Tuple2 <>(v, w));
+                    } else if (tree.size() > 1) {
+                        for (Tuple2 <Integer, Integer> t : tree) {
+                            w = t._2;
+                            if (v != -1) {
+                                map.computeIfAbsent(c2, candidate -> new ArrayList <>()).add(new Tuple2 <>(v, w));
+                            }
+                            v = w;
+                        }
+                    }
+
                     c2.set(i, vArray[i]);
 
                 } else {
 
                     if (c1 == null)
                         c1 = new Candidate(this);
-                    int checkIdx = sonl.neighborIndex(i, vArray);
-                    if (checkIdx >= 0) {
-                        if (c1Check == null)
-                            c1Check = new IntArrayList();
-                        c1Check.add(checkIdx);
+
+                    tree.clear();
+                    for (int idx : sonl.isnArray[i]) {
+                        if (c1.vArray[idx] != 0) {
+//                            if (o1 == null)
+//                                o1 = new IntOpenHashSet();
+//                            o1.add(c1.orders[idx]);
+                            tree.add(new Tuple2 <>(c1.orders[idx], c1.vArray[idx]));
+                        }
                     }
+
+                    int v = -1;
+                    int w = -1;
+                    if (tree.size() == 1) {
+                        v = tree.first()._2;
+                        map.computeIfAbsent(c1, candidate -> new ArrayList <>()).add(new Tuple2 <>(v, w));
+                    } else if (tree.size() > 1) {
+                        for (Tuple2 <Integer, Integer> t : tree) {
+                            w = t._2;
+                            if (v != -1) {
+                                map.computeIfAbsent(c1, candidate -> new ArrayList <>()).add(new Tuple2 <>(v, w));                            }
+                            v = w;
+                        }
+                    }
+
                     c1.set(i, other.vArray[i]);
                 }
             }
         }
 
-        if (c1Check != null)
-            c1.checkIndexes = c1Check.toIntArray();
-        if (c2Check != null)
-            c2.checkIndexes = c2Check.toIntArray();
-
-        List <Candidate> list = new ArrayList <>(1);
-        if (c1 != null)
-            list.add(c1);
-        if (c2 != null)
-            list.add(c2);
-        return list;
+//        if (o1 != null) {
+//            IntSet set = new IntOpenHashSet(o1.size());
+//            for (int order : o1) {
+//                set.add(c1.vIndex[order]);
+//            }
+//            c1.checkIndexes = o1.toIntArray();
+//        }
+//        if (o2 != null) {
+//            IntSet set = new IntOpenHashSet(o2.size());
+//            for (int order : o2) {
+//                set.add(c2.vIndex[order]);
+//            }
+//            c2.checkIndexes = o2.toIntArray();
+//        }
+//
+//        List <Candidate> list = new ArrayList <>(1);
+//        if (c1 !=  null)
+//            list.add(c1);
+//        if (c2 != null)
+//            list.add(c2);
+        return map;
     }
 
-    public boolean neighbor(Fvalue<LabelMeta> fvalue) {
-        if (checkIndexes == null)
-            return true;
-
-        for (int index : checkIndexes) {
-            boolean check = false;
-            for (int fonl : fvalue.fonl) {
-                check = vArray[index] == fonl;
-                if (check)
-                    break;
-            }
-            if (!check)
-                return false;
-        }
-        return true;
-    }
-
-    public boolean neighbor(SONL sonl, Fvalue<LabelMeta> fvalue) {
-        if (checkIndexes == null)
-            return true;
-
-        for (int index : checkIndexes) {
-            boolean check = false;
-            for (int fonl : fvalue.fonl) {
-                check = vArray[index] == fonl;
-                if (check)
-                    break;
-            }
-            if (!check)
-                return false;
-        }
-        return true;
-    }
-
+//    public boolean neighbor(Fvalue <LabelMeta> fvalue) {
+////        if (checkIndexes == null)
+////            return true;
+//
+//        for (int index : checkIndexes) {
+//            boolean check = false;
+//            for (int fonl : fvalue.fonl) {
+//                check = vIndex[index] == fonl;
+//                if (check)
+//                    break;
+//            }
+//            if (!check)
+//                return false;
+//        }
+//        return true;
+//    }
 
     public void set(int index, int vertex) {
-        if (vArray[index] == 0 && vertex != 0)
-            setCount++;
-        vArray[index] = vertex;
+        if (vertex == 0)
+            return;
+        if (vArray[index] == 0) {
+            orders[index] = setCount;
+            vArray[index] = vertex;
+            setCount ++;
+        }
     }
 
     public int index(int vertex) {
@@ -236,8 +279,8 @@ public class Candidate implements Serializable {
         StringBuilder sb = new StringBuilder();
         sb.append("C[ " +
                 "Src: " + src + ", " +
-                "CheckIndexes: {" + Arrays.toString(checkIndexes) + "}, " +
-                "Indexes: {" + Arrays.toString(vArray) +"}" +
+//                "CheckIndexes: {" + Arrays.toString(checkIndexes) + "}, " +
+                "Indexes: {" + Arrays.toString(vArray) + "}" +
                 "]");
         return sb.toString();
     }
