@@ -55,13 +55,15 @@ public class SparkFonlCreator {
 
             Fvalue <DegreeMeta> fValue = new Fvalue <>();
             fValue.meta = new DegreeMeta(degree, list.size());
-            ;
             fValue.fonl = new int[list.size()];
 
             for (int i = 0; i < list.size(); i++) {
                 fValue.fonl[i] = list.get(i).vertex;
                 fValue.meta.degs[i] = list.get(i).degree;
             }
+            fValue.ifonl = new int[fValue.fonl.length];
+            System.arraycopy(fValue.fonl, 0, fValue.ifonl, 0, fValue.ifonl.length);
+            Arrays.sort(fValue.ifonl);
 
             return new Tuple2 <>(kv._1, fValue);
         }).cache();
@@ -100,6 +102,7 @@ public class SparkFonlCreator {
                     Fvalue <DegreeMeta> dfonl = value._1._1;
 
                     fvalue.fonl = dfonl.fonl;
+                    fvalue.ifonl = dfonl.ifonl;
                     fvalue.meta = new LabelMeta();
                     fvalue.meta.label = value._1._2;
                     fvalue.meta.deg = dfonl.meta.deg;

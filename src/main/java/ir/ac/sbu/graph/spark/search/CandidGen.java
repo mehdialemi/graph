@@ -1,38 +1,38 @@
 package ir.ac.sbu.graph.spark.search;
 
 import ir.ac.sbu.graph.fonl.Fvalue;
-import ir.ac.sbu.graph.fonl.SortedNeighbors;
 import ir.ac.sbu.graph.fonl.LabelMeta;
+import ir.ac.sbu.graph.fonl.SONL;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import scala.Tuple2;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class CandidGen {
 
     private final int vertex;
     private final Fvalue <LabelMeta> fvalue;
-    private final SortedNeighbors query;
+    private final SONL query;
 
-    public CandidGen(int vertex, Fvalue<LabelMeta> fvalue, SortedNeighbors query) {
+    public CandidGen(int vertex, Fvalue <LabelMeta> fvalue, SONL query) {
 
         this.vertex = vertex;
         this.fvalue = fvalue;
         this.query = query;
     }
 
-    public List <Tuple2<Integer, Candidate>> newCandidates() {
-        return newCandidates(new Candidate(query.size()), true);
+    public Map <Integer, Set <Candidate>> newCandidates() {
+        return newCandidates(new Candidate(vertex, query.size()), true);
     }
 
-    public List <Tuple2<Integer, Candidate>> newCandidates(Candidate candidate) {
+    public Map <Integer, Set <Candidate>> newCandidates(Candidate candidate) {
         return newCandidates(candidate, false);
     }
 
-    public List <Tuple2<Integer, Candidate>> newCandidates(Candidate candidate, boolean includeSelf) {
+    public Map <Integer, Set <Candidate>> newCandidates(Candidate candidate, boolean includeSelf) {
         int vDeg = fvalue.meta.deg;
         String label = fvalue.meta.label;
 
@@ -51,47 +51,61 @@ public class CandidGen {
             }
 
             if (list == null)
-                return Collections.emptyList();
+                return null;
         }
 
         int[] indexes;
         if (includeSelf) {
             indexes = list.toIntArray();
         } else {
-            indexes = new int[1];
-            indexes[0] = candidate.index(vertex);
+            int index = candidate.index(vertex);
+            if (index == -1)
+                return null;
+            indexes = new int[]{index};
         }
 
-//        if (candidate.oneEmptyRemain()) {
-//            candidate.set(indexes[0], vertex);
-//            Tuple2 <Integer, Candidate> tuple = new Tuple2 <>(vertex, candidate);
-//            return Arrays.asList(tuple);
-//        }
-
-        List <Tuple2 <Integer, Candidate>> newCandidates = new ArrayList<>();
         int[] nDegs = fvalue.meta.degs;
         String[] nLabels = fvalue.meta.labels;
 
-
+        Map <Integer, Set <Candidate>> map = new HashMap <>();
         for (int i = 0; i < nDegs.length; i++) {
             int nId = fvalue.fonl[i];
             for (int vIndex : indexes) {
-                int[] vNeighborIndexes = query.nIndexes(vIndex, nDegs[i], nLabels[i], candidate);
+                int[] nIndexes = query.nIndexes(vIndex, nDegs[i], nLabels[i], candidate);
 
-                if (vNeighborIndexes == null)
+                if (nIndexes == null)
                     continue;
 
-                Candidate cand = new Candidate(candidate);
-                cand.set(vIndex, vertex);
-                for (int neighborIndex : vNeighborIndexes) {
-                    cand.set(neighborIndex, nId);
-                }
+                for (int idx : nIndexes) {
+                    // check correct extension of candidate by adding idx by the following check
+                    // check neighborhood of idx neighbors in the big graph
 
-                newCandidates.add(new Tuple2 <>(nId, cand));
+//                    if (candidate.canExtend(query.dsnArray[idx], fvalue)) {
+//                    IntList intList = new IntArrayList();
+//                    for (int idx2 : query.isnArray[idx]) {
+//                        if(candidate.vArray[idx2] != 0) {
+//                            intList.add(candidate.vArray[idx2]);
+//                        }
+//                    }
+
+                    Candidate cand = new Candidate(candidate);
+                    cand.set(vIndex, vertex);
+                    cand.set(idx, nId);
+                    addToMap(nId, cand, map);
+//                    }
+                }
             }
         }
 
-        return newCandidates;
+        return map;
+    }
 
+    public static void addToMap(int kVertex, Candidate candidate, Map <Integer, Set <Candidate>> map) {
+        map.compute(kVertex, (k, v) -> {
+            if (v == null)
+                v = new HashSet <>();
+            v.add(candidate);
+            return v;
+        });
     }
 }

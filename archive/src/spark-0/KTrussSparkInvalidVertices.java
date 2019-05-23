@@ -148,7 +148,7 @@ public class KTrussSparkInvalidVertices {
 
             // Join invalids with  edgeVertices
             JavaPairRDD<Tuple2<Integer, Integer>, Iterable<Integer>> invalidUpdate =
-                edgeVertices.join(invalids) // TODO find a best partition and test the reverse join
+                edgeVertices.join(invalids) // TODO find a best partition and test the reverse complement
                     .flatMapToPair(kv -> {
 
                         Tuple2<Integer, IntSet> invalid = kv._2._2;
@@ -180,7 +180,7 @@ public class KTrussSparkInvalidVertices {
                     }).groupByKey(); // TODO repartition?
 
             // Join invalid update with edgeSup to update the current edgeSup.
-            // By this join the list in the value part would be updated with those invalid vertices for the current edge
+            // By this complement the list in the value part would be updated with those invalid vertices for the current edge
             edgeSup = edgeSup.leftOuterJoin(invalidUpdate) // TODO find a best partition
                 .mapValues(joinValue -> {
 
@@ -224,7 +224,7 @@ public class KTrussSparkInvalidVertices {
 //            long t3 = System.currentTimeMillis();
 //            log("ratio: " + ratio + ", edgeCount: " + edgeCount + ", sumRatio: " + sumRatio, t1, t3);
 //            if (ratio < MIN_THRESHOLD) {
-//                edgeVertices = edgeVertices.join(edgeSup).mapValues(joinValues -> {
+//                edgeVertices = edgeVertices.complement(edgeSup).mapValues(joinValues -> {
 //                    Tuple2<Integer, int[]> localEdgeSup = joinValues._2;
 //                    int newSup = localEdgeSup._1 - localEdgeSup._2.length;
 //                    if (newSup > MIN_THRESHOLD)

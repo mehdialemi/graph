@@ -5,6 +5,7 @@ import java.util.Arrays;
 public class Fvalue<T extends Meta> {
     public T meta;
     public int[] fonl;
+    public int[] ifonl;
 
     @Override
     public String toString() {

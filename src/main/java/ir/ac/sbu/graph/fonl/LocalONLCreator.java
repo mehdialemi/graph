@@ -4,11 +4,9 @@ import ir.ac.sbu.graph.types.VertexDeg;
 
 import java.util.*;
 
-public class LocalFonlCreator{
+public class LocalONLCreator {
 
-
-
-    public static SortedNeighbors create(Map<Integer, List<Integer>> neighbors, Map<Integer, String> labelMap) {
+    public static SONL create(Map<Integer, List<Integer>> neighbors, Map<Integer, String> labelMap) {
         // sort vertex by their degree
         SortedMap<VertexDeg, SortedSet<VertexDeg>> sortedMap = new TreeMap <>((o1, o2) -> {
             int result = o1.degree - o2.degree;
@@ -30,16 +28,13 @@ public class LocalFonlCreator{
                 int neighborId = nIter.next();
                 int nDeg = neighbors.get(neighborId).size();
 
-//                if (nDeg < degree || (nDeg == degree && neighborId < vId))
-//                    continue;
-
                 sortedSet.add(new VertexDeg(neighborId, nDeg));
             }
 
             sortedMap.put(new VertexDeg(vId, degree), sortedSet);
         }
 
-        SortedNeighbors sortedNeighbors = new SortedNeighbors(sortedMap.size());
+        SONL SONL = new SONL(sortedMap.size());
 
         Map<Integer, Integer> vIndex = new HashMap <>();
         int index = 0;
@@ -54,25 +49,13 @@ public class LocalFonlCreator{
             VertexDeg[] vertexDegs = entry.getValue().toArray(new VertexDeg[0]);
 
             int[] nIndex= new int[vertexDegs.length];
-            int[] nDegs = new int[vertexDegs.length];
-            String[] labels = new String[vertexDegs.length];
             for (int i = 0; i < vertexDegs.length; i++) {
                 nIndex[i] = vIndex.get(vertexDegs[i].vertex);
-                nDegs[i] = vertexDegs[i].degree;
-                labels[i] = labelMap.get(vertexDegs[i].vertex);
             }
-
-            Fvalue<LabelMeta> fvalue = new Fvalue <>();
-            fvalue.fonl = nIndex;
-            fvalue.meta = new LabelMeta();
-            fvalue.meta.deg = degree;
-            fvalue.meta.label = labelMap.get(vertex);
-            fvalue.meta.labels = labels;
-            fvalue.meta.degs = nDegs;
-
-            sortedNeighbors.add(vertex, degree, fvalue);
+            String label = labelMap.get(vertex);
+            SONL.add(vertex, degree, label, nIndex);
         }
 
-        return sortedNeighbors;
+        return SONL;
     }
 }

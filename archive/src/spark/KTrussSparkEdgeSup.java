@@ -65,11 +65,11 @@ public class KTrussSparkEdgeSup extends KTruss {
                 break;
 
             // If we have invalid edges then their triangles are invalid. To find other edges of the invalid
-            // triangle, we should join the current invalid edges with the tvSets. By this condition,
+            // triangle, we should complement the current invalid edges with the tvSets. By this condition,
             // we are able to determine invalid vertices which should be removed from the triangle
             // vertex set of the valid edges.
             JavaPairRDD<Tuple2<Integer, Integer>, Iterable<Integer>> invUpdates =
-                tvSets.join(invalids) // TODO find a best partition and test the reverse join
+                tvSets.join(invalids) // TODO find a best partition and test the reverse complement
                     .flatMapToPair(kv -> {
 
                         IntSet original = kv._2._1;
@@ -104,7 +104,7 @@ public class KTrussSparkEdgeSup extends KTruss {
                     }).groupByKey(partitioner2); // TODO repartition?
 
             // Join invalid update with edgeSup to update the current edgeSup.
-            // By this join the list in the value part would be updated with those invalid vertices for the current edge
+            // By this complement the list in the value part would be updated with those invalid vertices for the current edge
             edgeSup = edgeSup.leftOuterJoin(invUpdates) // TODO find a best partition
                 .mapValues(joinValue -> {
 

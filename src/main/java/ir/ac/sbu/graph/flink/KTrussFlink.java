@@ -140,7 +140,7 @@
 //        GroupReduceOperator<Tuple3<Integer, Integer, Integer>, Tuple2<Tuple2<Integer, Integer>, int[]>> edgeVertices = fonls.map(t -> {
 //            Arrays.sort(t.f1, 1, t.f1.length);
 //            return t;
-//        }).returns(TUPLE_2_INT_ARRAY_TYPE_HINT).join(candidates)
+//        }).returns(TUPLE_2_INT_ARRAY_TYPE_HINT).complement(candidates)
 //            .where(0)
 //            .equalTo(0)
 //            .with((FlatJoinFunction<Tuple2<Integer, int[]>, Tuple2<Integer, int[]>, Tuple3<Integer, Integer, Integer>>)
