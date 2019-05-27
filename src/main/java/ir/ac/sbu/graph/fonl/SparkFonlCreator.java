@@ -122,11 +122,15 @@ public class SparkFonlCreator {
     }
 
     public static JavaPairRDD<Integer, int[]> createCandidates(JavaPairRDD <Integer, Fvalue <LabelMeta>>  labelFonl) {
-        return labelFonl.filter(t -> t._2.fonl.length > 2) // Select vertices having more than 2 items in their values
+        return labelFonl.filter(t -> t._2.fonl.length > 1) // Select vertices having more than 2 items in their values
                 .flatMapToPair(t -> {
 
-                    int[] ifonl = t._2.ifonl;
-                    int size = ifonl.length - 1; // one is for the first index holding node's degree
+                    if (t._1.equals(7)) {
+                        System.out.println("cannddand");
+                    }
+//                    int[] ifonl = t._2.ifonl;
+                    int[] fonl = t._2.fonl;
+                    int size = fonl.length; // one is for the first index holding node's degree
 
                     if (size == 1)
                         return Collections.emptyIterator();
@@ -135,11 +139,11 @@ public class SparkFonlCreator {
                     output = new ArrayList<>(size);
 
                     for (int index = 0; index < size; index++) {
-                        int cVertex = ifonl[index];
+                        int cVertex = fonl[index];
                         int len = size - index;
-                        int[] cValue = new int[len + 1];
+                        int[] cValue = new int[len];
                         cValue[0] = t._1; // First vertex in the triangle
-                        System.arraycopy(ifonl, index + 1, cValue, 1, len);
+                        System.arraycopy(fonl, index + 1, cValue, 1, len - 1);
                         output.add(new Tuple2<>(cVertex, cValue));
                     }
 
@@ -154,6 +158,10 @@ public class SparkFonlCreator {
             Fvalue <LabelMeta> lFValue = kv._2._2;
 
             int fVertex = cArray[0];
+
+            if (fVertex == 7) {
+                System.out.println("hhh");
+            }
             List <Edge> list = new ArrayList <>();
             int vertex = kv._1;
             for (int i = 1; i < cArray.length; i++) {
@@ -162,6 +170,8 @@ public class SparkFonlCreator {
                     continue;
 
                 list.add(new Edge(vertex, cArray[i]));
+//                list.add(new Edge(fVertex, vertex));
+//                list.add(new Edge(fVertex, cArray[i]));
             }
 
             if (list.isEmpty())

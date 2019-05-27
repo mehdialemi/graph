@@ -1,8 +1,8 @@
 package ir.ac.sbu.graph.spark.search;
 
 import ir.ac.sbu.graph.fonl.Fvalue;
-import ir.ac.sbu.graph.fonl.matcher.LabelMeta;
 import ir.ac.sbu.graph.fonl.SparkFonlCreator;
+import ir.ac.sbu.graph.fonl.matcher.LabelMeta;
 import ir.ac.sbu.graph.fonl.matcher.LocalFonlCreator;
 import ir.ac.sbu.graph.fonl.matcher.QFonl;
 import ir.ac.sbu.graph.fonl.matcher.TFonlValue;
@@ -10,10 +10,7 @@ import ir.ac.sbu.graph.spark.ArgumentReader;
 import ir.ac.sbu.graph.spark.EdgeLoader;
 import ir.ac.sbu.graph.spark.NeighborList;
 import ir.ac.sbu.graph.spark.SparkApp;
-import it.unimi.dsi.fastutil.ints.IntAVLTreeSet;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
-import it.unimi.dsi.fastutil.ints.IntSortedSet;
+import it.unimi.dsi.fastutil.ints.*;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.broadcast.Broadcast;
@@ -43,13 +40,18 @@ public class SGMatcher extends SparkApp {
         JavaPairRDD <Integer, TFonlValue> tFonl = SparkFonlCreator.createTFonl(lFonl);
 
         Broadcast <QFonl> broadcast = conf.getSc().broadcast(qFonl);
+        Broadcast <Integer> splitBroadcast = conf.getSc().broadcast(0);
 
-        JavaPairRDD <Integer, int[][]> candidates = getPartials(tFonl, broadcast, 0)
+        JavaPairRDD <Integer, Tuple2 <int[], int[][]>> candidates = getPartials(tFonl, broadcast, splitBroadcast)
                 .mapValues(v -> {
                     int[][] match = new int[broadcast.getValue().splits.length][];
-                    match[0] = v;
-                    return match;
+                    match[0] = v._2;
+                    int count = v._1;
+                    int[] counts = new int[broadcast.getValue().splits.length];
+                    counts[0] = count;
+                    return new Tuple2 <>(counts, match);
                 });
+
         printCandidates("split 0", candidates);
 
         for (int i = 1; i < qFonl.splits.length; i++) {
@@ -63,35 +65,44 @@ public class SGMatcher extends SparkApp {
                 return 0;
             }
 
-            JavaPairRDD <Integer, int[]> partials = getPartials(tFonl, broadcast, splitIndex);
+            splitBroadcast = conf.getSc().broadcast(splitIndex);
+            JavaPairRDD <Integer, Tuple2 <Integer, int[]>> partials = getPartials(tFonl, broadcast, splitBroadcast);
             printPartials("split" + splitIndex, partials);
 
             candidates = candidates.join(partials).mapValues(val -> {
-                IntSet set = new IntOpenHashSet(val._2);
-                val._1[splitIndex] = set.toIntArray();
+                IntSet set = new IntOpenHashSet(val._2._2);
+                val._1._2[splitIndex] = set.toIntArray();
+                val._1._1[splitIndex] = val._2._1;
                 return val._1;
             }).cache();
 
             printCandidates("split " + splitIndex, candidates);
-
         }
 
         return candidates.map(kv -> {
             int matchCount = 1;
-            for (int[] sVertices : kv._2) {
-                matchCount *= sVertices.length;
+            for (int sVertices : kv._2._1) {
+                matchCount *= sVertices;
             }
             return matchCount;
         }).reduce((a, b) -> a + b);
     }
 
-    private JavaPairRDD <Integer, int[]> getPartials(JavaPairRDD <Integer, TFonlValue> tFonl,
-                                                     Broadcast <QFonl> broadcast, int splitIndex) {
+    private JavaPairRDD <Integer, Tuple2 <Integer, int[]>> getPartials(JavaPairRDD <Integer, TFonlValue> tFonl,
+                                                                       Broadcast <QFonl> broadcast, Broadcast <Integer> splitBroadcast) {
         return tFonl.flatMapToPair(kv -> {
 
-            List <Tuple2 <Integer, Integer>> out = new ArrayList <>();
-            for (int key : kv._2.expands(splitIndex, broadcast.getValue())) {
-                out.add(new Tuple2 <>(key, kv._1));
+            if (kv._1.equals(7)) {
+                System.out.println("ahs");
+            }
+            List <Tuple2 <Integer, Tuple2 <Integer, Integer>>> out = new ArrayList <>();
+            Integer split = splitBroadcast.getValue();
+            QFonl qFonl = broadcast.getValue();
+
+            Int2IntOpenHashMap counters = kv._2.expands(kv._1, split, qFonl);
+
+            for (Map.Entry <Integer, Integer> entry : counters.entrySet()) {
+                out.add(new Tuple2 <>(entry.getKey(), new Tuple2 <>(entry.getValue(), kv._1)));
             }
 
             return out.iterator();
@@ -99,32 +110,34 @@ public class SGMatcher extends SparkApp {
         }).groupByKey(tFonl.getNumPartitions())
                 .mapValues(val -> {
                     IntSortedSet sortedSet = new IntAVLTreeSet();
-                    for (Integer vId : val) {
-                        sortedSet.add(vId.intValue());
+                    int count = 0;
+                    for (Tuple2 <Integer, Integer> vId : val) {
+                        count += vId._1;
+                        sortedSet.add(vId._2.intValue());
                     }
-                    return sortedSet.toIntArray();
+                    return new Tuple2 <>(count, sortedSet.toIntArray());
                 }).cache();
     }
 
-    private void printCandidates(String title, JavaPairRDD <Integer, int[][]> candidates) {
-        List <Tuple2 <Integer, int[][]>> collect = candidates.collect();
-        System.out.println("((((((((((((( Candidates (count: " + collect.size() +") ** " + title + " ** ))))))))))))))");
-        for (Tuple2 <Integer, int[][]> entry : collect) {
-            StringBuilder str = new StringBuilder("Key: " + entry._1 + ", Values: ");
-
-            for (int[] array : entry._2) {
+    private void printCandidates(String title, JavaPairRDD <Integer, Tuple2 <int[], int[][]>> candidates) {
+        List <Tuple2 <Integer, Tuple2 <int[], int[][]>>> collect = candidates.collect();
+        System.out.println("((((((((((((( Candidates (count: " + collect.size() + ") ** " + title + " ** ))))))))))))))");
+        for (Tuple2 <Integer, Tuple2 <int[], int[][]>> entry : collect) {
+            StringBuilder str = new StringBuilder("Key: " + entry._1 + ", Values => ");
+            str.append("counts: ").append(Arrays.toString(entry._2._1)).append(" ");
+            for (int[] array : entry._2._2) {
                 str.append(Arrays.toString(array)).append(" , ");
             }
             System.out.println(str.toString());
         }
     }
 
-    private void printPartials(String title, JavaPairRDD <Integer, int[]> partial) {
-        List <Tuple2 <Integer, int[]>> collect = partial.collect();
+    private void printPartials(String title, JavaPairRDD <Integer, Tuple2 <Integer, int[]>> partial) {
+        List <Tuple2 <Integer, Tuple2 <Integer, int[]>>> collect = partial.collect();
         System.out.println("((((((((((((( Partials (count: " + collect.size() + ") ** " + title + " ** ))))))))))))))");
-        for (Tuple2 <Integer, int[]> entry : collect) {
+        for (Tuple2 <Integer, Tuple2 <Integer, int[]>> entry : collect) {
             StringBuilder sb = new StringBuilder("Key: " + entry._1 + ", Values: ");
-            sb.append(Arrays.toString(entry._2));
+            sb.append(Arrays.toString(entry._2._2));
             System.out.println(sb);
         }
 
