@@ -1,6 +1,9 @@
 package ir.ac.sbu.graph.spark.search;
 
 import ir.ac.sbu.graph.fonl.*;
+import ir.ac.sbu.graph.fonl.matcher.LabelMeta;
+import ir.ac.sbu.graph.fonl.matcher.LocalFonlCreator;
+import ir.ac.sbu.graph.fonl.matcher.Sonl;
 import ir.ac.sbu.graph.spark.ArgumentReader;
 import ir.ac.sbu.graph.spark.EdgeLoader;
 import ir.ac.sbu.graph.spark.NeighborList;
@@ -17,11 +20,11 @@ import java.util.*;
 
 public class SPMiner extends SparkApp {
 
-    private FSearchConf conf;
+    private SGMatcherConf conf;
     private EdgeLoader edgeLoader;
     private JavaPairRDD <Integer, String> labels;
 
-    public SPMiner(FSearchConf conf, EdgeLoader edgeLoader, JavaPairRDD <Integer, String> labels) {
+    public SPMiner(SGMatcherConf conf, EdgeLoader edgeLoader, JavaPairRDD <Integer, String> labels) {
         super(edgeLoader);
         this.conf = conf;
         this.edgeLoader = edgeLoader;
@@ -372,7 +375,7 @@ public class SPMiner extends SparkApp {
 
     public static void main(String[] args) {
         long t1 = System.currentTimeMillis();
-        FSearchConf conf = new FSearchConf(new ArgumentReader(args));
+        SGMatcherConf conf = new SGMatcherConf(new ArgumentReader(args));
         conf.init();
 
         EdgeLoader edgeLoader = new EdgeLoader(conf);

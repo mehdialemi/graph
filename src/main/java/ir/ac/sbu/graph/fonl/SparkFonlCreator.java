@@ -1,5 +1,8 @@
 package ir.ac.sbu.graph.fonl;
 
+import ir.ac.sbu.graph.fonl.matcher.DegreeMeta;
+import ir.ac.sbu.graph.fonl.matcher.LabelMeta;
+import ir.ac.sbu.graph.fonl.matcher.TFonlValue;
 import ir.ac.sbu.graph.spark.NeighborList;
 import ir.ac.sbu.graph.types.Edge;
 import ir.ac.sbu.graph.types.VertexDeg;
@@ -118,7 +121,7 @@ public class SparkFonlCreator {
                 }).cache();
     }
 
-    public JavaPairRDD<Integer, int[]> createCandidates(JavaPairRDD <Integer, Fvalue <LabelMeta>>  labelFonl) {
+    public static JavaPairRDD<Integer, int[]> createCandidates(JavaPairRDD <Integer, Fvalue <LabelMeta>>  labelFonl) {
         return labelFonl.filter(t -> t._2.fonl.length > 2) // Select vertices having more than 2 items in their values
                 .flatMapToPair(t -> {
 
@@ -144,7 +147,7 @@ public class SparkFonlCreator {
                 });
     }
 
-    public static JavaPairRDD <Integer, Fvalue <TriangleMeta>> createLabelTriangles(JavaPairRDD <Integer, Fvalue <LabelMeta>>  labelFonl) {
+    public static JavaPairRDD <Integer, TFonlValue> createTFonl(JavaPairRDD <Integer, Fvalue <LabelMeta>>  labelFonl) {
         JavaPairRDD <Integer, int[]> candidates = createCandidates(labelFonl);
         JavaPairRDD <Integer, Iterable <Edge[]>> tEdges = candidates.join(labelFonl).flatMapToPair(kv -> {
             int[] cArray = kv._2._1;
@@ -167,19 +170,19 @@ public class SparkFonlCreator {
             return Collections.singleton(new Tuple2 <>(fVertex, list.toArray(new Edge[0]))).iterator();
         }).groupByKey(labelFonl.getNumPartitions());
 
-        JavaPairRDD <Integer, Fvalue <TriangleMeta>> triangleFonl = labelFonl.leftOuterJoin(tEdges).mapValues(v -> {
+        JavaPairRDD <Integer, TFonlValue> triangleFonl = labelFonl.leftOuterJoin(tEdges).mapValues(v -> {
 
-            Fvalue <TriangleMeta> fvalue = new Fvalue <>();
-            fvalue.meta = new TriangleMeta(v._1.meta);
-            fvalue.ifonl = v._1.ifonl;
-            fvalue.fonl = v._1.fonl;
+            TFonlValue tFonlValue = new TFonlValue();
+            tFonlValue.meta = new TriangleMeta(v._1.meta);
+            tFonlValue.ifonl = v._1.ifonl;
+            tFonlValue.fonl = v._1.fonl;
             for (Edge[] edges : v._2.orElse(CollatingIterator::new)) {
                 for (Edge edge : edges) {
-                    fvalue.meta.edges.add(edge);
+                    tFonlValue.meta.edges.add(edge);
                 }
             }
 
-            return fvalue;
+            return tFonlValue;
         }).cache();
 
         return triangleFonl;

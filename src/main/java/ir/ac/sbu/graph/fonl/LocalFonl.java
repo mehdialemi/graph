@@ -3,8 +3,12 @@ package ir.ac.sbu.graph.fonl;
 import java.io.Serializable;
 
 public class LocalFonl implements Serializable {
-    public int[] vIndex;
+    public int[] vIndices;
     public int[][] fonl;
-    public int[] dIndex;
+    public int[] degIndices;
     public String[] labels;
+
+    public int[] getFonl(int index) {
+        return fonl[index];
+    }
 }

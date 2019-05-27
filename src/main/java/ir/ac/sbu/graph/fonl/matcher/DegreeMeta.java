@@ -1,8 +1,11 @@
-package ir.ac.sbu.graph.fonl;
+package ir.ac.sbu.graph.fonl.matcher;
+
+import ir.ac.sbu.graph.fonl.Fvalue;
+import ir.ac.sbu.graph.fonl.Meta;
 
 import java.util.Arrays;
 
-public class DegreeMeta extends Meta{
+public class DegreeMeta extends Meta {
     public int[] degs;
 
     public DegreeMeta() {}

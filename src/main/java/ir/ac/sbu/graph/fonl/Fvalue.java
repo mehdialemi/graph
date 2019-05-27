@@ -7,6 +7,7 @@ public class Fvalue<T extends Meta> {
     public int[] fonl;
     public int[] ifonl;
 
+
     @Override
     public String toString() {
         return "Meta: " + meta.toString() + ", fonl: " + Arrays.toString(fonl);

@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.fonl;
+package ir.ac.sbu.graph.fonl.matcher;
 
 import ir.ac.sbu.graph.spark.search.Candidate;
 import it.unimi.dsi.fastutil.ints.IntArrayList;

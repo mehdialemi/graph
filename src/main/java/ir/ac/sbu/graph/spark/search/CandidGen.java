@@ -1,8 +1,8 @@
 package ir.ac.sbu.graph.spark.search;
 
 import ir.ac.sbu.graph.fonl.Fvalue;
-import ir.ac.sbu.graph.fonl.LabelMeta;
-import ir.ac.sbu.graph.fonl.Sonl;
+import ir.ac.sbu.graph.fonl.matcher.LabelMeta;
+import ir.ac.sbu.graph.fonl.matcher.Sonl;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 
@@ -83,8 +83,8 @@ public class CandidGen {
 //                    if (candidate.canExtend(query.dsnArray[idx], fvalue)) {
 //                    IntList intList = new IntArrayList();
 //                    for (int idx2 : query.isnArray[idx]) {
-//                        if(candidate.vIndex[idx2] != 0) {
-//                            intList.add(candidate.vIndex[idx2]);
+//                        if(candidate.vIndices[idx2] != 0) {
+//                            intList.add(candidate.vIndices[idx2]);
 //                        }
 //                    }
 

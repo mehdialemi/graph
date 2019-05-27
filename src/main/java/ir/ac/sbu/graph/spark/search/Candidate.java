@@ -1,9 +1,8 @@
 package ir.ac.sbu.graph.spark.search;
 
 import ir.ac.sbu.graph.fonl.Fvalue;
-import ir.ac.sbu.graph.fonl.LabelMeta;
-import ir.ac.sbu.graph.fonl.Sonl;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import ir.ac.sbu.graph.fonl.matcher.LabelMeta;
+import ir.ac.sbu.graph.fonl.matcher.Sonl;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import scala.Tuple2;
 
@@ -171,14 +170,14 @@ public class Candidate implements Serializable {
 //        if (o1 != null) {
 //            IntSet set = new IntOpenHashSet(o1.size());
 //            for (int order : o1) {
-//                set.add(c1.vIndex[order]);
+//                set.add(c1.vIndices[order]);
 //            }
 //            c1.checkIndexes = o1.toIntArray();
 //        }
 //        if (o2 != null) {
 //            IntSet set = new IntOpenHashSet(o2.size());
 //            for (int order : o2) {
-//                set.add(c2.vIndex[order]);
+//                set.add(c2.vIndices[order]);
 //            }
 //            c2.checkIndexes = o2.toIntArray();
 //        }
@@ -198,7 +197,7 @@ public class Candidate implements Serializable {
 //        for (int index : checkIndexes) {
 //            boolean check = false;
 //            for (int fonl : fvalue.fonl) {
-//                check = vIndex[index] == fonl;
+//                check = vIndices[index] == fonl;
 //                if (check)
 //                    break;
 //            }
