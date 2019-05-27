@@ -2,6 +2,8 @@ package ir.ac.sbu.graph.fonl.matcher;
 
 import ir.ac.sbu.graph.fonl.Fvalue;
 import ir.ac.sbu.graph.fonl.TriangleMeta;
+import ir.ac.sbu.graph.spark.search.fonl.QFonl;
+import ir.ac.sbu.graph.spark.search.fonl.QSplit;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;

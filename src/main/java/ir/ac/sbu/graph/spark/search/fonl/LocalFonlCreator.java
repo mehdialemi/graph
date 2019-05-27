@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.fonl.matcher;
+package ir.ac.sbu.graph.spark.search.fonl;
 
 import ir.ac.sbu.graph.fonl.LocalFonl;
 import ir.ac.sbu.graph.types.Edge;
@@ -10,6 +10,30 @@ import java.util.*;
 
 public class LocalFonlCreator {
 
+    public static List<Subquery> getSubqueries(QFonl qFonl) {
+        List<Subquery> list = new ArrayList <>();
+
+        for (QSplit split : qFonl.splits) {
+            Subquery subquery = new Subquery();
+            subquery.vertex = split.vIndex;
+            subquery.degree = qFonl.degIndices[split.vIndex];
+            subquery.label = qFonl.labels[split.vIndex];
+            int[] fonl = qFonl.fonl[split.vIndex];
+            subquery.fonlValue = fonl;
+            subquery.degrees = new int[fonl.length];
+            subquery.labels = new String[fonl.length];
+
+            for (int i = 0; i < fonl.length; i++) {
+                int index = fonl[i];
+                subquery.degrees[i] = qFonl.degIndices[index];
+                subquery.labels[i] = qFonl.labels[index];
+            }
+
+            list.add(subquery);
+        }
+
+        return list;
+    }
     public static QFonl createQFonl(Map <Integer, List <Integer>> neighbors, Map <Integer, String> labelMap) {
 
         LocalFonl localFonl = createFonl(neighbors, labelMap);
@@ -143,14 +167,14 @@ public class LocalFonlCreator {
     }
 
     public static LocalFonl createFonl(Map <Integer, List <Integer>> neighbors, Map <Integer, String> labelMap) {
-        Sonl sonl = createSonl(neighbors, labelMap);
+        OrderedNeighbors orderedNeighbors = createOrderedNeighbors(neighbors, labelMap);
         LocalFonl localFonl = new LocalFonl();
-        localFonl.vIndices = sonl.vArray;
-        localFonl.degIndices = sonl.dArray;
-        localFonl.labels = sonl.labels;
-        localFonl.fonl = new int[sonl.vArray.length][];
+        localFonl.vIndices = orderedNeighbors.vArray;
+        localFonl.degIndices = orderedNeighbors.dArray;
+        localFonl.labels = orderedNeighbors.labels;
+        localFonl.fonl = new int[orderedNeighbors.vArray.length][];
         int i = 0;
-        for (int[] snIdx : sonl.dsnArray) {
+        for (int[] snIdx : orderedNeighbors.dsnArray) {
             int d = localFonl.degIndices[i];
             int v = localFonl.vIndices[i];
 
@@ -167,7 +191,7 @@ public class LocalFonlCreator {
         return localFonl;
     }
 
-    public static Sonl createSonl(Map <Integer, List <Integer>> neighbors, Map <Integer, String> labelMap) {
+    public static OrderedNeighbors createOrderedNeighbors(Map <Integer, List <Integer>> neighbors, Map <Integer, String> labelMap) {
         // sort vertex by their degree
         SortedMap <VertexDeg, SortedSet <VertexDeg>> sortedMap = new TreeMap <>((o1, o2) -> {
             int result = o1.degree - o2.degree;
@@ -195,7 +219,7 @@ public class LocalFonlCreator {
             sortedMap.put(new VertexDeg(vId, degree), sortedSet);
         }
 
-        Sonl SONL = new Sonl(sortedMap.size());
+        OrderedNeighbors OrderedNeighbors = new OrderedNeighbors(sortedMap.size());
 
         Map <Integer, Integer> vIndex = new HashMap <>();
         int index = 0;
@@ -215,9 +239,9 @@ public class LocalFonlCreator {
             }
 
             String label = labelMap.get(vertex);
-            SONL.add(vertex, degree, label, nIndex);
+            OrderedNeighbors.add(vertex, degree, label, nIndex);
         }
 
-        return SONL;
+        return OrderedNeighbors;
     }
 }

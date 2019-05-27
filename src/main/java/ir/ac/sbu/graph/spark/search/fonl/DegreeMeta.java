@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.fonl.matcher;
+package ir.ac.sbu.graph.spark.search.fonl;
 
 import ir.ac.sbu.graph.fonl.Fvalue;
 import ir.ac.sbu.graph.fonl.Meta;

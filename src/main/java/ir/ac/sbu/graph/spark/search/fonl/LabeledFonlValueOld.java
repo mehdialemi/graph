@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.fonl.matcher;
+package ir.ac.sbu.graph.spark.search.fonl;
 
 import ir.ac.sbu.graph.fonl.Fvalue;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -8,9 +8,8 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.HashSet;
 import java.util.Set;
 
-public class LFonlValue  extends Fvalue<LabelMeta> {
+public class LabeledFonlValueOld  extends Fvalue<LabelMeta> {
     private static Int2IntOpenHashMap tEmpty = new Int2IntOpenHashMap();
-
 
     public Int2IntOpenHashMap expands(int vertex, int splitIndex, QFonl qFonl) {
 

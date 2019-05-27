@@ -1,13 +1,10 @@
 package ir.ac.sbu.graph.spark.search;
 
-import ir.ac.sbu.graph.fonl.SparkFonlCreator;
-import ir.ac.sbu.graph.fonl.matcher.LFonlValue;
-import ir.ac.sbu.graph.fonl.matcher.LocalFonlCreator;
-import ir.ac.sbu.graph.fonl.matcher.QFonl;
 import ir.ac.sbu.graph.spark.ArgumentReader;
 import ir.ac.sbu.graph.spark.EdgeLoader;
 import ir.ac.sbu.graph.spark.NeighborList;
 import ir.ac.sbu.graph.spark.SparkApp;
+import ir.ac.sbu.graph.spark.search.fonl.*;
 import it.unimi.dsi.fastutil.ints.*;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -16,13 +13,13 @@ import scala.Tuple2;
 
 import java.util.*;
 
-public class SGSearcher extends SparkApp {
+public class SgSearcher extends SparkApp {
 
-    private SGMatcherConf conf;
+    private SgConf conf;
     private EdgeLoader edgeLoader;
     private JavaPairRDD <Integer, String> labels;
 
-    public SGSearcher(SGMatcherConf conf, EdgeLoader edgeLoader, JavaPairRDD <Integer, String> labels) {
+    public SgSearcher(SgConf conf, EdgeLoader edgeLoader, JavaPairRDD <Integer, String> labels) {
         super(edgeLoader);
         this.conf = conf;
         this.edgeLoader = edgeLoader;
@@ -30,52 +27,53 @@ public class SGSearcher extends SparkApp {
     }
 
     public int search(QFonl qFonl) {
+        List <Subquery> subqueries = LocalFonlCreator.getSubqueries(qFonl);
+        if (subqueries.isEmpty())
+            return 0;
+
+        Queue<Subquery> queue = new LinkedList <>(subqueries);
 
         NeighborList neighborList = new NeighborList(edgeLoader);
-        JavaPairRDD <Integer, LFonlValue> lFonl = SparkFonlCreator.createLabelFonl(neighborList, labels);
-        printFonl(lFonl);
+        JavaPairRDD <Integer, LabledFonlValue> lFonl = LabelFonlCreator.createLabeledFonl(neighborList, labels);
 
-        Broadcast <QFonl> broadcast = conf.getSc().broadcast(qFonl);
-        Broadcast <Integer> splitBroadcast = conf.getSc().broadcast(0);
+        Broadcast <Subquery> broadcast = conf.getSc().broadcast(queue.remove());
 
-        JavaPairRDD <Integer, Tuple2 <int[], int[][]>> candidates = getPartials(lFonl, broadcast, splitBroadcast)
+        final int splitSize = qFonl.splits.length;
+        JavaPairRDD <Integer, Tuple2 <int[], int[][]>> matches = getPartials(lFonl, broadcast)
                 .mapValues(v -> {
-                    int[][] match = new int[broadcast.getValue().splits.length][];
+                    int[][] match = new int[splitSize][];
                     match[0] = v._2;
                     int count = v._1;
-                    int[] counts = new int[broadcast.getValue().splits.length];
+                    int[] counts = new int[splitSize];
                     counts[0] = count;
                     return new Tuple2 <>(counts, match);
                 });
 
-        printCandidates("split 0", candidates);
+        int qIndex = 1;
+        while (!queue.isEmpty()) {
+            Subquery subquery = queue.remove();
+            broadcast = conf.getSc().broadcast(subquery);
+            final int splitIndex = qIndex;
 
-        for (int i = 1; i < qFonl.splits.length; i++) {
-
-            final int splitIndex = i;
-            long count = candidates.count();
+            long count = matches.count();
             System.out.println("partial count: " + count);
-
             if (count == 0) {
                 System.out.println("No match found");
                 return 0;
             }
 
-            splitBroadcast = conf.getSc().broadcast(splitIndex);
-            JavaPairRDD <Integer, Tuple2 <Integer, int[]>> partials = getPartials(lFonl, broadcast, splitBroadcast);
-            printPartials("split" + splitIndex, partials);
-
-            candidates = candidates.join(partials).mapValues(val -> {
+            JavaPairRDD <Integer, Tuple2 <Integer, int[]>> splitMatch = getPartials(lFonl, broadcast);
+            matches = matches.join(splitMatch).mapValues(val -> {
                 IntSet set = new IntOpenHashSet(val._2._2);
                 val._1._2[splitIndex] = set.toIntArray();
                 val._1._1[splitIndex] = val._2._1;
                 return val._1;
             }).cache();
 
-            printCandidates("split " + splitIndex, candidates);
+            printMatches("matches (" + splitIndex + ")", matches);
         }
 
-        return candidates.map(kv -> {
+        return matches.map(kv -> {
             int matchCount = 1;
             for (int sVertices : kv._2._1) {
                 matchCount *= sVertices;
@@ -84,18 +82,14 @@ public class SGSearcher extends SparkApp {
         }).reduce((a, b) -> a + b);
     }
 
-    private JavaPairRDD <Integer, Tuple2 <Integer, int[]>> getPartials(JavaPairRDD <Integer, LFonlValue> tFonl,
-                                                                       Broadcast <QFonl> broadcast, Broadcast <Integer> splitBroadcast) {
+    private JavaPairRDD <Integer, Tuple2 <Integer, int[]>> getPartials(JavaPairRDD <Integer, LabledFonlValue> tFonl,
+                                                                       Broadcast <Subquery> broadcast) {
         return tFonl.flatMapToPair(kv -> {
 
-            if (kv._1.equals(7)) {
-                System.out.println("ahs");
-            }
             List <Tuple2 <Integer, Tuple2 <Integer, Integer>>> out = new ArrayList <>();
-            Integer split = splitBroadcast.getValue();
-            QFonl qFonl = broadcast.getValue();
+            Subquery subquery = broadcast.getValue();
 
-            Int2IntOpenHashMap counters = kv._2.expands(kv._1, split, qFonl);
+            Int2IntOpenHashMap counters = kv._2.matchSubquery(kv._1, subquery);
 
             for (Map.Entry <Integer, Integer> entry : counters.entrySet()) {
                 out.add(new Tuple2 <>(entry.getKey(), new Tuple2 <>(entry.getValue(), kv._1)));
@@ -115,7 +109,7 @@ public class SGSearcher extends SparkApp {
                 }).cache();
     }
 
-    private void printCandidates(String title, JavaPairRDD <Integer, Tuple2 <int[], int[][]>> candidates) {
+    private void printMatches(String title, JavaPairRDD <Integer, Tuple2 <int[], int[][]>> candidates) {
         List <Tuple2 <Integer, Tuple2 <int[], int[][]>>> collect = candidates.collect();
         System.out.println("((((((((((((( Candidates (count: " + collect.size() + ") ** " + title + " ** ))))))))))))))");
         for (Tuple2 <Integer, Tuple2 <int[], int[][]>> entry : collect) {
@@ -141,13 +135,13 @@ public class SGSearcher extends SparkApp {
     }
 
     public static void main(String[] args) {
-        SGMatcherConf conf = new SGMatcherConf(new ArgumentReader(args));
+        SgConf conf = new SgConf(new ArgumentReader(args));
         conf.init();
 
         EdgeLoader edgeLoader = new EdgeLoader(conf);
         JavaPairRDD <Integer, String> labels = getLables(conf.getSc(), conf.getLablePath(), conf.getPartitionNum());
 
-        SGSearcher matcher = new SGSearcher(conf, edgeLoader, labels);
+        SgSearcher matcher = new SgSearcher(conf, edgeLoader, labels);
 
         Map <Integer, List <Integer>> neighbors = new HashMap <>();
         neighbors.put(1, Arrays.asList(4, 2, 3));
@@ -162,7 +156,7 @@ public class SGSearcher extends SparkApp {
         labelMap.put(4, "A");
 
         QFonl qFonl = LocalFonlCreator.createQFonl(neighbors, labelMap);
-        System.out.println("qFonl" + qFonl.toString());
+        System.out.println("qFonl" + qFonl);
 
         int matches = matcher.search(qFonl);
         System.out.println("Number of matches: " + matches);
@@ -177,9 +171,9 @@ public class SGSearcher extends SparkApp {
                 .mapToPair(split -> new Tuple2 <>(Integer.parseInt(split[0]), split[1]));
     }
 
-    private void printFonl(JavaPairRDD <Integer, LFonlValue> labelFonl) {
-        List <Tuple2 <Integer, LFonlValue>> collect = labelFonl.collect();
-        for (Tuple2 <Integer,LFonlValue> t : collect) {
+    private void printFonl(JavaPairRDD <Integer, LabledFonlValue> labelFonl) {
+        List <Tuple2 <Integer, LabledFonlValue>> collect = labelFonl.collect();
+        for (Tuple2 <Integer, LabledFonlValue> t : collect) {
             System.out.println(t);
         }
     }

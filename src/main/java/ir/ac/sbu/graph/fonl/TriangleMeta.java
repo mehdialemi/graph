@@ -1,6 +1,6 @@
 package ir.ac.sbu.graph.fonl;
 
-import ir.ac.sbu.graph.fonl.matcher.LabelMeta;
+import ir.ac.sbu.graph.spark.search.fonl.LabelMeta;
 import ir.ac.sbu.graph.types.Edge;
 
 import java.util.HashSet;

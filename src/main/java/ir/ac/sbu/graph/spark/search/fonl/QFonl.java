@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.fonl.matcher;
+package ir.ac.sbu.graph.spark.search.fonl;
 
 import ir.ac.sbu.graph.fonl.LocalFonl;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
