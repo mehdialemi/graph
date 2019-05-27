@@ -3,6 +3,7 @@ package ir.ac.sbu.graph.fonl.matcher;
 import ir.ac.sbu.graph.types.Edge;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Set;
 
 public class QSplit implements Serializable {
@@ -25,5 +26,12 @@ public class QSplit implements Serializable {
     public QSplit(int vIndex, int[] fonlIndex) {
         this.vIndex = vIndex;
         this.fonlIndex = fonlIndex;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("QSplit");
+        sb.append("vIndex: ").append(vIndex).append(", fonlIndex: ").append(Arrays.toString(fonlIndex));
+        return sb.toString();
     }
 }

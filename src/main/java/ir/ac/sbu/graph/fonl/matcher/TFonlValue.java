@@ -40,13 +40,14 @@ public class TFonlValue extends Fvalue <TriangleMeta> {
         if (!qFonl.labels[vIndex].equals(meta.label))
             return null;
 
-        IntSet[] set = new IntSet[split.fonlIndex.length];
+        if (qFonl.degIndices[vIndex] > meta.deg)
+            return null;
 
-        int c = 0;
-        int[] qvFonl = qFonl.fonl[vIndex];
-        for (int fonlIndex : split.fonlIndex) {
-            int qvIndex = qvFonl[fonlIndex];
+        int[] qFonlValue = qFonl.fonl[vIndex];
+        IntSet[] set = new IntSet[qFonlValue.length];
 
+        int sIndex = 0;
+        for (int qvIndex : qFonlValue) {
             for (int i = 0; i < this.fonl.length; i++) {
                 if (!meta.labels[i].equals(qFonl.labels[qvIndex]))
                     continue;
@@ -54,33 +55,33 @@ public class TFonlValue extends Fvalue <TriangleMeta> {
                 if (meta.degs[i] < qFonl.degIndices[qvIndex])
                     continue;
 
-                int qRemains = qvFonl.length - fonlIndex;
+                int qRemains = qFonlValue.length - sIndex;
                 int gRemains = this.fonl.length - i;
 
                 if (qRemains > gRemains)
                     break;
 
-                if (set[c] == null)
-                    set[c] = new IntOpenHashSet();
+                if (set[sIndex] == null)
+                    set[sIndex] = new IntOpenHashSet();
 
-                set[c].add(this.fonl[i]);
+                set[sIndex].add(this.fonl[i]);
             }
 
-            if (set[c] == null)
+            if (set[sIndex] == null)
                 return null;
 
-            c++;
+            sIndex ++;
         }
 
         int[][] selects = new int[set.length][];
-        for (int k = 0; k < selects.length; k++) {
+        for (int k = 0; k < set.length; k++) {
             selects[k] = set[k].toIntArray();
         }
 
-        int[] indexes = new int[selects.length];
+        int[] indexes = new int[split.fonlIndex.length];
         Set <int[]> resultSet = new HashSet <>();
         for (int vertexIndex = 0; vertexIndex < selects[0].length; vertexIndex++) {
-            join(0, vertexIndex, indexes, selects, qFonl, split, resultSet);
+            join(0, vertexIndex, split.fonlIndex[0], indexes, selects, qFonl, split, resultSet);
         }
 
         if (resultSet.size() == 0)
@@ -89,11 +90,16 @@ public class TFonlValue extends Fvalue <TriangleMeta> {
         return resultSet;
     }
 
-    public void join(int selectIndex, int currentVertexIndex, int[] partialMatch, int[][] selects,
-                     QFonl qFonl, QSplit qSplit, Set <int[]> resultSet) {
-        partialMatch[selectIndex] = currentVertexIndex;
+    public void join(int selectIndex, int currentVertexIndex, int pIndex, int[] partialMatch,
+                     int[][] selects, QFonl qFonl, QSplit qSplit, Set <int[]> resultSet) {
 
-        if (selectIndex == selects.length - 1) {
+        int[] qFonlValue = qFonl.fonl[qSplit.vIndex];
+        if (qFonlValue[pIndex] == selectIndex) {
+            partialMatch[pIndex] = currentVertexIndex;
+            pIndex ++;
+        }
+
+        if (selectIndex >= selects.length - 1) {
             int[] pMatch = new int[partialMatch.length];
             System.arraycopy(partialMatch, 0, pMatch, 0, pMatch.length);
             resultSet.add(pMatch);
@@ -103,16 +109,10 @@ public class TFonlValue extends Fvalue <TriangleMeta> {
         // go to the right array
         int nextIndex = selectIndex + 1;
 
-        int index = qSplit.fonlIndex[selectIndex];
-        int qVertexIdx1 = qFonl.fonl[qSplit.vIndex][index];
-
-        index = qSplit.fonlIndex[nextIndex];
-        int qVertexIdx2 = qFonl.fonl[qSplit.vIndex][index];
-
         boolean verifyEdge = qFonl
                 .edgeArray[qSplit.vIndex]
-                .getOrDefault(qVertexIdx1, new IntOpenHashSet())
-                .contains(qVertexIdx2);
+                .getOrDefault(qFonlValue[selectIndex], new IntOpenHashSet())
+                .contains(qFonlValue[nextIndex]);
 
         int id1 = selects[selectIndex][currentVertexIndex];
         for (int vertexIndex = 0; vertexIndex < selects[nextIndex].length; vertexIndex++) {
@@ -121,7 +121,7 @@ public class TFonlValue extends Fvalue <TriangleMeta> {
             if (verifyEdge && !hasEdge(id1, id2))
                 continue;
 
-            join(nextIndex, vertexIndex, partialMatch, selects, qFonl, qSplit, resultSet);
+            join(nextIndex, vertexIndex, pIndex, partialMatch, selects, qFonl, qSplit, resultSet);
         }
     }
 

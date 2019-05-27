@@ -1,14 +1,11 @@
 package ir.ac.sbu.graph.fonl.matcher;
 
 import ir.ac.sbu.graph.fonl.LocalFonl;
-import ir.ac.sbu.graph.types.Edge;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.Arrays;
 
 public class QFonl extends LocalFonl {
     // Per fonl vertex an index exist
@@ -31,4 +28,20 @@ public class QFonl extends LocalFonl {
         }
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("vIndices: ").append(Arrays.toString(vIndices)).append("\n");
+        sb.append("degIndices: ").append(Arrays.toString(degIndices)).append("\n");
+        sb.append("labels: ").append(Arrays.toString(labels)).append("\n");
+        sb.append("fonl: ").append("\n");
+        for (int[] f : fonl) {
+            sb.append(Arrays.toString(f)).append("\n");
+        }
+        sb.append("splits: ").append("\n");
+        for (QSplit split : splits) {
+            sb.append(split).append("\n");
+        }
+        return sb.toString();
+    }
 }

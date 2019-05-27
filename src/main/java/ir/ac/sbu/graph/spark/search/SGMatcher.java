@@ -41,6 +41,7 @@ public class SGMatcher extends SparkApp {
         printFonl(lFonl);
 
         JavaPairRDD <Integer, TFonlValue> tFonl = SparkFonlCreator.createTFonl(lFonl);
+
         Broadcast <QFonl> broadcast = conf.getSc().broadcast(qFonl);
 
         JavaPairRDD <Integer, int[][]> candidates = getPartials(tFonl, broadcast, 0)
@@ -107,7 +108,7 @@ public class SGMatcher extends SparkApp {
 
     private void printCandidates(String title, JavaPairRDD <Integer, int[][]> candidates) {
         List <Tuple2 <Integer, int[][]>> collect = candidates.collect();
-        System.out.println("((((((((((((( Candidates (" + collect.size() +" ) ** " + title + " ** ))))))))))))))");
+        System.out.println("((((((((((((( Candidates (count: " + collect.size() +") ** " + title + " ** ))))))))))))))");
         for (Tuple2 <Integer, int[][]> entry : collect) {
             StringBuilder str = new StringBuilder("Key: " + entry._1 + ", Values: ");
 
@@ -120,7 +121,7 @@ public class SGMatcher extends SparkApp {
 
     private void printPartials(String title, JavaPairRDD <Integer, int[]> partial) {
         List <Tuple2 <Integer, int[]>> collect = partial.collect();
-        System.out.println("((((((((((((( Partials (" + collect.size() + ") ** " + title + " ** ))))))))))))))");
+        System.out.println("((((((((((((( Partials (count: " + collect.size() + ") ** " + title + " ** ))))))))))))))");
         for (Tuple2 <Integer, int[]> entry : collect) {
             StringBuilder sb = new StringBuilder("Key: " + entry._1 + ", Values: ");
             sb.append(Arrays.toString(entry._2));
@@ -151,8 +152,10 @@ public class SGMatcher extends SparkApp {
         labelMap.put(3, "C");
         labelMap.put(4, "A");
 
-        QFonl QFonl = LocalFonlCreator.createQFonl(neighbors, labelMap);
-        int matches = matcher.search(QFonl);
+        QFonl qFonl = LocalFonlCreator.createQFonl(neighbors, labelMap);
+        System.out.println("qFonl" + qFonl.toString());
+
+        int matches = matcher.search(qFonl);
         System.out.println("Number of matches: " + matches);
 
         matcher.close();
