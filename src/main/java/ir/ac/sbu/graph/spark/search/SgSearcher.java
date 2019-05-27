@@ -19,7 +19,7 @@ public class SgSearcher extends SparkApp {
     private EdgeLoader edgeLoader;
     private JavaPairRDD <Integer, String> labels;
 
-    public SgSearcher(SgConf conf, EdgeLoader edgeLoader, JavaPairRDD <Integer, String> labels) {
+    private SgSearcher(SgConf conf, EdgeLoader edgeLoader, JavaPairRDD <Integer, String> labels) {
         super(edgeLoader);
         this.conf = conf;
         this.edgeLoader = edgeLoader;
@@ -35,11 +35,12 @@ public class SgSearcher extends SparkApp {
 
         NeighborList neighborList = new NeighborList(edgeLoader);
         JavaPairRDD <Integer, LabledFonlValue> lFonl = LabelFonlCreator.createLabeledFonl(neighborList, labels);
+        printFonl(lFonl);
 
         Broadcast <Subquery> broadcast = conf.getSc().broadcast(queue.remove());
 
         final int splitSize = qFonl.splits.length;
-        JavaPairRDD <Integer, Tuple2 <int[], int[][]>> matches = getPartials(lFonl, broadcast)
+        JavaPairRDD <Integer, Tuple2 <int[], int[][]>> matches = getSubMatches(lFonl, broadcast)
                 .mapValues(v -> {
                     int[][] match = new int[splitSize][];
                     match[0] = v._2;
@@ -62,8 +63,10 @@ public class SgSearcher extends SparkApp {
                 return 0;
             }
 
-            JavaPairRDD <Integer, Tuple2 <Integer, int[]>> splitMatch = getPartials(lFonl, broadcast);
-            matches = matches.join(splitMatch).mapValues(val -> {
+            JavaPairRDD <Integer, Tuple2 <Integer, int[]>> subMatches = getSubMatches(lFonl, broadcast);
+            printSubMatches("SubMatch (" + splitIndex + ")", subMatches);
+
+            matches = matches.join(subMatches).mapValues(val -> {
                 IntSet set = new IntOpenHashSet(val._2._2);
                 val._1._2[splitIndex] = set.toIntArray();
                 val._1._1[splitIndex] = val._2._1;
@@ -82,8 +85,8 @@ public class SgSearcher extends SparkApp {
         }).reduce((a, b) -> a + b);
     }
 
-    private JavaPairRDD <Integer, Tuple2 <Integer, int[]>> getPartials(JavaPairRDD <Integer, LabledFonlValue> tFonl,
-                                                                       Broadcast <Subquery> broadcast) {
+    private JavaPairRDD <Integer, Tuple2 <Integer, int[]>> getSubMatches(JavaPairRDD <Integer, LabledFonlValue> tFonl,
+                                                                         Broadcast <Subquery> broadcast) {
         return tFonl.flatMapToPair(kv -> {
 
             List <Tuple2 <Integer, Tuple2 <Integer, Integer>>> out = new ArrayList <>();
@@ -122,7 +125,7 @@ public class SgSearcher extends SparkApp {
         }
     }
 
-    private void printPartials(String title, JavaPairRDD <Integer, Tuple2 <Integer, int[]>> partial) {
+    private void printSubMatches(String title, JavaPairRDD <Integer, Tuple2 <Integer, int[]>> partial) {
         List <Tuple2 <Integer, Tuple2 <Integer, int[]>>> collect = partial.collect();
         System.out.println("((((((((((((( Partials (count: " + collect.size() + ") ** " + title + " ** ))))))))))))))");
         for (Tuple2 <Integer, Tuple2 <Integer, int[]>> entry : collect) {
@@ -130,8 +133,6 @@ public class SgSearcher extends SparkApp {
             sb.append(Arrays.toString(entry._2._2));
             System.out.println(sb);
         }
-
-
     }
 
     public static void main(String[] args) {
@@ -147,7 +148,7 @@ public class SgSearcher extends SparkApp {
         neighbors.put(1, Arrays.asList(4, 2, 3));
         neighbors.put(2, Arrays.asList(3, 1));
         neighbors.put(3, Arrays.asList(2, 1));
-        neighbors.put(4, Arrays.asList(1));
+        neighbors.put(4, Collections.singletonList(1));
 
         Map <Integer, String> labelMap = new HashMap <>();
         labelMap.put(1, "A");

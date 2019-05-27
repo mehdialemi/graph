@@ -16,7 +16,7 @@ public class LabledFonlValue extends Fvalue<LabelMeta> {
 
     public LabledFonlValue() {}
 
-    public LabledFonlValue(int degree, List<VLabelDeg> list) {
+    LabledFonlValue(int degree, List<VLabelDeg> list) {
         meta = new LabelMeta(degree, list.size());
         fonl = new int[list.size()];
         meta.labels = new String[list.size()];
@@ -50,9 +50,11 @@ public class LabledFonlValue extends Fvalue<LabelMeta> {
         return counter;
     }
 
-    public Set<int[]> matchAllFonls(Subquery subquery) {
+    private Set<int[]> matchAllFonls(Subquery subquery) {
         Set <int[]> resultSet = new HashSet<>();
-        matchPartial(meta.label, meta.deg, 0, subquery, resultSet);
+        Set <int[]> result = matchPartial(meta.label, meta.deg, 0, subquery);
+        if (result != null)
+            resultSet.addAll(result);
 
         for (int offset = 0; offset < fonl.length; offset++) {
             if (fonl.length - offset < subquery.fonlValue.length)
@@ -61,13 +63,15 @@ public class LabledFonlValue extends Fvalue<LabelMeta> {
             int deg = meta.degs[offset];
             String label = meta.labels[offset];
 
-            matchPartial(label, deg, offset + 1, subquery, resultSet);
+            result = matchPartial(label, deg, offset + 1, subquery);
+            if (result != null)
+                resultSet.addAll(result);
         }
 
         return resultSet;
     }
 
-    public Set<int[]> matchPartial(String label, int deg, int fonlOffset, Subquery subquery, Set <int[]> resultSet) {
+    private Set<int[]> matchPartial(String label, int deg, int fonlOffset, Subquery subquery) {
         if (!subquery.label.equals(label))
             return null;
 
@@ -108,6 +112,7 @@ public class LabledFonlValue extends Fvalue<LabelMeta> {
 
         int[] indexes = new int[subquery.fonlValue.length];
 
+        Set <int[]> resultSet = new HashSet <>();
         for (int vertexIndex = 0; vertexIndex < selects[0].length; vertexIndex++) {
             joinCurrentMatches(0, vertexIndex, indexes, selects, resultSet);
         }
@@ -118,7 +123,7 @@ public class LabledFonlValue extends Fvalue<LabelMeta> {
         return resultSet;
     }
 
-    public void joinCurrentMatches(int selectIndex, int currentVertexIndex, int[] partialMatch,
+    private void joinCurrentMatches(int selectIndex, int currentVertexIndex, int[] partialMatch,
                      int[][] selects, Set <int[]> resultSet) {
 
         partialMatch[selectIndex] = this.fonl[currentVertexIndex];
@@ -136,6 +141,4 @@ public class LabledFonlValue extends Fvalue<LabelMeta> {
             joinCurrentMatches(nextIndex, vertexIndex, partialMatch, selects, resultSet);
         }
     }
-
-
 }
