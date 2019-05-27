@@ -1,6 +1,7 @@
 package ir.ac.sbu.graph.spark.search;
 
 import ir.ac.sbu.graph.fonl.*;
+import ir.ac.sbu.graph.fonl.matcher.LFonlValue;
 import ir.ac.sbu.graph.fonl.matcher.LabelMeta;
 import ir.ac.sbu.graph.fonl.matcher.LocalFonlCreator;
 import ir.ac.sbu.graph.fonl.matcher.Sonl;
@@ -34,7 +35,7 @@ public class SPMiner extends SparkApp {
     public void search(Sonl query) {
         // load label
         NeighborList neighborList = new NeighborList(edgeLoader);
-        JavaPairRDD <Integer, Fvalue <LabelMeta>> lFonl = SparkFonlCreator.createLabelFonl(neighborList, labels);
+        JavaPairRDD <Integer, LFonlValue> lFonl = SparkFonlCreator.createLabelFonl(neighborList, labels);
         printFonl(lFonl);
 
         JavaPairRDD <Integer, Integer> edges = lFonl.flatMapToPair(kv -> {
@@ -194,7 +195,7 @@ public class SPMiner extends SparkApp {
         printCandidates(fullMatches.distinct());
     }
 
-    private JavaPairRDD <Integer, Tuple2 <Integer, Candidate>> getComplement(JavaPairRDD <Integer, Fvalue <LabelMeta>> lFonl,
+    private JavaPairRDD <Integer, Tuple2 <Integer, Candidate>> getComplement(JavaPairRDD <Integer, LFonlValue> lFonl,
                                                                         Broadcast <Sonl> queryBroadCast,
                                                                         JavaPairRDD <Integer, Iterable <Candidate[]>> candidateList) {
         return candidateList.flatMapToPair(kv -> {
@@ -282,7 +283,7 @@ public class SPMiner extends SparkApp {
         }).cache();
     }
 
-    private JavaPairRDD <Integer, Iterable <Candidate[]>> initCandidates(JavaPairRDD <Integer, Fvalue <LabelMeta>> lFonl,
+    private JavaPairRDD <Integer, Iterable <Candidate[]>> initCandidates(JavaPairRDD <Integer, LFonlValue> lFonl,
                                                                          Broadcast <Sonl> queryBroadCast) {
         return lFonl.flatMapToPair(kv -> {
             int vertex = kv._1;
@@ -345,9 +346,9 @@ public class SPMiner extends SparkApp {
         }
     }
 
-    private void printFonl(JavaPairRDD <Integer, Fvalue <LabelMeta>> labelFonl) {
-        List <Tuple2 <Integer, Fvalue <LabelMeta>>> collect = labelFonl.collect();
-        for (Tuple2 <Integer, Fvalue <LabelMeta>> t : collect) {
+    private void printFonl(JavaPairRDD <Integer, LFonlValue> labelFonl) {
+        List <Tuple2 <Integer, LFonlValue>> collect = labelFonl.collect();
+        for (Tuple2 <Integer,LFonlValue> t : collect) {
             System.out.println(t);
         }
     }

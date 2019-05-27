@@ -1,8 +1,9 @@
 package ir.ac.sbu.graph.spark.search;
 
-import ir.ac.sbu.graph.fonl.Fvalue;
 import ir.ac.sbu.graph.fonl.SparkFonlCreator;
-import ir.ac.sbu.graph.fonl.matcher.*;
+import ir.ac.sbu.graph.fonl.matcher.LFonlValue;
+import ir.ac.sbu.graph.fonl.matcher.LocalFonlCreator;
+import ir.ac.sbu.graph.fonl.matcher.QFonl;
 import ir.ac.sbu.graph.spark.ArgumentReader;
 import ir.ac.sbu.graph.spark.EdgeLoader;
 import ir.ac.sbu.graph.spark.NeighborList;
@@ -15,13 +16,13 @@ import scala.Tuple2;
 
 import java.util.*;
 
-public class SGMatcher extends SparkApp {
+public class SGSearcher extends SparkApp {
 
     private SGMatcherConf conf;
     private EdgeLoader edgeLoader;
     private JavaPairRDD <Integer, String> labels;
 
-    public SGMatcher(SGMatcherConf conf, EdgeLoader edgeLoader, JavaPairRDD <Integer, String> labels) {
+    public SGSearcher(SGMatcherConf conf, EdgeLoader edgeLoader, JavaPairRDD <Integer, String> labels) {
         super(edgeLoader);
         this.conf = conf;
         this.edgeLoader = edgeLoader;
@@ -34,12 +35,10 @@ public class SGMatcher extends SparkApp {
         JavaPairRDD <Integer, LFonlValue> lFonl = SparkFonlCreator.createLabelFonl(neighborList, labels);
         printFonl(lFonl);
 
-        JavaPairRDD <Integer, TFonlValue> tFonl = SparkFonlCreator.createTFonl(lFonl);
-
         Broadcast <QFonl> broadcast = conf.getSc().broadcast(qFonl);
         Broadcast <Integer> splitBroadcast = conf.getSc().broadcast(0);
 
-        JavaPairRDD <Integer, Tuple2 <int[], int[][]>> candidates = getPartials(tFonl, broadcast, splitBroadcast)
+        JavaPairRDD <Integer, Tuple2 <int[], int[][]>> candidates = getPartials(lFonl, broadcast, splitBroadcast)
                 .mapValues(v -> {
                     int[][] match = new int[broadcast.getValue().splits.length][];
                     match[0] = v._2;
@@ -63,7 +62,7 @@ public class SGMatcher extends SparkApp {
             }
 
             splitBroadcast = conf.getSc().broadcast(splitIndex);
-            JavaPairRDD <Integer, Tuple2 <Integer, int[]>> partials = getPartials(tFonl, broadcast, splitBroadcast);
+            JavaPairRDD <Integer, Tuple2 <Integer, int[]>> partials = getPartials(lFonl, broadcast, splitBroadcast);
             printPartials("split" + splitIndex, partials);
 
             candidates = candidates.join(partials).mapValues(val -> {
@@ -85,7 +84,7 @@ public class SGMatcher extends SparkApp {
         }).reduce((a, b) -> a + b);
     }
 
-    private JavaPairRDD <Integer, Tuple2 <Integer, int[]>> getPartials(JavaPairRDD <Integer, TFonlValue> tFonl,
+    private JavaPairRDD <Integer, Tuple2 <Integer, int[]>> getPartials(JavaPairRDD <Integer, LFonlValue> tFonl,
                                                                        Broadcast <QFonl> broadcast, Broadcast <Integer> splitBroadcast) {
         return tFonl.flatMapToPair(kv -> {
 
@@ -148,7 +147,7 @@ public class SGMatcher extends SparkApp {
         EdgeLoader edgeLoader = new EdgeLoader(conf);
         JavaPairRDD <Integer, String> labels = getLables(conf.getSc(), conf.getLablePath(), conf.getPartitionNum());
 
-        SGMatcher matcher = new SGMatcher(conf, edgeLoader, labels);
+        SGSearcher matcher = new SGSearcher(conf, edgeLoader, labels);
 
         Map <Integer, List <Integer>> neighbors = new HashMap <>();
         neighbors.put(1, Arrays.asList(4, 2, 3));
@@ -180,7 +179,7 @@ public class SGMatcher extends SparkApp {
 
     private void printFonl(JavaPairRDD <Integer, LFonlValue> labelFonl) {
         List <Tuple2 <Integer, LFonlValue>> collect = labelFonl.collect();
-        for (Tuple2 <Integer, LFonlValue> t : collect) {
+        for (Tuple2 <Integer,LFonlValue> t : collect) {
             System.out.println(t);
         }
     }

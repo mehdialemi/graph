@@ -1,7 +1,6 @@
 package ir.ac.sbu.graph.fonl.matcher;
 
 import ir.ac.sbu.graph.fonl.Fvalue;
-import ir.ac.sbu.graph.fonl.TriangleMeta;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
@@ -9,14 +8,13 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.HashSet;
 import java.util.Set;
 
-public class TFonlValue extends Fvalue <TriangleMeta> {
-
-    private static int[] EMPTY = new int[0];
+public class LFonlValue  extends Fvalue<LabelMeta> {
     private static Int2IntOpenHashMap tEmpty = new Int2IntOpenHashMap();
+
 
     public Int2IntOpenHashMap expands(int vertex, int splitIndex, QFonl qFonl) {
 
-        Set <int[]> partials = allPartials(splitIndex, qFonl);
+        Set<int[]> partials = allPartials(splitIndex, qFonl);
 
         if (partials == null || partials.isEmpty())
             return tEmpty;
@@ -37,7 +35,7 @@ public class TFonlValue extends Fvalue <TriangleMeta> {
         int vIndex = qSplit.vIndex;
         int[] qFonlValue = qFonl.fonl[vIndex];
 
-        Set <int[]> resultSet = new HashSet <>();
+        Set <int[]> resultSet = new HashSet<>();
         partial(meta.label, meta.deg, 0, qSplit, qFonl, resultSet);
 
         for (int offset = 0; offset < fonl.length; offset++) {
@@ -113,7 +111,6 @@ public class TFonlValue extends Fvalue <TriangleMeta> {
     public void join(int selectIndex, int currentVertexIndex, int[] partialMatch,
                      int[][] selects, QFonl qFonl, QSplit qSplit, Set <int[]> resultSet) {
 
-        int[] qFonlValue = qFonl.fonl[qSplit.vIndex];
         partialMatch[selectIndex] = this.fonl[currentVertexIndex];
 
         if (selectIndex >= selects.length - 1) {
@@ -126,24 +123,8 @@ public class TFonlValue extends Fvalue <TriangleMeta> {
         // go to the right array
         int nextIndex = selectIndex + 1;
 
-//        boolean verifyEdge = qFonl
-//                .edgeArray[qSplit.vIndex]
-//                .getOrDefault(qFonlValue[selectIndex], new IntOpenHashSet())
-//                .contains(qFonlValue[nextIndex]);
-
-//        int id1 = selects[selectIndex][currentVertexIndex];
         for (int vertexIndex = 0; vertexIndex < selects[nextIndex].length; vertexIndex++) {
-//            int id2 = selects[nextIndex][vertexIndex];
-
-//            if (verifyEdge && !hasEdge(id1, id2))
-//                continue;
-
             join(nextIndex, vertexIndex, partialMatch, selects, qFonl, qSplit, resultSet);
         }
     }
-
-//    public boolean hasEdge(int v1, int v2) {
-//        return meta.edges.contains(new Edge(v1, v2));
-//    }
 }
-

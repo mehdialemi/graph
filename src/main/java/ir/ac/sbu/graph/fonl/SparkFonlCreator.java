@@ -1,6 +1,7 @@
 package ir.ac.sbu.graph.fonl;
 
 import ir.ac.sbu.graph.fonl.matcher.DegreeMeta;
+import ir.ac.sbu.graph.fonl.matcher.LFonlValue;
 import ir.ac.sbu.graph.fonl.matcher.LabelMeta;
 import ir.ac.sbu.graph.fonl.matcher.TFonlValue;
 import ir.ac.sbu.graph.spark.NeighborList;
@@ -74,8 +75,8 @@ public class SparkFonlCreator {
         }).cache();
     }
 
-    public static JavaPairRDD <Integer, Fvalue <LabelMeta>> createLabelFonl(NeighborList neighborList,
-                                                                            JavaPairRDD <Integer, String> labels) {
+    public static JavaPairRDD <Integer, LFonlValue> createLabelFonl(NeighborList neighborList,
+                                                                    JavaPairRDD <Integer, String> labels) {
         JavaPairRDD <Integer, Fvalue <DegreeMeta>> degFonl = createDegFonl(neighborList);
 
         JavaPairRDD <Integer, Iterable <Tuple2 <Integer, String>>> labelMsg = degFonl.flatMapToPair(kv -> {
@@ -103,7 +104,7 @@ public class SparkFonlCreator {
                         labelMap.put(vLabel._1, vLabel._2);
                     }
 
-                    Fvalue <LabelMeta> fvalue = new Fvalue <>();
+                    LFonlValue fvalue = new LFonlValue();
                     Fvalue <DegreeMeta> dfonl = value._1._1;
 
                     fvalue.fonl = dfonl.fonl;
@@ -121,7 +122,7 @@ public class SparkFonlCreator {
                 }).cache();
     }
 
-    public static JavaPairRDD<Integer, int[]> createCandidates(JavaPairRDD <Integer, Fvalue <LabelMeta>>  labelFonl) {
+    public static JavaPairRDD<Integer, int[]> createCandidates(JavaPairRDD <Integer, LFonlValue>  labelFonl) {
         return labelFonl.filter(t -> t._2.fonl.length > 1) // Select vertices having more than 2 items in their values
                 .flatMapToPair(t -> {
 
@@ -151,7 +152,7 @@ public class SparkFonlCreator {
                 });
     }
 
-    public static JavaPairRDD <Integer, TFonlValue> createTFonl(JavaPairRDD <Integer, Fvalue <LabelMeta>>  labelFonl) {
+    public static JavaPairRDD <Integer, TFonlValue> createTFonl(JavaPairRDD <Integer, LFonlValue>  labelFonl) {
         JavaPairRDD <Integer, int[]> candidates = createCandidates(labelFonl);
         JavaPairRDD <Integer, Iterable <Edge[]>> tEdges = candidates.join(labelFonl).flatMapToPair(kv -> {
             int[] cArray = kv._2._1;
