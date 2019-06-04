@@ -13,5 +13,4 @@ public class Subquery {
     public int[] degrees;
     public Int2ObjectMap<IntSet> vi2List;
     public Int2IntMap v2i;
-
 }

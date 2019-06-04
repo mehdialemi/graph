@@ -39,6 +39,7 @@ public class TriangleFonl extends LabelFonl {
     public JavaPairRDD <Integer, TriangleFonlValue> createTFonl() {
 
         JavaPairRDD <Integer, LabledFonlValue> labelFonl = super.getOrCreateLFonl();
+        printFonl(labelFonl);
 
         JavaPairRDD <Integer, int[]> candidates = createCandidates(labelFonl);
 
@@ -54,7 +55,6 @@ public class TriangleFonl extends LabelFonl {
                     LabledFonlValue labledFonlValue = iterator.next();
                     int[] hDegs = labledFonlValue.fonl;
 
-                    kv._2._1.iterator();
                     Iterator <int[]> cIterator = kv._2._1.iterator();
                     if (!cIterator.hasNext())
                         return output.iterator();
@@ -62,6 +62,7 @@ public class TriangleFonl extends LabelFonl {
                     Arrays.sort(hDegs, 0, hDegs.length);
 
                     int v = kv._1;
+
                     do {
                         int[] forward = cIterator.next();
                         int u = forward[0];
@@ -77,7 +78,7 @@ public class TriangleFonl extends LabelFonl {
                             output.add(new Tuple2 <>(v, new Edge(w, -1)));
                         }
 
-                    } while (iterator.hasNext());
+                    } while (cIterator.hasNext());
 
                     return output.iterator();
                 }).groupByKey(labelFonl.getNumPartitions());
@@ -93,16 +94,8 @@ public class TriangleFonl extends LabelFonl {
                     for (Edge edge : join._2.get()) {
                         if (edge.v2 == -1)
                             removes.add(edge.v1);
-                    }
-
-                    for (Edge edge : join._2.get()) {
-                        if (edge.v2 == -1)
-                            continue;
-
-                        if (removes.contains(edge.v1) || removes.contains(edge.v2))
-                            continue;
-
-                        triangleFonlValue.addNeighborEdge(edge);
+                        else
+                            triangleFonlValue.addNeighborEdge(edge);
                     }
 
                     if (!removes.isEmpty())
@@ -118,14 +111,14 @@ public class TriangleFonl extends LabelFonl {
                 .flatMapToPair(t -> {
 
                     int[] fonl = t._2.fonl;
-                    int size = fonl.length; // one is for the first index holding node's degree
+                    int max = fonl.length - 1; // one is for the first index holding node's degree
 
                     List <Tuple2 <Integer, int[]>> output;
-                    output = new ArrayList <>(size);
+                    output = new ArrayList <>(max);
 
-                    for (int index = 0; index < size; index++) {
+                    for (int index = 0; index < max; index++) {
                         int cVertex = fonl[index];
-                        int len = size - index;
+                        int len = fonl.length - index;
                         int[] cValue = new int[len];
                         cValue[0] = t._1; // First vertex in the triangle
                         System.arraycopy(fonl, index + 1, cValue, 1, len - 1);
@@ -135,5 +128,12 @@ public class TriangleFonl extends LabelFonl {
 
                     return output.iterator();
                 });
+    }
+
+    private void printFonl(JavaPairRDD <Integer, LabledFonlValue> labelFonl) {
+        List <Tuple2 <Integer, LabledFonlValue>> collect = labelFonl.collect();
+        for (Tuple2 <Integer, LabledFonlValue> t : collect) {
+            System.out.println(t);
+        }
     }
 }

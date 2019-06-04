@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class TriangleFonlValue extends Fvalue <TriangleMeta> {
@@ -50,6 +51,7 @@ public class TriangleFonlValue extends Fvalue <TriangleMeta> {
 
     public void addNeighborEdge(Edge edge) {
         meta.addV2V(edge.v1, edge.v2);
+//        meta.addV2V(edge.v2, edge.v1);
     }
 
     public Int2IntMap matches(int fonlKey, Subquery subquery) {
@@ -87,7 +89,7 @@ public class TriangleFonlValue extends Fvalue <TriangleMeta> {
         for (Integer key : keySet) {
             IntOpenHashSet rSet = new IntOpenHashSet();
             rSet.add(key);
-            join(0, rSet, setArray, results);
+            join(0, rSet, setArray, results, subquery);
         }
 
         if (results.isEmpty())
@@ -106,9 +108,38 @@ public class TriangleFonlValue extends Fvalue <TriangleMeta> {
         return v2count;
     }
 
-    private void join(int idx, IntSet iSet, IntSet[] setArray, Set<int[]> result) {
+    private void join(int idx, IntSet iSet, IntSet[] setArray, Set<int[]> result, Subquery subquery) {
 
         if (idx == setArray.length) {
+
+            int[] c = iSet.toIntArray();
+            for (Map.Entry <Integer, IntSet> entry : subquery.vi2List.entrySet()) {
+                int vi = entry.getKey();
+                int index1 = subquery.v2i.get(vi);
+                int v1 = fonl[index1];
+
+                if (v1 == -1)
+                    continue;
+
+                IntSet v1Connections = null;
+
+                for (Integer v2i : entry.getValue()) {
+                    int index2 = subquery.v2i.get(v2i);
+
+                    int v2 = fonl[index2];
+                    if (v2 == -1)
+                        continue;
+
+                    if (v1Connections == null)
+                        v1Connections = meta.v2n.getOrDefault(v1, new IntOpenHashSet());
+
+                    if (!v1Connections.contains(v2))
+                        return;
+                }
+            }
+            for (int i : c) {
+
+            }
             result.add(iSet.toIntArray());
             return;
         }
@@ -121,7 +152,7 @@ public class TriangleFonlValue extends Fvalue <TriangleMeta> {
             IntOpenHashSet rSet = new IntOpenHashSet(iSet);
             rSet.add(index);
 
-            join(idx + 1, rSet, setArray, result);
+            join(idx + 1, rSet, setArray, result, subquery);
         }
     }
 }

@@ -19,6 +19,7 @@ public class TriangleMeta extends LabelMeta {
     public void addV2V(int v1, int v2) {
         if (v2n == null)
             v2n = new Int2ObjectOpenHashMap <>();
+
         IntSet intSet = v2n.get(v1);
         if (intSet == null) {
             intSet = new IntOpenHashSet();
