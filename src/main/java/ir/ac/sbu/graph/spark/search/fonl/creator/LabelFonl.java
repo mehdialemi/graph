@@ -1,7 +1,7 @@
-package ir.ac.sbu.graph.spark.search.fonl;
+package ir.ac.sbu.graph.spark.search.fonl.creator;
 
 import ir.ac.sbu.graph.spark.NeighborList;
-import ir.ac.sbu.graph.spark.search.VLabelDeg;
+import ir.ac.sbu.graph.spark.search.fonl.value.LabledFonlValue;
 import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
 
@@ -9,12 +9,26 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class LabelFonlCreator {
+public class LabelFonl {
 
     public final static String EMPTY_LABEL = "_";
+    protected final NeighborList neighborList;
+    protected final JavaPairRDD <Integer, String> labels;
+    private JavaPairRDD <Integer, LabledFonlValue> lfonl;
 
-    public static JavaPairRDD <Integer, LabledFonlValue> createLabeledFonl(NeighborList neighborList,
-                                                                           JavaPairRDD <Integer, String> labels) {
+    public LabelFonl(NeighborList neighborList, JavaPairRDD <Integer, String> labels) {
+        this.neighborList = neighborList;
+        this.labels = labels;
+    }
+
+    public JavaPairRDD <Integer, LabledFonlValue> getOrCreateLFonl() {
+        if (lfonl == null) {
+            lfonl = createLFonl();
+        }
+        return lfonl;
+    }
+
+    public JavaPairRDD <Integer, LabledFonlValue> createLFonl() {
         JavaPairRDD <Integer, int[]> neighbors = neighborList.getOrCreate();
 
         JavaPairRDD <Integer, VLabelDeg> labelDegMsg = neighbors
@@ -37,7 +51,7 @@ public class LabelFonlCreator {
         JavaPairRDD <Integer, LabledFonlValue> fonlLabels = labelDegMsg.groupByKey(neighbors.getNumPartitions()).mapToPair(kv -> {
             int degree = 0;
 
-            for (VLabelDeg vLabelDeg : kv._2) {
+            for (VLabelDeg value : kv._2) {
                 degree++;
             }
 
@@ -67,6 +81,6 @@ public class LabelFonlCreator {
         return fonlLabels.leftOuterJoin(labels).mapValues(v -> {
             v._1.meta.label = v._2.orElse(EMPTY_LABEL);
             return v._1;
-        });
+        }).cache();
     }
 }

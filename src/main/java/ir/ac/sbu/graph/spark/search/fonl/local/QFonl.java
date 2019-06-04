@@ -1,6 +1,5 @@
-package ir.ac.sbu.graph.spark.search.fonl;
+package ir.ac.sbu.graph.spark.search.fonl.local;
 
-import ir.ac.sbu.graph.fonl.LocalFonl;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntSet;

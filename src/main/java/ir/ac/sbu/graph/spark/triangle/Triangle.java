@@ -1,7 +1,11 @@
 package ir.ac.sbu.graph.spark.triangle;
 
 import ir.ac.sbu.graph.spark.SparkApp;
+import ir.ac.sbu.graph.spark.search.fonl.local.OrderedNeighbors;
 import ir.ac.sbu.graph.types.VertexDeg;
+import ir.ac.sbu.graph.utils.OrderedNeighborList;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntListIterator;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
@@ -148,11 +152,19 @@ public class Triangle extends SparkApp {
             int sum = 0;
             do {
                 int[] forward = iterator.next();
-                int count = sortedIntersection(hDegs, forward, output, 1, 1);
-                if (count > 0) {
-                    sum += count;
-                    output.add(new Tuple2<>(forward[0], count));
+                IntList intersects = OrderedNeighborList.intersection(hDegs, forward, 1, 1);
+                if (intersects == null)
+                    continue;
+
+                IntListIterator iter = intersects.intListIterator();
+                while (iter.hasNext()) {
+                    int w = iter.nextInt();
+                    output.add(new Tuple2 <>(w, 1));
                 }
+
+                sum += intersects.size();
+                output.add(new Tuple2<>(forward[0], intersects.size()));
+
             } while (iterator.hasNext());
 
             if (sum > 0) {
@@ -169,52 +181,5 @@ public class Triangle extends SparkApp {
         return tc3 / 3;
     }
 
-    private static int sortedIntersection(int[] hDegs, int[] forward, List<Tuple2<Integer, Integer>> output,
-                                   int hIndex, int fIndex) {
-        int fLen = forward.length;
-        int hLen = hDegs.length;
 
-        if (hDegs.length == 0 || fLen == 0)
-            return 0;
-
-        boolean leftRead = true;
-        boolean rightRead = true;
-
-        int h = 0;
-        int f = 0;
-        int count = 0;
-
-        boolean finish = false;
-        while (!finish) {
-
-            if (hIndex >= hLen && fIndex >= fLen)
-                break;
-
-            if ((hIndex >= hLen && !rightRead) || (fIndex >= fLen && !leftRead))
-                break;
-
-            if (leftRead && hIndex < hLen) {
-                h = hDegs[hIndex++];
-            }
-
-            if (rightRead && fIndex < fLen) {
-                f = forward[fIndex++];
-            }
-
-            if (h == f) {
-                if (output != null)
-                    output.add(new Tuple2<>(h, 1));
-                count++;
-                leftRead = true;
-                rightRead = true;
-            } else if (h < f) {
-                leftRead = true;
-                rightRead = false;
-            } else {
-                leftRead = false;
-                rightRead = true;
-            }
-        }
-        return count;
-    }
 }

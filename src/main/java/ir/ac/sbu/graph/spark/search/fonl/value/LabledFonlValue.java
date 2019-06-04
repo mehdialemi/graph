@@ -1,12 +1,11 @@
-package ir.ac.sbu.graph.spark.search.fonl;
+package ir.ac.sbu.graph.spark.search.fonl.value;
 
-import ir.ac.sbu.graph.fonl.Fvalue;
-import ir.ac.sbu.graph.spark.search.VLabelDeg;
+import ir.ac.sbu.graph.spark.search.fonl.creator.VLabelDeg;
+import ir.ac.sbu.graph.spark.search.fonl.local.Subquery;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,7 +15,7 @@ public class LabledFonlValue extends Fvalue<LabelMeta> {
 
     public LabledFonlValue() {}
 
-    LabledFonlValue(int degree, List<VLabelDeg> list) {
+    public LabledFonlValue(int degree, List<VLabelDeg> list) {
         meta = new LabelMeta(degree, list.size());
         fonl = new int[list.size()];
         meta.labels = new String[list.size()];
@@ -26,10 +25,6 @@ public class LabledFonlValue extends Fvalue<LabelMeta> {
             meta.degs[i] = list.get(i).degree;
             meta.labels[i] = list.get(i).label;
         }
-
-        ifonl = new int[fonl.length];
-        System.arraycopy(fonl, 0, ifonl, 0, ifonl.length);
-        Arrays.sort(ifonl);
     }
 
     public Int2IntOpenHashMap matchSubquery(int vertex, Subquery subquery) {
@@ -56,10 +51,7 @@ public class LabledFonlValue extends Fvalue<LabelMeta> {
         if (result != null)
             resultSet.addAll(result);
 
-        for (int offset = 0; offset < fonl.length; offset++) {
-            if (fonl.length - offset < subquery.fonlValue.length)
-                break;
-
+        for (int offset = 0; offset < fonl.length - subquery.fonl.length; offset++) {
             int deg = meta.degs[offset];
             String label = meta.labels[offset];
 
@@ -78,23 +70,19 @@ public class LabledFonlValue extends Fvalue<LabelMeta> {
         if (subquery.degree > deg)
             return null;
 
-        IntSet[] set = new IntSet[subquery.fonlValue.length];
+        IntSet[] set = new IntSet[subquery.fonl.length];
 
-        for (int i = 0; i < subquery.fonlValue.length; i++) {
+        for (int i = 0; i < subquery.fonl.length; i++) {
             String qvLabel = subquery.labels[i];
             int qvDegree = subquery.degrees[i];
 
-            for (int j = fonlOffset; j < this.fonl.length; j++) {
+            int max = this.fonl.length - subquery.fonl.length + i + 1;
+            for (int j = fonlOffset; j < max; j++) {
                 if (!meta.labels[j].equals(qvLabel))
                     continue;
 
                 if (meta.degs[j] < qvDegree)
                     continue;
-
-                int querySize = subquery.fonlValue.length - i;
-                int graphSize = this.fonl.length - j;
-                if (querySize> graphSize)
-                    break;
 
                 if (set[i] == null)
                     set[i] = new IntOpenHashSet();
@@ -110,7 +98,7 @@ public class LabledFonlValue extends Fvalue<LabelMeta> {
             selects[k] = set[k].toIntArray();
         }
 
-        int[] indexes = new int[subquery.fonlValue.length];
+        int[] indexes = new int[subquery.fonl.length];
 
         Set <int[]> resultSet = new HashSet <>();
         for (int vertexIndex = 0; vertexIndex < selects[0].length; vertexIndex++) {
@@ -128,7 +116,7 @@ public class LabledFonlValue extends Fvalue<LabelMeta> {
 
         partialMatch[selectIndex] = this.fonl[currentVertexIndex];
 
-        if (selectIndex >= selects.length - 1) {
+        if (selectIndex == selects.length - 1) {
             int[] pMatch = new int[partialMatch.length];
             System.arraycopy(partialMatch, 0, pMatch, 0, pMatch.length);
             resultSet.add(pMatch);

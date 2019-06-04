@@ -4,7 +4,11 @@ import ir.ac.sbu.graph.spark.ArgumentReader;
 import ir.ac.sbu.graph.spark.EdgeLoader;
 import ir.ac.sbu.graph.spark.NeighborList;
 import ir.ac.sbu.graph.spark.SparkApp;
-import ir.ac.sbu.graph.spark.search.fonl.*;
+import ir.ac.sbu.graph.spark.search.fonl.creator.LocalFonlCreator;
+import ir.ac.sbu.graph.spark.search.fonl.creator.TriangleFonl;
+import ir.ac.sbu.graph.spark.search.fonl.local.QFonl;
+import ir.ac.sbu.graph.spark.search.fonl.local.Subquery;
+import ir.ac.sbu.graph.spark.search.fonl.value.TriangleFonlValue;
 import it.unimi.dsi.fastutil.ints.*;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -34,7 +38,8 @@ public class SgSearcher extends SparkApp {
         Queue<Subquery> queue = new LinkedList <>(subqueries);
 
         NeighborList neighborList = new NeighborList(edgeLoader);
-        JavaPairRDD <Integer, LabledFonlValue> lFonl = LabelFonlCreator.createLabeledFonl(neighborList, labels);
+        TriangleFonl triangleFonl = new TriangleFonl (neighborList, labels);
+        JavaPairRDD <Integer, TriangleFonlValue> lFonl = triangleFonl.getOrCreateTFonl();
         printFonl(lFonl);
 
         Broadcast <Subquery> broadcast = conf.getSc().broadcast(queue.remove());
@@ -85,14 +90,14 @@ public class SgSearcher extends SparkApp {
         }).reduce((a, b) -> a + b);
     }
 
-    private JavaPairRDD <Integer, Tuple2 <Integer, int[]>> getSubMatches(JavaPairRDD <Integer, LabledFonlValue> tFonl,
+    private JavaPairRDD <Integer, Tuple2 <Integer, int[]>> getSubMatches(JavaPairRDD <Integer, TriangleFonlValue> tFonl,
                                                                          Broadcast <Subquery> broadcast) {
         return tFonl.flatMapToPair(kv -> {
 
             List <Tuple2 <Integer, Tuple2 <Integer, Integer>>> out = new ArrayList <>();
             Subquery subquery = broadcast.getValue();
 
-            Int2IntOpenHashMap counters = kv._2.matchSubquery(kv._1, subquery);
+            Int2IntMap counters = kv._2.matchCount(kv._1, subquery);
 
             for (Map.Entry <Integer, Integer> entry : counters.entrySet()) {
                 out.add(new Tuple2 <>(entry.getKey(), new Tuple2 <>(entry.getValue(), kv._1)));
@@ -172,9 +177,9 @@ public class SgSearcher extends SparkApp {
                 .mapToPair(split -> new Tuple2 <>(Integer.parseInt(split[0]), split[1]));
     }
 
-    private void printFonl(JavaPairRDD <Integer, LabledFonlValue> labelFonl) {
-        List <Tuple2 <Integer, LabledFonlValue>> collect = labelFonl.collect();
-        for (Tuple2 <Integer, LabledFonlValue> t : collect) {
+    private void printFonl(JavaPairRDD <Integer, TriangleFonlValue> labelFonl) {
+        List <Tuple2 <Integer, TriangleFonlValue>> collect = labelFonl.collect();
+        for (Tuple2 <Integer, TriangleFonlValue> t : collect) {
             System.out.println(t);
         }
     }

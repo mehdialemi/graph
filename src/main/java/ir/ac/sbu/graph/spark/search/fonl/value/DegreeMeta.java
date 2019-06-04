@@ -1,7 +1,4 @@
-package ir.ac.sbu.graph.spark.search.fonl;
-
-import ir.ac.sbu.graph.fonl.Fvalue;
-import ir.ac.sbu.graph.fonl.Meta;
+package ir.ac.sbu.graph.spark.search.fonl.value;
 
 import java.util.Arrays;
 

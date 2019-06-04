@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.spark.search.fonl;
+package ir.ac.sbu.graph.spark.search.fonl.value;
 
 import java.util.Arrays;
 
@@ -9,7 +9,13 @@ public class LabelMeta extends DegreeMeta {
     public LabelMeta() { }
 
     public LabelMeta(int deg, int fonlValueSize) {
+        this(deg, "", fonlValueSize);
+    }
+
+    public LabelMeta(int deg, String label, int fonlValueSize) {
         super(deg, fonlValueSize);
+        this.label = label;
+        labels = new String[fonlValueSize];
     }
 
     public LabelMeta(LabelMeta labelMeta) {

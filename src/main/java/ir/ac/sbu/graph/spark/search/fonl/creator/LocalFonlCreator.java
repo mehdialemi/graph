@@ -1,6 +1,10 @@
-package ir.ac.sbu.graph.spark.search.fonl;
+package ir.ac.sbu.graph.spark.search.fonl.creator;
 
-import ir.ac.sbu.graph.fonl.LocalFonl;
+import ir.ac.sbu.graph.spark.search.fonl.local.LocalFonl;
+import ir.ac.sbu.graph.spark.search.fonl.local.OrderedNeighbors;
+import ir.ac.sbu.graph.spark.search.fonl.local.QFonl;
+import ir.ac.sbu.graph.spark.search.fonl.local.QSplit;
+import ir.ac.sbu.graph.spark.search.fonl.local.Subquery;
 import ir.ac.sbu.graph.types.Edge;
 import ir.ac.sbu.graph.types.VertexDeg;
 import it.unimi.dsi.fastutil.ints.*;
@@ -18,15 +22,21 @@ public class LocalFonlCreator {
             subquery.vertex = split.vIndex;
             subquery.degree = qFonl.degIndices[split.vIndex];
             subquery.label = qFonl.labels[split.vIndex];
+
             int[] fonl = qFonl.fonl[split.vIndex];
-            subquery.fonlValue = fonl;
+            subquery.fonl = fonl;
             subquery.degrees = new int[fonl.length];
             subquery.labels = new String[fonl.length];
+            subquery.v2i = new Int2IntOpenHashMap();
 
             for (int i = 0; i < fonl.length; i++) {
                 int index = fonl[i];
+                subquery.v2i.put(fonl[i], index);
                 subquery.degrees[i] = qFonl.degIndices[index];
                 subquery.labels[i] = qFonl.labels[index];
+
+                if (qFonl.edgeArray[i] != null)
+                    subquery.vi2List = qFonl.edgeArray[i];
             }
 
             list.add(subquery);
@@ -34,6 +44,7 @@ public class LocalFonlCreator {
 
         return list;
     }
+
     public static QFonl createQFonl(Map <Integer, List <Integer>> neighbors, Map <Integer, String> labelMap) {
 
         LocalFonl localFonl = createFonl(neighbors, labelMap);
@@ -163,6 +174,7 @@ public class LocalFonlCreator {
         }
 
         qFonl.splits = qSplits.toArray(new QSplit[0]);
+
         return qFonl;
     }
 

@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.spark.search;
+package ir.ac.sbu.graph.spark.search.fonl.creator;
 
 import java.io.Serializable;
 

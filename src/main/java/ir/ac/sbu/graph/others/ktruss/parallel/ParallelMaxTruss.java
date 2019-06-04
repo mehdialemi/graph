@@ -107,7 +107,7 @@ public class ParallelMaxTruss extends ParallelKTrussBase {
 
         long tSort = System.currentTimeMillis();
         long tCreateFonl = tSort - tInitFonl;
-        System.out.println("getOrCreate fonl in " + tCreateFonl + " ms");
+        System.out.println("getOrCreateLFonl fonl in " + tCreateFonl + " ms");
 
         Long2ObjectOpenHashMap<IntSet>[] mapThreads = new Long2ObjectOpenHashMap[threads];
         for (int i = 0; i < threads; i++) {

@@ -160,7 +160,7 @@ public class PartitioningUtils {
             partitions[u] = -1;
         }
 
-        // getOrCreate dominate set
+        // getOrCreateLFonl dominate set
         DataInputBuffer in = new DataInputBuffer();
         int neighborhood = 5;
         int currentPartition = 0;

@@ -19,7 +19,7 @@ public class TriangleParallelForkJoin {
         throws Exception {
         long t1 = System.currentTimeMillis();
 
-        // for each thread, getOrCreate a map from vertex id to its degree
+        // for each thread, getOrCreateLFonl a map from vertex id to its degree
         final List<Tuple2<Integer, Integer>> edgeBuckets = createBuckets(threads, edges.size());
         Stream<Map<Integer, Integer>> vdResult = forkJoinPool.submit(() -> {
             return edgeBuckets.parallelStream().map(bucket -> {
@@ -47,7 +47,7 @@ public class TriangleParallelForkJoin {
         final int vertexNum = vdLocalMaps.stream().map(v -> v.size()).reduce((a, b) -> b + a).get() + 1;
         final int batchSize = ((int) (vertexNum * batchRatio) / threads) * threads; // make batchSize as a multiplier of threads
 
-        // getOrCreate an array to hold each vertex's degree. index of this array corresponds to vertex Id
+        // getOrCreateLFonl an array to hold each vertex's degree. index of this array corresponds to vertex Id
         int[] vertexDegrees = new int[vertexNum];
 
         // Iterate over local vertex degree map (vdLocalMaps) and update vertexDegrees accordingly.
@@ -125,7 +125,7 @@ public class TriangleParallelForkJoin {
                 int syncSize = syncSizeSelector.getAndAdd(syncIncrement) + batchSize;
                 Map<Long, Set<Integer>> eVerticesMap = new HashMap<>(batchSize * 2);
 
-                // Each thread getOrCreate an output as Map which represents edge as a key and a list of pair ver as value.
+                // Each thread getOrCreateLFonl an output as Map which represents edge as a key and a list of pair ver as value.
                 while (start < vertexNum) {
                     start = batchSelector.getAndAdd(batchSize);
 

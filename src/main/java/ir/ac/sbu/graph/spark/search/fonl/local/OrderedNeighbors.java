@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.spark.search.fonl;
+package ir.ac.sbu.graph.spark.search.fonl.local;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -12,7 +12,7 @@ public class OrderedNeighbors implements Serializable {
     public int[][] dsnArray;
     public int[][] isnArray;
 
-    OrderedNeighbors(int vSize) {
+    public OrderedNeighbors(int vSize) {
         vArray = new int[vSize];
         dArray = new int[vSize];
         labels = new String[vSize];

@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.spark.search;
+package ir.ac.sbu.graph.spark.search.fonl.creator;
 
 public class VLabelDeg extends VLabel {
 
