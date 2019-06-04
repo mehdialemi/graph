@@ -17,13 +17,16 @@ import scala.Tuple2;
 
 import java.util.*;
 
-public class SgSearcher extends SparkApp {
+/**
+ * Search the given graph pattern in the big graph
+ */
+public class SGPCounter extends SparkApp {
 
     private SgConf conf;
     private EdgeLoader edgeLoader;
     private JavaPairRDD <Integer, String> labels;
 
-    private SgSearcher(SgConf conf, EdgeLoader edgeLoader, JavaPairRDD <Integer, String> labels) {
+    private SGPCounter(SgConf conf, EdgeLoader edgeLoader, JavaPairRDD <Integer, String> labels) {
         super(edgeLoader);
         this.conf = conf;
         this.edgeLoader = edgeLoader;
@@ -147,7 +150,7 @@ public class SgSearcher extends SparkApp {
         EdgeLoader edgeLoader = new EdgeLoader(conf);
         JavaPairRDD <Integer, String> labels = getLables(conf.getSc(), conf.getLablePath(), conf.getPartitionNum());
 
-        SgSearcher matcher = new SgSearcher(conf, edgeLoader, labels);
+        SGPCounter matcher = new SGPCounter(conf, edgeLoader, labels);
 
         Map <Integer, List <Integer>> neighbors = new HashMap <>();
         neighbors.put(1, Arrays.asList(4, 2, 3));
