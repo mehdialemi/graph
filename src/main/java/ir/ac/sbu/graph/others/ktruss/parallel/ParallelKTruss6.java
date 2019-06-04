@@ -195,7 +195,7 @@ public class ParallelKTruss6 extends ParallelKTrussBase {
         })).get().reduce((a, b) -> Math.max(a, b)).getAsInt();
         long tTC = System.currentTimeMillis();
         long tTV = tTC - tSort;
-        System.out.println("tc duration: " + tTV + " ms");
+        System.out.println("tcArray duration: " + tTV + " ms");
 
         int len = maxSup + 1;
 //        System.out.println("len: " + len);

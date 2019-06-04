@@ -4,7 +4,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22149 ms
 start ktruss with kc = 3, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 498 ms
-tc duration: 13413 ms
+tcArray duration: 13413 ms
 iteration 1, invalid size: 0 time: 26 ms
 Complete in 6158 ms
 Total: 20069 ms, iteration count: 0
@@ -18,7 +18,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22037 ms
 start ktruss with kc = 4, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 495 ms
-tc duration: 14716 ms
+tcArray duration: 14716 ms
 iteration 1, invalid size: 4357294 time: 183 ms
 Update in 1296 ms
 iteration 2, invalid size: 980167 time: 106 ms
@@ -68,7 +68,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22197 ms
 start ktruss with kc = 5, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 500 ms
-tc duration: 13766 ms
+tcArray duration: 13766 ms
 iteration 1, invalid size: 7639353 time: 186 ms
 Update in 2732 ms
 iteration 2, invalid size: 1763595 time: 12 ms
@@ -128,7 +128,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22267 ms
 start ktruss with kc = 6, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 524 ms
-tc duration: 14130 ms
+tcArray duration: 14130 ms
 iteration 1, invalid size: 10228285 time: 127 ms
 Update in 3430 ms
 iteration 2, invalid size: 2298288 time: 46 ms
@@ -192,7 +192,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 23319 ms
 start ktruss with kc = 7, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 506 ms
-tc duration: 14203 ms
+tcArray duration: 14203 ms
 iteration 1, invalid size: 12343981 time: 196 ms
 Update in 4763 ms
 iteration 2, invalid size: 2643140 time: 5 ms
@@ -280,7 +280,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22871 ms
 start ktruss with kc = 8, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 546 ms
-tc duration: 13936 ms
+tcArray duration: 13936 ms
 iteration 1, invalid size: 14106860 time: 154 ms
 Update in 5198 ms
 iteration 2, invalid size: 2853302 time: 28 ms
@@ -358,7 +358,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22219 ms
 start ktruss with kc = 9, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 528 ms
-tc duration: 13495 ms
+tcArray duration: 13495 ms
 iteration 1, invalid size: 15594258 time: 173 ms
 Update in 5500 ms
 iteration 2, invalid size: 2962204 time: 77 ms
@@ -450,7 +450,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 20684 ms
 start ktruss with kc = 10, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 639 ms
-tc duration: 14323 ms
+tcArray duration: 14323 ms
 iteration 1, invalid size: 16864360 time: 139 ms
 Update in 6956 ms
 iteration 2, invalid size: 2997609 time: 71 ms
@@ -552,7 +552,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22100 ms
 start ktruss with kc = 11, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 498 ms
-tc duration: 13581 ms
+tcArray duration: 13581 ms
 iteration 1, invalid size: 17957408 time: 142 ms
 Update in 6422 ms
 iteration 2, invalid size: 2981499 time: 62 ms
@@ -648,7 +648,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 21555 ms
 start ktruss with kc = 12, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 521 ms
-tc duration: 13537 ms
+tcArray duration: 13537 ms
 iteration 1, invalid size: 18904278 time: 159 ms
 Update in 7533 ms
 iteration 2, invalid size: 2925384 time: 165 ms
@@ -760,7 +760,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22451 ms
 start ktruss with kc = 13, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 496 ms
-tc duration: 13881 ms
+tcArray duration: 13881 ms
 iteration 1, invalid size: 19732908 time: 97 ms
 Update in 7019 ms
 iteration 2, invalid size: 2843187 time: 8 ms
@@ -874,7 +874,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22484 ms
 start ktruss with kc = 14, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 486 ms
-tc duration: 13689 ms
+tcArray duration: 13689 ms
 iteration 1, invalid size: 20456591 time: 226 ms
 Update in 7311 ms
 iteration 2, invalid size: 2739289 time: 81 ms
@@ -988,7 +988,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 21835 ms
 start ktruss with kc = 15, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 506 ms
-tc duration: 14296 ms
+tcArray duration: 14296 ms
 iteration 1, invalid size: 21090955 time: 91 ms
 Update in 8456 ms
 iteration 2, invalid size: 2626138 time: 3 ms
@@ -1100,7 +1100,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22625 ms
 start ktruss with kc = 16, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 457 ms
-tc duration: 15337 ms
+tcArray duration: 15337 ms
 iteration 1, invalid size: 21653935 time: 169 ms
 Update in 8359 ms
 iteration 2, invalid size: 2505287 time: 76 ms
@@ -1206,7 +1206,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 23244 ms
 start ktruss with kc = 17, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 437 ms
-tc duration: 14477 ms
+tcArray duration: 14477 ms
 iteration 1, invalid size: 22152511 time: 179 ms
 Update in 8742 ms
 iteration 2, invalid size: 2384562 time: 69 ms
@@ -1296,7 +1296,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 21957 ms
 start ktruss with kc = 18, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 527 ms
-tc duration: 13077 ms
+tcArray duration: 13077 ms
 iteration 1, invalid size: 22596010 time: 197 ms
 Update in 15440 ms
 iteration 2, invalid size: 2266640 time: 14 ms
@@ -1418,7 +1418,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 22398 ms
 start ktruss with kc = 19, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 522 ms
-tc duration: 13713 ms
+tcArray duration: 13713 ms
 iteration 1, invalid size: 22992246 time: 138 ms
 Update in 16428 ms
 iteration 2, invalid size: 2150797 time: 9 ms
@@ -1562,7 +1562,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 21503 ms
 start ktruss with kc = 20, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 560 ms
-tc duration: 14595 ms
+tcArray duration: 14595 ms
 iteration 1, invalid size: 23348153 time: 259 ms
 Update in 9246 ms
 iteration 2, invalid size: 2038578 time: 10 ms

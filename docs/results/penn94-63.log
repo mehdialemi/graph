@@ -4,7 +4,7 @@ Loading /home/i/graph-data/penn94
 Graph loaded, edges: 1362220, load time: 983 ms
 start ktruss with kc = 63, threads = 12, method = 6 input: /home/i/graph-data/penn94
 create fonl in 212 ms
-tc duration: 1197 ms
+tcArray duration: 1197 ms
 iteration 1, invalid size: 1274471 time: 197 ms
 Update in 1760 ms
 iteration 2, invalid size: 37382 time: 4 ms
@@ -21,7 +21,7 @@ Loading /home/i/graph-data/penn94
 Graph loaded, edges: 1362220, load time: 943 ms
 start ktruss with kc = 63, threads = 12, method = 6 input: /home/i/graph-data/penn94
 create fonl in 183 ms
-tc duration: 1222 ms
+tcArray duration: 1222 ms
 iteration 1, invalid size: 1274471 time: 86 ms
 Update in 1867 ms
 iteration 2, invalid size: 37382 time: 2 ms
@@ -38,7 +38,7 @@ Loading /home/i/graph-data/penn94
 Graph loaded, edges: 1362220, load time: 968 ms
 start ktruss with kc = 63, threads = 12, method = 6 input: /home/i/graph-data/penn94
 create fonl in 195 ms
-tc duration: 1230 ms
+tcArray duration: 1230 ms
 iteration 1, invalid size: 1274471 time: 145 ms
 Update in 2023 ms
 iteration 2, invalid size: 37382 time: 2 ms

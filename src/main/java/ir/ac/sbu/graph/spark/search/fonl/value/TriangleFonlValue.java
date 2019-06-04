@@ -8,7 +8,6 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class TriangleFonlValue extends Fvalue <TriangleMeta> {
@@ -21,6 +20,9 @@ public class TriangleFonlValue extends Fvalue <TriangleMeta> {
         super.meta = new TriangleMeta(labledFonlValue.meta);
     }
 
+    /**
+     * Note: after this function triangle count and edges should be calculated
+     */
     public void remove(IntSet removes) {
         int fonlValueSize = fonl.length - removes.size();
 
@@ -32,7 +34,6 @@ public class TriangleFonlValue extends Fvalue <TriangleMeta> {
 
         int[] uFonl = new int[fonlValueSize];
         TriangleMeta triangleMeta = new TriangleMeta(meta.deg, meta.label, fonlValueSize);
-        triangleMeta.v2n = meta.v2n;
 
         int index = 0;
         for (int i = 0; i < fonl.length; i++) {
@@ -42,16 +43,23 @@ public class TriangleFonlValue extends Fvalue <TriangleMeta> {
             uFonl[index] = fonl[i];
             triangleMeta.labels[index] = meta.labels[i];
             triangleMeta.degs[index] = meta.degs[i];
-            index ++;
+            index++;
         }
 
         fonl = uFonl;
         meta = triangleMeta;
     }
 
-    public void addNeighborEdge(Edge edge) {
-        meta.addV2V(edge.v1, edge.v2);
-//        meta.addV2V(edge.v2, edge.v1);
+    public void setEdges(Set <Edge> edges, Int2IntOpenHashMap tcMap) {
+        if (!edges.isEmpty()) {
+            meta.setEdges(edges);
+        }
+
+        int[] tcArray = new int[fonl.length];
+        for (int i = 0; i < fonl.length; i++) {
+            tcArray[i] = tcMap.get(fonl[i]);
+        }
+        meta.setTcArray(tcArray);
     }
 
     public Int2IntMap matches(int fonlKey, Subquery subquery) {
@@ -64,9 +72,10 @@ public class TriangleFonlValue extends Fvalue <TriangleMeta> {
         if (meta.label.equals(subquery.label) && meta.deg >= subquery.degree)
             keySet.add(-1);
 
-        for (int j = 0; j < fonl.length; j++) {
-            if (meta.labels[j].equals(subquery.label) && meta.degs[j] >= subquery.degree)
-                keySet.add(j);
+        for (int i = 0; i < fonl.length; i++) {
+            if (meta.labels[i].equals(subquery.label) &&
+                    meta.degs[i] >= subquery.degree && meta.tcArray[i] >= subquery.tc)
+                keySet.add(i);
         }
 
         for (int i = 0; i < subquery.fonl.length; i++) {
@@ -85,10 +94,10 @@ public class TriangleFonlValue extends Fvalue <TriangleMeta> {
             setArray[i] = set;
         }
 
-        Set<int[]> results = new HashSet <>();
-        for (Integer key : keySet) {
+        Set <int[]> results = new HashSet <>();
+        for (int keyIndex : keySet) {
             IntOpenHashSet rSet = new IntOpenHashSet();
-            rSet.add(key);
+            rSet.add(keyIndex);
             join(0, rSet, setArray, results, subquery);
         }
 
@@ -108,48 +117,57 @@ public class TriangleFonlValue extends Fvalue <TriangleMeta> {
         return v2count;
     }
 
-    private void join(int idx, IntSet iSet, IntSet[] setArray, Set<int[]> result, Subquery subquery) {
+    private void join(int idx, IntSet indexSet, IntSet[] setArray, Set <int[]> result, Subquery subquery) {
 
         if (idx == setArray.length) {
+            int[] indexArray = indexSet.toIntArray();
 
-            int[] c = iSet.toIntArray();
-            for (Map.Entry <Integer, IntSet> entry : subquery.vi2List.entrySet()) {
-                int vi = entry.getKey();
-                int index1 = subquery.v2i.get(vi);
-                int v1 = fonl[index1];
-
-                if (v1 == -1)
-                    continue;
-
-                IntSet v1Connections = null;
-
-                for (Integer v2i : entry.getValue()) {
-                    int index2 = subquery.v2i.get(v2i);
-
-                    int v2 = fonl[index2];
-                    if (v2 == -1)
+            int keyIndex = indexArray[0];
+            if (keyIndex != -1) {
+                for (int i = 1; i < indexArray.length; i++) {
+                    int index = indexArray[i];
+                    if (index == -1)
                         continue;
 
-                    if (v1Connections == null)
-                        v1Connections = meta.v2n.getOrDefault(v1, new IntOpenHashSet());
-
-                    if (!v1Connections.contains(v2))
+                    Edge e = keyIndex < index ?
+                            new Edge(fonl[keyIndex], fonl[index]) :
+                            new Edge(fonl[index], fonl[keyIndex]);
+                    if(!meta.edges.contains(e))
                         return;
                 }
             }
-            for (int i : c) {
 
+            // check other connections
+            if (!subquery.edges.isEmpty()) {
+                if (meta.edges == null)
+                    return;
+
+                for (Edge edge : subquery.edges) {
+                    int i1 = subquery.v2i.get(edge.v1);
+                    int i2 = subquery.v2i.get(edge.v2);
+
+                    int fIndex1 = indexArray[i1];
+                    int fIndex2 = indexArray[i2];
+                    if (fIndex1 == -1 || fIndex2 == -1)
+                        continue;
+
+                    int v1 = fonl[fIndex1];
+                    int v2 = fonl[fIndex2];
+
+                    if (!meta.edges.contains(new Edge(v1, v2)))
+                        return;
+                }
             }
-            result.add(iSet.toIntArray());
+
+            result.add(indexArray);
             return;
         }
 
         for (int index : setArray[idx]) {
-            if (iSet.contains(index))
+            if (indexSet.contains(index))
                 continue;
 
-
-            IntOpenHashSet rSet = new IntOpenHashSet(iSet);
+            IntOpenHashSet rSet = new IntOpenHashSet(indexSet);
             rSet.add(index);
 
             join(idx + 1, rSet, setArray, result, subquery);

@@ -1,10 +1,14 @@
 package ir.ac.sbu.graph.spark.search.fonl.value;
 
-import it.unimi.dsi.fastutil.ints.*;
+import ir.ac.sbu.graph.types.Edge;
+
+import java.util.Set;
 
 public class TriangleMeta extends LabelMeta {
 
-    public Int2ObjectMap<IntSet> v2n; // for triangle (u, v, w) and key = u, stores v -> (..., w, ...)
+    public Set<Edge> edges;
+    public int[] tcArray;
+    public int tc;
 
     public TriangleMeta() {}
 
@@ -16,15 +20,12 @@ public class TriangleMeta extends LabelMeta {
         super(labelMeta);
     }
 
-    public void addV2V(int v1, int v2) {
-        if (v2n == null)
-            v2n = new Int2ObjectOpenHashMap <>();
+    public void setEdges(Set<Edge> edges) {
+        this.edges = edges;
+        this.tc = edges.size();
+    }
 
-        IntSet intSet = v2n.get(v1);
-        if (intSet == null) {
-            intSet = new IntOpenHashSet();
-            v2n.put(v1, intSet);
-        }
-        intSet.add(v2);
+    public void setTcArray(int[] tcArray) {
+        this.tcArray = tcArray;
     }
 }

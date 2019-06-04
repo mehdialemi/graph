@@ -193,7 +193,7 @@ public class ParallelMaxTruss extends ParallelKTrussBase {
             return max;
         })).get().reduce((a, b) -> Math.max(a, b)).getAsInt();
         long tTC = System.currentTimeMillis();
-        System.out.println("tc duration: " + (tTC - tSort) + " ms");
+        System.out.println("tcArray duration: " + (tTC - tSort) + " ms");
 
         final IntArrayList[] localInvalids = new IntArrayList[threads];
         for (int i = 0; i < threads; i++) {

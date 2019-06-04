@@ -125,13 +125,13 @@ public class ParallelKTruss5 extends ParallelKTrussBase {
 
 
         long tTC = System.currentTimeMillis();
-        System.out.println("tc in " + (tTC - tStart) + " ms");
+        System.out.println("tcArray in " + (tTC - tStart) + " ms");
 
         int sum = 0;
         for (int i = 0; i < edgeSup.length; i++) {
             sum += edgeSup[i].get();
         }
 
-        System.out.println("tc: " + sum / 3);
+        System.out.println("tcArray: " + sum / 3);
     }
 }

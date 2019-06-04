@@ -4,7 +4,7 @@ Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 10902 ms
 start ktruss with kc = 3, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 996 ms
-tc duration: 1917 ms
+tcArray duration: 1917 ms
 iteration 1, invalid size: 0 time: 29 ms
 Complete in 2158 ms
 Total: 5071 ms, iteration count: 0
@@ -18,7 +18,7 @@ Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11399 ms
 start ktruss with kc = 4, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1063 ms
-tc duration: 1638 ms
+tcArray duration: 1638 ms
 iteration 1, invalid size: 3416336 time: 135 ms
 Update in 1828 ms
 iteration 2, invalid size: 1019563 time: 5 ms
@@ -66,7 +66,7 @@ Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11265 ms
 start ktruss with kc = 5, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1051 ms
-tc duration: 1394 ms
+tcArray duration: 1394 ms
 iteration 1, invalid size: 5102318 time: 116 ms
 Update in 1673 ms
 iteration 2, invalid size: 1112175 time: 6 ms
@@ -114,7 +114,7 @@ Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11232 ms
 start ktruss with kc = 6, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1082 ms
-tc duration: 1662 ms
+tcArray duration: 1662 ms
 iteration 1, invalid size: 6032783 time: 162 ms
 Update in 1878 ms
 iteration 2, invalid size: 938504 time: 5 ms
@@ -174,7 +174,7 @@ Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11180 ms
 start ktruss with kc = 7, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 991 ms
-tc duration: 1863 ms
+tcArray duration: 1863 ms
 iteration 1, invalid size: 6585182 time: 298 ms
 Update in 2107 ms
 iteration 2, invalid size: 746092 time: 9 ms
@@ -226,7 +226,7 @@ Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11040 ms
 start ktruss with kc = 8, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1041 ms
-tc duration: 1556 ms
+tcArray duration: 1556 ms
 iteration 1, invalid size: 6930673 time: 203 ms
 Update in 2098 ms
 iteration 2, invalid size: 589254 time: 8 ms
@@ -292,7 +292,7 @@ Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11233 ms
 start ktruss with kc = 9, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1169 ms
-tc duration: 1727 ms
+tcArray duration: 1727 ms
 iteration 1, invalid size: 7156456 time: 276 ms
 Update in 2550 ms
 iteration 2, invalid size: 467732 time: 14 ms
@@ -340,7 +340,7 @@ Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 10682 ms
 start ktruss with kc = 10, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1060 ms
-tc duration: 1754 ms
+tcArray duration: 1754 ms
 iteration 1, invalid size: 7309734 time: 91 ms
 Update in 1872 ms
 iteration 2, invalid size: 374267 time: 13 ms
@@ -392,7 +392,7 @@ Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11102 ms
 start ktruss with kc = 11, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1032 ms
-tc duration: 1970 ms
+tcArray duration: 1970 ms
 iteration 1, invalid size: 7416992 time: 257 ms
 Update in 2158 ms
 iteration 2, invalid size: 303006 time: 16 ms
@@ -436,7 +436,7 @@ Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11197 ms
 start ktruss with kc = 12, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1066 ms
-tc duration: 1762 ms
+tcArray duration: 1762 ms
 iteration 1, invalid size: 7494931 time: 130 ms
 Update in 1986 ms
 iteration 2, invalid size: 248586 time: 6 ms
@@ -496,7 +496,7 @@ Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 10693 ms
 start ktruss with kc = 13, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1038 ms
-tc duration: 1529 ms
+tcArray duration: 1529 ms
 iteration 1, invalid size: 7552072 time: 129 ms
 Update in 2773 ms
 iteration 2, invalid size: 205896 time: 7 ms
@@ -540,7 +540,7 @@ Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 10704 ms
 start ktruss with kc = 14, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1055 ms
-tc duration: 1415 ms
+tcArray duration: 1415 ms
 iteration 1, invalid size: 7595363 time: 234 ms
 Update in 2178 ms
 iteration 2, invalid size: 172386 time: 9 ms
@@ -578,7 +578,7 @@ Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11042 ms
 start ktruss with kc = 15, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1061 ms
-tc duration: 1436 ms
+tcArray duration: 1436 ms
 iteration 1, invalid size: 7628016 time: 137 ms
 Update in 2462 ms
 iteration 2, invalid size: 146004 time: 8 ms
@@ -616,7 +616,7 @@ Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11083 ms
 start ktruss with kc = 16, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1052 ms
-tc duration: 1673 ms
+tcArray duration: 1673 ms
 iteration 1, invalid size: 7653986 time: 175 ms
 Update in 2342 ms
 iteration 2, invalid size: 124884 time: 12 ms
@@ -650,7 +650,7 @@ Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11205 ms
 start ktruss with kc = 17, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1071 ms
-tc duration: 1662 ms
+tcArray duration: 1662 ms
 iteration 1, invalid size: 7674534 time: 116 ms
 Update in 2346 ms
 iteration 2, invalid size: 107948 time: 7 ms
@@ -676,7 +676,7 @@ Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11063 ms
 start ktruss with kc = 18, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1004 ms
-tc duration: 1988 ms
+tcArray duration: 1988 ms
 iteration 1, invalid size: 7690842 time: 182 ms
 Update in 2175 ms
 iteration 2, invalid size: 93848 time: 10 ms
@@ -700,7 +700,7 @@ Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11081 ms
 start ktruss with kc = 19, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1031 ms
-tc duration: 1557 ms
+tcArray duration: 1557 ms
 iteration 1, invalid size: 7704389 time: 262 ms
 Update in 2007 ms
 iteration 2, invalid size: 81963 time: 10 ms
@@ -724,7 +724,7 @@ Loading /home/i/graph-data/cit-Patents.txt
 Graph loaded, edges: 16518948, load time: 11789 ms
 start ktruss with kc = 20, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1080 ms
-tc duration: 1688 ms
+tcArray duration: 1688 ms
 iteration 1, invalid size: 7715465 time: 129 ms
 Update in 2104 ms
 iteration 2, invalid size: 71833 time: 6 ms

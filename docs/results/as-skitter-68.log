@@ -4,7 +4,7 @@ Loading /home/i/graph-data/as-skitter
 Graph loaded, edges: 11095298, load time: 7557 ms
 start ktruss with kc = 68, threads = 12, method = 6 input: /home/i/graph-data/as-skitter
 create fonl in 448 ms
-tc duration: 2333 ms
+tcArray duration: 2333 ms
 iteration 1, invalid size: 8618814 time: 251 ms
 Update in 2785 ms
 iteration 2, invalid size: 108950 time: 7 ms
@@ -61,7 +61,7 @@ Loading /home/i/graph-data/as-skitter
 Graph loaded, edges: 11095298, load time: 7475 ms
 start ktruss with kc = 68, threads = 12, method = 6 input: /home/i/graph-data/as-skitter
 create fonl in 412 ms
-tc duration: 2289 ms
+tcArray duration: 2289 ms
 iteration 1, invalid size: 8618814 time: 91 ms
 Update in 2890 ms
 iteration 2, invalid size: 108950 time: 10 ms
@@ -118,7 +118,7 @@ Loading /home/i/graph-data/as-skitter
 Graph loaded, edges: 11095298, load time: 7512 ms
 start ktruss with kc = 68, threads = 12, method = 6 input: /home/i/graph-data/as-skitter
 create fonl in 456 ms
-tc duration: 2235 ms
+tcArray duration: 2235 ms
 iteration 1, invalid size: 8618814 time: 316 ms
 Update in 2835 ms
 iteration 2, invalid size: 108950 time: 13 ms

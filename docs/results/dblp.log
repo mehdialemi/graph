@@ -4,7 +4,7 @@ Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 751 ms
 start ktruss with kc = 3, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 207 ms
-tc duration: 446 ms
+tcArray duration: 446 ms
 iteration 1, invalid size: 0 time: 29 ms
 Complete in 232 ms
 Total: 885 ms, iteration count: 0
@@ -18,7 +18,7 @@ Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 781 ms
 start ktruss with kc = 4, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 211 ms
-tc duration: 622 ms
+tcArray duration: 622 ms
 iteration 1, invalid size: 168538 time: 32 ms
 Update in 317 ms
 iteration 2, invalid size: 14760 time: 1 ms
@@ -48,7 +48,7 @@ Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 743 ms
 start ktruss with kc = 5, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 231 ms
-tc duration: 550 ms
+tcArray duration: 550 ms
 iteration 1, invalid size: 354949 time: 39 ms
 Update in 520 ms
 iteration 2, invalid size: 35701 time: 3 ms
@@ -86,7 +86,7 @@ Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 749 ms
 start ktruss with kc = 6, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 194 ms
-tc duration: 933 ms
+tcArray duration: 933 ms
 iteration 1, invalid size: 502639 time: 62 ms
 Update in 598 ms
 iteration 2, invalid size: 47078 time: 5 ms
@@ -130,7 +130,7 @@ Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 762 ms
 start ktruss with kc = 7, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 252 ms
-tc duration: 464 ms
+tcArray duration: 464 ms
 iteration 1, invalid size: 611701 time: 79 ms
 Update in 307 ms
 iteration 2, invalid size: 47605 time: 6 ms
@@ -176,7 +176,7 @@ Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 764 ms
 start ktruss with kc = 8, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 262 ms
-tc duration: 537 ms
+tcArray duration: 537 ms
 iteration 1, invalid size: 687583 time: 65 ms
 Update in 670 ms
 iteration 2, invalid size: 43011 time: 6 ms
@@ -212,7 +212,7 @@ Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 735 ms
 start ktruss with kc = 9, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 242 ms
-tc duration: 526 ms
+tcArray duration: 526 ms
 iteration 1, invalid size: 741927 time: 107 ms
 Update in 1031 ms
 iteration 2, invalid size: 37003 time: 5 ms
@@ -252,7 +252,7 @@ Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 763 ms
 start ktruss with kc = 10, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 230 ms
-tc duration: 585 ms
+tcArray duration: 585 ms
 iteration 1, invalid size: 781337 time: 85 ms
 Update in 542 ms
 iteration 2, invalid size: 31091 time: 3 ms
@@ -282,7 +282,7 @@ Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 768 ms
 start ktruss with kc = 11, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 253 ms
-tc duration: 710 ms
+tcArray duration: 710 ms
 iteration 1, invalid size: 811141 time: 81 ms
 Update in 957 ms
 iteration 2, invalid size: 25851 time: 4 ms
@@ -310,7 +310,7 @@ Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 742 ms
 start ktruss with kc = 12, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 229 ms
-tc duration: 507 ms
+tcArray duration: 507 ms
 iteration 1, invalid size: 832421 time: 105 ms
 Update in 697 ms
 iteration 2, invalid size: 21219 time: 4 ms
@@ -336,7 +336,7 @@ Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 756 ms
 start ktruss with kc = 13, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 228 ms
-tc duration: 580 ms
+tcArray duration: 580 ms
 iteration 1, invalid size: 848865 time: 87 ms
 Update in 531 ms
 iteration 2, invalid size: 17576 time: 1 ms
@@ -358,7 +358,7 @@ Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 744 ms
 start ktruss with kc = 14, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 246 ms
-tc duration: 574 ms
+tcArray duration: 574 ms
 iteration 1, invalid size: 863740 time: 103 ms
 Update in 727 ms
 iteration 2, invalid size: 15477 time: 3 ms
@@ -382,7 +382,7 @@ Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 775 ms
 start ktruss with kc = 15, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 250 ms
-tc duration: 576 ms
+tcArray duration: 576 ms
 iteration 1, invalid size: 876304 time: 73 ms
 Update in 582 ms
 iteration 2, invalid size: 12781 time: 2 ms
@@ -406,7 +406,7 @@ Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 744 ms
 start ktruss with kc = 16, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 245 ms
-tc duration: 435 ms
+tcArray duration: 435 ms
 iteration 1, invalid size: 886249 time: 127 ms
 Update in 602 ms
 iteration 2, invalid size: 10769 time: 2 ms
@@ -428,7 +428,7 @@ Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 731 ms
 start ktruss with kc = 17, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 240 ms
-tc duration: 533 ms
+tcArray duration: 533 ms
 iteration 1, invalid size: 895486 time: 146 ms
 Update in 431 ms
 iteration 2, invalid size: 9718 time: 2 ms
@@ -448,7 +448,7 @@ Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 751 ms
 start ktruss with kc = 18, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 246 ms
-tc duration: 487 ms
+tcArray duration: 487 ms
 iteration 1, invalid size: 901774 time: 69 ms
 Update in 692 ms
 iteration 2, invalid size: 8219 time: 1 ms
@@ -470,7 +470,7 @@ Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 748 ms
 start ktruss with kc = 19, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 222 ms
-tc duration: 665 ms
+tcArray duration: 665 ms
 iteration 1, invalid size: 907907 time: 66 ms
 Update in 753 ms
 iteration 2, invalid size: 7260 time: 2 ms
@@ -490,7 +490,7 @@ Loading /home/i/graph-data/dblp
 Graph loaded, edges: 1049866, load time: 735 ms
 start ktruss with kc = 20, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 254 ms
-tc duration: 465 ms
+tcArray duration: 465 ms
 iteration 1, invalid size: 911837 time: 112 ms
 Update in 759 ms
 iteration 2, invalid size: 6075 time: 1 ms

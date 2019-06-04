@@ -4,7 +4,7 @@ Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2093 ms
 start ktruss with kc = 3, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 282 ms
-tc duration: 642 ms
+tcArray duration: 642 ms
 iteration 1, invalid size: 0 time: 21 ms
 Complete in 303 ms
 Total: 1227 ms, iteration count: 0
@@ -18,7 +18,7 @@ Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 1929 ms
 start ktruss with kc = 4, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 343 ms
-tc duration: 553 ms
+tcArray duration: 553 ms
 iteration 1, invalid size: 466980 time: 68 ms
 Update in 1016 ms
 iteration 2, invalid size: 86530 time: 10 ms
@@ -52,7 +52,7 @@ Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 1967 ms
 start ktruss with kc = 5, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 401 ms
-tc duration: 879 ms
+tcArray duration: 879 ms
 iteration 1, invalid size: 704820 time: 53 ms
 Update in 650 ms
 iteration 2, invalid size: 115669 time: 26 ms
@@ -94,7 +94,7 @@ Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2073 ms
 start ktruss with kc = 6, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 288 ms
-tc duration: 536 ms
+tcArray duration: 536 ms
 iteration 1, invalid size: 849489 time: 113 ms
 Update in 549 ms
 iteration 2, invalid size: 121736 time: 9 ms
@@ -146,7 +146,7 @@ Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2086 ms
 start ktruss with kc = 7, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 293 ms
-tc duration: 639 ms
+tcArray duration: 639 ms
 iteration 1, invalid size: 945905 time: 89 ms
 Update in 691 ms
 iteration 2, invalid size: 120721 time: 12 ms
@@ -198,7 +198,7 @@ Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2056 ms
 start ktruss with kc = 8, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 282 ms
-tc duration: 778 ms
+tcArray duration: 778 ms
 iteration 1, invalid size: 1016523 time: 77 ms
 Update in 671 ms
 iteration 2, invalid size: 117082 time: 3 ms
@@ -248,7 +248,7 @@ Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2019 ms
 start ktruss with kc = 9, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 293 ms
-tc duration: 686 ms
+tcArray duration: 686 ms
 iteration 1, invalid size: 1069922 time: 91 ms
 Update in 1203 ms
 iteration 2, invalid size: 112063 time: 8 ms
@@ -312,7 +312,7 @@ Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2075 ms
 start ktruss with kc = 10, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 278 ms
-tc duration: 654 ms
+tcArray duration: 654 ms
 iteration 1, invalid size: 1111522 time: 127 ms
 Update in 750 ms
 iteration 2, invalid size: 107507 time: 8 ms
@@ -396,7 +396,7 @@ Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2045 ms
 start ktruss with kc = 11, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 280 ms
-tc duration: 745 ms
+tcArray duration: 745 ms
 iteration 1, invalid size: 1145315 time: 65 ms
 Update in 741 ms
 iteration 2, invalid size: 102761 time: 7 ms
@@ -454,7 +454,7 @@ Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2076 ms
 start ktruss with kc = 12, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 224 ms
-tc duration: 635 ms
+tcArray duration: 635 ms
 iteration 1, invalid size: 1172674 time: 134 ms
 Update in 1277 ms
 iteration 2, invalid size: 98263 time: 8 ms
@@ -526,7 +526,7 @@ Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2018 ms
 start ktruss with kc = 13, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 292 ms
-tc duration: 732 ms
+tcArray duration: 732 ms
 iteration 1, invalid size: 1195995 time: 60 ms
 Update in 1343 ms
 iteration 2, invalid size: 93692 time: 6 ms
@@ -600,7 +600,7 @@ Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2055 ms
 start ktruss with kc = 14, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 287 ms
-tc duration: 896 ms
+tcArray duration: 896 ms
 iteration 1, invalid size: 1215375 time: 49 ms
 Update in 685 ms
 iteration 2, invalid size: 89720 time: 4 ms
@@ -666,7 +666,7 @@ Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2044 ms
 start ktruss with kc = 15, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 263 ms
-tc duration: 571 ms
+tcArray duration: 571 ms
 iteration 1, invalid size: 1232087 time: 120 ms
 Update in 769 ms
 iteration 2, invalid size: 85618 time: 6 ms
@@ -736,7 +736,7 @@ Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2168 ms
 start ktruss with kc = 16, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 427 ms
-tc duration: 528 ms
+tcArray duration: 528 ms
 iteration 1, invalid size: 1246690 time: 75 ms
 Update in 1188 ms
 iteration 2, invalid size: 81611 time: 5 ms
@@ -852,7 +852,7 @@ Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2066 ms
 start ktruss with kc = 17, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 260 ms
-tc duration: 826 ms
+tcArray duration: 826 ms
 iteration 1, invalid size: 1259437 time: 101 ms
 Update in 494 ms
 iteration 2, invalid size: 78028 time: 5 ms
@@ -918,7 +918,7 @@ Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 1947 ms
 start ktruss with kc = 18, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 408 ms
-tc duration: 621 ms
+tcArray duration: 621 ms
 iteration 1, invalid size: 1270640 time: 133 ms
 Update in 820 ms
 iteration 2, invalid size: 74762 time: 10 ms
@@ -968,7 +968,7 @@ Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 2083 ms
 start ktruss with kc = 19, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 275 ms
-tc duration: 588 ms
+tcArray duration: 588 ms
 iteration 1, invalid size: 1280498 time: 91 ms
 Update in 471 ms
 iteration 2, invalid size: 71430 time: 10 ms
@@ -1070,7 +1070,7 @@ Loading /home/i/graph-data/youtube
 Graph loaded, edges: 2987624, load time: 1936 ms
 start ktruss with kc = 20, threads = 12, method = 6 input: /home/i/graph-data/youtube
 create fonl in 296 ms
-tc duration: 640 ms
+tcArray duration: 640 ms
 iteration 1, invalid size: 1289178 time: 57 ms
 Update in 791 ms
 iteration 2, invalid size: 68237 time: 4 ms

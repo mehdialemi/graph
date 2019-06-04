@@ -1,10 +1,6 @@
 package ir.ac.sbu.graph.spark.search.fonl.creator;
 
-import ir.ac.sbu.graph.spark.search.fonl.local.LocalFonl;
-import ir.ac.sbu.graph.spark.search.fonl.local.OrderedNeighbors;
-import ir.ac.sbu.graph.spark.search.fonl.local.QFonl;
-import ir.ac.sbu.graph.spark.search.fonl.local.QSplit;
-import ir.ac.sbu.graph.spark.search.fonl.local.Subquery;
+import ir.ac.sbu.graph.spark.search.fonl.local.*;
 import ir.ac.sbu.graph.types.Edge;
 import ir.ac.sbu.graph.types.VertexDeg;
 import it.unimi.dsi.fastutil.ints.*;
@@ -15,7 +11,7 @@ import java.util.*;
 public class LocalFonlCreator {
 
     public static List<Subquery> getSubqueries(QFonl qFonl) {
-        List<Subquery> list = new ArrayList <>();
+        List<Subquery> subqueries = new ArrayList <>();
 
         for (QSplit split : qFonl.splits) {
             Subquery subquery = new Subquery();
@@ -29,20 +25,38 @@ public class LocalFonlCreator {
             subquery.labels = new String[fonl.length];
             subquery.v2i = new Int2IntOpenHashMap();
 
+            int tc = 0;
+            Int2IntOpenHashMap tcMap = new Int2IntOpenHashMap();
             for (int i = 0; i < fonl.length; i++) {
                 int index = fonl[i];
                 subquery.v2i.put(fonl[i], i);
                 subquery.degrees[i] = qFonl.degIndices[index];
                 subquery.labels[i] = qFonl.labels[index];
 
-                if (qFonl.edgeArray[i] != null)
-                    subquery.vi2List = qFonl.edgeArray[i];
+                if (qFonl.edgeArray[i] != null) {
+                    Int2ObjectMap <IntSet> set = qFonl.edgeArray[i];
+                    for (Map.Entry <Integer, IntSet> entry : set.entrySet()) {
+                        int v1 = entry.getKey();
+                        for (Integer v2 : entry.getValue()) {
+                            subquery.addEdge(new Edge(v1, v2));
+                            tcMap.addTo(v1, 1);
+                            tcMap.addTo(v2, 1);
+                            tc ++;
+                        }
+                    }
+                }
             }
 
-            list.add(subquery);
+            int[] tcArray = new int[fonl.length];
+            for (int i = 0; i < fonl.length; i++) {
+                tcArray[i] = tcMap.get(fonl[i]);
+            }
+            subquery.tcArray = tcArray;
+            subquery.tc = tc;
+            subqueries.add(subquery);
         }
 
-        return list;
+        return subqueries;
     }
 
     public static QFonl createQFonl(Map <Integer, List <Integer>> neighbors, Map <Integer, String> labelMap) {

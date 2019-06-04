@@ -224,7 +224,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
         })).get();
 
         long tTC = System.currentTimeMillis();
-        System.out.println("tc duration: " + (tTC - tStart) + " ms");
+        System.out.println("tcArray duration: " + (tTC - tStart) + " ms");
 
         byte[][] fonlSeconds = new byte[vCount][];
         DataOutputBuffer[][] fonlThirds = new DataOutputBuffer[vCount][];
@@ -411,7 +411,7 @@ public class ParallelKTruss4 extends ParallelKTrussBase {
 //            for (int j = 1 ; j < support[i].length; j ++)
 //                sum += support[i][j];
 //        }
-//        System.out.println("tc: " + sum / 3);
+//        System.out.println("tcArray: " + sum / 3);
     }
 
     private int[] findPartition(int threads, int[][] fonls, int[] fl, byte[][] fonlNeighborL1, int[] pSizes) throws IOException {

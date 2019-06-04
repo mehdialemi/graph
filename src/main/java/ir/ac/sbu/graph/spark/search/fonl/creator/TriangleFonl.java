@@ -5,18 +5,12 @@ import ir.ac.sbu.graph.spark.search.fonl.value.LabledFonlValue;
 import ir.ac.sbu.graph.spark.search.fonl.value.TriangleFonlValue;
 import ir.ac.sbu.graph.types.Edge;
 import ir.ac.sbu.graph.utils.OrderedNeighborList;
-import it.unimi.dsi.fastutil.ints.IntList;
-import it.unimi.dsi.fastutil.ints.IntListIterator;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.ints.*;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Triangle Based Fonl
@@ -91,15 +85,27 @@ public class TriangleFonl extends LabelFonl {
                         return triangleFonlValue;
 
                     IntSet removes = new IntOpenHashSet();
-                    for (Edge edge : join._2.get()) {
+                    Iterable <Edge> edges = join._2.get();
+                    for (Edge edge : edges) {
                         if (edge.v2 == -1)
                             removes.add(edge.v1);
-                        else
-                            triangleFonlValue.addNeighborEdge(edge);
+                    }
+
+                    Set<Edge> eSet = new HashSet <>();
+                    Int2IntOpenHashMap tcMap = new Int2IntOpenHashMap();
+                    for (Edge edge : edges) {
+                        if (removes.contains(edge.v1) || removes.contains(edge.v2))
+                            continue;
+
+                        tcMap.addTo(edge.v1, 1);
+                        tcMap.addTo(edge.v2, 1);
+                        eSet.add(edge);
                     }
 
                     if (!removes.isEmpty())
                         triangleFonlValue.remove(removes);
+
+                    triangleFonlValue.setEdges(eSet, tcMap);
 
                     return triangleFonlValue;
                 }).repartition(labelFonl.getNumPartitions())

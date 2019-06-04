@@ -4,7 +4,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 21851 ms
 start ktruss with kc = 214, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 626 ms
-tc duration: 14514 ms
+tcArray duration: 14514 ms
 iteration 1, invalid size: 28362206 time: 88 ms
 Update in 23334 ms
 iteration 2, invalid size: 154157 time: 14 ms
@@ -37,7 +37,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 23734 ms
 start ktruss with kc = 214, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 497 ms
-tc duration: 13465 ms
+tcArray duration: 13465 ms
 iteration 1, invalid size: 28362206 time: 249 ms
 Update in 19711 ms
 iteration 2, invalid size: 154157 time: 6 ms
@@ -70,7 +70,7 @@ Loading /home/i/graph-data/live-journal
 Graph loaded, edges: 34681189, load time: 21506 ms
 start ktruss with kc = 214, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 502 ms
-tc duration: 13809 ms
+tcArray duration: 13809 ms
 iteration 1, invalid size: 28362206 time: 155 ms
 Update in 21521 ms
 iteration 2, invalid size: 154157 time: 10 ms

@@ -137,7 +137,7 @@ public class SeqMethod3 extends SequentialBase {
         }
 
         long t2 = System.currentTimeMillis();
-        System.out.println("tc duration: " + (t2 - t1) + " ms");
+        System.out.println("tcArray duration: " + (t2 - t1) + " ms");
 
         int tcCount = 0;
         DataInputBuffer in1 = new DataInputBuffer();
