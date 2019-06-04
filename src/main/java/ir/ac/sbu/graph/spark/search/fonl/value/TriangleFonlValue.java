@@ -2,7 +2,10 @@ package ir.ac.sbu.graph.spark.search.fonl.value;
 
 import ir.ac.sbu.graph.spark.search.fonl.local.Subquery;
 import ir.ac.sbu.graph.types.Edge;
-import it.unimi.dsi.fastutil.ints.*;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -49,139 +52,77 @@ public class TriangleFonlValue extends Fvalue <TriangleMeta> {
         meta.addV2V(edge.v1, edge.v2);
     }
 
-    public Int2IntMap matchCount(int fonlKey, Subquery subquery) {
-        Set <int[]> results = new HashSet <>();
+    public Int2IntMap matches(int fonlKey, Subquery subquery) {
+        Int2IntOpenHashMap v2count = new Int2IntOpenHashMap();
 
-        // First check => using current fonl.key as subquery.key
-        Set <int[]> rSet = matchOffset(meta.deg, meta.label, 0, subquery);
-        if (rSet != null)
-            results.addAll(rSet);
+        IntSet keySet = new IntOpenHashSet();
+        IntSet[] setArray = new IntSet[subquery.fonl.length];
 
-        for (int start = 0; start < fonl.length - subquery.fonl.length; start++) {
-            int deg = meta.degs[start];
-            String label = meta.labels[start];
+        // search for key candidates
+        if (meta.label.equals(subquery.label) && meta.deg >= subquery.degree)
+            keySet.add(-1);
 
-            rSet = matchOffset(deg, label, start + 1, subquery);
-            if (rSet != null)
-                results.addAll(rSet);
+        for (int j = 0; j < fonl.length; j++) {
+            if (meta.labels[j].equals(subquery.label) && meta.degs[j] >= subquery.degree)
+                keySet.add(j);
         }
 
-        Int2IntMap v2count = new Int2IntOpenHashMap();
+        for (int i = 0; i < subquery.fonl.length; i++) {
+            IntSet set = new IntOpenHashSet();
 
-        if (!results.isEmpty())
-            ((Int2IntOpenHashMap) v2count).addTo(fonlKey, results.size());
+            if (meta.label.equals(subquery.labels[i]) && meta.deg >= subquery.degrees[i])
+                set.add(-1);
 
-        for (int[] indexes : results) {
-            for (int index : indexes) {
-                ((Int2IntOpenHashMap) v2count).addTo(fonl[index], 1);
+            for (int j = 0; j < fonl.length; j++) {
+                if (meta.labels[j].equals(subquery.labels[i]) && meta.degs[j] >= subquery.degrees[i])
+                    set.add(j);
+            }
+            if (set.isEmpty())
+                return v2count;
+
+            setArray[i] = set;
+        }
+
+        Set<int[]> results = new HashSet <>();
+        for (Integer key : keySet) {
+            IntOpenHashSet rSet = new IntOpenHashSet();
+            rSet.add(key);
+            join(0, rSet, setArray, results);
+        }
+
+        if (results.isEmpty())
+            return v2count;
+
+        for (int[] result : results) {
+            for (int index : result) {
+                if (index == -1) {
+                    v2count.addTo(fonlKey, 1);
+                } else {
+                    v2count.addTo(fonl[index], 1);
+                }
             }
         }
 
         return v2count;
     }
 
-    private Set <int[]> matchOffset(int deg, String label, int start, Subquery subquery) {
-        if (!label.equals(subquery.label) || deg < subquery.degree)
-            return null;
+    private void join(int idx, IntSet iSet, IntSet[] setArray, Set<int[]> result) {
 
-        Set <int[]> result = new HashSet <>();
-
-        IntList indexes = new IntArrayList();
-        int len = fonl.length - subquery.fonl.length;
-        for (int offset = start; offset <= len; offset++) {
-            indexes.clear();
-
-            if (!meta.labels[offset].equals(subquery.labels[0]) || meta.degs[offset] < subquery.degrees[0])
-                continue;
-
-            indexes.add(offset);
-            if (subquery.fonl.length == 1) {
-                result.add(indexes.toIntArray());
-                indexes.clear();
-                continue;
-            }
-
-            int pointer = 1;
-            int index = offset + 1;
-            while (pointer > 0 && indexes.size() > 0 && len >= (index - pointer)) {
-
-                int matchIdx = matchNext(subquery, pointer, index);
-
-                if (matchIdx == -1) {
-                    // No neighbor in the fonl found for the current index
-                    int lastIdx = indexes.size() - 1;
-                    index = indexes.get(lastIdx);
-                    indexes.removeElements(lastIdx, lastIdx + 1);
-                    pointer --;
-                } else {
-                    indexes.add(matchIdx);
-                    if (indexes.size() == subquery.fonl.length) {
-                        if (validateEdge(subquery, indexes)) {
-                            result.add(indexes.toIntArray());
-                        }
-
-                        if (matchIdx < fonl.length) {
-                            indexes.removeInt(matchIdx);
-                        } else {
-                            break;
-                        }
-
-                    } else {
-                        pointer ++;
-                        index = matchIdx + 1;
-                    }
-
-                }
-
-            }
+        if (idx == setArray.length) {
+            result.add(iSet.toIntArray());
+            return;
         }
 
-        return result;
-    }
-
-    int matchNext(Subquery subquery, int pointer, int startIndex) {
-        int remain = subquery.fonl.length - pointer;
-        int max = fonl.length - (remain + startIndex);
-        for (int index = startIndex; index < max; index++) {
-            String label1 = meta.labels[index];
-            int deg1 = meta.degs[index];
-
-            String label2 = subquery.labels[pointer];
-            int deg2 = subquery.degrees[pointer];
-
-            if (label1.equals(label2) && deg1 >= deg2)
-                return index;
-        }
-        return -1;
-    }
-
-    boolean validateEdge(Subquery subquery, IntList indexes) {
-
-        // check for connectivity
-        for (int index = 0; index < indexes.size(); index++) {
-            int idx = indexes.getInt(index);
-            int v1 = fonl[idx];
-
-            int sv1 = subquery.fonl[index];
-            IntSet set = subquery.vi2List.get(sv1);
-            if (set == null)
+        for (int index : setArray[idx]) {
+            if (iSet.contains(index))
                 continue;
 
-            IntIterator iterator = set.iterator();
-            while (iterator.hasNext()) {
 
-                int sv2 = iterator.nextInt();
-                int idx2 = subquery.v2i.get(sv2);
-                int v2 = fonl[idx2];
+            IntOpenHashSet rSet = new IntOpenHashSet(iSet);
+            rSet.add(index);
 
-                IntSet neighbors = meta.v2n.get(v1);
-                if (neighbors == null || !neighbors.contains(v2)) {
-                    return false;
-                }
-            }
+            join(idx + 1, rSet, setArray, result);
         }
-
-        return true;
     }
 }
 

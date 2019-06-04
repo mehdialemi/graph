@@ -31,7 +31,7 @@ public class LocalFonlCreator {
 
             for (int i = 0; i < fonl.length; i++) {
                 int index = fonl[i];
-                subquery.v2i.put(fonl[i], index);
+                subquery.v2i.put(fonl[i], i);
                 subquery.degrees[i] = qFonl.degIndices[index];
                 subquery.labels[i] = qFonl.labels[index];
 

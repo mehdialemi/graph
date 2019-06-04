@@ -97,7 +97,7 @@ public class SgSearcher extends SparkApp {
             List <Tuple2 <Integer, Tuple2 <Integer, Integer>>> out = new ArrayList <>();
             Subquery subquery = broadcast.getValue();
 
-            Int2IntMap counters = kv._2.matchCount(kv._1, subquery);
+            Int2IntMap counters = kv._2.matches(kv._1, subquery);
 
             for (Map.Entry <Integer, Integer> entry : counters.entrySet()) {
                 out.add(new Tuple2 <>(entry.getKey(), new Tuple2 <>(entry.getValue(), kv._1)));

@@ -3,6 +3,7 @@ package ir.ac.sbu.graph.spark.search.fonl.creator;
 import ir.ac.sbu.graph.spark.NeighborList;
 import ir.ac.sbu.graph.spark.search.fonl.value.LabledFonlValue;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.util.ArrayList;
@@ -48,39 +49,43 @@ public class LabelFonl {
                     return list.iterator();
                 });
 
-        JavaPairRDD <Integer, LabledFonlValue> fonlLabels = labelDegMsg.groupByKey(neighbors.getNumPartitions()).mapToPair(kv -> {
-            int degree = 0;
+        JavaPairRDD <Integer, LabledFonlValue> fonlLabels = labelDegMsg
+                .groupByKey(neighbors.getNumPartitions())
+                .mapToPair(kv -> {
+                    int degree = 0;
 
-            for (VLabelDeg value : kv._2) {
-                degree++;
-            }
+                    if (kv._1 == 1) {
+                        System.out.println("test");
+                    }
 
-            List <VLabelDeg> list = new ArrayList <>();
-            for (VLabelDeg vd : kv._2) {
-                if (vd.degree > degree || (vd.degree == degree && vd.vertex > kv._1)) {
-                    list.add(vd);
-                }
-            }
+                    for (VLabelDeg value : kv._2) {
+                        degree++;
+                    }
 
-            list.sort((a, b) -> {
-                int x, y;
-                if (a.degree != b.degree) {
-                    x = a.degree;
-                    y = b.degree;
-                } else {
-                    x = a.vertex;
-                    y = b.vertex;
-                }
-                return x - y;
-            });
+                    List <VLabelDeg> list = new ArrayList <>();
+                    for (VLabelDeg vd : kv._2) {
+                        if (vd.degree > degree || (vd.degree == degree && vd.vertex > kv._1)) {
+                            list.add(vd);
+                        }
+                    }
 
-            LabledFonlValue value = new LabledFonlValue(degree, list);
-            return new Tuple2 <>(kv._1, value);
-        }).cache();
+                    list.sort((a, b) -> {
+                        if (a.degree != b.degree) {
+                            return a.degree - b.degree;
+                        } else {
+                            return a.vertex - b.vertex;
+                        }
+                    });
+
+                    LabledFonlValue value = new LabledFonlValue(degree, list);
+                    return new Tuple2 <>(kv._1, value);
+                }).cache();
 
         return fonlLabels.leftOuterJoin(labels).mapValues(v -> {
             v._1.meta.label = v._2.orElse(EMPTY_LABEL);
+
             return v._1;
-        }).cache();
+        }).repartition(fonlLabels.getNumPartitions())
+                .persist(StorageLevel.MEMORY_AND_DISK());
     }
 }
