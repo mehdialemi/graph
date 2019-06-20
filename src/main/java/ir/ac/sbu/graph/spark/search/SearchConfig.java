@@ -48,7 +48,6 @@ public class SearchConfig {
                 master = SearchConfig.this.master;
 
                 sparkConf = new SparkConf();
-                sparkConf.setMaster(master);
                 sparkConf.setAppName("PatternCounter");
                 sparkConf.set("spark.driver.memory", "10g");
                 sparkConf.set("spark.driver.maxResultSize", "9g");
