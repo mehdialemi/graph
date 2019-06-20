@@ -47,16 +47,9 @@ public class SearchConfig {
                 partitionNum = SearchConfig.this.partitionNum;
                 master = SearchConfig.this.master;
 
-                String appName = "PatternCounter";
-
                 sparkConf = new SparkConf();
-                if (!graphInputPath.startsWith("hdfs")) {
-                    sparkConf.set("spark.driver.bindAddress", "localhost");
-                    sparkConf.setMaster("local[" + cores + "]");
-
-                }
-
-                sparkConf.setAppName(appName);
+                sparkConf.setMaster(master);
+                sparkConf.setAppName("PatternCounter");
                 sparkConf.set("spark.driver.memory", "10g");
                 sparkConf.set("spark.driver.maxResultSize", "9g");
                 sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
