@@ -1,4 +1,4 @@
-graphPath: "youtube"
+graphPath: "/graph-data/youtube"
 graphLabelPath: ""
 sampleName: "mySampleEmptyLabel"
 master: "alemi-1"

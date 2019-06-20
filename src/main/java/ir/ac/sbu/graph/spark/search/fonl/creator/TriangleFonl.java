@@ -33,7 +33,7 @@ public class TriangleFonl extends LabelFonl {
     public JavaPairRDD <Integer, TriangleFonlValue> createTFonl() {
 
         JavaPairRDD <Integer, LabledFonlValue> labelFonl = super.getOrCreateLFonl();
-        printFonl(labelFonl);
+//        printFonl(labelFonl);
 
         JavaPairRDD <Integer, int[]> candidates = createCandidates(labelFonl);
 
