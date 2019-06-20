@@ -17,6 +17,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.*;
 
 public class SearchConfig {
@@ -32,9 +33,7 @@ public class SearchConfig {
 
     public static SearchConfig load(String file) throws FileNotFoundException {
         Yaml yaml = new Yaml();
-        FileInputStream inputStream = new FileInputStream(file);
-        SearchConfig config = yaml.load(inputStream);
-        return config;
+        return yaml.loadAs(new FileReader(file), SearchConfig.class);
     }
 
     public SparkAppConf getSparkAppConf() {
