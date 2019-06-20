@@ -18,7 +18,7 @@ import java.util.*;
 public class NodeIteratorPlusGCC_Spark {
 
     public static void main(String[] args) {
-//        String inputPath = "input.txt";
+//        String graphInputPath = "input.txt";
         String inputPath = "/home/mehdi/ir.ac.sbu.graph-data/com-amazon.ungraph.txt";
         if (args.length > 0)
             inputPath = args[0];

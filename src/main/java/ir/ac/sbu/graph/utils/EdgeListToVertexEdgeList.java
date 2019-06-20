@@ -23,7 +23,7 @@ public class EdgeListToVertexEdgeList extends SparkApp  {
     }
 
     public void generate() throws FileNotFoundException {
-        JavaRDD<String> input = conf.getSc().textFile(conf.getInputPath());
+        JavaRDD<String> input = conf.getSc().textFile(conf.getGraphInputPath());
         int numPartitions = input.getNumPartitions();
         long count = input.count();
         final int partitionLines = (int) Math.ceil(count / (float)numPartitions);
@@ -61,7 +61,7 @@ public class EdgeListToVertexEdgeList extends SparkApp  {
             return list.iterator();
         });
 
-        String outPath = conf.getInputPath() + ".edgelist";
+        String outPath = conf.getGraphInputPath() + ".edgelist";
         System.out.println("Deleting " + outPath);
         FileUtils.deleteQuietly(new File(outPath));
         System.out.println("New vertex edge list file in " + outPath);

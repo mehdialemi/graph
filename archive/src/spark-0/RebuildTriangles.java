@@ -23,7 +23,7 @@ public class RebuildTriangles {
 
     public static void main(String[] args) {
         String inputPath = "/home/mehdi/ir.ac.sbu.graph-data/com-amazon.ungraph.txt";
-//        String inputPath = "/home/mehdi/ir.ac.sbu.graph-data/cit-Patents.txt";
+//        String graphInputPath = "/home/mehdi/ir.ac.sbu.graph-data/cit-Patents.txt";
         String outputPath = "/home/mehdi/ir.ac.sbu.graph-data/output-mapreduce";
         if (args.length > 0)
             inputPath = args[0];

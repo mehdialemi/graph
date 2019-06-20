@@ -6,10 +6,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,7 +22,7 @@ public class EdgeListUndirector extends SparkApp  {
     }
 
     public void generate() {
-        String outPath = conf.getInputPath() + ".edges";
+        String outPath = conf.getGraphInputPath() + ".edges";
         System.out.println("Deleting " + outPath);
         FileUtils.deleteQuietly(new File(outPath));
         System.out.println("New vertex edge list file in " + outPath);

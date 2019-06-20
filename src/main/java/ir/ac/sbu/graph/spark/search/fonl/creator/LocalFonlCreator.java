@@ -10,7 +10,7 @@ import java.util.*;
 
 public class LocalFonlCreator {
 
-    public static List<Subquery> getSubqueries(QFonl qFonl) {
+    public static List<Subquery> getSubQueries(QFonl qFonl) {
         List<Subquery> subqueries = new ArrayList <>();
 
         for (QSplit split : qFonl.splits) {

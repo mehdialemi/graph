@@ -16,7 +16,7 @@ import java.util.*;
  */
 public class SparkAppConf {
 
-    protected String inputPath;
+    protected String graphInputPath;
     protected int partitionNum;
     protected SparkConf sparkConf;
     protected int cores;
@@ -25,11 +25,11 @@ public class SparkAppConf {
     public SparkAppConf() {}
 
     public SparkAppConf(SparkAppConf conf) {
-        this.inputPath = conf.inputPath;
+        this.graphInputPath = conf.graphInputPath;
         this.cores = conf.cores;
     }
     public SparkAppConf (ArgumentReader argumentReader) {
-        inputPath = argumentReader.nextString("/home/mehdi/graph-data/com-youtube.ungraph.txt");
+        graphInputPath = argumentReader.nextString("/home/mehdi/graph-data/com-youtube.ungraph.txt");
         cores = argumentReader.nextInt(2);
         partitionNum = argumentReader.nextInt(4);
     }
@@ -39,14 +39,14 @@ public class SparkAppConf {
     }
 
     public String getFileName() {
-        return new File(getInputPath()).getName() ;
+        return new File(getGraphInputPath()).getName() ;
     }
 
     public void init() {
         String appName = createAppName();
 
         sparkConf = new SparkConf();
-        if (!inputPath.startsWith("hdfs")) {
+        if (!graphInputPath.startsWith("hdfs")) {
             sparkConf.set("spark.driver.bindAddress", "localhost");
             sparkConf.setMaster("local[" + cores + "]");
 
@@ -70,8 +70,8 @@ public class SparkAppConf {
     }
 
 
-    public String getInputPath() {
-        return inputPath;
+    public String getGraphInputPath() {
+        return graphInputPath;
     }
 
     public int getPartitionNum() {

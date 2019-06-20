@@ -40,10 +40,10 @@
 //    public static void main(String[] args) throws Exception {
 //
 //        final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-//        String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
+//        String graphInputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
 //
 //        if (args.length > 0)
-//            inputPath = args[0];
+//            graphInputPath = args[0];
 //
 //        int k = 4; // k-truss
 //        if (args.length > 1)
@@ -55,7 +55,7 @@
 //        env.getConfig().registerPojoType(int[].class);
 //
 //        long startTime = System.currentTimeMillis();
-//        FlatMapOperator<Tuple2<Integer, Integer>, Tuple2<Integer, Integer>> edges = env.readCsvFile(inputPath)
+//        FlatMapOperator<Tuple2<Integer, Integer>, Tuple2<Integer, Integer>> edges = env.readCsvFile(graphInputPath)
 //            .fieldDelimiter("\t").ignoreComments("#")
 //            .types(Integer.class, Integer.class)
 //            .flatMap((Tuple2<Integer, Integer> t, Collector<Tuple2<Integer, Integer>> collector) -> {

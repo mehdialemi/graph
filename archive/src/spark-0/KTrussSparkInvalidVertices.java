@@ -34,7 +34,7 @@ public class KTrussSparkInvalidVertices {
 
     public static void main(String[] args) {
         String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
-//        String inputPath = "/home/mehdi/graph-data/cit-Patents.txt";
+//        String graphInputPath = "/home/mehdi/graph-data/cit-Patents.txt";
         if (args.length > 0)
             inputPath = args[0];
 

@@ -10,8 +10,8 @@ public class KTrussParallel {
 
     public static void main(String[] args) throws Exception {
         String inputPath = "/home/mehdi/graph-data/com-amazon.ungraph.txt";
-//        String inputPath = "/home/mehdi/graph-data/cit-Patents.txt";
-//        String inputPath = "/home/mehdi/graph-data/Email-EuAll.txt";
+//        String graphInputPath = "/home/mehdi/graph-data/cit-Patents.txt";
+//        String graphInputPath = "/home/mehdi/graph-data/Email-EuAll.txt";
         if (args.length > 0)
             inputPath = args[0];
 
