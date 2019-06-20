@@ -39,7 +39,7 @@ public class PatternCounter extends SparkApp {
         this.labels = labels;
     }
 
-    public int search(QFonl qFonl) {
+    public long search(QFonl qFonl) {
         List <SubQuery> subQueries = LocalFonlCreator.getSubQueries(qFonl);
         if (subQueries.isEmpty())
             return 0;
@@ -56,21 +56,23 @@ public class PatternCounter extends SparkApp {
         Broadcast <SubQuery> broadcast = sparkConf.getSc().broadcast(queue.remove());
 
         final int splitSize = qFonl.splits.length;
-        JavaPairRDD <Integer, Tuple2 <int[], int[][]>> matches = getSubMatches(lFonl, broadcast)
+        JavaPairRDD <Integer, Tuple2 <long[], int[][]>> matches = getSubMatches(lFonl, broadcast)
                 .mapValues(v -> {
                     int[][] match = new int[splitSize][];
                     match[0] = v._2;
-                    int count = v._1;
-                    int[] counts = new int[splitSize];
+                    long count = v._1;
+                    long[] counts = new long[splitSize];
                     counts[0] = count;
                     return new Tuple2 <>(counts, match);
                 });
 
-        int qIndex = 1;
+        int qIndex = 0;
         while (!queue.isEmpty()) {
+            qIndex ++;
             SubQuery subquery = queue.remove();
             broadcast = sparkConf.getSc().broadcast(subquery);
             final int splitIndex = qIndex;
+
 
             long count = matches.count();
             System.out.println("partial count: " + count);
@@ -79,14 +81,15 @@ public class PatternCounter extends SparkApp {
                 return 0;
             }
 
-            JavaPairRDD <Integer, Tuple2 <Integer, int[]>> subMatches = getSubMatches(lFonl, broadcast);
+            JavaPairRDD <Integer, Tuple2 <Long, int[]>> subMatches = getSubMatches(lFonl, broadcast);
             if(searchConfig.isSingle())
                 printSubMatches("SubMatch (" + splitIndex + ")", subMatches);
 
             matches = matches.join(subMatches).mapValues(val -> {
+                // val._2 => (count, keyVertices)
                 IntSet set = new IntOpenHashSet(val._2._2);
-                val._1._2[splitIndex] = set.toIntArray();
                 val._1._1[splitIndex] = val._2._1;
+                val._1._2[splitIndex] = set.toIntArray();
                 return val._1;
             }).cache();
 
@@ -95,24 +98,26 @@ public class PatternCounter extends SparkApp {
         }
 
         return matches.map(kv -> {
-            int matchCount = 1;
-            for (int sVertices : kv._2._1) {
-                matchCount *= sVertices;
+            long matchCount = 1;
+            for (long subCount : kv._2._1) {
+                matchCount *= subCount;
             }
             return matchCount;
         }).reduce((a, b) -> a + b);
     }
 
-    private JavaPairRDD <Integer, Tuple2 <Integer, int[]>> getSubMatches(JavaPairRDD <Integer, TriangleFonlValue> tFonl,
+    private JavaPairRDD <Integer, Tuple2 <Long, int[]>> getSubMatches(JavaPairRDD <Integer, TriangleFonlValue> tFonl,
                                                                          Broadcast <SubQuery> broadcast) {
         return tFonl.flatMapToPair(kv -> {
 
-            List <Tuple2 <Integer, Tuple2 <Integer, Integer>>> out = new ArrayList <>();
+            List <Tuple2 <Integer, Tuple2 <Long, Integer>>> out = new ArrayList <>();
             SubQuery subquery = broadcast.getValue();
 
-            Int2IntMap counters = kv._2.matches(kv._1, subquery);
+            // vertex to count
+            Int2LongMap counters = kv._2.matches(kv._1, subquery);
 
-            for (Map.Entry <Integer, Integer> entry : counters.entrySet()) {
+            for (Map.Entry <Integer, Long> entry : counters.entrySet()) {
+                // (vertex, (count, keyVertex))
                 out.add(new Tuple2 <>(entry.getKey(), new Tuple2 <>(entry.getValue(), kv._1)));
             }
 
@@ -121,8 +126,9 @@ public class PatternCounter extends SparkApp {
         }).groupByKey(tFonl.getNumPartitions())
                 .mapValues(val -> {
                     IntSortedSet sortedSet = new IntAVLTreeSet();
-                    int count = 0;
-                    for (Tuple2 <Integer, Integer> vId : val) {
+                    long count = 0;
+                    // (count, keyVertex)
+                    for (Tuple2 <Long, Integer> vId : val) {
                         count += vId._1;
                         sortedSet.add(vId._2.intValue());
                     }
@@ -155,7 +161,7 @@ public class PatternCounter extends SparkApp {
 
         PatternCounter matcher = new PatternCounter(searchConfig, sparkConf, edgeLoader, labels);
 
-        int matches = matcher.search(qFonl);
+        long matches = matcher.search(qFonl);
         System.out.println("Number of matches: " + matches);
 
         matcher.close();

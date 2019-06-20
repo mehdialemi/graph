@@ -9,10 +9,10 @@ import java.util.List;
 
 public class PatternDebugUtils {
 
-    public static void printMatches(String title, JavaPairRDD<Integer, Tuple2<int[], int[][]>> candidates) {
-        List<Tuple2 <Integer, Tuple2 <int[], int[][]>>> collect = candidates.collect();
+    public static void printMatches(String title, JavaPairRDD<Integer, Tuple2<long[], int[][]>> candidates) {
+        List<Tuple2 <Integer, Tuple2 <long[], int[][]>>> collect = candidates.collect();
         System.out.println("((((((((((((( Candidates (count: " + collect.size() + ") ** " + title + " ** ))))))))))))))");
-        for (Tuple2 <Integer, Tuple2 <int[], int[][]>> entry : collect) {
+        for (Tuple2 <Integer, Tuple2 <long[], int[][]>> entry : collect) {
             StringBuilder str = new StringBuilder("Key: " + entry._1 + ", Values => ");
             str.append("counts: ").append(Arrays.toString(entry._2._1)).append(" ");
             for (int[] array : entry._2._2) {
@@ -22,10 +22,10 @@ public class PatternDebugUtils {
         }
     }
 
-    public static void printSubMatches(String title, JavaPairRDD <Integer, Tuple2 <Integer, int[]>> partial) {
-        List <Tuple2 <Integer, Tuple2 <Integer, int[]>>> collect = partial.collect();
+    public static void printSubMatches(String title, JavaPairRDD <Integer, Tuple2 <Long, int[]>> partial) {
+        List <Tuple2 <Integer, Tuple2 <Long, int[]>>> collect = partial.collect();
         System.out.println("((((((((((((( Partials (count: " + collect.size() + ") ** " + title + " ** ))))))))))))))");
-        for (Tuple2 <Integer, Tuple2 <Integer, int[]>> entry : collect) {
+        for (Tuple2 <Integer, Tuple2 <Long, int[]>> entry : collect) {
             StringBuilder sb = new StringBuilder("Key: " + entry._1 + ", Values: ");
             sb.append(Arrays.toString(entry._2._2));
             System.out.println(sb);

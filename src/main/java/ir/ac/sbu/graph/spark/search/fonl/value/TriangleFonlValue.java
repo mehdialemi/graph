@@ -2,10 +2,7 @@ package ir.ac.sbu.graph.spark.search.fonl.value;
 
 import ir.ac.sbu.graph.spark.search.fonl.local.SubQuery;
 import ir.ac.sbu.graph.types.Edge;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.ints.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -62,8 +59,8 @@ public class TriangleFonlValue extends Fvalue <TriangleMeta> {
         meta.setTcArray(tcArray);
     }
 
-    public Int2IntMap matches(int fonlKey, SubQuery subquery) {
-        Int2IntOpenHashMap v2count = new Int2IntOpenHashMap();
+    public Int2LongMap matches(int fonlKey, SubQuery subquery) {
+        Int2LongOpenHashMap v2count = new Int2LongOpenHashMap();
 
         IntSet keySet = new IntOpenHashSet();
         IntSet[] setArray = new IntSet[subquery.fonl.length];
@@ -78,6 +75,7 @@ public class TriangleFonlValue extends Fvalue <TriangleMeta> {
             if (label == null) {
                 System.out.println(this.toString());
             }
+
             if (label.equals(subQueryLabel) && meta.degs[i] >= subquery.degree)
                 if (subquery.tc == 0 || (meta.tcArray != null && meta.tcArray[i] >= subquery.tc))
                     keySet.add(i);
