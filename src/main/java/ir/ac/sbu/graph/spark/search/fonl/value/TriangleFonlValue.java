@@ -69,11 +69,13 @@ public class TriangleFonlValue extends Fvalue <TriangleMeta> {
         IntSet[] setArray = new IntSet[subquery.fonl.length];
 
         // search for key candidates
-        if (meta.label.equals(subquery.label) && meta.deg >= subquery.degree)
+        String subQueryLabel = subquery.label;
+        if (meta.label.equals(subQueryLabel) && meta.deg >= subquery.degree)
             keySet.add(-1);
 
         for (int i = 0; i < fonl.length; i++) {
-            if (meta.labels[i].equals(subquery.label) &&
+            String label = meta.labels[i];
+            if (label.equals(subQueryLabel) &&
                     meta.degs[i] >= subquery.degree && meta.tcArray[i] >= subquery.tc)
                 keySet.add(i);
         }
