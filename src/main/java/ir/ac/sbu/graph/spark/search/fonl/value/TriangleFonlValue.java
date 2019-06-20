@@ -79,7 +79,7 @@ public class TriangleFonlValue extends Fvalue <TriangleMeta> {
                 System.out.println(this.toString());
             }
             if (label.equals(subQueryLabel) &&
-                    meta.degs[i] >= subquery.degree && meta.tcArray[i] >= subquery.tc)
+                    meta.degs[i] >= subquery.degree && meta.tcArray != null &&  meta.tcArray[i] >= subquery.tc)
                 keySet.add(i);
         }
 
