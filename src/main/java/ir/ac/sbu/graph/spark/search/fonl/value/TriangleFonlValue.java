@@ -78,9 +78,9 @@ public class TriangleFonlValue extends Fvalue <TriangleMeta> {
             if (label == null) {
                 System.out.println(this.toString());
             }
-            if (label.equals(subQueryLabel) &&
-                    meta.degs[i] >= subquery.degree && meta.tcArray != null &&  meta.tcArray[i] >= subquery.tc)
-                keySet.add(i);
+            if (label.equals(subQueryLabel) && meta.degs[i] >= subquery.degree)
+                if (subquery.tc == 0 || (meta.tcArray != null && meta.tcArray[i] >= subquery.tc))
+                    keySet.add(i);
         }
 
         for (int i = 0; i < subquery.fonl.length; i++) {
@@ -137,7 +137,7 @@ public class TriangleFonlValue extends Fvalue <TriangleMeta> {
                     Edge e = keyIndex < index ?
                             new Edge(fonl[keyIndex], fonl[index]) :
                             new Edge(fonl[index], fonl[keyIndex]);
-                    if(!meta.edges.contains(e))
+                    if(meta.edges == null || !meta.edges.contains(e))
                         return;
                 }
             }
