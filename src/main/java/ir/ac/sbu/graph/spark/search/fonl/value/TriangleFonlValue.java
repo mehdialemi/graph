@@ -76,7 +76,7 @@ public class TriangleFonlValue extends Fvalue <TriangleMeta> {
         for (int i = 0; i < fonl.length; i++) {
             String label = meta.labels[i];
             if (label == null) {
-                System.out.println(this.toString();
+                System.out.println(this.toString());
             }
             if (label.equals(subQueryLabel) &&
                     meta.degs[i] >= subquery.degree && meta.tcArray[i] >= subquery.tc)
