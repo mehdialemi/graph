@@ -3,10 +3,11 @@ package ir.ac.sbu.graph.spark.search.fonl.local;
 import ir.ac.sbu.graph.types.Edge;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Subquery {
+public class SubQuery implements Serializable {
     public int vertex;
     public String label;
     public int degree;

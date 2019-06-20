@@ -1,7 +1,7 @@
 package ir.ac.sbu.graph.spark.search.fonl.value;
 
 import ir.ac.sbu.graph.spark.search.fonl.creator.VLabelDeg;
-import ir.ac.sbu.graph.spark.search.fonl.local.Subquery;
+import ir.ac.sbu.graph.spark.search.fonl.local.SubQuery;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
@@ -27,7 +27,7 @@ public class LabledFonlValue extends Fvalue<LabelMeta> {
         }
     }
 
-    public Int2IntOpenHashMap matchSubquery(int vertex, Subquery subquery) {
+    public Int2IntOpenHashMap matchSubquery(int vertex, SubQuery subquery) {
 
         Set<int[]> partials = matchAllFonls(subquery);
 
@@ -45,7 +45,7 @@ public class LabledFonlValue extends Fvalue<LabelMeta> {
         return counter;
     }
 
-    private Set<int[]> matchAllFonls(Subquery subquery) {
+    private Set<int[]> matchAllFonls(SubQuery subquery) {
         Set <int[]> resultSet = new HashSet<>();
         Set <int[]> result = matchPartial(meta.label, meta.deg, 0, subquery);
         if (result != null)
@@ -63,7 +63,7 @@ public class LabledFonlValue extends Fvalue<LabelMeta> {
         return resultSet;
     }
 
-    private Set<int[]> matchPartial(String label, int deg, int fonlOffset, Subquery subquery) {
+    private Set<int[]> matchPartial(String label, int deg, int fonlOffset, SubQuery subquery) {
         if (!subquery.label.equals(label))
             return null;
 

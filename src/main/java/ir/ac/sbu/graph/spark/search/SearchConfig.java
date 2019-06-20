@@ -1,12 +1,9 @@
 package ir.ac.sbu.graph.spark.search;
 
-import ir.ac.sbu.graph.spark.SparkApp;
 import ir.ac.sbu.graph.spark.SparkAppConf;
-import ir.ac.sbu.graph.spark.ktruss.MaxTSetValue;
-import ir.ac.sbu.graph.spark.partitioning.PartitionInfoAccumulator;
 import ir.ac.sbu.graph.spark.search.fonl.creator.VLabel;
 import ir.ac.sbu.graph.spark.search.fonl.creator.VLabelDeg;
-import ir.ac.sbu.graph.spark.search.fonl.local.Subquery;
+import ir.ac.sbu.graph.spark.search.fonl.local.SubQuery;
 import ir.ac.sbu.graph.spark.search.fonl.value.*;
 import ir.ac.sbu.graph.types.*;
 import it.unimi.dsi.fastutil.Function;
@@ -15,7 +12,6 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.*;
@@ -61,7 +57,7 @@ public class SearchConfig {
                         Meta.class,
                         TriangleFonlValue.class,
                         TriangleMeta.class,
-                        Subquery.class,
+                        SubQuery.class,
                         Int2IntMap.class,
                         Int2IntFunction.class,
                         Map.class,
