@@ -97,6 +97,7 @@ public class PatternCounter extends SparkApp {
                 return val._1;
             }).cache();
 
+            System.out.println("matches count: " + matches.count());
             if (searchConfig.isSingle())
                 printMatches("matches (" + splitIndex + ")", matches);
         }
