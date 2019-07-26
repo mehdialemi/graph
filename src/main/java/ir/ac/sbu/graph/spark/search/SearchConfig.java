@@ -45,8 +45,8 @@ public class SearchConfig {
 
                 sparkConf = new SparkConf();
                 sparkConf.setAppName("PatternCounter");
-                sparkConf.set("spark.driver.memory", "10g");
-                sparkConf.set("spark.driver.bindAddress", "9090");
+//                sparkConf.set("spark.driver.memory", "10g");
+//                sparkConf.set("spark.driver.bindAddress", "9090");
                 sparkConf.set("spark.driver.maxResultSize", "9g");
                 sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
                 sparkConf.registerKryoClasses(new Class[] {
