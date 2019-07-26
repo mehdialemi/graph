@@ -47,8 +47,12 @@ public class PatternCounter extends SparkApp {
         Queue<SubQuery> queue = new LinkedList <>(subQueries);
 
         NeighborList neighborList = new NeighborList(edgeLoader);
+        System.out.println("node count: " + neighborList.getOrCreate().count());
+
         TriangleFonl triangleFonl = new TriangleFonl (neighborList, labels);
         JavaPairRDD <Integer, TriangleFonlValue> lFonl = triangleFonl.getOrCreateTFonl();
+        System.out.println("lFonl count: " + lFonl.count());
+
 
         if (searchConfig.isSingle())
             printFonl(lFonl);

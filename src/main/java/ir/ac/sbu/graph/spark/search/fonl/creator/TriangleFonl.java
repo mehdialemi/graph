@@ -7,7 +7,6 @@ import ir.ac.sbu.graph.types.Edge;
 import ir.ac.sbu.graph.utils.OrderedNeighborList;
 import it.unimi.dsi.fastutil.ints.*;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.util.*;
@@ -75,7 +74,9 @@ public class TriangleFonl extends LabelFonl {
                     } while (cIterator.hasNext());
 
                     return output.iterator();
-                }).groupByKey(labelFonl.getNumPartitions());
+                })
+                .groupByKey(labelFonl.getNumPartitions())
+                .cache();
 
         return labelFonl
                 .leftOuterJoin(edgeMsg)
@@ -108,8 +109,10 @@ public class TriangleFonl extends LabelFonl {
                     triangleFonlValue.setEdges(eSet, tcMap);
 
                     return triangleFonlValue;
-                }).repartition(labelFonl.getNumPartitions())
-                .persist(StorageLevel.MEMORY_AND_DISK());
+                })
+                .repartition(labelFonl.getNumPartitions())
+                .cache();
+//                .persist(StorageLevel.MEMORY_AND_DISK());
     }
 
     private JavaPairRDD <Integer, int[]> createCandidates(JavaPairRDD <Integer, LabledFonlValue> labelFonl) {

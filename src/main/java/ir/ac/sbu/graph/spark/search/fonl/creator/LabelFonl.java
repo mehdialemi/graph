@@ -3,7 +3,6 @@ package ir.ac.sbu.graph.spark.search.fonl.creator;
 import ir.ac.sbu.graph.spark.NeighborList;
 import ir.ac.sbu.graph.spark.search.fonl.value.LabledFonlValue;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import java.util.List;
 
 public class LabelFonl {
 
-    public final static String EMPTY_LABEL = "_";
     protected final NeighborList neighborList;
     protected final JavaPairRDD <Integer, String> labels;
     private JavaPairRDD <Integer, LabledFonlValue> lfonl;
@@ -39,7 +37,7 @@ public class LabelFonl {
                     if (deg == 0)
                         return Collections.emptyIterator();
 
-                    VLabelDeg vLabelDeg = new VLabelDeg(kv._1, kv._2._2.orElse(EMPTY_LABEL), deg);
+                    VLabelDeg vLabelDeg = new VLabelDeg(kv._1, kv._2._2.orElse("_"), deg);
                     List <Tuple2 <Integer, VLabelDeg>> list = new ArrayList <>(deg);
 
                     for (int neighbor : kv._2._1) {
@@ -79,13 +77,18 @@ public class LabelFonl {
 
                     LabledFonlValue value = new LabledFonlValue(degree, list);
                     return new Tuple2 <>(kv._1, value);
-                }).cache();
+                });
+//                .cache();
 
-        return fonlLabels.leftOuterJoin(labels).mapValues(v -> {
-            v._1.meta.label = v._2.orElse(EMPTY_LABEL);
+        return fonlLabels
+                .leftOuterJoin(labels, fonlLabels.getNumPartitions())
+                .mapValues(v -> {
+                    v._1.meta.label = v._2.orElse("_");
 
             return v._1;
-        }).repartition(fonlLabels.getNumPartitions())
-                .persist(StorageLevel.MEMORY_AND_DISK());
+        })
+//                .repartition(fonlLabels.getNumPartitions())
+                .cache();
+//                .persist(StorageLevel.MEMORY_AND_DISK());
     }
 }
