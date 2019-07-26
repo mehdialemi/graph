@@ -74,9 +74,7 @@ public class TriangleFonl extends LabelFonl {
                     } while (cIterator.hasNext());
 
                     return output.iterator();
-                })
-                .groupByKey(labelFonl.getNumPartitions())
-                .cache();
+                }).groupByKey(labelFonl.getNumPartitions()).cache();
 
         return labelFonl
                 .leftOuterJoin(edgeMsg)
@@ -109,10 +107,7 @@ public class TriangleFonl extends LabelFonl {
                     triangleFonlValue.setEdges(eSet, tcMap);
 
                     return triangleFonlValue;
-                })
-                .repartition(labelFonl.getNumPartitions())
-                .cache();
-//                .persist(StorageLevel.MEMORY_AND_DISK());
+                }).cache();
     }
 
     private JavaPairRDD <Integer, int[]> createCandidates(JavaPairRDD <Integer, LabledFonlValue> labelFonl) {
