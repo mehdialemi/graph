@@ -137,8 +137,12 @@ public class PatternCounter extends SparkApp {
     }
 
     static JavaPairRDD <Integer, String> getLabels(JavaSparkContext sc, String path, int pNum) {
-        if (path.isEmpty())
-            return sc.parallelizePairs(new ArrayList <>());
+        if (path.isEmpty()) {
+            List<Tuple2<Integer, String>> list = new ArrayList <>();
+            list.add(new Tuple2 <>(Integer.MAX_VALUE, "_"));
+            return sc.parallelizePairs(list);
+        }
+
         return sc
                 .textFile(path, pNum)
                 .map(line -> line.split("\\s+"))
