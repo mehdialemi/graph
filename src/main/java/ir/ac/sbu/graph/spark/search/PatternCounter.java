@@ -48,8 +48,6 @@ public class PatternCounter extends SparkApp {
         Queue<SubQuery> queue = new LinkedList <>(subQueries);
 
         NeighborList neighborList = new NeighborList(edgeLoader);
-        Triangle triangle = new Triangle(neighborList);
-
 
         System.out.println("node count: " + neighborList.getOrCreate().count());
 
