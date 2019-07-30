@@ -53,13 +53,13 @@ public class SearchConfig {
                 sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
                 sparkConf.registerKryoClasses(new Class[] {
                         int[].class,
-                        LabledFonlValue.class,
-                        Fvalue.class,
+                        LabelFonlValue.class,
+                        FonlValue.class,
                         LabelMeta.class,
                         DegreeMeta.class,
                         Meta.class,
-                        TriangleFonlValue.class,
-                        TriangleMeta.class,
+                        LabelTriangleFonlValue.class,
+                        TriangleDegreeMeta.class,
                         SubQuery.class,
                         Int2IntMap.class,
                         Int2IntFunction.class,

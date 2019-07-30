@@ -1,31 +1,26 @@
 package ir.ac.sbu.graph.spark.search.fonl.value;
 
 import ir.ac.sbu.graph.types.Edge;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 
-import java.util.Set;
+public class TriangleMeta extends Meta {
 
-public class TriangleMeta extends LabelMeta {
+    protected int[] v1Array;
+    protected int[] v2Array;
 
-    public Set<Edge> edges;
-    public int[] tcArray;
-    public int tc;
+    public TriangleMeta() { }
 
-    public TriangleMeta() {}
+    public TriangleMeta(int degree, Iterable<Edge> edges) {
+        super(degree);
+        IntList v1List = new IntArrayList();
+        IntList v2List = new IntArrayList();
+        for (Edge edge : edges) {
+            v1List.add(edge.v1);
+            v2List.add(edge.v2);
+        }
 
-    public TriangleMeta(int deg, String label, int fonlValueSize) {
-        super(deg, label, fonlValueSize);
-    }
-
-    public TriangleMeta(LabelMeta labelMeta) {
-        super(labelMeta);
-    }
-
-    public void setEdges(Set<Edge> edges) {
-        this.edges = edges;
-        this.tc = edges.size();
-    }
-
-    public void setTcArray(int[] tcArray) {
-        this.tcArray = tcArray;
+        v1Array = v1List.toIntArray();
+        v2Array = v2List.toIntArray();
     }
 }

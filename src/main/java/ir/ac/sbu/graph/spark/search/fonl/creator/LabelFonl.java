@@ -1,7 +1,7 @@
 package ir.ac.sbu.graph.spark.search.fonl.creator;
 
 import ir.ac.sbu.graph.spark.NeighborList;
-import ir.ac.sbu.graph.spark.search.fonl.value.LabledFonlValue;
+import ir.ac.sbu.graph.spark.search.fonl.value.LabelFonlValue;
 import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
 
@@ -13,21 +13,21 @@ public class LabelFonl {
 
     protected final NeighborList neighborList;
     protected final JavaPairRDD <Integer, String> labels;
-    private JavaPairRDD <Integer, LabledFonlValue> lfonl;
+    private JavaPairRDD <Integer, LabelFonlValue> lfonl;
 
     public LabelFonl(NeighborList neighborList, JavaPairRDD <Integer, String> labels) {
         this.neighborList = neighborList;
         this.labels = labels;
     }
 
-    public JavaPairRDD <Integer, LabledFonlValue> getOrCreateLFonl() {
+    public JavaPairRDD <Integer, LabelFonlValue> getOrCreateLFonl() {
         if (lfonl == null) {
             lfonl = createLFonl();
         }
         return lfonl;
     }
 
-    public JavaPairRDD <Integer, LabledFonlValue> createLFonl() {
+    public JavaPairRDD <Integer, LabelFonlValue> createLFonl() {
         JavaPairRDD <Integer, int[]> neighbors = neighborList.getOrCreate();
 
         JavaPairRDD <Integer, VLabelDeg> labelDegMsg = neighbors
@@ -47,7 +47,7 @@ public class LabelFonl {
                     return list.iterator();
                 });
 
-        JavaPairRDD <Integer, LabledFonlValue> fonlLabels = labelDegMsg
+        JavaPairRDD <Integer, LabelFonlValue> fonlLabels = labelDegMsg
                 .groupByKey(neighbors.getNumPartitions())
                 .mapToPair(kv -> {
                     int degree = 0;
@@ -75,7 +75,7 @@ public class LabelFonl {
                         }
                     });
 
-                    LabledFonlValue value = new LabledFonlValue(degree, list);
+                    LabelFonlValue value = new LabelFonlValue(degree, list);
                     return new Tuple2 <>(kv._1, value);
                 });
 //                .cache();

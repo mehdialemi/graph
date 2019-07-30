@@ -305,7 +305,7 @@ public class PowerPartitioning extends SparkApp {
 //
 //            int power = kv._2._1();
 //            final int[] neighbors = kv._2._3();
-//            final int deg = neighbors.length;
+//            final int degree = neighbors.length;
 //
 //
 //            if (power == INIT_POWER)

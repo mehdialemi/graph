@@ -103,7 +103,7 @@ public class ParallelKTruss1 extends ParallelKTrussBase {
         if (max == -1)
             throw new Exception("Problem in max finding");
 
-        // construct deg arrayList
+        // construct degree arrayList
         AtomicInteger[] degArray = new AtomicInteger[max + 1];
         final int batchSize = (int) (degArray.length * batchRatio);
         forkJoinPool.submit(() -> IntStream.range(0, degArray.length).parallel().forEach(i -> degArray[i] = new AtomicInteger(0))).get();

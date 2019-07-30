@@ -129,7 +129,7 @@ public class SeqMethod1 extends SequentialBase {
         for(int i = vertices.length - 1 ; i >= 0 ; i --) {
             int u = vertices[i]; // get current vertex id as u
 
-            // since vertices are sorted based on degrees in async order, don't process all deg = 0 or deg = 1 vertices
+            // since vertices are sorted based on degrees in async order, don't process all degree = 0 or degree = 1 vertices
             if (degArray[u] == 1)
                 break;
 

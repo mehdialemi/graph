@@ -1,6 +1,6 @@
 package ir.ac.sbu.graph.spark.search.patterns;
 
-import ir.ac.sbu.graph.spark.search.fonl.value.TriangleFonlValue;
+import ir.ac.sbu.graph.spark.search.fonl.value.LabelTriangleFonlValue;
 import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
 
@@ -32,9 +32,9 @@ public class PatternDebugUtils {
         }
     }
 
-    public static void printFonl(JavaPairRDD <Integer, TriangleFonlValue> labelFonl) {
-        List <Tuple2 <Integer, TriangleFonlValue>> collect = labelFonl.collect();
-        for (Tuple2 <Integer, TriangleFonlValue> t : collect) {
+    public static void printFonl(JavaPairRDD <Integer, LabelTriangleFonlValue> labelFonl) {
+        List <Tuple2 <Integer, LabelTriangleFonlValue>> collect = labelFonl.collect();
+        for (Tuple2 <Integer, LabelTriangleFonlValue> t : collect) {
             System.out.println(t);
         }
     }

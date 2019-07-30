@@ -54,7 +54,7 @@ public class ParallelKTruss7 extends ParallelKTrussBase {
 
 
         long tDeg = System.currentTimeMillis();
-        System.out.println("calculate deg in " + (tDeg - tMax) + " ms");
+        System.out.println("calculate degree in " + (tDeg - tMax) + " ms");
 
         final VertexCompare vertexCompare = new VertexCompare(d);
         final Int2ObjectOpenHashMap<IntArrayList> fonl = new Int2ObjectOpenHashMap<>(vCount);

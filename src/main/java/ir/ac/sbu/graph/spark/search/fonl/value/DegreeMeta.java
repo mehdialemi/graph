@@ -3,30 +3,30 @@ package ir.ac.sbu.graph.spark.search.fonl.value;
 import java.util.Arrays;
 
 public class DegreeMeta extends Meta {
-    public int[] degs;
+    public int[] degrees;
 
     public DegreeMeta() {}
 
-    public DegreeMeta(int deg, int fSize) {
-        this.deg = deg;
-        this.degs = new int[fSize];
+    public DegreeMeta(int deg, int size) {
+        super(deg);
+        this.degrees = new int[size];
     }
 
     public DegreeMeta(DegreeMeta degreeMeta) {
         super(degreeMeta);
-        degs = degreeMeta.degs;
+        degrees = degreeMeta.degrees;
     }
 
-    public static Fvalue<DegreeMeta> createEmptyFValue() {
-        Fvalue<DegreeMeta> fvalue = new Fvalue <>();
-        fvalue.meta = new LabelMeta();
-        fvalue.fonl = new int[0];
-        fvalue.meta.degs = new int[0];
-        return fvalue;
+    public static FonlValue<DegreeMeta> createEmptyFValue() {
+        FonlValue<DegreeMeta> fonlValue = new FonlValue<>();
+        fonlValue.meta = new LabelMeta();
+        fonlValue.fonl = new int[0];
+        fonlValue.meta.degrees = new int[0];
+        return fonlValue;
     }
 
     @Override
     public String toString() {
-        return super.toString() + ", degs: " + Arrays.toString(degs);
+        return super.toString() + ", degrees: " + Arrays.toString(degrees);
     }
 }

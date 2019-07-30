@@ -2,11 +2,12 @@ package ir.ac.sbu.graph.spark.search;
 
 import ir.ac.sbu.graph.spark.*;
 import ir.ac.sbu.graph.spark.search.fonl.creator.LocalFonlCreator;
-import ir.ac.sbu.graph.spark.search.fonl.creator.TriangleFonl;
+import ir.ac.sbu.graph.spark.search.fonl.creator.TriangleFonl2;
 import ir.ac.sbu.graph.spark.search.fonl.local.QFonl;
 import ir.ac.sbu.graph.spark.search.fonl.local.SubQuery;
-import ir.ac.sbu.graph.spark.search.fonl.value.TriangleFonlValue;
+import ir.ac.sbu.graph.spark.search.fonl.value.LabelTriangleFonlValue;
 import ir.ac.sbu.graph.spark.search.patterns.PatternReaderUtils;
+import ir.ac.sbu.graph.spark.triangle.Triangle;
 import it.unimi.dsi.fastutil.ints.*;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -40,17 +41,20 @@ public class PatternCounter extends SparkApp {
     }
 
     public long search(QFonl qFonl) {
+
         List <SubQuery> subQueries = LocalFonlCreator.getSubQueries(qFonl);
         if (subQueries.isEmpty())
             return 0;
-
         Queue<SubQuery> queue = new LinkedList <>(subQueries);
 
         NeighborList neighborList = new NeighborList(edgeLoader);
+        Triangle triangle = new Triangle(neighborList);
+
+
         System.out.println("node count: " + neighborList.getOrCreate().count());
 
-        TriangleFonl triangleFonl = new TriangleFonl (neighborList, labels);
-        JavaPairRDD <Integer, TriangleFonlValue> lFonl = triangleFonl.getOrCreateTFonl();
+        TriangleFonl2 triangleFonl2 = new TriangleFonl2(neighborList, labels);
+        JavaPairRDD <Integer, LabelTriangleFonlValue> lFonl = triangleFonl2.getOrCreateTFonl();
         System.out.println("lFonl count: " + lFonl.count());
 
 
@@ -111,7 +115,7 @@ public class PatternCounter extends SparkApp {
         }).reduce((a, b) -> a + b);
     }
 
-    private JavaPairRDD <Integer, Tuple2 <Long, int[]>> getSubMatches(JavaPairRDD <Integer, TriangleFonlValue> tFonl,
+    private JavaPairRDD <Integer, Tuple2 <Long, int[]>> getSubMatches(JavaPairRDD <Integer, LabelTriangleFonlValue> tFonl,
                                                                          Broadcast <SubQuery> broadcast) {
         return tFonl.flatMapToPair(kv -> {
 

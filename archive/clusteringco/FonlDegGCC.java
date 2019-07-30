@@ -39,8 +39,8 @@ public class FonlDegGCC {
         JavaPairRDD<Long, long[]> fonl = FonlUtils.createWith2ReduceNoSort(edges, partition);
 
         // Partition based on degree. To balance workload, it is better to have a partitioning mechanism that
-        // for example a vertex with high number of higherIds (high deg) would be allocated besides vertex with
-        // low number of higherIds (high deg)
+        // for example a vertex with high number of higherIds (high degree) would be allocated besides vertex with
+        // low number of higherIds (high degree)
         JavaPairRDD<Long, long[]> candidates = FonlDegTC.generateCandidates(fonl);
 
         long totalTriangles = FonlDegTC.countTriangles(candidates, fonl, partition);

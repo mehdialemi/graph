@@ -31,8 +31,8 @@ object KTrussSpark {
         // A neighbor list that each neighbor has its degree
         val vdNeighbor = neighbor.flatMap { t =>
             var msg = mutable.Map[Long, (Long, Int)]()
-            val deg = t._2.size
-            t._2.foreach(e => msg += e -> (t._1, deg))
+            val degree = t._2.size
+            t._2.foreach(e => msg += e -> (t._1, degree))
             msg
         }.groupByKey()
 

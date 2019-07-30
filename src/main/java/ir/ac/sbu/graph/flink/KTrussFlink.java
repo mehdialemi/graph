@@ -99,19 +99,19 @@
 //                    }
 //
 //                    int vertex = list.get(0).f0;
-//                    int deg = list.support();
+//                    int degree = list.support();
 //                    holds.clear();
 //
-//                    for (int i = 0; i < deg; i++) {
+//                    for (int i = 0; i < degree; i++) {
 //                        Tuple3<Integer, Integer, Integer> tuple = list.get(i);
-//                        if (tuple.f2 > deg || (tuple.f2 == deg && tuple.f1 > tuple.f0))
+//                        if (tuple.f2 > degree || (tuple.f2 == degree && tuple.f1 > tuple.f0))
 //                            holds.add(tuple);
 //                    }
 //
 //                    Collections.sort(holds, (a, sign) -> a.f2 != sign.f2 ? a.f2 - sign.f2 : a.f1 - sign.f1);
 //
 //                    int[] higherDegs = new int[holds.support() + 1];
-//                    higherDegs[0] = deg;
+//                    higherDegs[0] = degree;
 //                    for (int i = 1; i < higherDegs.length; i++)
 //                        higherDegs[i] = holds.get(i - 1).f1;
 //

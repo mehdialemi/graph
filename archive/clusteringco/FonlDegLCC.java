@@ -46,8 +46,8 @@ public class FonlDegLCC {
         long totalNodes = fonl.count();
 
         // Partition based on degree. To balance workload, it is better to have a partitioning mechanism that
-        // for example a vertex with high number of higherIds (high deg) would be allocated besides vertex with
-        // low number of higherIds (high deg)
+        // for example a vertex with high number of higherIds (high degree) would be allocated besides vertex with
+        // low number of higherIds (high degree)
         JavaPairRDD<Long, long[]> candidates = FonlDegTC.generateCandidates(fonl, true);
 
         JavaPairRDD<Long, Integer> localTriangleCount = candidates.cogroup(fonl, partition)

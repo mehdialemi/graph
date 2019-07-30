@@ -251,10 +251,10 @@ public class SPMiner extends SparkApp {
         });
     }
 
-//    private JavaPairRDD <Integer, Iterable <Candidate[]>> getExCandidates(JavaPairRDD <Integer, Fvalue <LabelMeta>> lFonl, Broadcast <OrderedNeighbors> queryBroadCast, JavaPairRDD <Integer, Iterable <Candidate[]>> complement) {
+//    private JavaPairRDD <Integer, Iterable <Candidate[]>> getExCandidates(JavaPairRDD <Integer, FonlValue <LabelMeta>> lFonl, Broadcast <OrderedNeighbors> queryBroadCast, JavaPairRDD <Integer, Iterable <Candidate[]>> complement) {
 //        return complement.join(lFonl).flatMapToPair(kv -> {
 //            OrderedNeighbors sonl = queryBroadCast.getValue();
-//            Fvalue<LabelMeta> fvalue = kv._2._2;
+//            FonlValue<LabelMeta> fvalue = kv._2._2;
 //            Map<Integer, Set<Candidate>> map = new HashMap<>();
 //            for (Candidate[] candidates : kv._2._1) {
 //                for (Candidate candidate : candidates) {

@@ -5,5 +5,5 @@ public class PInfo {
     public int low;
     public int high;
     public int partitionNum;
-    public int[] sortedDegCounts; // from low to high deg
+    public int[] sortedDegCounts; // from low to high degree
 }

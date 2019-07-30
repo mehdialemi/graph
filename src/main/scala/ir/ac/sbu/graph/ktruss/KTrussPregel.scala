@@ -52,7 +52,7 @@ object KTrussPregel {
         // Third getOrCreate a new ir.ac.sbu.graph with new edges and previous vertices
 
         // Set degree of each vertex in the property.
-        val graphVD = inputGraph.outerJoinVertices(inputGraph.degrees)((vid, vertex, deg) => deg)
+        val graphVD = inputGraph.outerJoinVertices(inputGraph.degrees)((vid, vertex, degree) => degree)
 
         // Find new edges with correct direction. A direction from a lower degree node to a higher degree node.
         val newEdges = graphVD.triplets.map { et =>

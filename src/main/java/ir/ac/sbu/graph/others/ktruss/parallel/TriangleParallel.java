@@ -32,7 +32,7 @@ public class TriangleParallel {
         if (max == -1)
             throw new Exception("Problem in max finding");
 
-        // construct deg array
+        // construct degree array
         AtomicInteger[] degArray = new AtomicInteger[max + 1];
         buckets = createBuckets(threads, degArray.length);
         buckets.parallelStream().forEach(bucket ->

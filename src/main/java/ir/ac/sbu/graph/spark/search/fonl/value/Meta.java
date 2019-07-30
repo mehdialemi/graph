@@ -3,16 +3,19 @@ package ir.ac.sbu.graph.spark.search.fonl.value;
 import java.io.Serializable;
 
 public class Meta implements Serializable {
-    public int deg;
+    public int degree;
 
     public Meta() {}
 
+    public Meta(int degree) {
+        this.degree = degree;
+    }
     public Meta(Meta meta) {
-        deg = meta.deg;
+        degree = meta.degree;
     }
 
     @Override
     public String toString() {
-        return "deg: " + deg;
+        return "degree: " + degree;
     }
 }

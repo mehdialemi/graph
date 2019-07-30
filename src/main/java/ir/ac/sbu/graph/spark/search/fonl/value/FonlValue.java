@@ -2,7 +2,7 @@ package ir.ac.sbu.graph.spark.search.fonl.value;
 
 import java.util.Arrays;
 
-public class Fvalue<T extends Meta> {
+public class FonlValue<T extends Meta> {
     public T meta;
     public int[] fonl;
 

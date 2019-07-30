@@ -10,19 +10,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class LabledFonlValue extends Fvalue<LabelMeta> {
+public class LabelFonlValue extends FonlValue<LabelMeta> {
     private static Int2IntOpenHashMap tEmpty = new Int2IntOpenHashMap();
 
-    public LabledFonlValue() {}
+    public LabelFonlValue() {}
 
-    public LabledFonlValue(int degree, List<VLabelDeg> list) {
+    public LabelFonlValue(int degree, List<VLabelDeg> list) {
         meta = new LabelMeta(degree, list.size());
         fonl = new int[list.size()];
         meta.labels = new String[list.size()];
 
         for (int i = 0; i < list.size(); i++) {
             fonl[i] = list.get(i).vertex;
-            meta.degs[i] = list.get(i).degree;
+            meta.degrees[i] = list.get(i).degree;
             meta.labels[i] = list.get(i).label;
         }
     }
@@ -47,12 +47,12 @@ public class LabledFonlValue extends Fvalue<LabelMeta> {
 
     private Set<int[]> matchAllFonls(SubQuery subquery) {
         Set <int[]> resultSet = new HashSet<>();
-        Set <int[]> result = matchPartial(meta.label, meta.deg, 0, subquery);
+        Set <int[]> result = matchPartial(meta.label, meta.degree, 0, subquery);
         if (result != null)
             resultSet.addAll(result);
 
         for (int offset = 0; offset < fonl.length - subquery.fonl.length; offset++) {
-            int deg = meta.degs[offset];
+            int deg = meta.degrees[offset];
             String label = meta.labels[offset];
 
             result = matchPartial(label, deg, offset + 1, subquery);
@@ -81,7 +81,7 @@ public class LabledFonlValue extends Fvalue<LabelMeta> {
                 if (!meta.labels[j].equals(qvLabel))
                     continue;
 
-                if (meta.degs[j] < qvDegree)
+                if (meta.degrees[j] < qvDegree)
                     continue;
 
                 if (set[i] == null)

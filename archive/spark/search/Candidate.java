@@ -190,7 +190,7 @@ public class Candidate implements Serializable {
         return map;
     }
 
-//    public boolean neighbor(Fvalue <LabelMeta> fvalue) {
+//    public boolean neighbor(FonlValue <LabelMeta> fvalue) {
 ////        if (checkIndexes == null)
 ////            return true;
 //

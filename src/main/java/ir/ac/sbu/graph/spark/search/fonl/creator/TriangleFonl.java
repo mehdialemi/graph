@@ -1,143 +1,124 @@
 package ir.ac.sbu.graph.spark.search.fonl.creator;
 
 import ir.ac.sbu.graph.spark.NeighborList;
-import ir.ac.sbu.graph.spark.search.fonl.value.LabledFonlValue;
 import ir.ac.sbu.graph.spark.search.fonl.value.TriangleFonlValue;
+import ir.ac.sbu.graph.spark.triangle.Triangle;
 import ir.ac.sbu.graph.types.Edge;
 import ir.ac.sbu.graph.utils.OrderedNeighborList;
-import it.unimi.dsi.fastutil.ints.*;
+import it.unimi.dsi.fastutil.ints.Int2IntAVLTreeMap;
+import it.unimi.dsi.fastutil.ints.Int2IntSortedMap;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntListIterator;
 import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
 
 import java.util.*;
 
-/**
- * Triangle Based Fonl
- */
-public class TriangleFonl extends LabelFonl {
+public class TriangleFonl {
 
-    protected JavaPairRDD <Integer, TriangleFonlValue> tfonl;
+    private NeighborList neighborList;
+    private JavaPairRDD <Integer, int[]> neighborRDD;
 
-    public TriangleFonl(NeighborList neighborList, JavaPairRDD <Integer, String> labels) {
-        super(neighborList, labels);
+    public TriangleFonl(NeighborList neighborList) {
+        this.neighborList = neighborList;
     }
 
-    public JavaPairRDD <Integer, TriangleFonlValue> getOrCreateTFonl() {
-        if (tfonl == null) {
-            tfonl = createTFonl();
-        }
-        return tfonl;
+    JavaPairRDD <Integer, int[]> getNeighborRDD() {
+        return neighborRDD;
     }
 
-    public JavaPairRDD <Integer, TriangleFonlValue> createTFonl() {
+    public JavaPairRDD <Integer, TriangleFonlValue> create() {
 
-        JavaPairRDD <Integer, LabledFonlValue> labelFonl = super.getOrCreateLFonl();
-//        printFonl(labelFonl);
+        neighborRDD = neighborList.getOrCreate();
 
-        JavaPairRDD <Integer, int[]> candidates = createCandidates(labelFonl);
+        Triangle triangle = new Triangle(neighborList);
 
-        JavaPairRDD <Integer, Iterable <Edge>> edgeMsg = candidates
-                .cogroup(labelFonl)
+        JavaPairRDD <Integer, int[]> fonlRDD = triangle.createFonl();
+
+        JavaPairRDD <Integer, int[]> candidates = triangle.createCandidates(fonlRDD);
+
+        JavaPairRDD <Integer, Iterable <Edge>> triangleInfo = candidates.cogroup(fonlRDD)
                 .flatMapToPair(kv -> {
                     List <Tuple2 <Integer, Edge>> output = new ArrayList <>();
 
-                    Iterator <LabledFonlValue> iterator = kv._2._2.iterator();
-                    if (!iterator.hasNext())
+                    // Iterator for fonlRDD
+                    Iterator <int[]> fonlIterator = kv._2._2.iterator();
+                    if (!fonlIterator.hasNext())
                         return output.iterator();
 
-                    LabledFonlValue labledFonlValue = iterator.next();
-                    int[] hDegs = labledFonlValue.fonl;
+                    int[] hDegs = fonlIterator.next();
 
-                    Iterator <int[]> cIterator = kv._2._1.iterator();
-                    if (!cIterator.hasNext())
+                    Iterator <int[]> candidateIterator = kv._2._1.iterator();
+                    if (!candidateIterator.hasNext())
                         return output.iterator();
 
-                    Arrays.sort(hDegs, 0, hDegs.length);
-
+                    // Consider the assumption u < v < w
                     int v = kv._1;
 
+                    Arrays.sort(hDegs, 1, hDegs.length);
                     do {
-                        int[] forward = cIterator.next();
+                        int[] forward = candidateIterator.next();
                         int u = forward[0];
 
-                        IntList intersects = OrderedNeighborList.intersection(hDegs, forward, 0, 1);
-                        if (intersects == null)
+                        IntList wList = OrderedNeighborList.intersection(hDegs, forward, 1, 1);
+                        if (wList == null)
                             continue;
 
-                        IntListIterator iter = intersects.intListIterator();
+                        IntListIterator iter = wList.listIterator();
                         while (iter.hasNext()) {
                             int w = iter.nextInt();
+
+                            // add edge (v, w) to TriangleFonlValue of key=u
                             output.add(new Tuple2 <>(u, new Edge(v, w)));
+
+                            // remove vertex w from the corresponding value of key=v
                             output.add(new Tuple2 <>(v, new Edge(w, -1)));
                         }
 
-                    } while (cIterator.hasNext());
+                    } while (candidateIterator.hasNext());
 
                     return output.iterator();
-                }).groupByKey(labelFonl.getNumPartitions()).cache();
+                }).groupByKey();
 
-        return labelFonl
-                .leftOuterJoin(edgeMsg)
-                .mapValues(join -> {
-                    TriangleFonlValue triangleFonlValue = new TriangleFonlValue(join._1);
-                    if (!join._2.isPresent())
-                        return triangleFonlValue;
+        // update fonlRDD based on triangle information
+        return fonlRDD.leftOuterJoin(triangleInfo).mapValues(value -> {
+            int degree = value._1[0];
+            int[] fonl = null;
 
-                    IntSet removes = new IntOpenHashSet();
-                    Iterable <Edge> edges = join._2.get();
-                    for (Edge edge : edges) {
-                        if (edge.v2 == -1)
-                            removes.add(edge.v1);
+            Iterable<Edge> edges;
+            if (value._2.isPresent()) {
+                Int2IntSortedMap v2Index = new Int2IntAVLTreeMap();
+                for (int i = 1; i < value._1.length; i++) {
+                    v2Index.put(value._1[i], i - 1);
+                }
+
+                List<Edge> list = new ArrayList <>();
+                for (Edge edge : value._2.get()) {
+                    if (edge.v2 < 0)
+                        v2Index.remove(edge.v1);
+                    else
+                        list.add(edge);
+                }
+                edges = list;
+
+                // check neighbor removing from the fonl value
+                if (v2Index.size() < value._1.length - 1) {
+                    // some vertices were removed from the fonl
+                    fonl = new int[v2Index.size()];
+                    for (Map.Entry <Integer, Integer> entry : v2Index.entrySet()) {
+                        fonl[entry.getValue()] = entry.getKey();
                     }
+                }
+            } else {
+                edges = Collections.emptyList();
+            }
 
-                    Set<Edge> eSet = new HashSet <>();
-                    Int2IntOpenHashMap tcMap = new Int2IntOpenHashMap();
-                    for (Edge edge : edges) {
-                        if (removes.contains(edge.v1) || removes.contains(edge.v2))
-                            continue;
+            if (fonl == null) {
+                fonl = new int[value._1.length - 1];
+                System.arraycopy(value._1, 1, fonl, 0, fonl.length);
+            }
 
-                        tcMap.addTo(edge.v1, 1);
-                        tcMap.addTo(edge.v2, 1);
-                        eSet.add(edge);
-                    }
-
-                    if (!removes.isEmpty())
-                        triangleFonlValue.remove(removes);
-
-                    triangleFonlValue.setEdges(eSet, tcMap);
-
-                    return triangleFonlValue;
-                }).cache();
-    }
-
-    private JavaPairRDD <Integer, int[]> createCandidates(JavaPairRDD <Integer, LabledFonlValue> labelFonl) {
-        return labelFonl.filter(t -> t._2.fonl.length > 1) // Select vertices having more than 2 items in their values
-                .flatMapToPair(t -> {
-
-                    int[] fonl = t._2.fonl;
-                    int max = fonl.length - 1; // one is for the first index holding node's degree
-
-                    List <Tuple2 <Integer, int[]>> output;
-                    output = new ArrayList <>(max);
-
-                    for (int index = 0; index < max; index++) {
-                        int cVertex = fonl[index];
-                        int len = fonl.length - index;
-                        int[] cValue = new int[len];
-                        cValue[0] = t._1; // First vertex in the triangle
-                        System.arraycopy(fonl, index + 1, cValue, 1, len - 1);
-                        Arrays.sort(cValue, 1, cValue.length);
-                        output.add(new Tuple2 <>(cVertex, cValue));
-                    }
-
-                    return output.iterator();
-                });
-    }
-
-    private void printFonl(JavaPairRDD <Integer, LabledFonlValue> labelFonl) {
-        List <Tuple2 <Integer, LabledFonlValue>> collect = labelFonl.collect();
-        for (Tuple2 <Integer, LabledFonlValue> t : collect) {
-            System.out.println(t);
-        }
+            return new TriangleFonlValue(degree, fonl, edges);
+        });
     }
 }
