@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * Represent fonl value including labels, degrees, and triangle information
  */
-public class LabelTriangleFonlValue extends FonlValue<LabelTriangleDegreeMeta> {
+public class LabelTriangleFonlValue extends FonlValue<TriangleDegreeMeta> {
 
     public LabelTriangleFonlValue() {
     }

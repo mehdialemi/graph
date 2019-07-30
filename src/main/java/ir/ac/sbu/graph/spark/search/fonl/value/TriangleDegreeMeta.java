@@ -4,15 +4,16 @@ import ir.ac.sbu.graph.types.Edge;
 
 import java.util.Set;
 
-public class TriangleDegreeMeta extends DegreeMeta {
+public class TriangleDegreeMeta extends LabelMeta {
 
-    private int[] e1Array;
-    private int[] e2Array;
+    public Set<Edge> edges;
+    public int[] tcArray;
+    public int tc;
 
     public TriangleDegreeMeta() {}
 
-    public TriangleDegreeMeta(int degree, int size) {
-        super(degree, size);
+    public TriangleDegreeMeta(int deg, String label, int fonlValueSize) {
+        super(deg, label, fonlValueSize);
     }
 
     public TriangleDegreeMeta(LabelMeta labelMeta) {
@@ -20,14 +21,11 @@ public class TriangleDegreeMeta extends DegreeMeta {
     }
 
     public void setEdges(Set<Edge> edges) {
-        this.e1Array = new int[edges.size()];
-        this.e2Array = new int[edges.size()];
+        this.edges = edges;
+        this.tc = edges.size();
+    }
 
-        int i = 0;
-        for (Edge edge : edges) {
-            e1Array[i] = edge.v1;
-            e2Array[i] = edge.v2;
-            i ++;
-        }
+    public void setTcArray(int[] tcArray) {
+        this.tcArray = tcArray;
     }
 }
