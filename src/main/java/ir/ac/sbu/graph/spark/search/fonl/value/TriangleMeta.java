@@ -1,26 +1,72 @@
 package ir.ac.sbu.graph.spark.search.fonl.value;
 
 import ir.ac.sbu.graph.types.Edge;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongAVLTreeSet;
+import it.unimi.dsi.fastutil.longs.LongSortedSet;
+
+import java.util.Arrays;
+import java.util.Map;
 
 public class TriangleMeta extends Meta {
 
-    protected int[] v1Array;
-    protected int[] v2Array;
+    private long[] triangleEdges;
+    private int[] vTc;
+    private int tc;
 
-    public TriangleMeta() { }
+    TriangleMeta() { }
 
-    public TriangleMeta(int degree, Iterable<Edge> edges) {
+    TriangleMeta(TriangleMeta triangleMeta) {
+        super(triangleMeta);
+        triangleEdges = triangleMeta.triangleEdges;
+        vTc = triangleMeta.vTc;
+    }
+
+    TriangleMeta(int degree, Iterable<Edge> triangleEdges, int[] fonl) {
         super(degree);
-        IntList v1List = new IntArrayList();
-        IntList v2List = new IntArrayList();
-        for (Edge edge : edges) {
-            v1List.add(edge.v1);
-            v2List.add(edge.v2);
+
+        Int2IntMap v2Index = new Int2IntOpenHashMap();
+        for (int i = 0; i < fonl.length; i++) {
+            v2Index.put(fonl[i], i);
         }
 
-        v1Array = v1List.toIntArray();
-        v2Array = v2List.toIntArray();
+        LongSortedSet edgeSet = new LongAVLTreeSet();
+        Int2IntOpenHashMap tcMap = new Int2IntOpenHashMap();
+        for (Edge edge : triangleEdges) {
+            edgeSet.add((long)edge.v1 << 32 | edge.v2 & 0xFFFFFFFFL);
+            tcMap.addTo(edge.v1, 1);
+            tcMap.addTo(edge.v2, 1);
+            tc ++;
+        }
+
+        this.triangleEdges = edgeSet.toLongArray();
+        vTc = new int[fonl.length];
+        for (Map.Entry <Integer, Integer> entry : tcMap.entrySet()) {
+            int vertex = entry.getKey();
+            int count = entry.getValue();
+            int index = v2Index.get(vertex);
+            vTc[index] = count;
+        }
+    }
+
+    public int tc(int index) {
+        return vTc[index];
+    }
+
+    public int tc() { return tc; }
+
+
+    boolean hasEdge(Edge edge) {
+        return hasEdge(edge.v1, edge.v2);
+    }
+
+    boolean hasEdge(int v1, int v2) {
+        long e = (long)v1 << 32 | v2 & 0xFFFFFFFFL;
+        return Arrays.binarySearch(triangleEdges, e) >= 0;
+    }
+
+    boolean hasTriangle() {
+        return triangleEdges != null;
     }
 }

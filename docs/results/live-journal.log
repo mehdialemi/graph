@@ -1,7 +1,7 @@
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
-Graph loaded, edges: 34681189, load time: 22149 ms
+Graph loaded, triangleEdges: 34681189, load time: 22149 ms
 start ktruss with kc = 3, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 498 ms
 tcArray duration: 13413 ms
@@ -15,7 +15,7 @@ duration: 22874 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
-Graph loaded, edges: 34681189, load time: 22037 ms
+Graph loaded, triangleEdges: 34681189, load time: 22037 ms
 start ktruss with kc = 4, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 495 ms
 tcArray duration: 14716 ms
@@ -65,7 +65,7 @@ duration: 26740 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
-Graph loaded, edges: 34681189, load time: 22197 ms
+Graph loaded, triangleEdges: 34681189, load time: 22197 ms
 start ktruss with kc = 5, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 500 ms
 tcArray duration: 13766 ms
@@ -125,7 +125,7 @@ duration: 27793 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
-Graph loaded, edges: 34681189, load time: 22267 ms
+Graph loaded, triangleEdges: 34681189, load time: 22267 ms
 start ktruss with kc = 6, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 524 ms
 tcArray duration: 14130 ms
@@ -189,7 +189,7 @@ duration: 28774 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
-Graph loaded, edges: 34681189, load time: 23319 ms
+Graph loaded, triangleEdges: 34681189, load time: 23319 ms
 start ktruss with kc = 7, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 506 ms
 tcArray duration: 14203 ms
@@ -277,7 +277,7 @@ duration: 30821 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
-Graph loaded, edges: 34681189, load time: 22871 ms
+Graph loaded, triangleEdges: 34681189, load time: 22871 ms
 start ktruss with kc = 8, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 546 ms
 tcArray duration: 13936 ms
@@ -355,7 +355,7 @@ duration: 31467 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
-Graph loaded, edges: 34681189, load time: 22219 ms
+Graph loaded, triangleEdges: 34681189, load time: 22219 ms
 start ktruss with kc = 9, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 528 ms
 tcArray duration: 13495 ms
@@ -447,7 +447,7 @@ duration: 32046 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
-Graph loaded, edges: 34681189, load time: 20684 ms
+Graph loaded, triangleEdges: 34681189, load time: 20684 ms
 start ktruss with kc = 10, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 639 ms
 tcArray duration: 14323 ms
@@ -549,7 +549,7 @@ duration: 34132 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
-Graph loaded, edges: 34681189, load time: 22100 ms
+Graph loaded, triangleEdges: 34681189, load time: 22100 ms
 start ktruss with kc = 11, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 498 ms
 tcArray duration: 13581 ms
@@ -645,7 +645,7 @@ duration: 33199 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
-Graph loaded, edges: 34681189, load time: 21555 ms
+Graph loaded, triangleEdges: 34681189, load time: 21555 ms
 start ktruss with kc = 12, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 521 ms
 tcArray duration: 13537 ms
@@ -757,7 +757,7 @@ duration: 33794 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
-Graph loaded, edges: 34681189, load time: 22451 ms
+Graph loaded, triangleEdges: 34681189, load time: 22451 ms
 start ktruss with kc = 13, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 496 ms
 tcArray duration: 13881 ms
@@ -871,7 +871,7 @@ duration: 33979 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
-Graph loaded, edges: 34681189, load time: 22484 ms
+Graph loaded, triangleEdges: 34681189, load time: 22484 ms
 start ktruss with kc = 14, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 486 ms
 tcArray duration: 13689 ms
@@ -985,7 +985,7 @@ duration: 41219 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
-Graph loaded, edges: 34681189, load time: 21835 ms
+Graph loaded, triangleEdges: 34681189, load time: 21835 ms
 start ktruss with kc = 15, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 506 ms
 tcArray duration: 14296 ms
@@ -1097,7 +1097,7 @@ duration: 43552 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
-Graph loaded, edges: 34681189, load time: 22625 ms
+Graph loaded, triangleEdges: 34681189, load time: 22625 ms
 start ktruss with kc = 16, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 457 ms
 tcArray duration: 15337 ms
@@ -1203,7 +1203,7 @@ duration: 36616 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
-Graph loaded, edges: 34681189, load time: 23244 ms
+Graph loaded, triangleEdges: 34681189, load time: 23244 ms
 start ktruss with kc = 17, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 437 ms
 tcArray duration: 14477 ms
@@ -1293,7 +1293,7 @@ duration: 36034 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
-Graph loaded, edges: 34681189, load time: 21957 ms
+Graph loaded, triangleEdges: 34681189, load time: 21957 ms
 start ktruss with kc = 18, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 527 ms
 tcArray duration: 13077 ms
@@ -1415,7 +1415,7 @@ duration: 41957 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
-Graph loaded, edges: 34681189, load time: 22398 ms
+Graph loaded, triangleEdges: 34681189, load time: 22398 ms
 start ktruss with kc = 19, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 522 ms
 tcArray duration: 13713 ms
@@ -1559,7 +1559,7 @@ duration: 43610 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/live-journal
-Graph loaded, edges: 34681189, load time: 21503 ms
+Graph loaded, triangleEdges: 34681189, load time: 21503 ms
 start ktruss with kc = 20, threads = 12, method = 6 input: /home/i/graph-data/live-journal
 create fonl in 560 ms
 tcArray duration: 14595 ms

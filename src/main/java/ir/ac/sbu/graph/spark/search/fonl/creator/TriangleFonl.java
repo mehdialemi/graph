@@ -5,8 +5,6 @@ import ir.ac.sbu.graph.spark.search.fonl.value.TriangleFonlValue;
 import ir.ac.sbu.graph.spark.triangle.Triangle;
 import ir.ac.sbu.graph.types.Edge;
 import ir.ac.sbu.graph.utils.OrderedNeighborList;
-import it.unimi.dsi.fastutil.ints.Int2IntAVLTreeMap;
-import it.unimi.dsi.fastutil.ints.Int2IntSortedMap;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntListIterator;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -54,7 +52,6 @@ public class TriangleFonl {
 
                     // Consider the assumption u < v < w
                     int v = kv._1;
-
                     Arrays.sort(hDegs, 1, hDegs.length);
                     do {
                         int[] forward = candidateIterator.next();
@@ -68,13 +65,9 @@ public class TriangleFonl {
                         while (iter.hasNext()) {
                             int w = iter.nextInt();
 
-                            // add edge (v, w) to TriangleFonlValue of key=u
+                            // add edge (v, w) to TriangleFonlValue to recognize a triangle in the fonl kv with key = u
                             output.add(new Tuple2 <>(u, new Edge(v, w)));
-
-                            // remove vertex w from the corresponding value of key=v
-                            output.add(new Tuple2 <>(v, new Edge(w, -1)));
                         }
-
                     } while (candidateIterator.hasNext());
 
                     return output.iterator();
@@ -82,43 +75,10 @@ public class TriangleFonl {
 
         // update fonlRDD based on triangle information
         return fonlRDD.leftOuterJoin(triangleInfo).mapValues(value -> {
-            int degree = value._1[0];
-            int[] fonl = null;
+            int[] fonl = new int[value._1.length - 1];
+            System.arraycopy(value._1, 1, fonl, 0, fonl.length);
 
-            Iterable<Edge> edges;
-            if (value._2.isPresent()) {
-                Int2IntSortedMap v2Index = new Int2IntAVLTreeMap();
-                for (int i = 1; i < value._1.length; i++) {
-                    v2Index.put(value._1[i], i - 1);
-                }
-
-                List<Edge> list = new ArrayList <>();
-                for (Edge edge : value._2.get()) {
-                    if (edge.v2 < 0)
-                        v2Index.remove(edge.v1);
-                    else
-                        list.add(edge);
-                }
-                edges = list;
-
-                // check neighbor removing from the fonl value
-                if (v2Index.size() < value._1.length - 1) {
-                    // some vertices were removed from the fonl
-                    fonl = new int[v2Index.size()];
-                    for (Map.Entry <Integer, Integer> entry : v2Index.entrySet()) {
-                        fonl[entry.getValue()] = entry.getKey();
-                    }
-                }
-            } else {
-                edges = Collections.emptyList();
-            }
-
-            if (fonl == null) {
-                fonl = new int[value._1.length - 1];
-                System.arraycopy(value._1, 1, fonl, 0, fonl.length);
-            }
-
-            return new TriangleFonlValue(degree, fonl, edges);
+            return new TriangleFonlValue(value._1[0], fonl, value._2.orElse(Collections.emptyList()));
         });
     }
 }

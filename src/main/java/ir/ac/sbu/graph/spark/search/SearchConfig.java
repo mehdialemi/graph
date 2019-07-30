@@ -3,7 +3,7 @@ package ir.ac.sbu.graph.spark.search;
 import ir.ac.sbu.graph.spark.SparkAppConf;
 import ir.ac.sbu.graph.spark.search.fonl.creator.VLabel;
 import ir.ac.sbu.graph.spark.search.fonl.creator.VLabelDeg;
-import ir.ac.sbu.graph.spark.search.fonl.local.SubQuery;
+import ir.ac.sbu.graph.spark.search.fonl.local.Subquery;
 import ir.ac.sbu.graph.spark.search.fonl.value.*;
 import ir.ac.sbu.graph.types.*;
 import it.unimi.dsi.fastutil.Function;
@@ -60,7 +60,7 @@ public class SearchConfig {
                         Meta.class,
                         LabelTriangleFonlValue.class,
                         TriangleDegreeMeta.class,
-                        SubQuery.class,
+                        Subquery.class,
                         Int2IntMap.class,
                         Int2IntFunction.class,
                         Map.class,

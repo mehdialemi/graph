@@ -188,8 +188,8 @@ public class ParallelKTruss3 extends ParallelKTrussBase {
         })).get();
 
         long tTC = System.currentTimeMillis();
-        System.out.println("tcArray after fonl: " + (tTC - t3) + " ms");
-        System.out.println("tcArray duration: " + (tTC - tStart) + " ms");
+        System.out.println("vTc after fonl: " + (tTC - t3) + " ms");
+        System.out.println("vTc duration: " + (tTC - tStart) + " ms");
 
         // aggregate internal and external fonl updates
         Int2ObjectOpenHashMap<IntList>[] maps = new Int2ObjectOpenHashMap[vCount];

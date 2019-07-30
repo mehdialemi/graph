@@ -34,23 +34,22 @@ public class LabelTriangleFonl {
                 .cache();
 
         // broadcast vertex label and degree to its fonl neighbors
-        JavaPairRDD <Integer, Iterable <Tuple3 <Integer, Integer, String>>> degreeLabelmessage = neighborLabelRDD.flatMapToPair(kv -> {
+        JavaPairRDD <Integer, Iterable <Tuple3 <Integer, Integer, String>>> degreeLabelMessage =
+                neighborLabelRDD.flatMapToPair(kv -> {
 
-            List <Tuple2 <Integer, Tuple3 <Integer, Integer, String>>> out = new ArrayList <>();
+                    List <Tuple2 <Integer, Tuple3 <Integer, Integer, String>>> out = new ArrayList <>();
+                    Tuple3 <Integer, Integer, String> neighborDegreeLabel = new Tuple3 <>(kv._1, kv._2._1.length, kv._2._2);
+                    for (int neighbor : kv._2._1) {
+                        out.add(new Tuple2 <>(neighbor, neighborDegreeLabel));
+                    }
+                    // add itself
+                    out.add(new Tuple2 <>(kv._1, neighborDegreeLabel));
+                    return out.iterator();
+                }).groupByKey();
 
-            Tuple3 <Integer, Integer, String> neighborDegreeLabel = new Tuple3 <>(kv._1, kv._2._1.length, kv._2._2);
-            for (int neighbor : kv._2._1) {
-                out.add(new Tuple2 <>(neighbor, neighborDegreeLabel));
-            }
-            // add itself
-            out.add(new Tuple2 <>(kv._1, neighborDegreeLabel));
-
-            return out.iterator();
-        }).groupByKey();
-
-        JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> labelDegreeTriangleFonlRDD =
+        JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD =
                 triangleFonlRDD
-                        .join(degreeLabelmessage)
+                        .join(degreeLabelMessage)
                         .mapToPair(kv -> {
                             TriangleFonlValue triangleFonlValue = kv._2._1;
                             Int2IntSortedMap v2Index = new Int2IntAVLTreeMap();
@@ -78,6 +77,6 @@ public class LabelTriangleFonl {
                             return new Tuple2 <>(kv._1, value);
                         }).cache();
 
-        return labelDegreeTriangleFonlRDD;
+        return ldtFonlRDD;
     }
 }

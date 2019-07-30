@@ -10,11 +10,11 @@ import java.util.*;
 
 public class LocalFonlCreator {
 
-    public static List<SubQuery> getSubQueries(QFonl qFonl) {
-        List<SubQuery> subqueries = new ArrayList <>();
+    public static List<Subquery> getSubQueries(QFonl qFonl) {
+        List<Subquery> subqueries = new ArrayList <>();
 
         for (QSplit split : qFonl.splits) {
-            SubQuery subquery = new SubQuery();
+            Subquery subquery = new Subquery();
             subquery.vertex = split.vIndex;
             subquery.degree = qFonl.degIndices[split.vIndex];
             subquery.label = qFonl.labels[split.vIndex];
@@ -51,7 +51,7 @@ public class LocalFonlCreator {
             for (int i = 0; i < fonl.length; i++) {
                 tcArray[i] = tcMap.get(fonl[i]);
             }
-            subquery.tcArray = tcArray;
+            subquery.vTc = tcArray;
             subquery.tc = tc;
             subqueries.add(subquery);
         }

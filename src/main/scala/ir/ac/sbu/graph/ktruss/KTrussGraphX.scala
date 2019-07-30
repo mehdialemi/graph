@@ -28,7 +28,7 @@ object KTrussGraphX {
     val sc = SparkContext.getOrCreate(conf)
 
     val start = System.currentTimeMillis()
-    // Load int ir.ac.sbu.graph which is as a list of edges
+    // Load int ir.ac.sbu.graph which is as a list of triangleEdges
     val inputGraph = GraphLoader.edgeListFile(sc, inputPath)
 
   }

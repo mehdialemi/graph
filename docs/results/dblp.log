@@ -1,7 +1,7 @@
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
-Graph loaded, edges: 1049866, load time: 751 ms
+Graph loaded, triangleEdges: 1049866, load time: 751 ms
 start ktruss with kc = 3, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 207 ms
 tcArray duration: 446 ms
@@ -15,7 +15,7 @@ duration: 1040 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
-Graph loaded, edges: 1049866, load time: 781 ms
+Graph loaded, triangleEdges: 1049866, load time: 781 ms
 start ktruss with kc = 4, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 211 ms
 tcArray duration: 622 ms
@@ -45,7 +45,7 @@ duration: 1601 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
-Graph loaded, edges: 1049866, load time: 743 ms
+Graph loaded, triangleEdges: 1049866, load time: 743 ms
 start ktruss with kc = 5, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 231 ms
 tcArray duration: 550 ms
@@ -83,7 +83,7 @@ duration: 1772 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
-Graph loaded, edges: 1049866, load time: 749 ms
+Graph loaded, triangleEdges: 1049866, load time: 749 ms
 start ktruss with kc = 6, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 194 ms
 tcArray duration: 933 ms
@@ -127,7 +127,7 @@ duration: 2306 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
-Graph loaded, edges: 1049866, load time: 762 ms
+Graph loaded, triangleEdges: 1049866, load time: 762 ms
 start ktruss with kc = 7, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 252 ms
 tcArray duration: 464 ms
@@ -173,7 +173,7 @@ duration: 1634 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
-Graph loaded, edges: 1049866, load time: 764 ms
+Graph loaded, triangleEdges: 1049866, load time: 764 ms
 start ktruss with kc = 8, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 262 ms
 tcArray duration: 537 ms
@@ -209,7 +209,7 @@ duration: 2040 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
-Graph loaded, edges: 1049866, load time: 735 ms
+Graph loaded, triangleEdges: 1049866, load time: 735 ms
 start ktruss with kc = 9, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 242 ms
 tcArray duration: 526 ms
@@ -249,7 +249,7 @@ duration: 2407 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
-Graph loaded, edges: 1049866, load time: 763 ms
+Graph loaded, triangleEdges: 1049866, load time: 763 ms
 start ktruss with kc = 10, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 230 ms
 tcArray duration: 585 ms
@@ -279,7 +279,7 @@ duration: 1895 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
-Graph loaded, edges: 1049866, load time: 768 ms
+Graph loaded, triangleEdges: 1049866, load time: 768 ms
 start ktruss with kc = 11, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 253 ms
 tcArray duration: 710 ms
@@ -307,7 +307,7 @@ duration: 2481 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
-Graph loaded, edges: 1049866, load time: 742 ms
+Graph loaded, triangleEdges: 1049866, load time: 742 ms
 start ktruss with kc = 12, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 229 ms
 tcArray duration: 507 ms
@@ -333,7 +333,7 @@ duration: 1974 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
-Graph loaded, edges: 1049866, load time: 756 ms
+Graph loaded, triangleEdges: 1049866, load time: 756 ms
 start ktruss with kc = 13, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 228 ms
 tcArray duration: 580 ms
@@ -355,7 +355,7 @@ duration: 1877 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
-Graph loaded, edges: 1049866, load time: 744 ms
+Graph loaded, triangleEdges: 1049866, load time: 744 ms
 start ktruss with kc = 14, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 246 ms
 tcArray duration: 574 ms
@@ -379,7 +379,7 @@ duration: 2136 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
-Graph loaded, edges: 1049866, load time: 775 ms
+Graph loaded, triangleEdges: 1049866, load time: 775 ms
 start ktruss with kc = 15, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 250 ms
 tcArray duration: 576 ms
@@ -403,7 +403,7 @@ duration: 1903 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
-Graph loaded, edges: 1049866, load time: 744 ms
+Graph loaded, triangleEdges: 1049866, load time: 744 ms
 start ktruss with kc = 16, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 245 ms
 tcArray duration: 435 ms
@@ -425,7 +425,7 @@ duration: 1895 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
-Graph loaded, edges: 1049866, load time: 731 ms
+Graph loaded, triangleEdges: 1049866, load time: 731 ms
 start ktruss with kc = 17, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 240 ms
 tcArray duration: 533 ms
@@ -445,7 +445,7 @@ duration: 1808 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
-Graph loaded, edges: 1049866, load time: 751 ms
+Graph loaded, triangleEdges: 1049866, load time: 751 ms
 start ktruss with kc = 18, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 246 ms
 tcArray duration: 487 ms
@@ -467,7 +467,7 @@ duration: 1938 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
-Graph loaded, edges: 1049866, load time: 748 ms
+Graph loaded, triangleEdges: 1049866, load time: 748 ms
 start ktruss with kc = 19, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 222 ms
 tcArray duration: 665 ms
@@ -487,7 +487,7 @@ duration: 2155 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/dblp
-Graph loaded, edges: 1049866, load time: 735 ms
+Graph loaded, triangleEdges: 1049866, load time: 735 ms
 start ktruss with kc = 20, threads = 12, method = 6 input: /home/i/graph-data/dblp
 create fonl in 254 ms
 tcArray duration: 465 ms

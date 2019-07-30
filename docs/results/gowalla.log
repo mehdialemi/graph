@@ -1,7 +1,7 @@
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
-Graph loaded, edges: 1900654, load time: 1310 ms
+Graph loaded, triangleEdges: 1900654, load time: 1310 ms
 start ktruss with kc = 3, threads = 12, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 385 ms
 tcArray duration: 822 ms
@@ -15,7 +15,7 @@ duration: 1799 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
-Graph loaded, edges: 1900654, load time: 1324 ms
+Graph loaded, triangleEdges: 1900654, load time: 1324 ms
 start ktruss with kc = 4, threads = 12, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 399 ms
 tcArray duration: 786 ms
@@ -29,7 +29,7 @@ duration: 1716 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
-Graph loaded, edges: 1900654, load time: 1231 ms
+Graph loaded, triangleEdges: 1900654, load time: 1231 ms
 start ktruss with kc = 5, threads = 12, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 358 ms
 tcArray duration: 947 ms
@@ -49,7 +49,7 @@ duration: 2164 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
-Graph loaded, edges: 1900654, load time: 1320 ms
+Graph loaded, triangleEdges: 1900654, load time: 1320 ms
 start ktruss with kc = 6, threads = 12, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 367 ms
 tcArray duration: 812 ms
@@ -81,7 +81,7 @@ duration: 2071 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
-Graph loaded, edges: 1900654, load time: 1321 ms
+Graph loaded, triangleEdges: 1900654, load time: 1321 ms
 start ktruss with kc = 7, threads = 12, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 400 ms
 tcArray duration: 928 ms
@@ -109,7 +109,7 @@ duration: 2239 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
-Graph loaded, edges: 1900654, load time: 1325 ms
+Graph loaded, triangleEdges: 1900654, load time: 1325 ms
 start ktruss with kc = 8, threads = 12, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 390 ms
 tcArray duration: 986 ms
@@ -143,7 +143,7 @@ duration: 2335 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
-Graph loaded, edges: 1900654, load time: 1229 ms
+Graph loaded, triangleEdges: 1900654, load time: 1229 ms
 start ktruss with kc = 9, threads = 12, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 388 ms
 tcArray duration: 1063 ms
@@ -173,7 +173,7 @@ duration: 2625 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
-Graph loaded, edges: 1900654, load time: 1209 ms
+Graph loaded, triangleEdges: 1900654, load time: 1209 ms
 start ktruss with kc = 10, threads = 12, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 420 ms
 tcArray duration: 851 ms
@@ -207,7 +207,7 @@ duration: 2378 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
-Graph loaded, edges: 1900654, load time: 1329 ms
+Graph loaded, triangleEdges: 1900654, load time: 1329 ms
 start ktruss with kc = 11, threads = 12, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 396 ms
 tcArray duration: 819 ms
@@ -241,7 +241,7 @@ duration: 2288 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
-Graph loaded, edges: 1900654, load time: 1312 ms
+Graph loaded, triangleEdges: 1900654, load time: 1312 ms
 start ktruss with kc = 12, threads = 12, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 350 ms
 tcArray duration: 1001 ms
@@ -275,7 +275,7 @@ duration: 2535 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
-Graph loaded, edges: 1900654, load time: 1230 ms
+Graph loaded, triangleEdges: 1900654, load time: 1230 ms
 start ktruss with kc = 13, threads = 12, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 363 ms
 tcArray duration: 937 ms
@@ -309,7 +309,7 @@ duration: 2462 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
-Graph loaded, edges: 1900654, load time: 1316 ms
+Graph loaded, triangleEdges: 1900654, load time: 1316 ms
 start ktruss with kc = 14, threads = 12, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 266 ms
 tcArray duration: 811 ms
@@ -343,7 +343,7 @@ duration: 2323 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
-Graph loaded, edges: 1900654, load time: 1318 ms
+Graph loaded, triangleEdges: 1900654, load time: 1318 ms
 start ktruss with kc = 15, threads = 12, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 400 ms
 tcArray duration: 876 ms
@@ -381,7 +381,7 @@ duration: 2684 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
-Graph loaded, edges: 1900654, load time: 1322 ms
+Graph loaded, triangleEdges: 1900654, load time: 1322 ms
 start ktruss with kc = 16, threads = 12, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 409 ms
 tcArray duration: 823 ms
@@ -419,7 +419,7 @@ duration: 2558 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
-Graph loaded, edges: 1900654, load time: 1244 ms
+Graph loaded, triangleEdges: 1900654, load time: 1244 ms
 start ktruss with kc = 17, threads = 12, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 427 ms
 tcArray duration: 809 ms
@@ -457,7 +457,7 @@ duration: 2822 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
-Graph loaded, edges: 1900654, load time: 1292 ms
+Graph loaded, triangleEdges: 1900654, load time: 1292 ms
 start ktruss with kc = 18, threads = 12, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 398 ms
 tcArray duration: 815 ms
@@ -497,7 +497,7 @@ duration: 2439 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
-Graph loaded, edges: 1900654, load time: 1302 ms
+Graph loaded, triangleEdges: 1900654, load time: 1302 ms
 start ktruss with kc = 19, threads = 12, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 392 ms
 tcArray duration: 833 ms
@@ -535,7 +535,7 @@ duration: 2558 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/gowalla
-Graph loaded, edges: 1900654, load time: 1256 ms
+Graph loaded, triangleEdges: 1900654, load time: 1256 ms
 start ktruss with kc = 20, threads = 12, method = 6 input: /home/i/graph-data/gowalla
 create fonl in 280 ms
 tcArray duration: 944 ms

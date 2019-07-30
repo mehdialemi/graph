@@ -1,7 +1,7 @@
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/as-skitter
-Graph loaded, edges: 11095298, load time: 7429 ms
+Graph loaded, triangleEdges: 11095298, load time: 7429 ms
 start ktruss with kc = 112, threads = 12, method = 6 input: /home/i/graph-data/as-skitter
 create fonl in 398 ms
 tcArray duration: 2076 ms
@@ -20,7 +20,7 @@ duration: 9618 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/as-skitter
-Graph loaded, edges: 11095298, load time: 6976 ms
+Graph loaded, triangleEdges: 11095298, load time: 6976 ms
 start ktruss with kc = 112, threads = 12, method = 6 input: /home/i/graph-data/as-skitter
 create fonl in 448 ms
 tcArray duration: 2509 ms
@@ -39,7 +39,7 @@ duration: 10334 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/as-skitter
-Graph loaded, edges: 11095298, load time: 7443 ms
+Graph loaded, triangleEdges: 11095298, load time: 7443 ms
 start ktruss with kc = 112, threads = 12, method = 6 input: /home/i/graph-data/as-skitter
 create fonl in 471 ms
 tcArray duration: 2182 ms

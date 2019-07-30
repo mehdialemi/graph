@@ -9,8 +9,7 @@ public class LabelDegreeTriangleMeta extends TriangleMeta {
     public LabelDegreeTriangleMeta() { }
 
     public LabelDegreeTriangleMeta(TriangleMeta triangleMeta, int size) {
-        v1Array = triangleMeta.v1Array;
-        v2Array = triangleMeta.v2Array;
+        super(triangleMeta);
         degree = triangleMeta.degree;
         labels = new String[size];
         degrees = new int[size];
@@ -22,8 +21,20 @@ public class LabelDegreeTriangleMeta extends TriangleMeta {
         this.degrees = degrees;
     }
 
+    public String getLabel() {
+        return label;
+    }
+
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public String[] getLabels() {
+        return labels;
+    }
+
+    public int[] getDegrees() {
+        return degrees;
     }
 
     public void setLabelDegree(int index, String label, int degree) {

@@ -1,7 +1,7 @@
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
-Graph loaded, edges: 16518948, load time: 11293 ms
+Graph loaded, triangleEdges: 16518948, load time: 11293 ms
 start ktruss with kc = 10, threads = 1, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1444 ms
 tcArray duration: 12839 ms
@@ -53,7 +53,7 @@ duration: 28380 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
-Graph loaded, edges: 16518948, load time: 11301 ms
+Graph loaded, triangleEdges: 16518948, load time: 11301 ms
 start ktruss with kc = 10, threads = 2, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 715 ms
 tcArray duration: 6400 ms
@@ -105,7 +105,7 @@ duration: 17213 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
-Graph loaded, edges: 16518948, load time: 11299 ms
+Graph loaded, triangleEdges: 16518948, load time: 11299 ms
 start ktruss with kc = 10, threads = 3, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 528 ms
 tcArray duration: 4524 ms
@@ -157,7 +157,7 @@ duration: 13793 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
-Graph loaded, edges: 16518948, load time: 11390 ms
+Graph loaded, triangleEdges: 16518948, load time: 11390 ms
 start ktruss with kc = 10, threads = 4, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 446 ms
 tcArray duration: 3896 ms
@@ -209,7 +209,7 @@ duration: 12725 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
-Graph loaded, edges: 16518948, load time: 11185 ms
+Graph loaded, triangleEdges: 16518948, load time: 11185 ms
 start ktruss with kc = 10, threads = 5, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 402 ms
 tcArray duration: 3248 ms
@@ -261,7 +261,7 @@ duration: 11010 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
-Graph loaded, edges: 16518948, load time: 11196 ms
+Graph loaded, triangleEdges: 16518948, load time: 11196 ms
 start ktruss with kc = 10, threads = 6, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1109 ms
 tcArray duration: 2123 ms
@@ -313,7 +313,7 @@ duration: 10286 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
-Graph loaded, edges: 16518948, load time: 11235 ms
+Graph loaded, triangleEdges: 16518948, load time: 11235 ms
 start ktruss with kc = 10, threads = 7, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1026 ms
 tcArray duration: 1895 ms
@@ -365,7 +365,7 @@ duration: 9920 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
-Graph loaded, edges: 16518948, load time: 11335 ms
+Graph loaded, triangleEdges: 16518948, load time: 11335 ms
 start ktruss with kc = 10, threads = 8, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1005 ms
 tcArray duration: 1747 ms
@@ -417,7 +417,7 @@ duration: 9894 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
-Graph loaded, edges: 16518948, load time: 11288 ms
+Graph loaded, triangleEdges: 16518948, load time: 11288 ms
 start ktruss with kc = 10, threads = 9, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1019 ms
 tcArray duration: 1632 ms
@@ -469,7 +469,7 @@ duration: 9557 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
-Graph loaded, edges: 16518948, load time: 11274 ms
+Graph loaded, triangleEdges: 16518948, load time: 11274 ms
 start ktruss with kc = 10, threads = 10, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1069 ms
 tcArray duration: 1694 ms
@@ -521,7 +521,7 @@ duration: 9642 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
-Graph loaded, edges: 16518948, load time: 11222 ms
+Graph loaded, triangleEdges: 16518948, load time: 11222 ms
 start ktruss with kc = 10, threads = 11, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1083 ms
 tcArray duration: 1727 ms
@@ -573,7 +573,7 @@ duration: 9630 ms
 GC = -XX:+UseParallelGC  -Xmx100g -Xms100g -XX:NewRatio=2 -XX:MaxGCPauseMillis=400 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:bin/ktruss/gc.log
 JAR = /home/i/subgraph-mining/target/subgraph-mining-1.0-jar-with-dependencies.jar
 Loading /home/i/graph-data/cit-Patents.txt
-Graph loaded, edges: 16518948, load time: 11219 ms
+Graph loaded, triangleEdges: 16518948, load time: 11219 ms
 start ktruss with kc = 10, threads = 12, method = 6 input: /home/i/graph-data/cit-Patents.txt
 create fonl in 1003 ms
 tcArray duration: 1529 ms

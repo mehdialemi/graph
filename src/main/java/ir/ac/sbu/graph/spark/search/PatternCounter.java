@@ -4,10 +4,9 @@ import ir.ac.sbu.graph.spark.*;
 import ir.ac.sbu.graph.spark.search.fonl.creator.LocalFonlCreator;
 import ir.ac.sbu.graph.spark.search.fonl.creator.TriangleFonl2;
 import ir.ac.sbu.graph.spark.search.fonl.local.QFonl;
-import ir.ac.sbu.graph.spark.search.fonl.local.SubQuery;
+import ir.ac.sbu.graph.spark.search.fonl.local.Subquery;
 import ir.ac.sbu.graph.spark.search.fonl.value.LabelTriangleFonlValue;
 import ir.ac.sbu.graph.spark.search.patterns.PatternReaderUtils;
-import ir.ac.sbu.graph.spark.triangle.Triangle;
 import it.unimi.dsi.fastutil.ints.*;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -42,10 +41,10 @@ public class PatternCounter extends SparkApp {
 
     public long search(QFonl qFonl) {
 
-        List <SubQuery> subQueries = LocalFonlCreator.getSubQueries(qFonl);
+        List <Subquery> subQueries = LocalFonlCreator.getSubQueries(qFonl);
         if (subQueries.isEmpty())
             return 0;
-        Queue<SubQuery> queue = new LinkedList <>(subQueries);
+        Queue<Subquery> queue = new LinkedList <>(subQueries);
 
         NeighborList neighborList = new NeighborList(edgeLoader);
 
@@ -59,7 +58,7 @@ public class PatternCounter extends SparkApp {
         if (searchConfig.isSingle())
             printFonl(lFonl);
 
-        Broadcast <SubQuery> broadcast = sparkConf.getSc().broadcast(queue.remove());
+        Broadcast <Subquery> broadcast = sparkConf.getSc().broadcast(queue.remove());
 
         final int splitSize = qFonl.splits.length;
         JavaPairRDD <Integer, Tuple2 <long[], int[][]>> matches = getSubMatches(lFonl, broadcast)
@@ -75,7 +74,7 @@ public class PatternCounter extends SparkApp {
         int qIndex = 0;
         while (!queue.isEmpty()) {
             qIndex ++;
-            SubQuery subquery = queue.remove();
+            Subquery subquery = queue.remove();
             broadcast = sparkConf.getSc().broadcast(subquery);
             final int splitIndex = qIndex;
 
@@ -114,11 +113,11 @@ public class PatternCounter extends SparkApp {
     }
 
     private JavaPairRDD <Integer, Tuple2 <Long, int[]>> getSubMatches(JavaPairRDD <Integer, LabelTriangleFonlValue> tFonl,
-                                                                         Broadcast <SubQuery> broadcast) {
+                                                                         Broadcast <Subquery> broadcast) {
         return tFonl.flatMapToPair(kv -> {
 
             List <Tuple2 <Integer, Tuple2 <Long, Integer>>> out = new ArrayList <>();
-            SubQuery subquery = broadcast.getValue();
+            Subquery subquery = broadcast.getValue();
 
             // vertex to count
             Int2LongMap counters = kv._2.matches(kv._1, subquery);

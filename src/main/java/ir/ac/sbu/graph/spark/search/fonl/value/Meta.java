@@ -10,6 +10,7 @@ public class Meta implements Serializable {
     public Meta(int degree) {
         this.degree = degree;
     }
+
     public Meta(Meta meta) {
         degree = meta.degree;
     }
