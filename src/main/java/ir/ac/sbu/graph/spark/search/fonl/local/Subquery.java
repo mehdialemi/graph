@@ -25,4 +25,8 @@ public class Subquery implements Serializable {
             edges = new HashSet <>();
         edges.add(edge);
     }
+
+    public int maxDegree() {
+        return degrees[degrees.length - 1];
+    }
 }

@@ -21,7 +21,7 @@ public class LabelDegreeTriangleFonlValue extends FonlValue <LabelDegreeTriangle
         // Vertices are sorted by their degree ascendingly.
         // Candidate vertices should have higher degree than that of sub-query
 
-        if (fonl.length < subquery.fonl.length)
+        if (fonl.length < subquery.fonl.length || meta.maxDegree() < subquery.maxDegree())
             return null;
 
 
@@ -41,6 +41,7 @@ public class LabelDegreeTriangleFonlValue extends FonlValue <LabelDegreeTriangle
             cIndices[i + 1] = candidates;
         }
 
+        // Check connectivity (edges, triangles) to find the true matches
 
 
     }

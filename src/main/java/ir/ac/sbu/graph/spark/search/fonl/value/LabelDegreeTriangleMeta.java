@@ -21,6 +21,10 @@ public class LabelDegreeTriangleMeta extends TriangleMeta {
         this.degrees = degrees;
     }
 
+    public int maxDegree() {
+        return degrees[degrees.length - 1];
+    }
+
     public String getLabel() {
         return label;
     }
