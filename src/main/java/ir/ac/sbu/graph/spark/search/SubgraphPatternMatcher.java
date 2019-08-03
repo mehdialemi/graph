@@ -37,13 +37,13 @@ public class SubgraphPatternMatcher extends SparkApp {
         List<Subquery> subQueries = LocalFonlCreator.getSubQueries(qFonl);
         if (subQueries.isEmpty())
             return 0;
-        Queue<Subquery> queue = new LinkedList<>(subQueries);
 
         NeighborList neighborList = new NeighborList(edgeLoader);
         TriangleFonl triangleFonl = new TriangleFonl(neighborList);
         LabelTriangleFonl labelTriangleFonl = new LabelTriangleFonl(triangleFonl, labels);
         JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD = labelTriangleFonl.create();
 
+        Queue<Subquery> queue = new LinkedList<>(subQueries);
         Broadcast<Subquery> broadcast = sparkConf.getSc().broadcast(queue.remove());
         JavaPairRDD<Integer, String> subMatches = getSubMatches(ldtFonlRDD, broadcast);
         long count = subMatches.count();
@@ -95,6 +95,9 @@ public class SubgraphPatternMatcher extends SparkApp {
         return tFonl.flatMapToPair(kv -> {
             // vertex to count
             Set<Tuple2<String, Integer>> matches = kv._2.matches(kv._1, broadcast.getValue());
+            if (matches == null)
+                return Collections.emptyIterator();
+
             return matches.iterator();
         }).groupByKey(tFonl.getNumPartitions()).flatMapToPair(kv -> {
             Set<Integer> set = new HashSet<>();
@@ -111,7 +114,6 @@ public class SubgraphPatternMatcher extends SparkApp {
         }).cache();
     }
 
-
     public static void main(String[] args) throws FileNotFoundException {
         SearchConfig searchConfig = SearchConfig.load(args[0]);
         SparkAppConf sparkConf = searchConfig.getSparkAppConf();
@@ -125,5 +127,8 @@ public class SubgraphPatternMatcher extends SparkApp {
         JavaPairRDD<Integer, String> labels = PatternCounter.getLabels(sparkConf.getSc(),
                 searchConfig.getGraphLabelPath(), sparkConf.getPartitionNum());
 
+        SubgraphPatternMatcher matcher = new SubgraphPatternMatcher(searchConfig, sparkConf, edgeLoader, labels);
+        long count = matcher.search(qFonl);
+        System.out.println("Number of matches: " + count);
     }
 }

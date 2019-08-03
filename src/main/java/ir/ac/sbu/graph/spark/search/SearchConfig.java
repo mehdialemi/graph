@@ -43,10 +43,8 @@ public class SearchConfig {
                 partitionNum = SearchConfig.this.partitionNum;
                 master = SearchConfig.this.master;
 
-                if (master.toLowerCase().contains("local"))
-                    sparkConf.set("spark.driver.bindAddress", "9090");
-
                 sparkConf = new SparkConf();
+                sparkConf.setMaster(master);
                 sparkConf.setAppName("PatternCounter");
                 sparkConf.set("spark.driver.memory", "10g");
                 sparkConf.set("spark.driver.maxResultSize", "9g");

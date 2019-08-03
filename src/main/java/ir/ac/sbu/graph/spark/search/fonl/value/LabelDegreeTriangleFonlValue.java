@@ -95,20 +95,18 @@ public class LabelDegreeTriangleFonlValue extends FonlValue <LabelDegreeTriangle
     private void join(int selectIndex, int currentVertexIndex, int[] partialMatch,
                       int[][] selects, Set<int[]> resultSet, int key) {
 
-        int value = currentVertexIndex == -1 ? key : fonl[currentVertexIndex];
-        for (int i = 0; i < selectIndex; i ++) {
-            if (this.fonl[i] == value)
-                return;
-        }
-
-        partialMatch[selectIndex] = value;
-
         if (selectIndex == selects.length - 1) {
             int[] pMatch = new int[partialMatch.length];
             System.arraycopy(partialMatch, 0, pMatch, 0, pMatch.length);
             resultSet.add(pMatch);
             return;
         }
+        int value = currentVertexIndex == -1 ? key : fonl[currentVertexIndex];
+        for (int i = 0; i < selectIndex; i ++) {
+            if (this.fonl[i] == value)
+                return;
+        }
+        partialMatch[selectIndex] = value;
 
         // go to the right index array
         int nextIndex = selectIndex + 1;

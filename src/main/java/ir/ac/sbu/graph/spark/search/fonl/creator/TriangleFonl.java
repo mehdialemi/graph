@@ -29,7 +29,7 @@ public class TriangleFonl {
 
         neighborRDD = neighborList.getOrCreate();
 
-        Triangle triangle = new Triangle(neighborList);
+        Triangle triangle = new Triangle(neighborList, neighborRDD);
 
         JavaPairRDD <Integer, int[]> fonlRDD = triangle.createFonl();
 
