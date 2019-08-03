@@ -11,16 +11,12 @@ import ir.ac.sbu.graph.spark.search.fonl.local.QFonl;
 import ir.ac.sbu.graph.spark.search.fonl.local.Subquery;
 import ir.ac.sbu.graph.spark.search.fonl.value.LabelDegreeTriangleFonlValue;
 import ir.ac.sbu.graph.spark.search.patterns.PatternReaderUtils;
-import it.unimi.dsi.fastutil.ints.*;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.broadcast.Broadcast;
 import scala.Tuple2;
 
 import java.io.FileNotFoundException;
 import java.util.*;
-
-import static ir.ac.sbu.graph.spark.search.patterns.PatternDebugUtils.printMatches;
-import static ir.ac.sbu.graph.spark.search.patterns.PatternDebugUtils.printSubMatches;
 
 public class SubgraphPatternMatcher extends SparkApp {
     private SearchConfig searchConfig;
@@ -29,7 +25,7 @@ public class SubgraphPatternMatcher extends SparkApp {
     private JavaPairRDD<Integer, String> labels;
 
     public SubgraphPatternMatcher(SearchConfig searchConfig, SparkAppConf sparkConf, EdgeLoader edgeLoader,
-                                  JavaPairRDD <Integer, String> labels) {
+                                  JavaPairRDD<Integer, String> labels) {
         super(edgeLoader);
         this.searchConfig = searchConfig;
         this.sparkConf = sparkConf;
@@ -46,90 +42,73 @@ public class SubgraphPatternMatcher extends SparkApp {
         NeighborList neighborList = new NeighborList(edgeLoader);
         TriangleFonl triangleFonl = new TriangleFonl(neighborList);
         LabelTriangleFonl labelTriangleFonl = new LabelTriangleFonl(triangleFonl, labels);
-        JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD = labelTriangleFonl.create();
+        JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD = labelTriangleFonl.create();
 
         Broadcast<Subquery> broadcast = sparkConf.getSc().broadcast(queue.remove());
+        JavaPairRDD<Integer, String> subMatches = getSubMatches(ldtFonlRDD, broadcast);
+        long count = subMatches.count();
+        System.out.println("First match count: " + count);
 
-        final int splitSize = qFonl.splits.length;
-        JavaPairRDD <Integer, Tuple2<long[], int[][]>> matches = getSubMatches(ldtFonlRDD, broadcast)
-                .mapValues(v -> {
-                    int[][] match = new int[splitSize][];
-                    match[0] = v._2;
-                    long count = v._1;
-                    long[] counts = new long[splitSize];
-                    counts[0] = count;
-                    return new Tuple2 <>(counts, match);
-                });
+        List<JavaPairRDD<Integer, String>> matches = new ArrayList<>();
+        matches.add(subMatches);
 
-        int qIndex = 0;
-        while (!queue.isEmpty()) {
-            qIndex ++;
+        while (count != 0 && !queue.isEmpty()) {
             Subquery subquery = queue.remove();
             broadcast = sparkConf.getSc().broadcast(subquery);
-            final int splitIndex = qIndex;
 
+            JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> rdd = subMatches
+                    .join(ldtFonlRDD)
+                    .mapValues(v -> v._2)
+                    .repartition(ldtFonlRDD.getNumPartitions());
 
-            long count = matches.count();
-            System.out.println("partial count: " + count);
-            if (count == 0) {
-                System.out.println("No match found");
-                return 0;
-            }
-
-            JavaPairRDD <Integer, Tuple2 <Long, int[]>> subMatches = getSubMatches(ldtFonlRDD, broadcast);
-            if(searchConfig.isSingle())
-                printSubMatches("SubMatch (" + splitIndex + ")", subMatches);
-
-            matches = matches.join(subMatches).mapValues(val -> {
-                // val._2 => (count, keyVertices)
-                IntSet set = new IntOpenHashSet(val._2._2);
-                val._1._1[splitIndex] = val._2._1;
-                val._1._2[splitIndex] = set.toIntArray();
-                return val._1;
-            }).cache();
-
-            System.out.println("matches count: " + matches.count());
-            if (searchConfig.isSingle())
-                printMatches("matches (" + splitIndex + ")", matches);
+            subMatches = getSubMatches(rdd, broadcast);
+            count = subMatches.count();
+            matches.add(subMatches);
+            System.out.println("Match count: " + count);
         }
 
-        return matches.map(kv -> {
-            long matchCount = 1;
-            for (long subCount : kv._2._1) {
-                matchCount *= subCount;
-            }
-            return matchCount;
-        }).reduce((a, b) -> a + b);
+        if (!queue.isEmpty())
+            return 0;
+
+        JavaPairRDD<Integer, String> left = matches.get(0);
+
+        for (int i = 1; i < matches.size(); i++) {
+            JavaPairRDD<Integer, Tuple2<Integer, String>> right = matches.get(i)
+                    .mapToPair(kv -> new Tuple2<>(
+                            Integer.parseInt(kv._2.split(" ")[0]),
+                            new Tuple2<>(kv._1, kv._2)
+                    ));
+
+            left = left.join(right)
+                    .mapToPair(kv -> new Tuple2<>(kv._2._2._1, kv._2._1.concat(kv._2._2._2)))
+                    .cache();
+
+            count = left.count();
+            System.out.println("Current count of match: " + count);
+        }
+
+        return count;
     }
 
-    private JavaPairRDD <Integer, Tuple2 <Long, int[]>> getSubMatches(JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> tFonl,
-                                                                      Broadcast <Subquery> broadcast) {
+    private JavaPairRDD<Integer, String> getSubMatches(JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> tFonl,
+                                                                    Broadcast<Subquery> broadcast) {
         return tFonl.flatMapToPair(kv -> {
-
-            List <Tuple2 <Integer, Tuple2 <Long, Integer>>> out = new ArrayList<>();
-            Subquery subquery = broadcast.getValue();
-
             // vertex to count
-            Int2LongMap counters = kv._2.matches(kv._1, subquery);
+            Set<Tuple2<String, Integer>> matches = kv._2.matches(kv._1, broadcast.getValue());
+            return matches.iterator();
+        }).groupByKey(tFonl.getNumPartitions()).flatMapToPair(kv -> {
+            Set<Integer> set = new HashSet<>();
+            for (Integer v : kv._2) {
+                set.add(v);
+            }
 
-            for (Map.Entry <Integer, Long> entry : counters.entrySet()) {
-                // (vertex, (count, keyVertex))
-                out.add(new Tuple2 <>(entry.getKey(), new Tuple2 <>(entry.getValue(), kv._1)));
+            List<Tuple2<Integer, String>> out = new ArrayList<>();
+            for (Integer v : set) {
+                out.add(new Tuple2<>(v, kv._1));
             }
 
             return out.iterator();
-
-        }).groupByKey(tFonl.getNumPartitions())
-                .mapValues(val -> {
-                    IntSortedSet sortedSet = new IntAVLTreeSet();
-                    long count = 0;
-                    // (count, keyVertex)
-                    for (Tuple2 <Long, Integer> vId : val) {
-                        count += vId._1;
-                        sortedSet.add(vId._2.intValue());
-                    }
-                    return new Tuple2 <>(count, sortedSet.toIntArray());
-                }).cache();
+        }).cache();
     }
 
 
@@ -143,7 +122,7 @@ public class SubgraphPatternMatcher extends SparkApp {
 
         EdgeLoader edgeLoader = new EdgeLoader(sparkConf);
 
-        JavaPairRDD <Integer, String> labels = PatternCounter.getLabels(sparkConf.getSc(),
+        JavaPairRDD<Integer, String> labels = PatternCounter.getLabels(sparkConf.getSc(),
                 searchConfig.getGraphLabelPath(), sparkConf.getPartitionNum());
 
     }

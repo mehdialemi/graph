@@ -1,21 +1,47 @@
 package ir.ac.sbu.graph.spark.search.fonl.value;
 
 import ir.ac.sbu.graph.spark.search.fonl.local.Subquery;
-import it.unimi.dsi.fastutil.ints.Int2LongMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import scala.Tuple2;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class LabelDegreeTriangleFonlValue extends FonlValue <LabelDegreeTriangleMeta> {
 
-    public LabelDegreeTriangleFonlValue() {
-    }
+    public LabelDegreeTriangleFonlValue() {  }
 
     public LabelDegreeTriangleFonlValue(int[] fonl, LabelDegreeTriangleMeta meta) {
         this.fonl = fonl;
         this.meta = meta;
     }
 
-    public Int2LongMap matches(Subquery subquery) {
+    public Set<Tuple2<String, Integer>> matches(int key, Subquery subquery) {
+        Set<int[]> result = matchesAll(key, subquery);
+        if (result == null)
+            return null;
+
+        Set<Tuple2<String, Integer>> out = new HashSet<>();
+        for (int[] matches : result) {
+            StringBuilder sb = new StringBuilder();
+            for (int match : matches) {
+                sb.append(match).append(" ");
+            }
+            String matchStr = sb.toString();
+            for (int anchorIndex : subquery.anchors) {
+                int vertex = matches[anchorIndex];
+                if (vertex == key) {
+                    out.add(new Tuple2<>(matchStr, key));
+                } else {
+                    out.add(new Tuple2<>(matchStr, vertex));
+                }
+            }
+        }
+        return out;
+    }
+
+    private Set<int[]> matchesAll(int key, Subquery subquery) {
 
         // Per sub-query fonl find the potential candidates using label, degree, tc
         // Vertices are sorted by their degree ascendingly.
@@ -23,7 +49,6 @@ public class LabelDegreeTriangleFonlValue extends FonlValue <LabelDegreeTriangle
 
         if (fonl.length < subquery.fonl.length || meta.maxDegree() < subquery.maxDegree())
             return null;
-
 
         // Find candidates for the key related properties of sub-query
         IntList candidates = candidates(subquery.label, subquery.degree, subquery.tc);
@@ -41,9 +66,55 @@ public class LabelDegreeTriangleFonlValue extends FonlValue <LabelDegreeTriangle
             cIndices[i + 1] = candidates;
         }
 
-        // Check connectivity (edges, triangles) to find the true matches
+        int[][] selects = new int[cIndices.length][];
+        for (int k = 0; k < selects.length; k++) {
+            selects[k] = cIndices[k].toIntArray();
+        }
 
+        int[] indexes = new int[subquery.fonl.length];
+        Set <int[]> resultSet = new HashSet<>();
+        for (int vertexIndex = 0; vertexIndex < selects[0].length; vertexIndex++) {
+            join(0, vertexIndex, indexes, selects, resultSet, key);
+        }
 
+        // Check the connectivity (edges, triangles) to find the true matches
+        if (resultSet.size() == 0)
+            return null;
+
+        return resultSet;
+    }
+
+    /**
+     * Generate all combination of selected vertices to fill sub-query match.
+     * @param selectIndex the index of current subquery array
+     * @param currentVertexIndex the index of current vertex of fonl
+     * @param partialMatch the selected indices of the current vertex fonl are maintained here
+     * @param selects all the selected indices from the fonl per subquery index
+     * @param resultSet all of the completed matches
+     */
+    private void join(int selectIndex, int currentVertexIndex, int[] partialMatch,
+                      int[][] selects, Set<int[]> resultSet, int key) {
+
+        int value = currentVertexIndex == -1 ? key : fonl[currentVertexIndex];
+        for (int i = 0; i < selectIndex; i ++) {
+            if (this.fonl[i] == value)
+                return;
+        }
+
+        partialMatch[selectIndex] = value;
+
+        if (selectIndex == selects.length - 1) {
+            int[] pMatch = new int[partialMatch.length];
+            System.arraycopy(partialMatch, 0, pMatch, 0, pMatch.length);
+            resultSet.add(pMatch);
+            return;
+        }
+
+        // go to the right index array
+        int nextIndex = selectIndex + 1;
+        for (int vertexIndex = 0; vertexIndex < selects[nextIndex].length; vertexIndex++) {
+            join(nextIndex, vertexIndex, partialMatch, selects, resultSet, key);
+        }
     }
 
     /**
