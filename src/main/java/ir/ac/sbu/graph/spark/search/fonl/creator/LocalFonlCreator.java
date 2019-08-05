@@ -1,6 +1,7 @@
 package ir.ac.sbu.graph.spark.search.fonl.creator;
 
 import ir.ac.sbu.graph.spark.search.fonl.local.*;
+import ir.ac.sbu.graph.spark.search.patterns.SubQuery;
 import ir.ac.sbu.graph.types.Edge;
 import ir.ac.sbu.graph.types.VertexDeg;
 import it.unimi.dsi.fastutil.ints.*;
@@ -10,11 +11,11 @@ import java.util.*;
 
 public class LocalFonlCreator {
 
-    public static List<Subquery> getSubQueries(QFonl qFonl) {
-        List<Subquery> subqueries = new ArrayList <>();
+    public static List<SubQuery> getSubQueries(QFonl qFonl) {
+        List<SubQuery> subqueries = new ArrayList <>();
 
         for (QSplit split : qFonl.splits) {
-            Subquery subquery = new Subquery();
+            SubQuery subquery = new SubQuery();
             subquery.vertex = split.vIndex;
             subquery.degree = qFonl.degIndices[split.vIndex];
             subquery.label = qFonl.labels[split.vIndex];

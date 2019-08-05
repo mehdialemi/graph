@@ -1,6 +1,6 @@
 package ir.ac.sbu.graph.spark.search.fonl.value;
 
-import ir.ac.sbu.graph.spark.search.fonl.local.Subquery;
+import ir.ac.sbu.graph.spark.search.patterns.SubQuery;
 import ir.ac.sbu.graph.types.Edge;
 import it.unimi.dsi.fastutil.ints.*;
 
@@ -62,7 +62,7 @@ public class LabelTriangleFonlValue extends FonlValue<TriangleDegreeMeta> {
         meta.setTcArray(tcArray);
     }
 
-    public Int2LongMap matches(int fonlKey, Subquery subquery) {
+    public Int2LongMap matches(int fonlKey, SubQuery subquery) {
         Int2LongOpenHashMap v2count = new Int2LongOpenHashMap();
 
         IntSet keySet = new IntOpenHashSet();
@@ -123,7 +123,7 @@ public class LabelTriangleFonlValue extends FonlValue<TriangleDegreeMeta> {
         return v2count;
     }
 
-    private void join(int idx, IntSet indexSet, IntSet[] setArray, Set <int[]> result, Subquery subquery) {
+    private void join(int idx, IntSet indexSet, IntSet[] setArray, Set <int[]> result, SubQuery subquery) {
 
         if (idx == setArray.length) {
             int[] indexArray = indexSet.toIntArray();

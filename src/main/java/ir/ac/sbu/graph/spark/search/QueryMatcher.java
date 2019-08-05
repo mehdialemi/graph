@@ -8,9 +8,11 @@ import ir.ac.sbu.graph.spark.search.fonl.creator.LabelTriangleFonl;
 import ir.ac.sbu.graph.spark.search.fonl.creator.LocalFonlCreator;
 import ir.ac.sbu.graph.spark.search.fonl.creator.TriangleFonl;
 import ir.ac.sbu.graph.spark.search.fonl.local.QFonl;
-import ir.ac.sbu.graph.spark.search.patterns.SubQuery;
 import ir.ac.sbu.graph.spark.search.fonl.value.LabelDegreeTriangleFonlValue;
 import ir.ac.sbu.graph.spark.search.patterns.PatternReaderUtils;
+import ir.ac.sbu.graph.spark.search.patterns.Query;
+import ir.ac.sbu.graph.spark.search.patterns.Samples;
+import ir.ac.sbu.graph.spark.search.patterns.SubQuery;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.broadcast.Broadcast;
 import scala.Tuple2;
@@ -18,14 +20,14 @@ import scala.Tuple2;
 import java.io.FileNotFoundException;
 import java.util.*;
 
-public class SubgraphPatternMatcher extends SparkApp {
+public class QueryMatcher extends SparkApp {
     private SearchConfig searchConfig;
     private SparkAppConf sparkConf;
     private EdgeLoader edgeLoader;
     private JavaPairRDD<Integer, String> labels;
 
-    public SubgraphPatternMatcher(SearchConfig searchConfig, SparkAppConf sparkConf, EdgeLoader edgeLoader,
-                                  JavaPairRDD<Integer, String> labels) {
+    public QueryMatcher(SearchConfig searchConfig, SparkAppConf sparkConf, EdgeLoader edgeLoader,
+                        JavaPairRDD<Integer, String> labels) {
         super(edgeLoader);
         this.searchConfig = searchConfig;
         this.sparkConf = sparkConf;
@@ -33,7 +35,8 @@ public class SubgraphPatternMatcher extends SparkApp {
         this.labels = labels;
     }
 
-    public long search(QFonl qFonl) {
+    public long search(Query query) {
+
         List<SubQuery> subQueries = LocalFonlCreator.getSubQueries(qFonl);
         if (subQueries.isEmpty())
             return 0;
@@ -119,15 +122,13 @@ public class SubgraphPatternMatcher extends SparkApp {
         SparkAppConf sparkConf = searchConfig.getSparkAppConf();
         sparkConf.init();
 
-        QFonl qFonl = PatternReaderUtils.loadSample(searchConfig.getSampleName());
-        System.out.println("qFonl" + qFonl);
-
+        Query query = Samples.mySampleQuery();
         EdgeLoader edgeLoader = new EdgeLoader(sparkConf);
 
         JavaPairRDD<Integer, String> labels = PatternCounter.getLabels(sparkConf.getSc(),
                 searchConfig.getGraphLabelPath(), sparkConf.getPartitionNum());
 
-        SubgraphPatternMatcher matcher = new SubgraphPatternMatcher(searchConfig, sparkConf, edgeLoader, labels);
+        QueryMatcher matcher = new QueryMatcher(searchConfig, sparkConf, edgeLoader, labels);
         long count = matcher.search(qFonl);
         System.out.println("Number of matches: " + count);
     }

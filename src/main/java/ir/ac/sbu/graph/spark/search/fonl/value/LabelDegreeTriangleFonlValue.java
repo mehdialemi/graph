@@ -1,6 +1,6 @@
 package ir.ac.sbu.graph.spark.search.fonl.value;
 
-import ir.ac.sbu.graph.spark.search.fonl.local.Subquery;
+import ir.ac.sbu.graph.spark.search.patterns.SubQuery;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import scala.Tuple2;
@@ -17,7 +17,7 @@ public class LabelDegreeTriangleFonlValue extends FonlValue <LabelDegreeTriangle
         this.meta = meta;
     }
 
-    public Set<Tuple2<String, Integer>> matches(int key, Subquery subquery) {
+    public Set<Tuple2<String, Integer>> matches(int key, SubQuery subquery) {
         Set<int[]> result = matchesAll(key, subquery);
         if (result == null)
             return null;
@@ -41,7 +41,7 @@ public class LabelDegreeTriangleFonlValue extends FonlValue <LabelDegreeTriangle
         return out;
     }
 
-    private Set<int[]> matchesAll(int key, Subquery subquery) {
+    private Set<int[]> matchesAll(int key, SubQuery subquery) {
 
         // Per sub-query fonl find the potential candidates using label, degree, tc
         // Vertices are sorted by their degree ascendingly.
