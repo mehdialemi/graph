@@ -183,7 +183,7 @@ public class QueryMatcher extends SparkApp {
         EdgeLoader edgeLoader = new EdgeLoader(sparkConf);
         JavaPairRDD<Integer, String> labels = getLabels(sparkConf.getSc(),
                 searchConfig.getGraphLabelPath(), sparkConf.getPartitionNum());
-        Query query = Samples.mySampleQuery();
+        Query query = Samples.mySampleEmptyLabel();
 
         QueryMatcher matcher = new QueryMatcher(sparkConf, edgeLoader, labels);
         long count = matcher.search(query);
