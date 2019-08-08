@@ -39,6 +39,10 @@ public class QueryMatcher extends SparkApp {
 
         NeighborList neighborList = new NeighborList(edgeLoader);
         TriangleFonl triangleFonl = new TriangleFonl(neighborList);
+
+        if (labels == null) {
+            labels = triangleFonl.getNeighborRDD().mapValues(v -> "_");
+        }
         LabelTriangleFonl labelTriangleFonl = new LabelTriangleFonl(triangleFonl, labels);
         JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD = labelTriangleFonl.create();
 //        PatternDebugUtils.printFonlLabelDegreeTriangleFonlValue(ldtFonlRDD);
@@ -179,9 +183,10 @@ public class QueryMatcher extends SparkApp {
 
     static JavaPairRDD <Integer, String> getLabels(JavaSparkContext sc, String path, int pNum) {
         if (path.isEmpty()) {
-            List<Tuple2<Integer, String>> list = new ArrayList <>();
-            list.add(new Tuple2 <>(Integer.MAX_VALUE, "_"));
-            return sc.parallelizePairs(list);
+            return null;
+//            List<Tuple2<Integer, String>> list = new ArrayList <>();
+//            list.add(new Tuple2 <>(Integer.MAX_VALUE, "_"));
+//            return sc.parallelizePairs(list);
         }
 
         return sc

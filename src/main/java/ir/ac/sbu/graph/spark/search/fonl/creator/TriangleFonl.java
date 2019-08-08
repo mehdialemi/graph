@@ -21,7 +21,7 @@ public class TriangleFonl {
         this.neighborList = neighborList;
     }
 
-    JavaPairRDD <Integer, int[]> getNeighborRDD() {
+    public JavaPairRDD <Integer, int[]> getNeighborRDD() {
         return neighborRDD;
     }
 
