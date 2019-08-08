@@ -2,6 +2,6 @@ graphPath: "/graph-data/cit-patents"
 graphLabelPath: ""
 sampleName: "mySampleEmptyLabel"
 master: "spark://alemi-1:7077"
-partitionNum: 20
-cores: 20
+partitionNum: 150
+cores: 80
 single: false
