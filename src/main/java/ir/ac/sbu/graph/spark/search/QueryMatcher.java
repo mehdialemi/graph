@@ -8,7 +8,7 @@ import ir.ac.sbu.graph.spark.search.fonl.creator.LabelTriangleFonl;
 import ir.ac.sbu.graph.spark.search.fonl.creator.TriangleFonl;
 import ir.ac.sbu.graph.spark.search.fonl.value.LabelDegreeTriangleFonlValue;
 import ir.ac.sbu.graph.spark.search.patterns.*;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.broadcast.Broadcast;
@@ -33,6 +33,7 @@ public class QueryMatcher extends SparkApp {
 
     public long search(Query query) {
         List<QuerySlice> querySlices = query.getQuerySlices();
+        System.out.println("Query: " + query);
         if (querySlices.isEmpty())
             throw new RuntimeException("No query slice found");
 
@@ -50,15 +51,7 @@ public class QueryMatcher extends SparkApp {
 
             if (querySlice.isProcessed()) {
                 // if the current query slice and all of its links are processed then there are nothing to do
-                boolean allProcessed = true;
-                for (Tuple2<Integer, QuerySlice> link : querySlice.getLinks()) {
-                    if (!link._2.isProcessed()) {
-                        allProcessed = false;
-                        break;
-                    }
-                }
-
-                if (allProcessed)
+                if (!querySlice.hasNotProcessedLink())
                     continue;
 
                 // if there are some unprocessed links, then we can get the result of current query slice from the
@@ -129,15 +122,9 @@ public class QueryMatcher extends SparkApp {
 
         return matchCounts
                 .mapToPair(kv -> new Tuple2<>(kv._2._1(), kv._2._3()))
-                .groupByKey()
                 .join(matchCounter)
-                .mapValues(v -> {
-                    long counter = v._2;
-                    for (Integer value : v._1) {
-                        counter *= value;
-                    }
-                    return counter;
-                }).cache();
+                .mapValues(v -> v._1 * v._2)
+                .cache();
     }
 
     /**
@@ -164,16 +151,23 @@ public class QueryMatcher extends SparkApp {
             List<Tuple2<Integer, Tuple3<Integer, Integer, Integer>>> out = new ArrayList<>();
 
             if (subquery.linkIndices.length > 0) {
-                Object2IntOpenHashMap<Tuple2<Integer, Integer>> counter = new Object2IntOpenHashMap<>();
-                for (int[] matchIndex : matchIndices) {
-                    for (int linkIndex : subquery.linkIndices) {
-                        int index = matchIndex[linkIndex];
+                Int2IntOpenHashMap[] countIndex = new Int2IntOpenHashMap[subquery.linkIndices.length];
+                for (int i = 0; i < subquery.linkIndices.length; i++) {
+                    Int2IntOpenHashMap count = new Int2IntOpenHashMap();
+                    for (int[] matchIndex : matchIndices) {
+                        int index = matchIndex[subquery.linkIndices[i]];
                         int neighbor = kv._2.fonl[index];
-                        counter.addTo(new Tuple2<>(neighbor, linkIndex), 1);
+                        count.addTo(neighbor, 1);
                     }
+                    countIndex[i] = count;
                 }
-                for (Map.Entry<Tuple2<Integer, Integer>, Integer> entry : counter.entrySet()) {
-                    out.add(new Tuple2<>(entry.getKey()._1, new Tuple3<>(kv._2.getSource(), entry.getKey()._2, entry.getValue())));
+
+                for (int i = 0; i < countIndex.length; i++) {
+                    Int2IntOpenHashMap count = countIndex[i];
+                    for (Map.Entry<Integer, Integer> entry : count.entrySet()) {
+                        out.add(new Tuple2<>(entry.getKey(),
+                                new Tuple3<>(kv._2.getSource(), subquery.linkIndices[i], entry.getValue())));
+                    }
                 }
             } else {
                 out.add(new Tuple2<>(kv._1, new Tuple3<>(kv._2.getSource(), 0, matchIndices.size())));

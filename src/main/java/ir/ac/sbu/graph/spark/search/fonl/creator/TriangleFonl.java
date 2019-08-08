@@ -30,9 +30,7 @@ public class TriangleFonl {
         neighborRDD = neighborList.getOrCreate();
 
         Triangle triangle = new Triangle(neighborList, neighborRDD);
-
         JavaPairRDD <Integer, int[]> fonlRDD = triangle.createFonl();
-
         JavaPairRDD <Integer, int[]> candidates = triangle.createCandidates(fonlRDD);
 
         JavaPairRDD <Integer, Iterable <Edge>> triangleInfo = candidates.cogroup(fonlRDD)

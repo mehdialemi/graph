@@ -54,8 +54,8 @@ public class Query {
                     int w = fonlValue[j];
                     if (edges.contains(new Edge(v, w))) {
                         triangles.computeIfAbsent(u, val -> new ArrayList<>()).add(new Triangle(u, v, w));
-                        triangles.computeIfAbsent(v, val -> new ArrayList<>()).add(new Triangle(v, u, w));
-                        triangles.computeIfAbsent(w, val -> new ArrayList<>()).add(new Triangle(w, u, v));
+//                        triangles.computeIfAbsent(v, val -> new ArrayList<>()).add(new Triangle(v, u, w));
+//                        triangles.computeIfAbsent(w, val -> new ArrayList<>()).add(new Triangle(w, u, v));
                     }
                 }
             }
@@ -70,16 +70,23 @@ public class Query {
             ranks.addTo(v, 2 * fonlSize + tc);
         }
 
-        IntSortedSet sortedRanks = new IntAVLTreeSet((v1, v2) ->
-                ranks.getOrDefault(v2, 0) - ranks.getOrDefault(v1, 0));
-        sortedRanks.addAll(ranks.keySet());
+        Int2IntSortedMap sRanks = new Int2IntAVLTreeMap((v1, v2) -> {
+            int compare = ranks.getOrDefault(v2, 0) - ranks.getOrDefault(v1, 0);
+            if (compare == 0)
+                return v2 - v1;
+            return compare;
+        });
+
+//        IntSortedSet sortedRanks = new IntAVLTreeSet((v1, v2) ->
+//                ranks.getOrDefault(v2, 0) - ranks.getOrDefault(v1, 0));
+        sRanks.putAll(ranks);
 
         // store original value of fonl before its update
         Int2ObjectMap<IntSet> freezeFonl = Int2ObjectMaps.unmodifiable(fonl);
         Int2ObjectMap<QuerySlice> querySliceMap = new Int2ObjectOpenHashMap<>();
         List<QuerySlice> querySliceList = new ArrayList<>();
-        while (!sortedRanks.isEmpty()) {
-            int v = sortedRanks.firstInt();
+        while (!sRanks.isEmpty()) {
+            int v = sRanks.firstIntKey();
             IntSet fonlValue = fonl.get(v);
 
             if (fonlValue.size() > 0) {
@@ -93,12 +100,12 @@ public class Query {
                 for (Triangle triangle : triangleList) {
                     // remove triangle vertices from the fonl value of v2
                     // update ranks and sortedRanks for triangle v2
-                    update(fonl, ranks, sortedRanks, v, triangle.getV2());
-                    update(fonl, ranks, sortedRanks, v, triangle.getV3());
+                    update(fonl, ranks, sRanks, v, triangle.getV2());
+                    update(fonl, ranks, sRanks, v, triangle.getV3());
                 }
             }
 
-            sortedRanks.remove(v);
+            sRanks.remove(v);
         }
 
         // find the relationship between query slices
@@ -182,14 +189,19 @@ public class Query {
         return querySlices;
     }
 
-    private void update(Int2ObjectMap<IntSet> fonl, Int2IntOpenHashMap ranks, IntSortedSet sortedRanks,
+    private void update(Int2ObjectMap<IntSet> fonl, Int2IntOpenHashMap ranks, Int2IntSortedMap sortedRanks,
                         int v, int vTriangle) {
         fonl.getOrDefault(vTriangle, new IntArraySet()).remove(v);
         sortedRanks.remove(vTriangle);
         int rank = ranks.get(vTriangle) - 2;
         if (rank > 0) {
             ranks.put(vTriangle, rank);
-            sortedRanks.add(vTriangle);
+            sortedRanks.put(vTriangle, rank);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Query(" + querySlices + ")";
     }
 }

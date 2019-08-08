@@ -13,15 +13,15 @@ public class PatternDebugUtils {
         }
     }
 
-    public static void printMatchCounter(JavaPairRDD<Integer, Long> matchCounter, int v) {
+    public static void printMatchCounter(JavaPairRDD<Integer, Long> matchCounter, int node) {
         for (Tuple2<Integer, Long> t : matchCounter.collect()) {
-            System.out.println("V: " + v + ", MATCH_COUNTER: " + t);
+            System.out.println("NODE: " + node + ", MATCH_COUNTER: " + t);
         }
     }
 
-    public static void printSliceMatch(JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>> sliceMatch, int v) {
+    public static void printSliceMatch(JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>> sliceMatch, int node) {
         for (Tuple2<Integer, Tuple3<Integer, Integer, Integer>> t : sliceMatch.collect()) {
-            System.out.println("V: " + v + ", SLICE_MATCH: " + t);
+            System.out.println("NODE: " + node + ", SLICE_MATCH: " + t);
         }
     }
 }

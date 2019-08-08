@@ -1,5 +1,7 @@
 package ir.ac.sbu.graph.spark.search.fonl.value;
 
+import java.util.Arrays;
+
 public class LabelDegreeTriangleMeta extends TriangleMeta {
 
     private String label;
@@ -13,12 +15,6 @@ public class LabelDegreeTriangleMeta extends TriangleMeta {
         degree = triangleMeta.degree;
         labels = new String[size];
         degrees = new int[size];
-    }
-
-    public LabelDegreeTriangleMeta(String label, String[] labels, int[] degrees) {
-        this.label = label;
-        this.labels = labels;
-        this.degrees = degrees;
     }
 
     public int maxDegree() {
@@ -44,5 +40,11 @@ public class LabelDegreeTriangleMeta extends TriangleMeta {
     public void setLabelDegree(int index, String label, int degree) {
         labels[index] = label;
         degrees[index] = degree;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " LabelDegreeTriangleMeta(label: " + label + ", labels: " + Arrays.toString(labels) +
+                ", degrees: " + Arrays.toString(degrees);
     }
 }

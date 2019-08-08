@@ -6,8 +6,8 @@ public class TriangleFonlValue extends  FonlValue<TriangleMeta>  {
 
     public TriangleFonlValue() { }
 
-    public TriangleFonlValue(int degree, int[] fonl, Iterable<Edge> edges) {
+    public TriangleFonlValue(int degree, int[] fonl, Iterable<Edge> triangleEdges) {
         this.fonl = fonl;
-        this.meta = new TriangleMeta(degree, edges, fonl);
+        this.meta = new TriangleMeta(degree, fonl, triangleEdges);
     }
 }

@@ -20,10 +20,11 @@ public class TriangleMeta extends Meta {
     TriangleMeta(TriangleMeta triangleMeta) {
         super(triangleMeta);
         triangleEdges = triangleMeta.triangleEdges;
+        tc = triangleMeta.tc;
         vTc = triangleMeta.vTc;
     }
 
-    TriangleMeta(int degree, Iterable<Edge> triangleEdges, int[] fonl) {
+    TriangleMeta(int degree, int[] fonl, Iterable<Edge> triangleEdges) {
         super(degree);
 
         Int2IntMap v2Index = new Int2IntOpenHashMap();
@@ -68,5 +69,11 @@ public class TriangleMeta extends Meta {
 
     boolean hasTriangle() {
         return triangleEdges != null;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " TriangleMeta(tc: " + tc + ", triangleEdges: " + Arrays.toString(triangleEdges) +
+                ", vTc" + Arrays.toString(vTc);
     }
 }

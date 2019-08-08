@@ -4,6 +4,7 @@ import ir.ac.sbu.graph.spark.search.patterns.Subquery;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -135,5 +136,10 @@ public class LabelDegreeTriangleFonlValue extends FonlValue <LabelDegreeTriangle
 
     public int getSource() {
         return source;
+    }
+
+    @Override
+    public String toString() {
+        return "LabelDegreeTriangleFonlValue(source: " + source + ", meta: " + meta + ", fonl: " + Arrays.toString(fonl);
     }
 }

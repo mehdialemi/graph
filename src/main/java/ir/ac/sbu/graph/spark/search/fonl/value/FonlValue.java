@@ -8,6 +8,6 @@ public class FonlValue<T extends Meta> {
 
     @Override
     public String toString() {
-        return "Meta: " + meta.toString() + ", fonl: " + Arrays.toString(fonl);
+        return "Meta: " + meta + ", fonl: " + Arrays.toString(fonl);
     }
 }

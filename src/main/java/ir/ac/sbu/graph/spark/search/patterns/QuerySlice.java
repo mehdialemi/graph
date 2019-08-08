@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import scala.Tuple2;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -71,6 +72,14 @@ public class QuerySlice {
         return links;
     }
 
+    public boolean hasNotProcessedLink() {
+        for (Tuple2<Integer, QuerySlice> link : links) {
+            if (!link._2.isProcessed())
+                return true;
+        }
+        return false;
+    }
+
     /**
      * Add a new link of query slice to the current query slice
      * @param fonlValueIndex the index of fonl value which makes a link to the sliceLink
@@ -126,5 +135,15 @@ public class QuerySlice {
 
     public void setProcessed(boolean processed) {
         this.processed = processed;
+    }
+
+    @Override
+    public String toString() {
+        return "QuerySlice(v:" + v + ", degree: " + degree + ", label: " + label + ", tc: " + tc +
+                ", vTc: " + Arrays.toString(vTc) + ", labels: " + Arrays.toString(labels) +
+                ", degrees: " + Arrays.toString(degrees) + ", linkCount: " + links.size() +
+                ", fonlValue: " + Arrays.toString(fonlValue) + ", triangleIndex: " + triangleIndex +
+                ", triangleIndexCount: " + triangleIndexCount + ", hasParent: " + hasParent +
+                ")";
     }
 }
