@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 CONF_FILE="$PWD/bin/pattern/config.yaml"
-MAIN_CLASS="ir.ac.sbu.graph.spark.search.PatternCounter"
+MAIN_CLASS="ir.ac.sbu.graph.spark.search.QueryMatcher"
 SPARK_MASTER="alemi-1"
 JAR_FILE="$PWD/target/subgraph-mining-1.0-jar-with-dependencies.jar"
 LOG_DIR="logs/pattern"
