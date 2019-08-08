@@ -40,9 +40,6 @@ public class QueryMatcher extends SparkApp {
         NeighborList neighborList = new NeighborList(edgeLoader);
         TriangleFonl triangleFonl = new TriangleFonl(neighborList);
 
-        if (labels == null) {
-            labels = triangleFonl.getNeighborRDD().mapValues(v -> "_");
-        }
         LabelTriangleFonl labelTriangleFonl = new LabelTriangleFonl(triangleFonl, labels);
         JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD = labelTriangleFonl.create();
 //        PatternDebugUtils.printFonlLabelDegreeTriangleFonlValue(ldtFonlRDD);

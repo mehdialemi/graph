@@ -15,7 +15,7 @@ import java.util.List;
 public class LabelTriangleFonl {
 
     private final TriangleFonl triangleFonl;
-    private final JavaPairRDD <Integer, String> labelRDD;
+    private JavaPairRDD <Integer, String> labelRDD;
 
     public LabelTriangleFonl(TriangleFonl triangleFonl, JavaPairRDD <Integer, String> labelRDD) {
 
@@ -26,6 +26,9 @@ public class LabelTriangleFonl {
     public JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> create() {
         JavaPairRDD <Integer, TriangleFonlValue> triangleFonlRDD = triangleFonl.create();
 
+        if (this.labelRDD == null) {
+            this.labelRDD = triangleFonl.getNeighborRDD().mapValues(v -> "_");
+        }
         // make an RDD containing degree and labels of each vertex
         JavaPairRDD <Integer, Tuple2 <int[], String>> neighborLabelRDD = triangleFonl
                 .getNeighborRDD()
