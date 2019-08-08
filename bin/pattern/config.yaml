@@ -1,7 +1,7 @@
-graphPath: "/graph-data/youtube"
+graphPath: "/graph-data/cit-patents"
 graphLabelPath: ""
 sampleName: "mySampleEmptyLabel"
 master: "spark://alemi-1:7077"
-partitionNum: 12
+partitionNum: 20
 cores: 20
 single: false
