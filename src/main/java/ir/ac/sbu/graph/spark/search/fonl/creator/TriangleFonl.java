@@ -32,7 +32,7 @@ public class TriangleFonl {
         JavaPairRDD <Integer, int[]> fonlRDD = triangle.createFonl();
         JavaPairRDD <Integer, int[]> candidates = triangle.createCandidates(fonlRDD);
 
-        JavaPairRDD <Integer, Iterable <Edge>> triangleInfo = candidates.cogroup(fonlRDD)
+        JavaPairRDD <Integer, Iterable <Edge>> triangleInfo = candidates.cogroup(fonlRDD, fonlRDD.getNumPartitions())
                 .flatMapToPair(kv -> {
                     List <Tuple2 <Integer, Edge>> output = new ArrayList <>();
 
