@@ -28,7 +28,6 @@ public class TriangleFonl {
     public JavaPairRDD <Integer, TriangleFonlValue> create() {
 
         neighborRDD = neighborList.getOrCreate();
-
         Triangle triangle = new Triangle(neighborList, neighborRDD);
         JavaPairRDD <Integer, int[]> fonlRDD = triangle.createFonl();
         JavaPairRDD <Integer, int[]> candidates = triangle.createCandidates(fonlRDD);

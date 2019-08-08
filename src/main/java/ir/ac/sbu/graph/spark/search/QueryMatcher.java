@@ -156,7 +156,7 @@ public class QueryMatcher extends SparkApp {
 
             if (subquery.linkIndices.length > 0) {
                 Int2IntOpenHashMap[] countIndex = new Int2IntOpenHashMap[subquery.linkIndices.length];
-                for (int i = 0; i < subquery.linkIndices.length; i++) {
+                for (int i = 0; i < countIndex.length; i++) {
                     Int2IntOpenHashMap count = new Int2IntOpenHashMap();
                     for (int[] matchIndex : matchIndices) {
                         int index = matchIndex[subquery.linkIndices[i]];
