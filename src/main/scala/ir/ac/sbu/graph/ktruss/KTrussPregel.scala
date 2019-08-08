@@ -41,7 +41,7 @@ object KTrussPregel {
         val sc = SparkContext.getOrCreate(conf)
 
         val start = System.currentTimeMillis()
-        // Load int ir.ac.sbu.graph which is as a list of triangleEdges
+        // Load int ir.ac.sbu.graph which is as a list of edges
         val inputGraph = GraphLoader.edgeListFile(sc, inputPath)
 
         val partition = inputGraph.edges.getNumPartitions * P_MULTIPLIER
@@ -49,12 +49,12 @@ object KTrussPregel {
         // Change direction from lower degree node to a higher node
         // First find degree of each node
         // Second find correct edge direction
-        // Third getOrCreate a new ir.ac.sbu.graph with new triangleEdges and previous vertices
+        // Third getOrCreate a new ir.ac.sbu.graph with new edges and previous vertices
 
         // Set degree of each vertex in the property.
         val graphVD = inputGraph.outerJoinVertices(inputGraph.degrees)((vid, vertex, degree) => degree)
 
-        // Find new triangleEdges with correct direction. A direction from a lower degree node to a higher degree node.
+        // Find new edges with correct direction. A direction from a lower degree node to a higher degree node.
         val newEdges = graphVD.triplets.map { et =>
             if (et.srcAttr.get <= et.dstAttr.get)
                 Edge(et.srcId, et.dstId, 0)
@@ -68,7 +68,7 @@ object KTrussPregel {
         var graph = Graph(empty, newEdges, defaultVertexAttr = 0,
             edgeStorageLevel = StorageLevel.MEMORY_AND_DISK, vertexStorageLevel = StorageLevel.MEMORY_AND_DISK)
 
-        // In a loop we find triangles and then remove triangleEdges lower than specified sup
+        // In a loop we find triangles and then remove edges lower than specified sup
         var stop = false
         var iteration = 0
         while (!stop) {
@@ -78,9 +78,9 @@ object KTrussPregel {
 
 //            graph.partitionBy(PartitionStrategy.CanonicalRandomVertexCut).persist(StorageLevel.MEMORY_AND_DISK)
 
-            val oldEdgeCount = graph.triangleEdges.count()
+            val oldEdgeCount = graph.edges.count()
             // =======================================================
-            // phase 1: Send message about completing the third triangleEdges.
+            // phase 1: Send message about completing the third edges.
             // =======================================================
 
             // Find outlink fonlValue ids
@@ -126,7 +126,7 @@ object KTrussPregel {
             // =======================================================
             // phase 3: Collate messages for each edge
             // =======================================================
-            val newEdgeCount = newGraph.triangleEdges.count()
+            val newEdgeCount = newGraph.edges.count()
 
             println("KTRUSS) iteration: " + iteration + ", edge count: " + newEdgeCount + ", duration: " +
               (System.currentTimeMillis() - t1) + " ms")
@@ -138,7 +138,7 @@ object KTrussPregel {
             graph = newGraph;
         }
 
-        println("KTRUSS final edge count: " + graph.triangleEdges.count() + ", duration: " + (System.currentTimeMillis
+        println("KTRUSS final edge count: " + graph.edges.count() + ", duration: " + (System.currentTimeMillis
         () - start) / 1000 + "s")
 
         sc.stop()

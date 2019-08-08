@@ -57,7 +57,7 @@ object KTrussSpark {
         }
 
 
-        //  Count triangleEdges
+        //  Count edges
         var finish = false
         var iter = 0
         while(!finish) {
@@ -70,7 +70,7 @@ object KTrussSpark {
                 List(((t._1, t._2) -> t._3), ((t._1, t._3) -> t._2), ((t._2, t._3) -> t._1)))
               .groupBy(identity)
               .filter(_._2.size < support)
-            println("invalid triangleEdges: " + invalidEdges.count())
+            println("invalid edges: " + invalidEdges.count())
 
             val removeTriangles = invalidEdges.map(e => makeTriangle(e._1._1._1, e._1._1._2, e._1._2))
             println("remove triangles: " + removeTriangles.count())
@@ -88,11 +88,11 @@ object KTrussSpark {
             }
         }
 
-        val triangleEdges = triangles.flatMap(t => List((t._1, t._2), (t._1, t._3), (t._2, t._3))).distinct()
+        val edges = triangles.flatMap(t => List((t._1, t._2), (t._1, t._3), (t._2, t._3))).distinct()
 
-        println("Remaining ir.ac.sbu.graph edge count: " + triangleEdges.count())
+        println("Remaining  edge count: " + edges.count())
         new File(outputPath).delete()
-        triangleEdges.saveAsTextFile(outputPath)
+        edges.saveAsTextFile(outputPath)
     }
 
 

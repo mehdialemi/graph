@@ -28,7 +28,7 @@
 //        conf.set("redis.host", "malemi-2").set("redis.port", "6379")
 //
 //        val sc = SparkContext.getOrCreate(conf)
-//        val triangleEdges = sc.textFile(inputPath, partition)
+//        val edges = sc.textFile(inputPath, partition)
 //          .filter(t => !t.startsWith("#")).map(t => t.split("\\s+"))
 //          .map(t => t(0).toLong -> t(1).toLong).mapPartitions(eha => {
 //            val jedis = new Jedis("malemi-2", 6379, 60000)
@@ -40,7 +40,7 @@
 //            map
 //        })
 //
-//        val count = triangleEdges.count()
+//        val count = edges.count()
 //        println(count)
 //        sc.stop()
 //    }

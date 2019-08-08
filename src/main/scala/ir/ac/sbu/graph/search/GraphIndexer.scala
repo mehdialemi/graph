@@ -22,7 +22,7 @@ object GraphIndexer {
         config.setMaster("local")
         val sc = SparkContext.getOrCreate(config)
 
-        // Load int ir.ac.sbu.graph which is as a list of triangleEdges
+        // Load int ir.ac.sbu.graph which is as a list of edges
         val inputGraph = GraphLoader.edgeListFile(sc, inputPath)
         val lables = sc.textFile(labelPath).map(t => {
             val split = t.split("\\s+")

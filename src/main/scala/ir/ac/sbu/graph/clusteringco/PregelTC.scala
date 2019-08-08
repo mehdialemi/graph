@@ -32,18 +32,18 @@ object PregelTC {
 
         val sc = new SparkContext(conf)
 
-        // Load int ir.ac.sbu.graph which is as a list of triangleEdges
+        // Load int ir.ac.sbu.graph which is as a list of edges
         val inputGraph = GraphLoader.edgeListFile(sc, inputPath, numEdgePartitions = partition)
 
         // Change direction from lower degree node to a higher node
         // First find degree of each node
         // Second find correct edge direction
-        // Third getOrCreate a new ir.ac.sbu.graph with new triangleEdges and previous vertices
+        // Third getOrCreate a new ir.ac.sbu.graph with new edges and previous vertices
 
         // Set degree of each vertex in the property.
         val graphVD = inputGraph.outerJoinVertices(inputGraph.degrees)((vid, vertex, degree) => degree)
 
-        // Find new triangleEdges with correct direction. A direction from a lower degree node to a higher degree node.
+        // Find new edges with correct direction. A direction from a lower degree node to a higher degree node.
         val newEdges = graphVD.triplets.map { et =>
             if (et.srcAttr.getOrElse(0) <= et.dstAttr.getOrElse(0))
                 Edge(et.srcId, et.dstId, true)
@@ -57,7 +57,7 @@ object PregelTC {
         var graph = Graph(empty, newEdges)
 
         // =======================================================
-        // phase 1: Send message about completing the third triangleEdges.
+        // phase 1: Send message about completing the third edges.
         // =======================================================
 
         // Find outlink fonlValue ids
