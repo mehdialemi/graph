@@ -8,6 +8,7 @@ import ir.ac.sbu.graph.utils.OrderedNeighborList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntListIterator;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.util.*;
@@ -15,35 +16,35 @@ import java.util.*;
 public class TriangleFonl {
 
     private NeighborList neighborList;
-    private JavaPairRDD <Integer, int[]> neighborRDD;
+    private JavaPairRDD<Integer, int[]> neighborRDD;
 
     public TriangleFonl(NeighborList neighborList) {
         this.neighborList = neighborList;
     }
 
-    public JavaPairRDD <Integer, int[]> getNeighborRDD() {
+    public JavaPairRDD<Integer, int[]> getNeighborRDD() {
         return neighborRDD;
     }
 
-    public JavaPairRDD <Integer, TriangleFonlValue> create() {
+    public JavaPairRDD<Integer, TriangleFonlValue> create() {
 
         neighborRDD = neighborList.getOrCreate();
         Triangle triangle = new Triangle(neighborList, neighborRDD);
-        JavaPairRDD <Integer, int[]> fonlRDD = triangle.createFonl();
-        JavaPairRDD <Integer, int[]> candidates = triangle.createCandidates(fonlRDD);
+        JavaPairRDD<Integer, int[]> fonlRDD = triangle.createFonl();
+        JavaPairRDD<Integer, int[]> candidates = triangle.createCandidates(fonlRDD);
 
-        JavaPairRDD <Integer, Iterable <Edge>> triangleInfo = candidates.cogroup(fonlRDD, fonlRDD.getNumPartitions())
+        JavaPairRDD<Integer, Iterable<Edge>> triangleInfo = candidates.cogroup(fonlRDD, fonlRDD.getNumPartitions())
                 .flatMapToPair(kv -> {
-                    List <Tuple2 <Integer, Edge>> output = new ArrayList <>();
+                    List<Tuple2<Integer, Edge>> output = new ArrayList<>();
 
                     // Iterator for fonlRDD
-                    Iterator <int[]> fonlIterator = kv._2._2.iterator();
+                    Iterator<int[]> fonlIterator = kv._2._2.iterator();
                     if (!fonlIterator.hasNext())
                         return output.iterator();
 
                     int[] hDegs = fonlIterator.next();
 
-                    Iterator <int[]> candidateIterator = kv._2._1.iterator();
+                    Iterator<int[]> candidateIterator = kv._2._1.iterator();
                     if (!candidateIterator.hasNext())
                         return output.iterator();
 
@@ -63,7 +64,7 @@ public class TriangleFonl {
                             int w = iter.nextInt();
 
                             // add edge (v, w) to TriangleFonlValue to recognize a triangle in the fonl kv with key = u
-                            output.add(new Tuple2 <>(u, new Edge(v, w)));
+                            output.add(new Tuple2<>(u, new Edge(v, w)));
                         }
                     } while (candidateIterator.hasNext());
 
@@ -71,11 +72,12 @@ public class TriangleFonl {
                 }).groupByKey();
 
         // update fonlRDD based on triangle information
-        return fonlRDD.leftOuterJoin(triangleInfo).mapValues(value -> {
-            int[] fonl = new int[value._1.length - 1];
-            System.arraycopy(value._1, 1, fonl, 0, fonl.length);
+        return fonlRDD.leftOuterJoin(triangleInfo, fonlRDD.getNumPartitions())
+                .mapValues(value -> {
+                    int[] fonl = new int[value._1.length - 1];
+                    System.arraycopy(value._1, 1, fonl, 0, fonl.length);
 
-            return new TriangleFonlValue(value._1[0], fonl, value._2.orElse(Collections.emptyList()));
-        });
+                    return new TriangleFonlValue(value._1[0], fonl, value._2.orElse(Collections.emptyList()));
+                }).persist(StorageLevel.MEMORY_AND_DISK());
     }
 }
