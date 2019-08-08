@@ -1,44 +1,25 @@
 package ir.ac.sbu.graph.spark.search.patterns;
 
 public class Triangle {
-    private final int u, v, w;
-    int u1, v1, w1;
-    Object processed = new Object();
+    private final int v1;
+    private final int v2;
+    private final int v3;
 
-    public Triangle(int u, int v, int w) {
-        this.u = u;
-        this.v = v;
-        this.w = w;
+    public Triangle(int v1, int v2, int v3) {
+        this.v1 = v1;
+        this.v2 = v2;
+        this.v3 = v3;
     }
 
-    public boolean isProcessed() {
-        return processed == null;
+    public int getV1() {
+        return v1;
     }
 
-    public void processed() {
-        processed = null;
+    public int getV2() {
+        return v2;
     }
 
-    public Edge getEdge() {
-        return new Edge(v1, w1);
-    }
-
-    public Triangle uTriangle() {
-        return set(u, v, w);
-    }
-
-    public Triangle vTriangle() {
-        return set(v, u, w);
-    }
-
-    public Triangle wTriangle() {
-        return set(w, u, v);
-    }
-
-    private Triangle set(int u, int v, int w) {
-        this.u1 = u;
-        this.v1 = v;
-        this.w1 = w;
-        return this;
+    public int getV3() {
+        return v3;
     }
 }

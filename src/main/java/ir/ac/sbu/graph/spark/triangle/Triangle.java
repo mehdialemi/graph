@@ -1,7 +1,6 @@
 package ir.ac.sbu.graph.spark.triangle;
 
 import ir.ac.sbu.graph.spark.SparkApp;
-import ir.ac.sbu.graph.spark.search.fonl.local.OrderedNeighbors;
 import ir.ac.sbu.graph.types.VertexDeg;
 import ir.ac.sbu.graph.utils.OrderedNeighborList;
 import it.unimi.dsi.fastutil.ints.IntList;

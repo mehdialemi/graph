@@ -5,116 +5,195 @@ import ir.ac.sbu.graph.spark.NeighborList;
 import ir.ac.sbu.graph.spark.SparkApp;
 import ir.ac.sbu.graph.spark.SparkAppConf;
 import ir.ac.sbu.graph.spark.search.fonl.creator.LabelTriangleFonl;
-import ir.ac.sbu.graph.spark.search.fonl.creator.LocalFonlCreator;
 import ir.ac.sbu.graph.spark.search.fonl.creator.TriangleFonl;
-import ir.ac.sbu.graph.spark.search.fonl.local.QFonl;
 import ir.ac.sbu.graph.spark.search.fonl.value.LabelDegreeTriangleFonlValue;
-import ir.ac.sbu.graph.spark.search.patterns.PatternReaderUtils;
-import ir.ac.sbu.graph.spark.search.patterns.Query;
-import ir.ac.sbu.graph.spark.search.patterns.Samples;
-import ir.ac.sbu.graph.spark.search.patterns.SubQuery;
+import ir.ac.sbu.graph.spark.search.patterns.*;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.broadcast.Broadcast;
 import scala.Tuple2;
+import scala.Tuple3;
 
 import java.io.FileNotFoundException;
 import java.util.*;
 
 public class QueryMatcher extends SparkApp {
-    private SearchConfig searchConfig;
     private SparkAppConf sparkConf;
     private EdgeLoader edgeLoader;
     private JavaPairRDD<Integer, String> labels;
 
-    public QueryMatcher(SearchConfig searchConfig, SparkAppConf sparkConf, EdgeLoader edgeLoader,
+    public QueryMatcher(SparkAppConf sparkConf, EdgeLoader edgeLoader,
                         JavaPairRDD<Integer, String> labels) {
         super(edgeLoader);
-        this.searchConfig = searchConfig;
         this.sparkConf = sparkConf;
         this.edgeLoader = edgeLoader;
         this.labels = labels;
     }
 
     public long search(Query query) {
-
-        List<SubQuery> subQueries = LocalFonlCreator.getSubQueries(qFonl);
-        if (subQueries.isEmpty())
-            return 0;
+        List<QuerySlice> querySlices = query.getQuerySlices();
+        if (querySlices.isEmpty())
+            throw new RuntimeException("No query slice found");
 
         NeighborList neighborList = new NeighborList(edgeLoader);
         TriangleFonl triangleFonl = new TriangleFonl(neighborList);
         LabelTriangleFonl labelTriangleFonl = new LabelTriangleFonl(triangleFonl, labels);
         JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD = labelTriangleFonl.create();
+        PatternDebugUtils.printFonlLabelDegreeTriangleFonlValue(ldtFonlRDD);
 
-        Queue<SubQuery> queue = new LinkedList<>(subQueries);
-        Broadcast<SubQuery> broadcast = sparkConf.getSc().broadcast(queue.remove());
-        JavaPairRDD<Integer, String> subMatches = getSubMatches(ldtFonlRDD, broadcast);
-        long count = subMatches.count();
-        System.out.println("First match count: " + count);
+        Map<QuerySlice, JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>>> sliceMatches = new HashMap<>();
+        JavaPairRDD<Integer, Long> matchCounter = ldtFonlRDD.mapValues(v -> 1L);
 
-        List<JavaPairRDD<Integer, String>> matches = new ArrayList<>();
-        matches.add(subMatches);
+        for (QuerySlice querySlice : querySlices) {
+            JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>> sliceMatch;
 
-        while (count != 0 && !queue.isEmpty()) {
-            SubQuery subquery = queue.remove();
-            broadcast = sparkConf.getSc().broadcast(subquery);
+            if (querySlice.isProcessed()) {
+                // if the current query slice and all of its links are processed then there are nothing to do
+                boolean allProcessed = true;
+                for (Tuple2<Integer, QuerySlice> link : querySlice.getLinks()) {
+                    if (!link._2.isProcessed()) {
+                        allProcessed = false;
+                        break;
+                    }
+                }
 
-            JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> rdd = subMatches
-                    .join(ldtFonlRDD)
-                    .mapValues(v -> v._2)
-                    .repartition(ldtFonlRDD.getNumPartitions());
+                if (allProcessed)
+                    continue;
 
-            subMatches = getSubMatches(rdd, broadcast);
-            count = subMatches.count();
-            matches.add(subMatches);
-            System.out.println("Match count: " + count);
-        }
+                // if there are some unprocessed links, then we can get the result of current query slice from the
+                // map of computed matches.
+                sliceMatch = sliceMatches.get(querySlice);
+                System.out.println("retrieve match count from the sliceMatch, for vertex: " + querySlice.getV());
+            } else { // if the current query slice is not processed, then it should be processed
+                sliceMatch = findMatchCounts(sparkConf.getSc(), ldtFonlRDD, querySlice);
 
-        if (!queue.isEmpty())
-            return 0;
+                long count = sliceMatch.count();
+                System.out.println("slice match count: " + count + ", for vertex: " + querySlice.getV());
+                if (count == 0)
+                    return 0;
 
-        JavaPairRDD<Integer, String> left = matches.get(0);
-
-        for (int i = 1; i < matches.size(); i++) {
-            JavaPairRDD<Integer, Tuple2<Integer, String>> right = matches.get(i)
-                    .mapToPair(kv -> new Tuple2<>(
-                            Integer.parseInt(kv._2.split(" ")[0]),
-                            new Tuple2<>(kv._1, kv._2)
-                    ));
-
-            left = left.join(right)
-                    .mapToPair(kv -> new Tuple2<>(kv._2._2._1, kv._2._1.concat(kv._2._2._2)))
-                    .cache();
-
-            count = left.count();
-            System.out.println("Current count of match: " + count);
-        }
-
-        return count;
-    }
-
-    private JavaPairRDD<Integer, String> getSubMatches(JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> tFonl,
-                                                                    Broadcast<SubQuery> broadcast) {
-        return tFonl.flatMapToPair(kv -> {
-            // vertex to count
-            Set<Tuple2<String, Integer>> matches = kv._2.matches(kv._1, broadcast.getValue());
-            if (matches == null)
-                return Collections.emptyIterator();
-
-            return matches.iterator();
-        }).groupByKey(tFonl.getNumPartitions()).flatMapToPair(kv -> {
-            Set<Integer> set = new HashSet<>();
-            for (Integer v : kv._2) {
-                set.add(v);
+                matchCounter = update(sliceMatches, matchCounter, querySlice, sliceMatch);
             }
 
-            List<Tuple2<Integer, String>> out = new ArrayList<>();
-            for (Integer v : set) {
-                out.add(new Tuple2<>(v, kv._1));
+            // find the matchIndices for the links
+            for (Tuple2<Integer, QuerySlice> link : querySlice.getLinks()) {
+
+                QuerySlice sliceLink = link._2;
+                if (sliceLink.isProcessed())
+                    continue;
+
+                final int fonlValueIndex = link._1;
+                JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>> fonlLeftKeys =
+                        sliceMatch.filter(kv -> kv._2._2().equals(fonlValueIndex))
+                        .distinct();
+
+                JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> fonlSubset =
+                        fonlLeftKeys.join(ldtFonlRDD).mapValues(v -> v._2);
+
+                JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>> linkSliceMatch =
+                        findMatchCounts(sparkConf.getSc(), fonlSubset, sliceLink);
+
+                // if nothing matched then no match exist
+                long count = linkSliceMatch.count();
+                System.out.println("link match, parent: " + querySlice.getV() + ", link: " + sliceLink.getV() +
+                        ", count: " + count);
+                if (count == 0)
+                    return 0;
+
+                matchCounter = update(sliceMatches, matchCounter, querySlice, linkSliceMatch);
+            }
+        }
+
+        return matchCounter.map(kv -> kv._2).reduce(Long::sum);
+    }
+
+    private JavaPairRDD<Integer, Long> update(
+            Map<QuerySlice, JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>>> sliceMatches,
+            JavaPairRDD<Integer, Long> matchCounter, QuerySlice querySlice,
+            JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>> linkSliceMatch) {
+
+        querySlice.setProcessed(true);
+        sliceMatches.put(querySlice, linkSliceMatch);
+        PatternDebugUtils.printSliceMatch(linkSliceMatch, querySlice.getV());
+
+        matchCounter = updateMatchCounter(matchCounter, linkSliceMatch);
+        PatternDebugUtils.printMatchCounter(matchCounter, querySlice.getV());
+
+        return matchCounter;
+    }
+
+    private JavaPairRDD<Integer, Long> updateMatchCounter(
+            JavaPairRDD<Integer, Long> matchCounter,
+            JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>> matchCounts) {
+
+        return matchCounts
+                .mapToPair(kv -> new Tuple2<>(kv._2._1(), kv._2._3()))
+                .groupByKey()
+                .join(matchCounter)
+                .mapValues(v -> {
+                    long counter = v._2;
+                    for (Integer value : v._1) {
+                        counter *= value;
+                    }
+                    return counter;
+                }).cache();
+    }
+
+    /**
+     * find matches based on the given ldtFonlRdd and querySlice.
+     * @param sc is used to broadcast subquery
+     * @param ldtFonlRDD base data to find matches
+     * @param querySlice the current query part to create subquery
+     * @return key-values => (key: vertex, Tuple3<>(value: source fonl key, linkIndex, count of matches for the key))
+     */
+    private JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>> findMatchCounts(
+            final JavaSparkContext sc, final JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD,
+            QuerySlice querySlice) {
+
+        Broadcast<Subquery> broadcast = sc.broadcast(querySlice.subquery());
+        return ldtFonlRDD.flatMapToPair(kv -> {
+            // get the subquery from the broadcast data
+            Subquery subquery = broadcast.getValue();
+
+            // get all of the matches for the current subquery
+            Set<int[]> matchIndices = kv._2.matchIndices(subquery);
+            if (matchIndices == null)
+                return Collections.emptyIterator();
+
+            List<Tuple2<Integer, Tuple3<Integer, Integer, Integer>>> out = new ArrayList<>();
+
+            if (subquery.linkIndices.length > 0) {
+                Object2IntOpenHashMap<Tuple2<Integer, Integer>> counter = new Object2IntOpenHashMap<>();
+                for (int[] matchIndex : matchIndices) {
+                    for (int linkIndex : subquery.linkIndices) {
+                        int index = matchIndex[linkIndex];
+                        int neighbor = kv._2.fonl[index];
+                        counter.addTo(new Tuple2<>(neighbor, linkIndex), 1);
+                    }
+                }
+                for (Map.Entry<Tuple2<Integer, Integer>, Integer> entry : counter.entrySet()) {
+                    out.add(new Tuple2<>(entry.getKey()._1, new Tuple3<>(kv._2.getSource(), entry.getKey()._2, entry.getValue())));
+                }
+            } else {
+                out.add(new Tuple2<>(kv._1, new Tuple3<>(kv._2.getSource(), 0, matchIndices.size())));
             }
 
             return out.iterator();
         }).cache();
+    }
+
+    static JavaPairRDD <Integer, String> getLabels(JavaSparkContext sc, String path, int pNum) {
+        if (path.isEmpty()) {
+            List<Tuple2<Integer, String>> list = new ArrayList <>();
+            list.add(new Tuple2 <>(Integer.MAX_VALUE, "_"));
+            return sc.parallelizePairs(list);
+        }
+
+        return sc
+                .textFile(path, pNum)
+                .map(line -> line.split("\\s+"))
+                .mapToPair(split -> new Tuple2 <>(Integer.parseInt(split[0]), split[1]));
     }
 
     public static void main(String[] args) throws FileNotFoundException {
@@ -122,14 +201,16 @@ public class QueryMatcher extends SparkApp {
         SparkAppConf sparkConf = searchConfig.getSparkAppConf();
         sparkConf.init();
 
-        Query query = Samples.mySampleQuery();
+
         EdgeLoader edgeLoader = new EdgeLoader(sparkConf);
-
-        JavaPairRDD<Integer, String> labels = PatternCounter.getLabels(sparkConf.getSc(),
+        JavaPairRDD<Integer, String> labels = getLabels(sparkConf.getSc(),
                 searchConfig.getGraphLabelPath(), sparkConf.getPartitionNum());
+        Query query = Samples.mySampleQuery();
 
-        QueryMatcher matcher = new QueryMatcher(searchConfig, sparkConf, edgeLoader, labels);
-        long count = matcher.search(qFonl);
-        System.out.println("Number of matches: " + count);
+        QueryMatcher matcher = new QueryMatcher(sparkConf, edgeLoader, labels);
+        long count = matcher.search(query);
+        System.out.println("final match count: " + count);
     }
+
+
 }

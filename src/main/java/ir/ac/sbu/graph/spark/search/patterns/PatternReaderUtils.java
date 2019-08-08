@@ -1,8 +1,5 @@
 package ir.ac.sbu.graph.spark.search.patterns;
 
-import ir.ac.sbu.graph.spark.search.fonl.creator.LocalFonlCreator;
-import ir.ac.sbu.graph.spark.search.fonl.local.QFonl;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -13,15 +10,15 @@ import java.util.Map;
 
 public class PatternReaderUtils {
 
-    public static QFonl loadSample(String sampleName) {
+    public static Query loadSample(String sampleName) {
         switch (sampleName) {
-            case "mySample" : return Samples.mySample();
+            case "mySample" : return Samples.mySampleQuery();
             case "mySampleEmptyLabel" : return Samples.mySampleEmptyLabel();
-            default: return Samples.mySample();
+            default: return Samples.mySampleQuery();
         }
     }
 
-    public static QFonl loadFromFile(String address) throws IOException {
+    public static Query loadFromFile(String address) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(address));
         Map<Integer, List<Integer>> neighbors = new HashMap<>();
         Map <Integer, String> labelMap = new HashMap <>();
@@ -55,9 +52,9 @@ public class PatternReaderUtils {
             }
         }
 
-        QFonl qFonl = LocalFonlCreator.createQFonl(neighbors, labelMap);
-        System.out.println("qFonl" + qFonl);
+        Query query = new Query(neighbors, labelMap);
+        System.out.println("qFonl" + query);
 
-        return qFonl;
+        return query;
     }
 }

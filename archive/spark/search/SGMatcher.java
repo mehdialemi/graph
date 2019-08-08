@@ -166,7 +166,7 @@ public class SGMatcher extends SparkApp {
         System.out.println("qFonl" + qFonl.toString());
 
         int matches = matcher.search(qFonl);
-        System.out.println("Number of matches: " + matches);
+        System.out.println("Number of matchIndices: " + matches);
 
         matcher.close();
     }

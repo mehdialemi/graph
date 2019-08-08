@@ -1,20 +1,24 @@
 package ir.ac.sbu.graph.spark.search;
 
 import ir.ac.sbu.graph.spark.SparkAppConf;
-import ir.ac.sbu.graph.spark.search.fonl.creator.VLabel;
-import ir.ac.sbu.graph.spark.search.fonl.creator.VLabelDeg;
-import ir.ac.sbu.graph.spark.search.patterns.SubQuery;
-import ir.ac.sbu.graph.spark.search.fonl.value.*;
-import ir.ac.sbu.graph.types.*;
+import ir.ac.sbu.graph.spark.search.fonl.value.FonlValue;
+import ir.ac.sbu.graph.spark.search.fonl.value.Meta;
+import ir.ac.sbu.graph.types.Edge;
+import ir.ac.sbu.graph.types.VertexDeg;
 import it.unimi.dsi.fastutil.Function;
-import it.unimi.dsi.fastutil.ints.*;
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.IntCollection;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class SearchConfig {
     private String graphPath;
@@ -51,22 +55,14 @@ public class SearchConfig {
                 sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
                 sparkConf.registerKryoClasses(new Class[] {
                         int[].class,
-                        LabelFonlValue.class,
                         FonlValue.class,
-                        LabelMeta.class,
-                        DegreeMeta.class,
                         Meta.class,
-                        LabelTriangleFonlValue.class,
-                        TriangleDegreeMeta.class,
-                        SubQuery.class,
                         Int2IntMap.class,
                         Int2IntFunction.class,
                         Map.class,
                         HashMap.class,
                         Function.class,
                         int[][].class,
-                        VLabel.class,
-                        VLabelDeg.class,
                         Edge.class,
                         VertexDeg.class,
                         List.class,

@@ -12,7 +12,7 @@ object GraphIndexer {
 
     case class NodeValue(label: String, rank: Float, id: Long)
     case class STwig(label: String, rootId: Long, children: ListBuffer[Long])
-    case class Message(neighbors: ListBuffer[(NodeValue, Long)]) // rank, degree, nodeId
+    case class Message(fonlValue: ListBuffer[(NodeValue, Long)]) // rank, degree, nodeId
 
     def main(args: Array[String]) {
         val inputPath = "input.txt"
@@ -24,17 +24,17 @@ object GraphIndexer {
 
         // Load int ir.ac.sbu.graph which is as a list of triangleEdges
         val inputGraph = GraphLoader.edgeListFile(sc, inputPath)
-        val labelMap = sc.textFile(labelPath).map(t => {
+        val lables = sc.textFile(labelPath).map(t => {
             val split = t.split("\\s+")
             split(0).toLong -> split(1)
         }).cache()
 
-        val labelCount = labelMap.map(t => t._2).countByValue
+        val labelCount = lables.map(t => t._2).countByValue
         val labelCountMap = sc.broadcast(labelCount)
         val graph = inputGraph.outerJoinVertices(inputGraph.degrees)((vid, vertex, degree) => degree).cache()
         inputGraph.unpersist()
 
-        val labelCountGraph = graph.outerJoinVertices(labelMap)((vid, degree, label) => {
+        val labelCountGraph = graph.outerJoinVertices(lables)((vid, degree, label) => {
             val popularity = labelCountMap.value.get(label.get).get.toFloat
             val rank = degree.get / popularity
             NodeValue(label.get, rank, vid)
@@ -45,7 +45,7 @@ object GraphIndexer {
             val children = new ListBuffer[Long]()
             val list = msg.orNull
             if (list != null)
-                list.neighbors.filter(t => {
+                list.fonlValue.filter(t => {
                 t._1.rank < value.rank || (t._1.rank == value.rank && t._1.id < value.id)
             }).map(t => children += t._2)
             STwig(value.label, id, children)
@@ -61,7 +61,7 @@ object GraphIndexer {
     }
 
     def mergeMsg(msg1: Message, msg2: Message): Message = {
-        msg1.neighbors += msg2.neighbors.head
+        msg1.fonlValue += msg2.fonlValue.head
         msg1
     }
 }

@@ -13,7 +13,7 @@ import scala.collection.mutable.ListBuffer
   */
 object PregelTC {
 
-    case class OneNeighborMsg(vId: Long, neighbors: Array[Long])
+    case class OneNeighborMsg(vId: Long, fonlValue: Array[Long])
 
     case class NeighborMessage(list: ListBuffer[OneNeighborMsg])
 
@@ -60,14 +60,14 @@ object PregelTC {
         // phase 1: Send message about completing the third triangleEdges.
         // =======================================================
 
-        // Find outlink neighbors ids
+        // Find outlink fonlValue ids
         val neighborIds = graph.collectNeighborIds(EdgeDirection.Out)
 
-        // Update each nodes with its outlink neighbors' id.
+        // Update each nodes with its outlink fonlValue' id.
         val graphWithOutlinks = graph.outerJoinVertices(neighborIds)((vid, _, nId) => nId.getOrElse(Array[Long]()))
         graphWithOutlinks.vertices.repartition(numPartitions = partition).persist(StorageLevel.DISK_ONLY)
 
-        // Send neighborIds of a node to all other its neighbors.
+        // Send neighborIds of a node to all other its fonlValue.
         val message = graphWithOutlinks.aggregateMessages(
             (ctx: EdgeContext[Array[Long], Boolean, List[(Long, Array[Long])]]) => {
                 val msg = List((ctx.srcId, ctx.srcAttr))
@@ -77,9 +77,9 @@ object PregelTC {
         // =======================================================
         // phase 2: Find triangles
         // =======================================================
-        // At first each node receive messages from its neighbor telling their neighbors' id.
-        // Then check that if receiving neighborIds have a common with its neighbors.
-        // If there was any common neighbors then it report back telling the sender the completing nodes to make
+        // At first each node receive messages from its neighbor telling their fonlValue' id.
+        // Then check that if receiving neighborIds have a common with its fonlValue.
+        // If there was any common fonlValue then it report back telling the sender the completing nodes to make
         // a triangle through it.
         val tCount = graphWithOutlinks.vertices.join(message).flatMap { case (vid, (n, msg)) =>
             msg.map(ids => (n.intersect(ids._2))).filter(_.size > 0)

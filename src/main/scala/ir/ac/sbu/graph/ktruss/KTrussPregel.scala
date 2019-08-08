@@ -15,7 +15,7 @@ import scala.collection.mutable.{ListBuffer, Map}
   */
 object KTrussPregel {
 
-    case class OneNeighborMsg(vId: Long, neighbors: Array[Long])
+    case class OneNeighborMsg(vId: Long, fonlValue: Array[Long])
 
     case class NeighborMessage(list: ListBuffer[OneNeighborMsg])
 
@@ -83,14 +83,14 @@ object KTrussPregel {
             // phase 1: Send message about completing the third triangleEdges.
             // =======================================================
 
-            // Find outlink neighbors ids
+            // Find outlink fonlValue ids
             val neighborIds = graph.collectNeighborIds(EdgeDirection.Either)
 
-            // Update each nodes with its outlink neighbors' id.
+            // Update each nodes with its outlink fonlValue' id.
             val graphWithOutlinks = graph.outerJoinVertices(neighborIds)((vid, _, nId) => nId.getOrElse(Array[Long]()))
 
-            // Send neighborIds of a node to all other its neighbors.
-            // Send neighborIds of a node to all other its neighbors.
+            // Send neighborIds of a node to all other its fonlValue.
+            // Send neighborIds of a node to all other its fonlValue.
             val message = graphWithOutlinks.aggregateMessages(
                 (ctx: EdgeContext[Array[Long], Int, List[(Long, Array[Long])]]) => {
                     val msg = List((ctx.srcId, ctx.srcAttr))
@@ -100,16 +100,16 @@ object KTrussPregel {
             // =======================================================
             // phase 2: Find triangles
             // =======================================================
-            // At first each node receives messages from its neighbor telling their neighbors' id.
-            // Then check that if receiving neighborIds have a common with its neighbors.
-            // If there was any common neighbors then it report back telling the sender the completing nodes to make
+            // At first each node receives messages from its neighbor telling their fonlValue' id.
+            // Then check that if receiving neighborIds have a common with its fonlValue.
+            // If there was any common fonlValue then it report back telling the sender the completing nodes to make
             // a triangle through it.
             val triangleMsg = graphWithOutlinks.vertices.join(message).flatMap { case (vid, (n, msg)) =>
                 msg.map(ids => (ids._1, vid -> n.intersect(ids._2).length)).filter(t => t._2._2 > 0)
             }.groupByKey()
 
-            // In this step tgraph have information about the common neighbors per neighbor as the follow:
-            // (neighborId, array of common neighbors with neighborId)
+            // In this step tgraph have information about the common fonlValue per neighbor as the follow:
+            // (neighborId, array of common fonlValue with neighborId)
             val edgeCount = graphWithOutlinks.outerJoinVertices(triangleMsg)((vid, n, msg) => {
                 val m = Map[Long, Int]()
                 msg.getOrElse(Map[Long, Int]()).map(t => m.put(t._1, t._2 + m.getOrElse(t._1, 0)))

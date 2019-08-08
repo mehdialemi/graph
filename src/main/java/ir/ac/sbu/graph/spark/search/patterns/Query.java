@@ -1,154 +1,195 @@
 package ir.ac.sbu.graph.spark.search.patterns;
 
+import ir.ac.sbu.graph.types.Edge;
 import it.unimi.dsi.fastutil.ints.*;
 
 import java.util.*;
 
 public class Query {
 
-    private final List<QuerySlice> querySlices;
+    private final List<QuerySlice> querySlices = new ArrayList<>();
 
-    public Query(Map<Integer, List<Integer>> _neighbors,  Map <Integer, String> labelMap) {
+    public Query(Map<Integer, List<Integer>> neighbors,  Map <Integer, String> labelMap) {
 
-        // sort neighbor list by their id
-        Map<Integer, int[]> neighbors = new HashMap<>();
-        Int2IntOpenHashMap vDegs = new Int2IntOpenHashMap();
-        for (Map.Entry<Integer, List<Integer>> entry : _neighbors.entrySet()) {
-            neighbors.put(entry.getKey(), new IntAVLTreeSet(entry.getValue()).toIntArray());
-            vDegs.addTo(entry.getKey(), entry.getValue().size());
-        }
-
-        // create edges and sort vertex by their degree descending
+        // init: create edge set and store degrees in a map
         Set<Edge> edges = new HashSet<>();
-        for (Map.Entry<Integer, int[]> entry : neighbors.entrySet()) {
-            for (Integer v2 : entry.getValue()) {
-                edges.add(new Edge(entry.getKey(), v2));
+        final Int2IntOpenHashMap degrees = new Int2IntOpenHashMap();
+        for (Map.Entry<Integer, List<Integer>> entry : neighbors.entrySet()) {
+            degrees.addTo(entry.getKey(), entry.getValue().size());
+            for (Integer v : entry.getValue()) {
+                edges.add(new Edge(entry.getKey(), v));
             }
         }
 
+        // create fonl
+        Int2ObjectMap<IntSet> fonl = new Int2ObjectOpenHashMap<>();
+        for (Map.Entry<Integer, List<Integer>> entry : neighbors.entrySet()) {
+            IntSortedSet fonlValue = new IntAVLTreeSet((v1, v2) -> {
+                int d1 = degrees.getOrDefault(v1, 0);
+                int d2 = degrees.getOrDefault(v2, 0);
+                if (d1 < d2 || (d1 == d2 && v1 < v2))
+                    return -1;
+                return 1;
+            });
+
+            int v = entry.getKey();
+            int d = degrees.get(v);
+            for (int neighbor : entry.getValue()) {
+                int d1 = degrees.getOrDefault(neighbor, 0);
+                if (d1 < d || (d1 == d && neighbor < v))
+                    continue;
+                fonlValue.add(neighbor);
+            }
+            fonl.put(v, fonlValue);
+        }
+
         // find triangles and create list of triangles per vertex
-        Int2ObjectMap<List<Triangle>> v2Triangles = new Int2ObjectOpenHashMap<>();
-        for (Map.Entry<Integer, int[]> entry : neighbors.entrySet()) {
+        Int2ObjectMap<List<Triangle>> triangles = new Int2ObjectOpenHashMap<>();
+        for (Map.Entry<Integer, IntSet> entry : fonl.entrySet()) {
             int u = entry.getKey();
-            int [] neighborArray = entry.getValue();
-            for (int i = 0; i < neighborArray.length - 1; i++) {
-                for (int j = i + 1; j < neighborArray.length; j++) {
-                    int v = neighborArray[i];
-                    int w = neighborArray[j];
+            int [] fonlValue = entry.getValue().toIntArray();
+            for (int i = 0; i < fonlValue.length - 1; i++) {
+                int v = fonlValue[i];
+                for (int j = i + 1; j < fonlValue.length; j++) {
+                    int w = fonlValue[j];
                     if (edges.contains(new Edge(v, w))) {
-                        Triangle triangle = new Triangle(u, v, w);
-                        v2Triangles.computeIfAbsent(u, val -> new ArrayList<>()).add(triangle.uTriangle());
-                        v2Triangles.computeIfAbsent(v, val -> new ArrayList<>()).add(triangle.vTriangle());
-                        v2Triangles.computeIfAbsent(w, val -> new ArrayList<>()).add(triangle.wTriangle());
+                        triangles.computeIfAbsent(u, val -> new ArrayList<>()).add(new Triangle(u, v, w));
+                        triangles.computeIfAbsent(v, val -> new ArrayList<>()).add(new Triangle(v, u, w));
+                        triangles.computeIfAbsent(w, val -> new ArrayList<>()).add(new Triangle(w, u, v));
                     }
                 }
             }
         }
 
-        List<QuerySlice> querySlices = new ArrayList<>();
-
         // rank vertices by their tc and deg and sort by rank descending
-        VertexRanks vertexRanks = new VertexRanks(neighbors, v2Triangles);
-        while (vertexRanks.hasItems()) {
-            V2Rank v2Rank = vertexRanks.removeHighest();
-            if (v2Rank == null)
-                break;
+        Int2IntOpenHashMap ranks = new Int2IntOpenHashMap();
+        for (Map.Entry<Integer, IntSet> entry : fonl.entrySet()) {
+            int v = entry.getKey();
+            int fonlSize = entry.getValue().size();
+            int tc = triangles.getOrDefault(v, new ArrayList<>()).size();
+            ranks.addTo(v, 2 * fonlSize + tc);
+        }
 
-            List<Triangle> triangles = v2Triangles.getOrDefault(v2Rank.v, new ArrayList<>());
-            for (Triangle triangle : triangles) {
-                Edge edge = triangle.getEdge();
-                vertexRanks.decRank(edge.v1, 2);
-                vertexRanks.decRank(edge.v2, 2);
+        IntSortedSet sortedRanks = new IntAVLTreeSet((v1, v2) ->
+                ranks.getOrDefault(v2, 0) - ranks.getOrDefault(v1, 0));
+        sortedRanks.addAll(ranks.keySet());
+
+        // store original value of fonl before its update
+        Int2ObjectMap<IntSet> freezeFonl = Int2ObjectMaps.unmodifiable(fonl);
+        Int2ObjectMap<QuerySlice> querySliceMap = new Int2ObjectOpenHashMap<>();
+        List<QuerySlice> querySliceList = new ArrayList<>();
+        while (!sortedRanks.isEmpty()) {
+            int v = sortedRanks.firstInt();
+            IntSet fonlValue = fonl.get(v);
+
+            if (fonlValue.size() > 0) {
+                List<Triangle> triangleList = triangles.getOrDefault(v, new ArrayList<>());
+
+                QuerySlice querySlice = new QuerySlice(v, freezeFonl.get(v).toIntArray(),
+                        triangleList, labelMap, degrees);
+                querySliceList.add(querySlice);
+                querySliceMap.put(v, querySlice);
+
+                for (Triangle triangle : triangleList) {
+                    // remove triangle vertices from the fonl value of v2
+                    // update ranks and sortedRanks for triangle v2
+                    update(fonl, ranks, sortedRanks, v, triangle.getV2());
+                    update(fonl, ranks, sortedRanks, v, triangle.getV3());
+                }
             }
 
-            querySlices.add(new QuerySlice(v2Rank.v, neighbors.getOrDefault(v2Rank.v, new int[] {}),
-                    v2Triangles.getOrDefault(v2Rank.v, new ArrayList<>()), labelMap, vDegs));
+            sortedRanks.remove(v);
         }
 
-        Map<Integer, QuerySlice> sliceMap = new HashMap<>();
-        for (QuerySlice querySlice : querySlices) {
-            sliceMap.put(querySlice.getV(), querySlice);
-        }
-
-        for (QuerySlice querySlice : querySlices) {
-            for (int neighbor : neighbors.get(querySlice.getV())) {
-                QuerySlice slice = sliceMap.get(neighbor);
-                if (slice != null && slice.getParent() == null) {
-                    slice.setParent(querySlice);
-                    querySlice.addChild(slice);
+        // find the relationship between query slices
+        for (QuerySlice querySlice : querySliceList) {
+            int v = querySlice.getV();
+            int[] fonlValue = freezeFonl.get(v).toIntArray();
+            for (int index = 0; index < fonlValue.length; index++) {
+                int neighbor = fonlValue[index];
+                QuerySlice neighborQuerySlice = querySliceMap.get(neighbor);
+                if (neighborQuerySlice != null) {
+                    if (!neighborQuerySlice.hasParent()) {
+                        querySlice.addLink(index, neighborQuerySlice);
+                    }
                 }
             }
         }
 
-        this.querySlices = querySlices;
+        // find the remaining links between the fonlValues
+        for (int i = 1; i < querySliceList.size(); i++) {
+            QuerySlice querySlice = querySliceList.get(i);
+            if (querySlice.hasParent())
+                continue;
+
+            int[] neighborFonlValue = querySlice.getFonlValue();
+            boolean find = false;
+            for (QuerySlice parentQuerySlice : querySliceList) {
+                int[] parentFonlValue = parentQuerySlice.getFonlValue();
+
+                for (int pIndex = 0; pIndex < parentFonlValue.length && !find; pIndex++) {
+                    int fonlValue = parentFonlValue[pIndex];
+
+                    for (int nIndex = 0; nIndex < neighborFonlValue.length && !find; nIndex++) {
+                        if (fonlValue == neighborFonlValue[nIndex]) {
+                            find = true;
+                            parentQuerySlice.addLink(pIndex, querySlice);
+                        }
+                    }
+                }
+
+                if (find)
+                    break;
+            }
+
+            if (!find)
+                throw new RuntimeException("Could not find links for vertex: " + querySlice.getV());
+        }
+
+        for (QuerySlice querySlice : querySliceList) {
+            querySlice.setProcessed(false);
+        }
+
+        // add query slices based on highest slice and its links
+        for (int i = 0; i < querySliceList.size(); i++) {
+            QuerySlice querySlice = querySliceList.get(i);
+            if (!querySlice.isProcessed()) {
+                querySlice.setProcessed(true);
+                this.querySlices.add(querySlice);
+            }
+
+            for (int j = 0; j < querySliceList.size(); j++) {
+                if (i == j) {
+                    continue;
+                }
+                QuerySlice link = querySliceList.get(i);
+                if (link.isProcessed())
+                    continue;
+
+                if (querySlice.getLinks().contains(link)) {
+                    link.setProcessed(true);
+                    this.querySlices.add(link);
+                }
+            }
+        }
+
+        for (QuerySlice querySlice : this.querySlices) {
+            querySlice.setProcessed(false);
+        }
     }
 
     public List<QuerySlice> getQuerySlices() {
         return querySlices;
     }
 
-    static class V2Rank {
-        int v;
-        int rank;
-
-        public V2Rank(int v, int rank) {
-            this.v = v;
-            this.rank = rank;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null)
-                return super.equals(obj);
-            V2Rank o = (V2Rank) obj;
-            return this.v == o.v;
-        }
-
-        @Override
-        public int hashCode() {
-            return new Integer(v).hashCode();
+    private void update(Int2ObjectMap<IntSet> fonl, Int2IntOpenHashMap ranks, IntSortedSet sortedRanks,
+                        int v, int vTriangle) {
+        fonl.getOrDefault(vTriangle, new IntArraySet()).remove(v);
+        sortedRanks.remove(vTriangle);
+        int rank = ranks.get(vTriangle) - 2;
+        if (rank > 0) {
+            ranks.put(vTriangle, rank);
+            sortedRanks.add(vTriangle);
         }
     }
-
-    static class VertexRanks {
-        SortedMap<V2Rank, V2Rank> v2Ranks = new TreeMap<>((o1, o2) -> o2.rank - o1.rank);
-
-        public VertexRanks(Map<Integer, int[]> neighbors, Int2ObjectMap<List<Triangle>> v2Triangles) {
-            for (Map.Entry<Integer, List<Triangle>> v2Triangle : v2Triangles.entrySet()) {
-                int v = v2Triangle.getKey();
-                int rank = v2Triangle.getValue().size() + neighbors.get(v).length;
-                V2Rank v2Rank = new V2Rank(v, rank);
-                v2Ranks.put(v2Rank, v2Rank);
-            }
-        }
-
-        public V2Rank removeHighest() {
-            if (v2Ranks.isEmpty())
-                return null;
-            return v2Ranks.firstKey();
-        }
-
-        public void decRank(int v, int amount) {
-            V2Rank v2Rank = v2Ranks.get(new V2Rank(v, amount));
-            if (v2Rank == null)
-                return;
-
-            if (v2Rank.rank <= 0) {
-                v2Ranks.remove(v2Rank);
-                return;
-            }
-
-            v2Rank.rank -= amount;
-            if (v2Rank.rank <= 0) {
-                v2Ranks.remove(v2Rank);
-                return;
-            }
-            v2Ranks.put(v2Rank, v2Rank);
-        }
-
-        public boolean hasItems() {
-            return !v2Ranks.isEmpty();
-        }
-    }
-
 }

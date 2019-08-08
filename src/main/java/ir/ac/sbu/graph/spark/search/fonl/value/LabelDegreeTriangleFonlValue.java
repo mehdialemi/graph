@@ -1,66 +1,56 @@
 package ir.ac.sbu.graph.spark.search.fonl.value;
 
-import ir.ac.sbu.graph.spark.search.patterns.SubQuery;
+import ir.ac.sbu.graph.spark.search.patterns.Subquery;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import scala.Tuple2;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class LabelDegreeTriangleFonlValue extends FonlValue <LabelDegreeTriangleMeta> {
 
+    private int source;
+
     public LabelDegreeTriangleFonlValue() {  }
 
-    public LabelDegreeTriangleFonlValue(int[] fonl, LabelDegreeTriangleMeta meta) {
+    public LabelDegreeTriangleFonlValue(int source, int[] fonl, LabelDegreeTriangleMeta meta) {
+        this.source = source;
         this.fonl = fonl;
         this.meta = meta;
     }
 
-    public Set<Tuple2<String, Integer>> matches(int key, SubQuery subquery) {
-        Set<int[]> result = matchesAll(key, subquery);
-        if (result == null)
-            return null;
-
-        Set<Tuple2<String, Integer>> out = new HashSet<>();
-        for (int[] matches : result) {
-            StringBuilder sb = new StringBuilder();
-            for (int match : matches) {
-                sb.append(match).append(" ");
-            }
-            String matchStr = sb.toString();
-            for (int anchorIndex : subquery.anchors) {
-                int vertex = matches[anchorIndex];
-                if (vertex == key) {
-                    out.add(new Tuple2<>(matchStr, key));
-                } else {
-                    out.add(new Tuple2<>(matchStr, vertex));
-                }
-            }
-        }
-        return out;
-    }
-
-    private Set<int[]> matchesAll(int key, SubQuery subquery) {
+    /**
+     * The set of all matchIndices of this fonl for the given subquery
+     * @param subquery is the subquery to be find its matchIndices in the current fonl
+     * @return a set of matchIndices. each match is an array of integer which
+     *                  index 0 of match is for key of the subquery
+     *                  and index 1 of match is for the index 0 of subquery.fonlValue
+     *                  and so on
+     */
+    public Set<int[]> matchIndices(Subquery subquery) {
 
         // Per sub-query fonl find the potential candidates using label, degree, tc
         // Vertices are sorted by their degree ascendingly.
         // Candidate vertices should have higher degree than that of sub-query
 
-        if (fonl.length < subquery.fonl.length || meta.maxDegree() < subquery.maxDegree())
+        if (fonl.length < subquery.fonlValue.length || meta.maxDegree() < subquery.maxDegree())
             return null;
 
         // Find candidates for the key related properties of sub-query
         IntList candidates = candidates(subquery.label, subquery.degree, subquery.tc);
+
+        // If no candidate found for the key then return without result
         if (candidates == null)
             return null;
 
-        IntList[] cIndices = new IntList[subquery.fonl.length + 1];
+        IntList[] cIndices = new IntList[subquery.fonlValue.length + 1];
         cIndices[0] = candidates;
 
         // Iterate over vertices of sub-query and find all of the candidates per one separately.
-        for (int i = 0; i < subquery.fonl.length; i++) {
+        for (int i = 0; i < subquery.fonlValue.length; i++) {
             candidates = candidates(subquery.labels[i], subquery.degrees[i], subquery.vTc[i]);
+
+            // if no candidate found for index i of sub query fonl value then return without result
             if (candidates == null)
                 return null;
             cIndices[i + 1] = candidates;
@@ -71,13 +61,16 @@ public class LabelDegreeTriangleFonlValue extends FonlValue <LabelDegreeTriangle
             selects[k] = cIndices[k].toIntArray();
         }
 
-        int[] indexes = new int[subquery.fonl.length];
+        // This matchIndex will be filled at the end of recursive. It contains the value of the fonls which are matched
+        // index 0 of matchIndex is for key of the subquery
+        // and index 1 of matchIndex is for the index 0 of subquery.fonlValue and so on
+        int[] matchIndex = new int[selects.length];
         Set <int[]> resultSet = new HashSet<>();
         for (int vertexIndex = 0; vertexIndex < selects[0].length; vertexIndex++) {
-            join(0, vertexIndex, indexes, selects, resultSet, key);
+            join(0, vertexIndex, matchIndex, selects, resultSet);
         }
 
-        // Check the connectivity (edges, triangles) to find the true matches
+        // Check the connectivity (edges, triangles) to find the true matchIndices
         if (resultSet.size() == 0)
             return null;
 
@@ -90,10 +83,10 @@ public class LabelDegreeTriangleFonlValue extends FonlValue <LabelDegreeTriangle
      * @param currentVertexIndex the index of current vertex of fonl
      * @param partialMatch the selected indices of the current vertex fonl are maintained here
      * @param selects all the selected indices from the fonl per subquery index
-     * @param resultSet all of the completed matches
+     * @param resultSet all of the completed matchIndices
      */
     private void join(int selectIndex, int currentVertexIndex, int[] partialMatch,
-                      int[][] selects, Set<int[]> resultSet, int key) {
+                      int[][] selects, Set<int[]> resultSet) {
 
         if (selectIndex == selects.length - 1) {
             int[] pMatch = new int[partialMatch.length];
@@ -101,17 +94,13 @@ public class LabelDegreeTriangleFonlValue extends FonlValue <LabelDegreeTriangle
             resultSet.add(pMatch);
             return;
         }
-        int value = currentVertexIndex == -1 ? key : fonl[currentVertexIndex];
-        for (int i = 0; i < selectIndex; i ++) {
-            if (this.fonl[i] == value)
-                return;
-        }
-        partialMatch[selectIndex] = value;
+
+        partialMatch[selectIndex] = currentVertexIndex;
 
         // go to the right index array
         int nextIndex = selectIndex + 1;
         for (int vertexIndex = 0; vertexIndex < selects[nextIndex].length; vertexIndex++) {
-            join(nextIndex, vertexIndex, partialMatch, selects, resultSet, key);
+            join(nextIndex, vertexIndex, partialMatch, selects, resultSet);
         }
     }
 
@@ -142,5 +131,9 @@ public class LabelDegreeTriangleFonlValue extends FonlValue <LabelDegreeTriangle
         }
 
         return list;
+    }
+
+    public int getSource() {
+        return source;
     }
 }

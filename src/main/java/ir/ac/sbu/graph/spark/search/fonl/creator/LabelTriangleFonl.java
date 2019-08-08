@@ -72,7 +72,7 @@ public class LabelTriangleFonl {
                             }
 
                             LabelDegreeTriangleFonlValue value =
-                                    new LabelDegreeTriangleFonlValue(triangleFonlValue.fonl, meta);
+                                    new LabelDegreeTriangleFonlValue(kv._1, triangleFonlValue.fonl, meta);
 
                             return new Tuple2 <>(kv._1, value);
                         }).cache();
