@@ -44,7 +44,7 @@ object KTrussPregel {
         // Load int ir.ac.sbu.graph which is as a list of triangleEdges
         val inputGraph = GraphLoader.edgeListFile(sc, inputPath)
 
-        val partition = inputGraph.triangleEdges.getNumPartitions * P_MULTIPLIER
+        val partition = inputGraph.edges.getNumPartitions * P_MULTIPLIER
 
         // Change direction from lower degree node to a higher node
         // First find degree of each node

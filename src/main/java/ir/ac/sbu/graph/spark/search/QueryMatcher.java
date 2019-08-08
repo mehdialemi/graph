@@ -41,7 +41,7 @@ public class QueryMatcher extends SparkApp {
         TriangleFonl triangleFonl = new TriangleFonl(neighborList);
         LabelTriangleFonl labelTriangleFonl = new LabelTriangleFonl(triangleFonl, labels);
         JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD = labelTriangleFonl.create();
-        PatternDebugUtils.printFonlLabelDegreeTriangleFonlValue(ldtFonlRDD);
+//        PatternDebugUtils.printFonlLabelDegreeTriangleFonlValue(ldtFonlRDD);
 
         Map<QuerySlice, JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>>> sliceMatches = new HashMap<>();
         JavaPairRDD<Integer, Long> matchCounter = ldtFonlRDD.mapValues(v -> 1L);
@@ -108,10 +108,10 @@ public class QueryMatcher extends SparkApp {
 
         querySlice.setProcessed(true);
         sliceMatches.put(querySlice, linkSliceMatch);
-        PatternDebugUtils.printSliceMatch(linkSliceMatch, querySlice.getV());
+//        PatternDebugUtils.printSliceMatch(linkSliceMatch, querySlice.getV());
 
         matchCounter = updateMatchCounter(matchCounter, linkSliceMatch);
-        PatternDebugUtils.printMatchCounter(matchCounter, querySlice.getV());
+//        PatternDebugUtils.printMatchCounter(matchCounter, querySlice.getV());
 
         return matchCounter;
     }
@@ -195,11 +195,10 @@ public class QueryMatcher extends SparkApp {
         SparkAppConf sparkConf = searchConfig.getSparkAppConf();
         sparkConf.init();
 
-
         EdgeLoader edgeLoader = new EdgeLoader(sparkConf);
         JavaPairRDD<Integer, String> labels = getLabels(sparkConf.getSc(),
                 searchConfig.getGraphLabelPath(), sparkConf.getPartitionNum());
-        Query query = Samples.mySampleQuery();
+        Query query = Samples.mySampleEmptyLabel();
 
         QueryMatcher matcher = new QueryMatcher(sparkConf, edgeLoader, labels);
         long count = matcher.search(query);
