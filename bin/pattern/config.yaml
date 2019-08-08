@@ -2,6 +2,6 @@ graphPath: "/graph-data/youtube"
 graphLabelPath: ""
 sampleName: "mySampleEmptyLabel"
 master: "spark://alemi-1:7077"
-partitionNum: 80
-cores: 80
+partitionNum: 12
+cores: 20
 single: false
