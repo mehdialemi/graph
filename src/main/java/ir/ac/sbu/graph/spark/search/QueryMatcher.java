@@ -42,10 +42,9 @@ public class QueryMatcher extends SparkApp {
 
         LabelTriangleFonl labelTriangleFonl = new LabelTriangleFonl(triangleFonl, labels);
         JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD = labelTriangleFonl.create();
-//        PatternDebugUtils.printFonlLabelDegreeTriangleFonlValue(ldtFonlRDD);
+        PatternDebugUtils.printFonlLabelDegreeTriangleFonlValue(ldtFonlRDD);
 
         Map<QuerySlice, JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>>> sliceMatches = new HashMap<>();
-        JavaPairRDD<Integer, Long> matchCounter = ldtFonlRDD.mapValues(v -> 1L);
 
         for (QuerySlice querySlice : querySlices) {
             JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>> sliceMatch;
@@ -67,7 +66,9 @@ public class QueryMatcher extends SparkApp {
                 if (count == 0)
                     return 0;
 
-                matchCounter = update(sliceMatches, matchCounter, querySlice, sliceMatch);
+                querySlice.setProcessed(true);
+                sliceMatches.put(querySlice, sliceMatch);
+                PatternDebugUtils.printSliceMatch(sliceMatch, querySlice.getV());
             }
 
             // find the matchIndices for the links
@@ -78,12 +79,14 @@ public class QueryMatcher extends SparkApp {
                     continue;
 
                 final int fonlValueIndex = link._1;
-                JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>> fonlLeftKeys =
-                        sliceMatch.filter(kv -> kv._2._2().equals(fonlValueIndex))
-                        .distinct();
+                JavaPairRDD<Integer, Iterable<Tuple3<Integer, Integer, Integer>>> fonlLeftKeys =
+                        sliceMatch.filter(kv -> kv._2._2().equals(fonlValueIndex)).groupByKey();
+                PatternDebugUtils.printFonlLeft(fonlLeftKeys);
 
-                JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> fonlSubset =
-                        fonlLeftKeys.join(ldtFonlRDD).mapValues(v -> v._2);
+                JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> fonlSubset = fonlLeftKeys
+                        .join(ldtFonlRDD)
+                        .mapValues(v -> v._2);
+                PatternDebugUtils.printFonlSubset(fonlSubset);
 
                 JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>> linkSliceMatch =
                         findMatchCounts(sparkConf.getSc(), fonlSubset, sliceLink);
@@ -94,38 +97,15 @@ public class QueryMatcher extends SparkApp {
                         ", count: " + count);
                 if (count == 0)
                     return 0;
+                PatternDebugUtils.printLinkSliceMatch(linkSliceMatch);
 
-                matchCounter = update(sliceMatches, matchCounter, querySlice, linkSliceMatch);
+                querySlice.setProcessed(true);
+                sliceMatches.put(querySlice, linkSliceMatch);
+                PatternDebugUtils.printSliceMatch(linkSliceMatch, querySlice.getV());
             }
         }
 
-        return matchCounter.map(kv -> kv._2).reduce(Long::sum);
-    }
-
-    private JavaPairRDD<Integer, Long> update(
-            Map<QuerySlice, JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>>> sliceMatches,
-            JavaPairRDD<Integer, Long> matchCounter, QuerySlice querySlice,
-            JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>> linkSliceMatch) {
-
-        querySlice.setProcessed(true);
-        sliceMatches.put(querySlice, linkSliceMatch);
-//        PatternDebugUtils.printSliceMatch(linkSliceMatch, querySlice.getV());
-
-        matchCounter = updateMatchCounter(matchCounter, linkSliceMatch);
-//        PatternDebugUtils.printMatchCounter(matchCounter, querySlice.getV());
-
-        return matchCounter;
-    }
-
-    private JavaPairRDD<Integer, Long> updateMatchCounter(
-            JavaPairRDD<Integer, Long> matchCounter,
-            JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>> matchCounts) {
-
-        return matchCounts
-                .mapToPair(kv -> new Tuple2<>(kv._2._1(), kv._2._3()))
-                .join(matchCounter)
-                .mapValues(v -> v._1 * v._2)
-                .cache();
+        return 1;
     }
 
     /**
@@ -157,7 +137,13 @@ public class QueryMatcher extends SparkApp {
                     Int2IntOpenHashMap count = new Int2IntOpenHashMap();
                     for (int[] matchIndex : matchIndices) {
                         int index = matchIndex[subquery.linkIndices[i]];
-                        int neighbor = kv._2.fonl[index];
+                        int neighbor;
+                        if (index == -1) {
+                            neighbor = kv._1;
+                        } else {
+                            neighbor = kv._2.fonl[index];
+                        }
+
                         count.addTo(neighbor, 1);
                     }
                     countIndex[i] = count;
@@ -181,9 +167,6 @@ public class QueryMatcher extends SparkApp {
     static JavaPairRDD <Integer, String> getLabels(JavaSparkContext sc, String path, int pNum) {
         if (path.isEmpty()) {
             return null;
-//            List<Tuple2<Integer, String>> list = new ArrayList <>();
-//            list.add(new Tuple2 <>(Integer.MAX_VALUE, "_"));
-//            return sc.parallelizePairs(list);
         }
 
         return sc
@@ -200,7 +183,7 @@ public class QueryMatcher extends SparkApp {
         EdgeLoader edgeLoader = new EdgeLoader(sparkConf);
         JavaPairRDD<Integer, String> labels = getLabels(sparkConf.getSc(),
                 searchConfig.getGraphLabelPath(), sparkConf.getPartitionNum());
-        Query query = Samples.mySampleEmptyLabel();
+        Query query = Samples.mySampleQuery();
 
         QueryMatcher matcher = new QueryMatcher(sparkConf, edgeLoader, labels);
         long count = matcher.search(query);
