@@ -35,11 +35,10 @@ public class GraphIndex {
 
         EdgeLoader edgeLoader = new EdgeLoader(config.getSparkAppConf());
         NeighborList neighborList = new NeighborList(edgeLoader);
-        TriangleFonl triangleFonl = new TriangleFonl(neighborList);
-        JavaPairRDD <Integer, String> labels = loadLabels(neighborList);
-
-        LabelTriangleFonl labelTriangleFonl = new LabelTriangleFonl(triangleFonl, labels);
-        JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD = labelTriangleFonl.create(neighborList);
+        TriangleFonl triangleFonl = new TriangleFonl(config);
+        LabelTriangleFonl labelTriangleFonl = new LabelTriangleFonl(config);
+        JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD =
+                labelTriangleFonl.create(neighborList, triangleFonl);
 
         ldtFonlRDD.saveAsObjectFile(config.getIndexPath());
     }
@@ -58,21 +57,6 @@ public class GraphIndex {
         }
 
         return indexRDD;
-    }
-
-    private JavaPairRDD <Integer, String> loadLabels(NeighborList neighborList) {
-        if (config.getGraphLabelPath() == null || config.getGraphLabelPath().equals("") ||
-                config.getGraphLabelPath().isEmpty()) {
-            return neighborList.getOrCreate().mapValues(v -> "_")
-                    .persist(config.getSparkAppConf().getStorageLevel());
-        }
-
-        return config.getSparkAppConf().getSc()
-                .textFile(config.getGraphLabelPath(), neighborList.getOrCreate().getNumPartitions())
-                .filter(line -> !line.startsWith("#"))
-                .map(line -> line.split("\\s+"))
-                .mapToPair(split -> new Tuple2 <>(Integer.parseInt(split[0]), split[1]))
-                .persist(config.getSparkAppConf().getStorageLevel());
     }
 
     public static void main(String[] args) throws IOException {

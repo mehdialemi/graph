@@ -96,8 +96,7 @@ public class Triangle extends SparkApp {
                         higherDegs[i] = list.get(i - 1).vertex;
 
                     return new Tuple2 <>(v._1, higherDegs);
-                }).repartition(conf.getPartitionNum())
-                .persist(conf.getStorageLevel());
+                }).persist(conf.getStorageLevel());
     }
 
     public JavaPairRDD <Integer, int[]> createFonl() {

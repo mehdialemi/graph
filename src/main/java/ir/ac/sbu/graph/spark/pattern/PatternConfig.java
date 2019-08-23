@@ -5,11 +5,6 @@ import ir.ac.sbu.graph.spark.SparkAppConf;
 import ir.ac.sbu.graph.spark.pattern.index.fonl.value.*;
 import ir.ac.sbu.graph.spark.pattern.query.Subquery;
 import ir.ac.sbu.graph.types.Edge;
-import ir.ac.sbu.graph.types.VertexDeg;
-import it.unimi.dsi.fastutil.Function;
-import it.unimi.dsi.fastutil.ints.Int2IntFunction;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.IntCollection;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -17,10 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class PatternConfig {
     private static final Logger logger = LoggerFactory.getLogger(PatternConfig.class);
@@ -96,6 +88,8 @@ public class PatternConfig {
                         LabelDegreeTriangleMeta.class,
                         TriangleMeta.class,
                         Edge.class,
+                        List.class,
+                        Iterable.class,
                         long[].class,
                         int[].class,
                         String[].class,

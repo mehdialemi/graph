@@ -1,7 +1,7 @@
 package ir.ac.sbu.graph.spark.pattern.index.fonl.creator;
 
 import ir.ac.sbu.graph.spark.NeighborList;
-import ir.ac.sbu.graph.spark.SparkAppConf;
+import ir.ac.sbu.graph.spark.pattern.PatternConfig;
 import ir.ac.sbu.graph.spark.pattern.index.fonl.value.TriangleFonlValue;
 import ir.ac.sbu.graph.spark.triangle.Triangle;
 import ir.ac.sbu.graph.types.Edge;
@@ -15,25 +15,19 @@ import java.util.*;
 
 public class TriangleFonl {
 
-    private NeighborList neighborList;
-    private final SparkAppConf conf;
+    private PatternConfig config;
 
-    public TriangleFonl(NeighborList neighborList) {
-        this.neighborList = neighborList;
-        this.conf = neighborList.getConf();
+    public TriangleFonl(PatternConfig config) {
+        this.config = config;
     }
 
-    public SparkAppConf getConf() {
-        return conf;
-    }
-
-    public JavaPairRDD<Integer, TriangleFonlValue> create() {
+    public JavaPairRDD<Integer, TriangleFonlValue> create(NeighborList neighborList) {
 
         Triangle triangle = new Triangle(neighborList);
         JavaPairRDD<Integer, int[]> fonlRDD = triangle.createFonl();
         JavaPairRDD<Integer, int[]> candidates = triangle.createCandidates(fonlRDD);
 
-        JavaPairRDD<Integer, Iterable<Edge>> triangleInfo = candidates.cogroup(fonlRDD, conf.getPartitionNum())
+        JavaPairRDD<Integer, Iterable<Edge>> triangleInfo = candidates.cogroup(fonlRDD)
                 .flatMapToPair(kv -> {
                     List<Tuple2<Integer, Edge>> output = new ArrayList<>();
 
@@ -69,15 +63,18 @@ public class TriangleFonl {
                     } while (candidateIterator.hasNext());
 
                     return output.iterator();
-                }).groupByKey();
+                }).groupByKey()
+                .persist(config.getSparkAppConf().getStorageLevel());
 
         // update fonlRDD based on triangle information
-        return fonlRDD.leftOuterJoin(triangleInfo, conf.getPartitionNum())
+        return fonlRDD
+                .leftOuterJoin(triangleInfo)
                 .mapValues(value -> {
                     int[] fonl = new int[value._1.length - 1];
                     System.arraycopy(value._1, 1, fonl, 0, fonl.length);
 
                     return new TriangleFonlValue(value._1[0], fonl, value._2.orElse(Collections.emptyList()));
-                }).persist(conf.getStorageLevel());
+                }).repartition(config.getPartitionNum())
+                .persist(config.getSparkAppConf().getStorageLevel());
     }
 }
