@@ -57,7 +57,6 @@ public class TriangleMeta extends Meta {
 
     public int tc() { return tc; }
 
-
     boolean hasEdge(Edge edge) {
         return hasEdge(edge.v1, edge.v2);
     }

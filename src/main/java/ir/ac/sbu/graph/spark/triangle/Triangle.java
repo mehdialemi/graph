@@ -98,7 +98,7 @@ public class Triangle extends SparkApp {
                 higherDegs[i] = list.get(i - 1).vertex;
 
             return new Tuple2<>(v._1, higherDegs);
-        }).persist(StorageLevel.MEMORY_AND_DISK_2());
+        }).persist(conf.getStorageLevel());
     }
 
     public JavaPairRDD<Integer, int[]> createFonl() {
@@ -172,7 +172,7 @@ public class Triangle extends SparkApp {
 
             return output.iterator();
         }).reduceByKey((a, b) -> a + b)
-                .persist(StorageLevel.MEMORY_AND_DISK());
+                .persist(conf.getStorageLevel());
     }
 
     public long triangleCount() {

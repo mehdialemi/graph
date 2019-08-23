@@ -7,6 +7,7 @@ import ir.ac.sbu.graph.utils.Log;
 import it.unimi.dsi.fastutil.ints.*;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.storage.StorageLevel;
 
 import java.io.File;
 import java.util.*;
@@ -21,6 +22,7 @@ public class SparkAppConf {
     protected SparkConf sparkConf;
     protected int cores;
     protected JavaSparkContext sc;
+    private StorageLevel storageLevel = StorageLevel.MEMORY_AND_DISK();
 
     public SparkAppConf() {}
 
@@ -88,5 +90,13 @@ public class SparkAppConf {
 
     public JavaSparkContext getSc() {
         return sc;
+    }
+
+    public StorageLevel getStorageLevel() {
+        return storageLevel;
+    }
+
+    public void setStorageLevel(StorageLevel storageLevel) {
+        this.storageLevel = storageLevel;
     }
 }

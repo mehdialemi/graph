@@ -15,6 +15,8 @@ import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.broadcast.Broadcast;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 import scala.Tuple3;
 
@@ -22,6 +24,7 @@ import java.io.File;
 import java.util.*;
 
 public class QueryMatcher extends SparkApp {
+    private static final Logger logger = LoggerFactory.getLogger(QueryMatcher.class);
     private GraphIndex graphIndex;
     private PatternConfig config;
 
@@ -35,11 +38,10 @@ public class QueryMatcher extends SparkApp {
 
     public long search(Query query) {
         List <QuerySlice> querySlices = query.getQuerySlices();
-        System.out.println("Query: " + query);
+        logger.info("Query: {}", query);
 
         if (querySlices.isEmpty())
             throw new RuntimeException("No query slice found");
-
 
         Map <QuerySlice, JavaPairRDD <Integer, Tuple3 <Integer, Integer, Integer>>> sliceMatches = new HashMap <>();
 
@@ -54,12 +56,14 @@ public class QueryMatcher extends SparkApp {
                 // if there are some unprocessed links, then we can get the result of current query slice from the
                 // map of computed matches.
                 sliceMatch = sliceMatches.get(querySlice);
-                System.out.println("retrieve match count from the sliceMatch, for vertex: " + querySlice.getV());
-            } else { // if the current query slice is not processed, then it should be processed
-                sliceMatch = findMatchCounts(config.getSparkAppConf().getSc(), querySlice, graphIndex.indexRDD());
+                logger.info("retrieve match count from the sliceMatch, for vertex: {}", querySlice.getV());
 
+            } else { // if the current query slice is not processed, then it should be processed
+
+                sliceMatch = findMatchCounts(config.getSparkAppConf().getSc(), querySlice, graphIndex.indexRDD());
                 long count = sliceMatch.count();
-                System.out.println("slice match count: " + count + ", for vertex: " + querySlice.getV());
+
+                logger.info("slice match count: {}, for vertex: {}", count, querySlice.getV());
                 if (count == 0)
                     return 0;
 
@@ -90,10 +94,10 @@ public class QueryMatcher extends SparkApp {
 
                 // if nothing matched then no match exist
                 long count = linkSliceMatch.count();
-                System.out.println("link match, parent: " + querySlice.getV() + ", link: " + sliceLink.getV() +
-                        ", count: " + count);
+                logger.info("link match, parent: {}, link: {}, count: {}", querySlice.getV(), sliceLink.getV(), count);
                 if (count == 0)
                     return 0;
+
                 PatternDebugUtils.printLinkSliceMatch(linkSliceMatch);
 
                 querySlice.setProcessed(true);
@@ -168,12 +172,9 @@ public class QueryMatcher extends SparkApp {
             conf = ConfigFactory.parseFile(new File(args[0]));
 
         PatternConfig config = new PatternConfig(conf);
-        System.out.println("loading config .... ");
-        System.out.println(config);
-
         Query querySample = QuerySamples.getSample(config.getQuerySample());
         QueryMatcher matcher = new QueryMatcher(config);
         long count = matcher.search(querySample);
-        System.out.println("final match count: " + count);
+        logger.info("final match count:{} ", count);
     }
 }

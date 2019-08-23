@@ -1,14 +1,9 @@
 package ir.ac.sbu.graph.spark;
 
-import ir.ac.sbu.graph.types.Edge;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
-
-import static ir.ac.sbu.graph.utils.Log.log;
 
 /**
  * Create and maintain neighbor list such that each item is a key-value which key is vertex id and
@@ -45,7 +40,7 @@ public class NeighborList extends SparkApp {
                 set.add(v.intValue());
             }
             return new Tuple2<>(t._1, set.toIntArray());
-        }).persist(StorageLevel.MEMORY_AND_DISK());
+        }).persist(conf.getStorageLevel());
     }
 
     public long getEdgeCount() {

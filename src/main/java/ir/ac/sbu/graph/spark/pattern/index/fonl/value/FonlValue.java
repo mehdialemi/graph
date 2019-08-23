@@ -1,8 +1,9 @@
 package ir.ac.sbu.graph.spark.pattern.index.fonl.value;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public class FonlValue<T extends Meta> {
+public class FonlValue<T extends Meta> implements Serializable {
     public T meta;
     public int[] fonl;
 

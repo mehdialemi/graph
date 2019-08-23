@@ -1,12 +1,12 @@
 package ir.ac.sbu.graph.spark.pattern.index.fonl.creator;
 
+import ir.ac.sbu.graph.spark.SparkAppConf;
 import ir.ac.sbu.graph.spark.pattern.index.fonl.value.LabelDegreeTriangleFonlValue;
 import ir.ac.sbu.graph.spark.pattern.index.fonl.value.LabelDegreeTriangleMeta;
 import ir.ac.sbu.graph.spark.pattern.index.fonl.value.TriangleFonlValue;
 import it.unimi.dsi.fastutil.ints.Int2IntAVLTreeMap;
 import it.unimi.dsi.fastutil.ints.Int2IntSortedMap;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 import scala.Tuple3;
 
@@ -16,10 +16,11 @@ import java.util.List;
 public class LabelTriangleFonl {
 
     private final TriangleFonl triangleFonl;
-    private JavaPairRDD <Integer, String> labelRDD;
+    private final SparkAppConf conf;
+    private final JavaPairRDD <Integer, String> labelRDD;
 
     public LabelTriangleFonl(TriangleFonl triangleFonl, JavaPairRDD <Integer, String> labelRDD) {
-
+        this.conf = triangleFonl.getConf();
         this.triangleFonl = triangleFonl;
         this.labelRDD = labelRDD;
     }
@@ -27,9 +28,6 @@ public class LabelTriangleFonl {
     public JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> create() {
         JavaPairRDD <Integer, TriangleFonlValue> triangleFonlRDD = triangleFonl.create();
 
-        if (this.labelRDD == null) {
-            this.labelRDD = triangleFonl.getNeighborRDD().mapValues(v -> "_");
-        }
         // make an RDD containing degree and labels of each vertex
         JavaPairRDD <Integer, Tuple2 <int[], String>> neighborLabelRDD = triangleFonl
                 .getNeighborRDD()
@@ -48,11 +46,11 @@ public class LabelTriangleFonl {
                     // add itself
                     out.add(new Tuple2 <>(kv._1, neighborDegreeLabel));
                     return out.iterator();
-                }).groupByKey(triangleFonlRDD.getNumPartitions());
+                }).groupByKey(conf.getPartitionNum());
 
         JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD =
                 triangleFonlRDD
-                        .join(degreeLabelMessage, triangleFonlRDD.getNumPartitions())
+                        .join(degreeLabelMessage, conf.getPartitionNum())
                         .mapToPair(kv -> {
                             TriangleFonlValue triangleFonlValue = kv._2._1;
                             Int2IntSortedMap v2Index = new Int2IntAVLTreeMap();
@@ -79,8 +77,8 @@ public class LabelTriangleFonl {
 
                             return new Tuple2 <>(kv._1, value);
                         })
-                        .repartition(triangleFonlRDD.getNumPartitions())
-                        .persist(StorageLevel.MEMORY_AND_DISK());
+                        .repartition(conf.getPartitionNum())
+                        .persist(conf.getStorageLevel());
 
         return ldtFonlRDD;
     }

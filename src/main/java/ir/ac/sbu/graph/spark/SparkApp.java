@@ -15,6 +15,10 @@ public class SparkApp {
         this.conf = sparkApp.conf;
     }
 
+    public SparkAppConf getConf() {
+        return conf;
+    }
+
     public void close() {
         this.conf.getSc().close();
     }

@@ -1,6 +1,7 @@
 package ir.ac.sbu.graph.spark.pattern.index.fonl.creator;
 
 import ir.ac.sbu.graph.spark.NeighborList;
+import ir.ac.sbu.graph.spark.SparkAppConf;
 import ir.ac.sbu.graph.spark.pattern.index.fonl.value.TriangleFonlValue;
 import ir.ac.sbu.graph.spark.triangle.Triangle;
 import ir.ac.sbu.graph.types.Edge;
@@ -8,7 +9,6 @@ import ir.ac.sbu.graph.utils.OrderedNeighborList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntListIterator;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.util.*;
@@ -17,9 +17,15 @@ public class TriangleFonl {
 
     private NeighborList neighborList;
     private JavaPairRDD<Integer, int[]> neighborRDD;
+    private final SparkAppConf conf;
 
     public TriangleFonl(NeighborList neighborList) {
         this.neighborList = neighborList;
+        this.conf = neighborList.getConf();
+    }
+
+    public SparkAppConf getConf() {
+        return conf;
     }
 
     public JavaPairRDD<Integer, int[]> getNeighborRDD() {
@@ -33,7 +39,7 @@ public class TriangleFonl {
         JavaPairRDD<Integer, int[]> fonlRDD = triangle.createFonl();
         JavaPairRDD<Integer, int[]> candidates = triangle.createCandidates(fonlRDD);
 
-        JavaPairRDD<Integer, Iterable<Edge>> triangleInfo = candidates.cogroup(fonlRDD, fonlRDD.getNumPartitions())
+        JavaPairRDD<Integer, Iterable<Edge>> triangleInfo = candidates.cogroup(fonlRDD, conf.getPartitionNum())
                 .flatMapToPair(kv -> {
                     List<Tuple2<Integer, Edge>> output = new ArrayList<>();
 
@@ -72,12 +78,12 @@ public class TriangleFonl {
                 }).groupByKey();
 
         // update fonlRDD based on triangle information
-        return fonlRDD.leftOuterJoin(triangleInfo, fonlRDD.getNumPartitions())
+        return fonlRDD.leftOuterJoin(triangleInfo, conf.getPartitionNum())
                 .mapValues(value -> {
                     int[] fonl = new int[value._1.length - 1];
                     System.arraycopy(value._1, 1, fonl, 0, fonl.length);
 
                     return new TriangleFonlValue(value._1[0], fonl, value._2.orElse(Collections.emptyList()));
-                }).persist(StorageLevel.MEMORY_AND_DISK());
+                }).persist(conf.getStorageLevel());
     }
 }
