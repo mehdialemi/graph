@@ -50,7 +50,7 @@ public class LocalCC extends SparkApp {
         EdgeLoader edgeLoader = new EdgeLoader(conf);
         NeighborList neighborList = new NeighborList(edgeLoader);
 
-        LocalCC lcc = new LocalCC(new Triangle(neighborList, neighborList.getOrCreate()));
+        LocalCC lcc = new LocalCC(new Triangle(neighborList));
         lcc.generateLcc();
 
         long t2 = System.currentTimeMillis();

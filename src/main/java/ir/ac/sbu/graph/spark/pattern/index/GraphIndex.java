@@ -39,7 +39,7 @@ public class GraphIndex {
         JavaPairRDD <Integer, String> labels = loadLabels(neighborList);
 
         LabelTriangleFonl labelTriangleFonl = new LabelTriangleFonl(triangleFonl, labels);
-        JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD = labelTriangleFonl.create();
+        JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD = labelTriangleFonl.create(neighborList);
 
         ldtFonlRDD.saveAsObjectFile(config.getIndexPath());
     }
@@ -61,7 +61,8 @@ public class GraphIndex {
     }
 
     private JavaPairRDD <Integer, String> loadLabels(NeighborList neighborList) {
-        if (config.getGraphLabelPath().isEmpty()) {
+        if (config.getGraphLabelPath() == null || config.getGraphLabelPath().equals("") ||
+                config.getGraphLabelPath().isEmpty()) {
             return neighborList.getOrCreate().mapValues(v -> "_")
                     .persist(config.getSparkAppConf().getStorageLevel());
         }

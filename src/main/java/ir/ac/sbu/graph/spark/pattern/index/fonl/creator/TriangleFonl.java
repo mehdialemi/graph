@@ -16,7 +16,6 @@ import java.util.*;
 public class TriangleFonl {
 
     private NeighborList neighborList;
-    private JavaPairRDD<Integer, int[]> neighborRDD;
     private final SparkAppConf conf;
 
     public TriangleFonl(NeighborList neighborList) {
@@ -28,14 +27,9 @@ public class TriangleFonl {
         return conf;
     }
 
-    public JavaPairRDD<Integer, int[]> getNeighborRDD() {
-        return neighborRDD;
-    }
-
     public JavaPairRDD<Integer, TriangleFonlValue> create() {
 
-        neighborRDD = neighborList.getOrCreate();
-        Triangle triangle = new Triangle(neighborList, neighborRDD);
+        Triangle triangle = new Triangle(neighborList);
         JavaPairRDD<Integer, int[]> fonlRDD = triangle.createFonl();
         JavaPairRDD<Integer, int[]> candidates = triangle.createCandidates(fonlRDD);
 

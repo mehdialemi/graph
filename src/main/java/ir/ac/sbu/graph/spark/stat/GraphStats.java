@@ -44,7 +44,7 @@ public class GraphStats extends SparkApp {
         Long maxDeg = degs.reduce((a, b) -> Math.max(a, b));
         statMap.put("MaxDeg", "" + maxDeg);
 
-        Triangle triangle = new Triangle(neighborList, neighborList.getOrCreate());
+        Triangle triangle = new Triangle(neighborList);
         long tc = triangle.triangleCount();
         statMap.put("TC", "" + tc);
 

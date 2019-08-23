@@ -22,18 +22,23 @@ public class SparkAppConf {
     protected SparkConf sparkConf;
     protected int cores;
     protected JavaSparkContext sc;
-    private StorageLevel storageLevel = StorageLevel.MEMORY_AND_DISK();
+    private final StorageLevel storageLevel;
 
-    public SparkAppConf() {}
+    public SparkAppConf() {
+        storageLevel = StorageLevel.MEMORY_AND_DISK();
+    }
 
     public SparkAppConf(SparkAppConf conf) {
         this.graphInputPath = conf.graphInputPath;
         this.cores = conf.cores;
+        storageLevel = StorageLevel.MEMORY_AND_DISK();
     }
+
     public SparkAppConf (ArgumentReader argumentReader) {
         graphInputPath = argumentReader.nextString("/home/mehdi/graph-data/com-youtube.ungraph.txt");
         cores = argumentReader.nextInt(2);
         partitionNum = argumentReader.nextInt(4);
+        storageLevel = StorageLevel.MEMORY_AND_DISK();
     }
 
     protected String createAppName() {
@@ -92,11 +97,7 @@ public class SparkAppConf {
         return sc;
     }
 
-    public StorageLevel getStorageLevel() {
+    public final StorageLevel getStorageLevel() {
         return storageLevel;
-    }
-
-    public void setStorageLevel(StorageLevel storageLevel) {
-        this.storageLevel = storageLevel;
     }
 }

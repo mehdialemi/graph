@@ -27,7 +27,7 @@ public class GlobalCC extends SparkApp {
         conf.init();
 
         NeighborList neighborList = new NeighborList(new EdgeLoader(conf));
-        GlobalCC gcc = new GlobalCC(new Triangle(neighborList, neighborList.getOrCreate()));
+        GlobalCC gcc = new GlobalCC(new Triangle(neighborList));
         long t2 = System.currentTimeMillis();
         log("GCC: " + gcc.getGCC(), t1, t2);
 

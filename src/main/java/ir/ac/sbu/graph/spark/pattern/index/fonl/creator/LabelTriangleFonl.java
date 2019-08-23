@@ -1,5 +1,6 @@
 package ir.ac.sbu.graph.spark.pattern.index.fonl.creator;
 
+import ir.ac.sbu.graph.spark.NeighborList;
 import ir.ac.sbu.graph.spark.SparkAppConf;
 import ir.ac.sbu.graph.spark.pattern.index.fonl.value.LabelDegreeTriangleFonlValue;
 import ir.ac.sbu.graph.spark.pattern.index.fonl.value.LabelDegreeTriangleMeta;
@@ -25,18 +26,15 @@ public class LabelTriangleFonl {
         this.labelRDD = labelRDD;
     }
 
-    public JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> create() {
+    public JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> create(NeighborList neighborList) {
         JavaPairRDD <Integer, TriangleFonlValue> triangleFonlRDD = triangleFonl.create();
 
         // make an RDD containing degree and labels of each vertex
-        JavaPairRDD <Integer, Tuple2 <int[], String>> neighborLabelRDD = triangleFonl
-                .getNeighborRDD()
+        JavaPairRDD <Integer, int[]> neighborRDD = neighborList.getOrCreate();
+        JavaPairRDD <Integer, Iterable <Tuple3 <Integer, Integer, String>>> degreeLabelMessage = neighborRDD
                 .leftOuterJoin(labelRDD)
-                .mapValues(v -> new Tuple2 <>(v._1, v._2.or("_")));
-
-        // broadcast vertex label and degree to its fonl neighbors
-        JavaPairRDD <Integer, Iterable <Tuple3 <Integer, Integer, String>>> degreeLabelMessage =
-                neighborLabelRDD.flatMapToPair(kv -> {
+                .mapValues(v -> new Tuple2 <>(v._1, v._2.or("_")))
+                .flatMapToPair(kv -> {
 
                     List <Tuple2 <Integer, Tuple3 <Integer, Integer, String>>> out = new ArrayList <>();
                     Tuple3 <Integer, Integer, String> neighborDegreeLabel = new Tuple3 <>(kv._1, kv._2._1.length, kv._2._2);
@@ -47,6 +45,10 @@ public class LabelTriangleFonl {
                     out.add(new Tuple2 <>(kv._1, neighborDegreeLabel));
                     return out.iterator();
                 }).groupByKey(conf.getPartitionNum());
+        ;
+
+        // broadcast vertex label and degree to its fonl neighbors
+
 
         JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD =
                 triangleFonlRDD

@@ -176,7 +176,7 @@ public class KTrussTSet extends SparkApp {
 
         JavaPairRDD <Integer, int[]> kcNeighbors = kCore.perform(neighbors, ktConf.getKc());
 
-        Triangle triangle = new Triangle(this);
+        Triangle triangle = new Triangle(neighborList);
 
         JavaPairRDD <Integer, int[]> fonl = triangle.createFonl(kcNeighbors);
 

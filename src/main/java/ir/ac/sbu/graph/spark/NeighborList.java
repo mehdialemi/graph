@@ -12,7 +12,7 @@ import scala.Tuple2;
 public class NeighborList extends SparkApp {
 
     private EdgeLoader edgeLoader;
-    protected JavaPairRDD<Integer, int[]> neighbors;
+    protected JavaPairRDD <Integer, int[]> neighbors;
     private long edgeCount;
     private long vertexCount;
 
@@ -25,7 +25,7 @@ public class NeighborList extends SparkApp {
         this.edgeLoader = edgeLoader;
     }
 
-    public JavaPairRDD<Integer, int[]> getOrCreate() {
+    public JavaPairRDD <Integer, int[]> getOrCreate() {
         if (neighbors == null) {
             JavaPairRDD <Integer, Integer> edges = edgeLoader.create();
             neighbors = createNeighbors(edges);
@@ -34,13 +34,14 @@ public class NeighborList extends SparkApp {
     }
 
     private JavaPairRDD <Integer, int[]> createNeighbors(JavaPairRDD <Integer, Integer> edges) {
-        return edges.groupByKey(conf.getPartitionNum()).mapToPair(t -> {
-            IntSet set = new IntOpenHashSet();
-            for (Integer v : t._2) {
-                set.add(v.intValue());
-            }
-            return new Tuple2<>(t._1, set.toIntArray());
-        }).persist(conf.getStorageLevel());
+        return edges.groupByKey(conf.getPartitionNum())
+                .mapToPair(t -> {
+                    IntSet set = new IntOpenHashSet();
+                    for (Integer v : t._2) {
+                        set.add(v.intValue());
+                    }
+                    return new Tuple2 <>(t._1, set.toIntArray());
+                }).persist(conf.getStorageLevel());
     }
 
     public long getEdgeCount() {
