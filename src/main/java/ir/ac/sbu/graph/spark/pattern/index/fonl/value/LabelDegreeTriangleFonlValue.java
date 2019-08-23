@@ -1,6 +1,6 @@
-package ir.ac.sbu.graph.spark.search.fonl.value;
+package ir.ac.sbu.graph.spark.pattern.index.fonl.value;
 
-import ir.ac.sbu.graph.spark.search.patterns.Subquery;
+import ir.ac.sbu.graph.spark.pattern.query.Subquery;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 

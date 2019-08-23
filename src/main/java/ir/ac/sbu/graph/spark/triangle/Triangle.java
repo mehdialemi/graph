@@ -155,7 +155,7 @@ public class Triangle extends SparkApp {
                 if (intersects == null)
                     continue;
 
-                IntListIterator iter = intersects.intListIterator();
+                IntListIterator iter = intersects.listIterator();
                 while (iter.hasNext()) {
                     int w = iter.nextInt();
                     output.add(new Tuple2 <>(w, 1));
@@ -179,6 +179,4 @@ public class Triangle extends SparkApp {
         Long tc3 = getVertexTC().map(kv -> Long.valueOf(kv._2)).reduce((a, b) -> a + b);
         return tc3 / 3;
     }
-
-
 }

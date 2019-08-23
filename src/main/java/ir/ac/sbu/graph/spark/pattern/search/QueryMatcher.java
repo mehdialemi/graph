@@ -1,13 +1,16 @@
-package ir.ac.sbu.graph.spark.search;
+package ir.ac.sbu.graph.spark.pattern.search;
 
-import ir.ac.sbu.graph.spark.EdgeLoader;
-import ir.ac.sbu.graph.spark.NeighborList;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import ir.ac.sbu.graph.spark.SparkApp;
-import ir.ac.sbu.graph.spark.SparkAppConf;
-import ir.ac.sbu.graph.spark.search.fonl.creator.LabelTriangleFonl;
-import ir.ac.sbu.graph.spark.search.fonl.creator.TriangleFonl;
-import ir.ac.sbu.graph.spark.search.fonl.value.LabelDegreeTriangleFonlValue;
-import ir.ac.sbu.graph.spark.search.patterns.*;
+import ir.ac.sbu.graph.spark.pattern.PatternConfig;
+import ir.ac.sbu.graph.spark.pattern.index.GraphIndex;
+import ir.ac.sbu.graph.spark.pattern.index.fonl.value.LabelDegreeTriangleFonlValue;
+import ir.ac.sbu.graph.spark.pattern.query.Query;
+import ir.ac.sbu.graph.spark.pattern.query.QuerySlice;
+import ir.ac.sbu.graph.spark.pattern.query.Subquery;
+import ir.ac.sbu.graph.spark.pattern.utils.PatternDebugUtils;
+import ir.ac.sbu.graph.spark.pattern.utils.QuerySamples;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -15,39 +18,33 @@ import org.apache.spark.broadcast.Broadcast;
 import scala.Tuple2;
 import scala.Tuple3;
 
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.util.*;
 
 public class QueryMatcher extends SparkApp {
-    private SparkAppConf sparkConf;
-    private EdgeLoader edgeLoader;
-    private JavaPairRDD<Integer, String> labels;
+    private GraphIndex graphIndex;
+    private PatternConfig config;
 
-    public QueryMatcher(SparkAppConf sparkConf, EdgeLoader edgeLoader,
-                        JavaPairRDD<Integer, String> labels) {
-        super(edgeLoader);
-        this.sparkConf = sparkConf;
-        this.edgeLoader = edgeLoader;
-        this.labels = labels;
+    public QueryMatcher(PatternConfig config) {
+        super(config.getSparkAppConf());
+        this.config = config;
+
+        this.graphIndex = new GraphIndex(config);
+        this.graphIndex.indexRDD(); // load index rdd for the first time
     }
 
     public long search(Query query) {
-        List<QuerySlice> querySlices = query.getQuerySlices();
+        List <QuerySlice> querySlices = query.getQuerySlices();
         System.out.println("Query: " + query);
+
         if (querySlices.isEmpty())
             throw new RuntimeException("No query slice found");
 
-        NeighborList neighborList = new NeighborList(edgeLoader);
-        TriangleFonl triangleFonl = new TriangleFonl(neighborList);
 
-        LabelTriangleFonl labelTriangleFonl = new LabelTriangleFonl(triangleFonl, labels);
-        JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD = labelTriangleFonl.create();
-        PatternDebugUtils.printFonlLabelDegreeTriangleFonlValue(ldtFonlRDD);
-
-        Map<QuerySlice, JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>>> sliceMatches = new HashMap<>();
+        Map <QuerySlice, JavaPairRDD <Integer, Tuple3 <Integer, Integer, Integer>>> sliceMatches = new HashMap <>();
 
         for (QuerySlice querySlice : querySlices) {
-            JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>> sliceMatch;
+            JavaPairRDD <Integer, Tuple3 <Integer, Integer, Integer>> sliceMatch;
 
             if (querySlice.isProcessed()) {
                 // if the current query slice and all of its links are processed then there are nothing to do
@@ -59,7 +56,7 @@ public class QueryMatcher extends SparkApp {
                 sliceMatch = sliceMatches.get(querySlice);
                 System.out.println("retrieve match count from the sliceMatch, for vertex: " + querySlice.getV());
             } else { // if the current query slice is not processed, then it should be processed
-                sliceMatch = findMatchCounts(sparkConf.getSc(), ldtFonlRDD, querySlice);
+                sliceMatch = findMatchCounts(config.getSparkAppConf().getSc(), querySlice, graphIndex.indexRDD());
 
                 long count = sliceMatch.count();
                 System.out.println("slice match count: " + count + ", for vertex: " + querySlice.getV());
@@ -72,24 +69,24 @@ public class QueryMatcher extends SparkApp {
             }
 
             // find the matchIndices for the links
-            for (Tuple2<Integer, QuerySlice> link : querySlice.getLinks()) {
+            for (Tuple2 <Integer, QuerySlice> link : querySlice.getLinks()) {
 
                 QuerySlice sliceLink = link._2;
                 if (sliceLink.isProcessed())
                     continue;
 
                 final int fonlValueIndex = link._1;
-                JavaPairRDD<Integer, Iterable<Tuple3<Integer, Integer, Integer>>> fonlLeftKeys =
+                JavaPairRDD <Integer, Iterable <Tuple3 <Integer, Integer, Integer>>> fonlLeftKeys =
                         sliceMatch.filter(kv -> kv._2._2().equals(fonlValueIndex)).groupByKey();
                 PatternDebugUtils.printFonlLeft(fonlLeftKeys);
 
-                JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> fonlSubset = fonlLeftKeys
-                        .join(ldtFonlRDD)
+                JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> indexSubset = fonlLeftKeys
+                        .join(graphIndex.indexRDD())
                         .mapValues(v -> v._2);
-                PatternDebugUtils.printFonlSubset(fonlSubset);
+                PatternDebugUtils.printFonlSubset(indexSubset);
 
-                JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>> linkSliceMatch =
-                        findMatchCounts(sparkConf.getSc(), fonlSubset, sliceLink);
+                JavaPairRDD <Integer, Tuple3 <Integer, Integer, Integer>> linkSliceMatch =
+                        findMatchCounts(config.getSparkAppConf().getSc(), sliceLink, indexSubset);
 
                 // if nothing matched then no match exist
                 long count = linkSliceMatch.count();
@@ -110,26 +107,27 @@ public class QueryMatcher extends SparkApp {
 
     /**
      * find matches based on the given ldtFonlRdd and querySlice.
-     * @param sc is used to broadcast subquery
-     * @param ldtFonlRDD base data to find matches
-     * @param querySlice the current query part to create subquery
+     *
+     * @param sc         is used to broadcast subquery
+     * @param querySlice the current query part to constructIndex subquery
      * @return key-values => (key: vertex, Tuple3<>(value: source fonl key, linkIndex, count of matches for the key))
      */
-    private JavaPairRDD<Integer, Tuple3<Integer, Integer, Integer>> findMatchCounts(
-            final JavaSparkContext sc, final JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD,
-            QuerySlice querySlice) {
+    private JavaPairRDD <Integer, Tuple3 <Integer, Integer, Integer>> findMatchCounts(
+            final JavaSparkContext sc, QuerySlice querySlice,
+            JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> indexRDD) {
 
-        Broadcast<Subquery> broadcast = sc.broadcast(querySlice.subquery());
-        return ldtFonlRDD.flatMapToPair(kv -> {
+        Broadcast <Subquery> broadcast = sc.broadcast(querySlice.subquery());
+        return indexRDD.flatMapToPair(kv -> {
+
             // get the subquery from the broadcast data
             Subquery subquery = broadcast.getValue();
 
             // get all of the matches for the current subquery
-            Set<int[]> matchIndices = kv._2.matchIndices(subquery);
+            Set <int[]> matchIndices = kv._2.matchIndices(subquery);
             if (matchIndices == null)
                 return Collections.emptyIterator();
 
-            List<Tuple2<Integer, Tuple3<Integer, Integer, Integer>>> out = new ArrayList<>();
+            List <Tuple2 <Integer, Tuple3 <Integer, Integer, Integer>>> out = new ArrayList <>();
 
             if (subquery.linkIndices.length > 0) {
                 Int2IntOpenHashMap[] countIndex = new Int2IntOpenHashMap[subquery.linkIndices.length];
@@ -151,44 +149,31 @@ public class QueryMatcher extends SparkApp {
 
                 for (int i = 0; i < countIndex.length; i++) {
                     Int2IntOpenHashMap count = countIndex[i];
-                    for (Map.Entry<Integer, Integer> entry : count.entrySet()) {
-                        out.add(new Tuple2<>(entry.getKey(),
-                                new Tuple3<>(kv._2.getSource(), subquery.linkIndices[i], entry.getValue())));
+                    for (Map.Entry <Integer, Integer> entry : count.entrySet()) {
+                        out.add(new Tuple2 <>(entry.getKey(),
+                                new Tuple3 <>(kv._2.getSource(), subquery.linkIndices[i], entry.getValue())));
                     }
                 }
             } else {
-                out.add(new Tuple2<>(kv._1, new Tuple3<>(kv._2.getSource(), 0, matchIndices.size())));
+                out.add(new Tuple2 <>(kv._1, new Tuple3 <>(kv._2.getSource(), 0, matchIndices.size())));
             }
 
             return out.iterator();
         }).cache();
     }
 
-    static JavaPairRDD <Integer, String> getLabels(JavaSparkContext sc, String path, int pNum) {
-        if (path.isEmpty()) {
-            return null;
-        }
+    public static void main(String[] args) {
+        Config conf = ConfigFactory.load();
+        if (args.length == 0)
+            conf = ConfigFactory.parseFile(new File(args[0]));
 
-        return sc
-                .textFile(path, pNum)
-                .map(line -> line.split("\\s+"))
-                .mapToPair(split -> new Tuple2 <>(Integer.parseInt(split[0]), split[1]));
-    }
+        PatternConfig config = new PatternConfig(conf);
+        System.out.println("loading config .... ");
+        System.out.println(config);
 
-    public static void main(String[] args) throws FileNotFoundException {
-        SearchConfig searchConfig = SearchConfig.load(args[0]);
-        SparkAppConf sparkConf = searchConfig.getSparkAppConf();
-        sparkConf.init();
-
-        EdgeLoader edgeLoader = new EdgeLoader(sparkConf);
-        JavaPairRDD<Integer, String> labels = getLabels(sparkConf.getSc(),
-                searchConfig.getGraphLabelPath(), sparkConf.getPartitionNum());
-        Query query = Samples.mySampleEmptyLabel();
-
-        QueryMatcher matcher = new QueryMatcher(sparkConf, edgeLoader, labels);
-        long count = matcher.search(query);
+        Query querySample = QuerySamples.getSample(config.getQuerySample());
+        QueryMatcher matcher = new QueryMatcher(config);
+        long count = matcher.search(querySample);
         System.out.println("final match count: " + count);
     }
-
-
 }

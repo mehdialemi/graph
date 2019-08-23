@@ -1,7 +1,0 @@
-graphPath: "bin/pattern/input1-edges.txt"
-graphLabelPath: "bin/pattern/input1-labels.txt"
-sampleName: "mySample"
-master: "local[2]"
-partitionNum: 10
-cores: 2
-single: true

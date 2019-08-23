@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.spark.search.patterns;
+package ir.ac.sbu.graph.spark.pattern.query;
 
 import ir.ac.sbu.graph.types.Edge;
 import it.unimi.dsi.fastutil.ints.*;
@@ -11,7 +11,7 @@ public class Query {
 
     public Query(Map<Integer, List<Integer>> neighbors,  Map <Integer, String> labelMap) {
 
-        // init: create edge set and store degrees in a map
+        // init: constructIndex edge set and store degrees in a map
         Set<Edge> edges = new HashSet<>();
         final Int2IntOpenHashMap degrees = new Int2IntOpenHashMap();
         for (Map.Entry<Integer, List<Integer>> entry : neighbors.entrySet()) {
@@ -21,7 +21,7 @@ public class Query {
             }
         }
 
-        // create fonl
+        // constructIndex fonl
         Int2ObjectMap<IntSet> fonl = new Int2ObjectOpenHashMap<>();
         for (Map.Entry<Integer, List<Integer>> entry : neighbors.entrySet()) {
             IntSortedSet fonlValue = new IntAVLTreeSet((v1, v2) -> {
@@ -43,7 +43,7 @@ public class Query {
             fonl.put(v, fonlValue);
         }
 
-        // find triangles and create list of triangles per vertex
+        // find triangles and constructIndex list of triangles per vertex
         Int2ObjectMap<List<Triangle>> triangles = new Int2ObjectOpenHashMap<>();
         for (Map.Entry<Integer, IntSet> entry : fonl.entrySet()) {
             int u = entry.getKey();

@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.spark.search.fonl.value;
+package ir.ac.sbu.graph.spark.pattern.index.fonl.value;
 
 import ir.ac.sbu.graph.types.Edge;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;

@@ -1,6 +1,6 @@
-package ir.ac.sbu.graph.spark.search.patterns;
+package ir.ac.sbu.graph.spark.pattern.utils;
 
-import ir.ac.sbu.graph.spark.search.fonl.value.LabelDegreeTriangleFonlValue;
+import ir.ac.sbu.graph.spark.pattern.index.fonl.value.LabelDegreeTriangleFonlValue;
 import org.apache.spark.api.java.JavaPairRDD;
 import scala.Tuple2;
 import scala.Tuple3;

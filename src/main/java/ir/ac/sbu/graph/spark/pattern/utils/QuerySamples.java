@@ -1,11 +1,20 @@
-package ir.ac.sbu.graph.spark.search.patterns;
+package ir.ac.sbu.graph.spark.pattern.utils;
+
+import ir.ac.sbu.graph.spark.pattern.query.Query;
 
 import java.util.*;
 
-public class Samples {
+public class QuerySamples {
 
+    public static Query getSample(String name) {
+        switch (name) {
+            case "sample1": return simple1();
+            case "sample2" : return simple2();
+        }
+        throw new RuntimeException("Invalid query sample name: " + name);
+    }
 
-    public static Query mySampleQuery() {
+    private static Query simple1() {
         Map<Integer, List<Integer>> neighbors = new HashMap<>();
         neighbors.put(1, Arrays.asList(4, 2, 3));
         neighbors.put(2, Arrays.asList(3, 1));
@@ -21,7 +30,7 @@ public class Samples {
         return new Query(neighbors, labelMap);
     }
 
-    public static Query mySampleEmptyLabel() {
+    private static Query simple2() {
         Map<Integer, List<Integer>> neighbors = new HashMap<>();
         neighbors.put(1, Arrays.asList(4, 2, 3));
         neighbors.put(2, Arrays.asList(3, 1));

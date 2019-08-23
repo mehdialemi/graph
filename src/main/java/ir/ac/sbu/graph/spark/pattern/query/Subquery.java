@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.spark.search.patterns;
+package ir.ac.sbu.graph.spark.pattern.query;
 
 import scala.Serializable;
 import scala.Tuple2;

@@ -1,7 +1,7 @@
-package ir.ac.sbu.graph.spark.search.fonl.creator;
+package ir.ac.sbu.graph.spark.pattern.index.fonl.creator;
 
 import ir.ac.sbu.graph.spark.NeighborList;
-import ir.ac.sbu.graph.spark.search.fonl.value.TriangleFonlValue;
+import ir.ac.sbu.graph.spark.pattern.index.fonl.value.TriangleFonlValue;
 import ir.ac.sbu.graph.spark.triangle.Triangle;
 import ir.ac.sbu.graph.types.Edge;
 import ir.ac.sbu.graph.utils.OrderedNeighborList;

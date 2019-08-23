@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.spark.search.patterns;
+package ir.ac.sbu.graph.spark.pattern.query;
 
 public class Triangle {
     private final int v1;

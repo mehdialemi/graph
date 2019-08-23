@@ -1,8 +1,8 @@
-package ir.ac.sbu.graph.spark.search.fonl.creator;
+package ir.ac.sbu.graph.spark.pattern.index.fonl.creator;
 
-import ir.ac.sbu.graph.spark.search.fonl.value.LabelDegreeTriangleFonlValue;
-import ir.ac.sbu.graph.spark.search.fonl.value.LabelDegreeTriangleMeta;
-import ir.ac.sbu.graph.spark.search.fonl.value.TriangleFonlValue;
+import ir.ac.sbu.graph.spark.pattern.index.fonl.value.LabelDegreeTriangleFonlValue;
+import ir.ac.sbu.graph.spark.pattern.index.fonl.value.LabelDegreeTriangleMeta;
+import ir.ac.sbu.graph.spark.pattern.index.fonl.value.TriangleFonlValue;
 import it.unimi.dsi.fastutil.ints.Int2IntAVLTreeMap;
 import it.unimi.dsi.fastutil.ints.Int2IntSortedMap;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -78,7 +78,9 @@ public class LabelTriangleFonl {
                                     new LabelDegreeTriangleFonlValue(kv._1, triangleFonlValue.fonl, meta);
 
                             return new Tuple2 <>(kv._1, value);
-                        }).persist(StorageLevel.MEMORY_AND_DISK());
+                        })
+                        .repartition(triangleFonlRDD.getNumPartitions())
+                        .persist(StorageLevel.MEMORY_AND_DISK());
 
         return ldtFonlRDD;
     }

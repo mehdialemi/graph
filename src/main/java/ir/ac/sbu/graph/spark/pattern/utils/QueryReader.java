@@ -1,4 +1,6 @@
-package ir.ac.sbu.graph.spark.search.patterns;
+package ir.ac.sbu.graph.spark.pattern.utils;
+
+import ir.ac.sbu.graph.spark.pattern.query.Query;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -8,17 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PatternReaderUtils {
+public class QueryReader {
 
-    public static Query loadSample(String sampleName) {
-        switch (sampleName) {
-            case "mySample" : return Samples.mySampleQuery();
-            case "mySampleEmptyLabel" : return Samples.mySampleEmptyLabel();
-            default: return Samples.mySampleQuery();
-        }
-    }
-
-    public static Query loadFromFile(String address) throws IOException {
+    public static Query load(String address) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(address));
         Map<Integer, List<Integer>> neighbors = new HashMap<>();
         Map <Integer, String> labelMap = new HashMap <>();

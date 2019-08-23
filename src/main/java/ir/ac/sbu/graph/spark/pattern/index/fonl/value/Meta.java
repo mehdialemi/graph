@@ -1,4 +1,4 @@
-package ir.ac.sbu.graph.spark.search.fonl.value;
+package ir.ac.sbu.graph.spark.pattern.index.fonl.value;
 
 import java.io.Serializable;
 
