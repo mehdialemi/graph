@@ -30,13 +30,15 @@ public class PatternConfig {
     private final int partitionNum;
     private final int cores;
     private final int driverMemoryGB;
+    private String app;
 
     private final String hdfsMaster;
 
     private final SparkAppConf sparkAppConf;
     private final Configuration hadoopConf;
 
-    public PatternConfig(Config conf) {
+    public PatternConfig(Config conf, String app) {
+        this.app = app;
         inputDir = conf.getString("inputDir");
         targetGraph = conf.getString("targetGraph");
         targetLabel = conf.getString("targetLabel");
@@ -76,7 +78,7 @@ public class PatternConfig {
                 partitionNum = PatternConfig.this.partitionNum;
                 cores = PatternConfig.this.cores;
                 sparkConf.setMaster(PatternConfig.this.sparkMaster);
-                sparkConf.setAppName("QueryMatcher[" + PatternConfig.this.targetGraph + "]");
+                sparkConf.setAppName("pattern-" + app + "[" + PatternConfig.this.targetGraph + "]");
                 sparkConf.set("spark.driver.memory", PatternConfig.this.driverMemoryGB + "g");
                 sparkConf.set("spark.driver.maxResultSize", PatternConfig.this.driverMemoryGB + "g");
                 sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
@@ -102,6 +104,10 @@ public class PatternConfig {
         };
     }
 
+    public Configuration getHadoopConf() {
+        return hadoopConf;
+    }
+
     public SparkAppConf getSparkAppConf() {
         return sparkAppConf;
     }
@@ -115,6 +121,9 @@ public class PatternConfig {
     }
 
     public String getGraphLabelPath() {
+        if ("".equals(targetLabel))
+            return "";
+
         return inputDir + targetLabel;
     }
 
@@ -154,14 +163,6 @@ public class PatternConfig {
         return driverMemoryGB;
     }
 
-    public String getHdfsMaster() {
-        return hdfsMaster;
-    }
-
-    public Configuration getHadoopConf() {
-        return hadoopConf;
-    }
-
     @Override
     public String toString() {
 
@@ -174,8 +175,8 @@ public class PatternConfig {
                 "sparkMaster: " + sparkMaster + "\n" +
                 "partitionNum: " + partitionNum + "\n" +
                 "cores: " + cores + "\n" +
-                "driverMemoryGB: " + driverMemoryGB + "\n" +
-                "hdfsMaster: " + hdfsMaster + "\n";
+                "driverMemoryGB: " + driverMemoryGB + "\n";
+//                "hdfsMaster: " + hdfsMaster + "\n";
     }
 
 }

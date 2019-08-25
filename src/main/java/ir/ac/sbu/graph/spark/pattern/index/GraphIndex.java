@@ -6,13 +6,11 @@ import ir.ac.sbu.graph.spark.EdgeLoader;
 import ir.ac.sbu.graph.spark.NeighborList;
 import ir.ac.sbu.graph.spark.pattern.PatternConfig;
 import ir.ac.sbu.graph.spark.pattern.index.fonl.creator.LabelTriangleFonl;
-import ir.ac.sbu.graph.spark.pattern.index.fonl.creator.TriangleFonl;
 import ir.ac.sbu.graph.spark.pattern.index.fonl.value.LabelDegreeTriangleFonlValue;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.storage.StorageLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
@@ -34,11 +32,15 @@ public class GraphIndex {
         fileSystem.delete(new Path(config.getIndexPath()));
 
         EdgeLoader edgeLoader = new EdgeLoader(config.getSparkAppConf());
-        NeighborList neighborList = new NeighborList(edgeLoader);
-        TriangleFonl triangleFonl = new TriangleFonl(config);
+        JavaPairRDD<Integer, Integer> edges = edgeLoader.create();
+
+        NeighborList neighborList = new NeighborList(config.getSparkAppConf());
+        JavaPairRDD<Integer, int[]> neighbors = neighborList.createNeighbors(edges);
+        logger.info("vertex count: {}", neighbors.count());
+
         LabelTriangleFonl labelTriangleFonl = new LabelTriangleFonl(config);
         JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD =
-                labelTriangleFonl.create(neighborList, triangleFonl);
+                labelTriangleFonl.create(neighbors);
 
         ldtFonlRDD.saveAsObjectFile(config.getIndexPath());
     }
@@ -46,6 +48,7 @@ public class GraphIndex {
     private JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> indexRDD;
 
     public JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> indexRDD() {
+        logger.info("loading index from hdfs");
         if (indexRDD == null) {
             JavaRDD <Object> file = config.getSparkAppConf()
                     .getSc()
@@ -53,9 +56,10 @@ public class GraphIndex {
 
             indexRDD = file.mapToPair(o -> (Tuple2 <Integer, LabelDegreeTriangleFonlValue>) o)
                     .repartition(config.getPartitionNum())
-                    .persist(StorageLevel.MEMORY_AND_DISK());
+                    .persist(config.getSparkAppConf().getStorageLevel());
         }
 
+        logger.info("index row count: {}", indexRDD.count());
         return indexRDD;
     }
 
@@ -64,7 +68,7 @@ public class GraphIndex {
         if (args.length > 0)
             conf = ConfigFactory.parseFile(new File(args[0]));
 
-        PatternConfig config = new PatternConfig(conf);
+        PatternConfig config = new PatternConfig(conf, "index");
         GraphIndex graphIndex = new GraphIndex(config);
         graphIndex.constructIndex();
         logger.info("graph index is constructed successfully, index path: {}", config.getIndexPath());

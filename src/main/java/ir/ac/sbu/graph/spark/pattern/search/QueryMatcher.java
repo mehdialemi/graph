@@ -27,6 +27,7 @@ public class QueryMatcher extends SparkApp {
     private static final Logger logger = LoggerFactory.getLogger(QueryMatcher.class);
     private GraphIndex graphIndex;
     private PatternConfig config;
+    private final Map <QuerySlice, JavaPairRDD <Integer, Tuple3 <Integer, Integer, Integer>>> sliceMatches = new HashMap <>();
 
     public QueryMatcher(PatternConfig config) {
         super(config.getSparkAppConf());
@@ -42,8 +43,6 @@ public class QueryMatcher extends SparkApp {
 
         if (querySlices.isEmpty())
             throw new RuntimeException("No query slice found");
-
-        Map <QuerySlice, JavaPairRDD <Integer, Tuple3 <Integer, Integer, Integer>>> sliceMatches = new HashMap <>();
 
         for (QuerySlice querySlice : querySlices) {
             JavaPairRDD <Integer, Tuple3 <Integer, Integer, Integer>> sliceMatch;
@@ -106,7 +105,29 @@ public class QueryMatcher extends SparkApp {
             }
         }
 
-        return 1;
+        for (QuerySlice querySlice : querySlices) {
+            querySlice.setProcessed(false);
+        }
+
+        JavaPairRDD<Integer, Long> counter = counter(querySlices.get(0));
+
+        return counter.map(v -> v._2).reduce(Long::sum);
+    }
+
+    private JavaPairRDD<Integer, Long> counter(QuerySlice querySlice) {
+
+        JavaPairRDD<Integer, Long> counts = sliceMatches.get(querySlice).mapValues(v -> v._3().longValue());
+        if (querySlice.getLinks().isEmpty())
+            return counts;
+
+        JavaPairRDD<Integer, Long> result = counts.mapValues(v -> 0L);
+        for (Tuple2<Integer, QuerySlice> link : querySlice.getLinks()) {
+            JavaPairRDD<Integer, Long> count = counter(link._2);
+            JavaPairRDD<Integer, Long> countJoin = counts.join(count).mapValues(v -> v._1 * v._2);
+            result = result.leftOuterJoin(countJoin).mapValues(v -> v._1 + v._2.orElse(0L));
+        }
+
+        return result;
     }
 
     /**
@@ -168,10 +189,10 @@ public class QueryMatcher extends SparkApp {
 
     public static void main(String[] args) {
         Config conf = ConfigFactory.load();
-        if (args.length == 0)
+        if (args.length > 0)
             conf = ConfigFactory.parseFile(new File(args[0]));
 
-        PatternConfig config = new PatternConfig(conf);
+        PatternConfig config = new PatternConfig(conf, "search");
         Query querySample = QuerySamples.getSample(config.getQuerySample());
         QueryMatcher matcher = new QueryMatcher(config);
         long count = matcher.search(querySample);

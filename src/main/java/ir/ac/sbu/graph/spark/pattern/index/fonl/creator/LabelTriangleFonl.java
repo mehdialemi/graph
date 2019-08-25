@@ -24,14 +24,15 @@ public class LabelTriangleFonl {
         this.config = config;
     }
 
-    public JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> create(NeighborList neighborList, TriangleFonl triangleFonl) {
-        JavaPairRDD<Integer, TriangleFonlValue> triangleFonlRDD = triangleFonl.create(neighborList);
+    public JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> create(JavaPairRDD<Integer, int[]> neighbors) {
+        TriangleFonl triangleFonl = new TriangleFonl(config);
+
+        JavaPairRDD<Integer, TriangleFonlValue> triangleFonlRDD = triangleFonl.create(neighbors);
 
         // make an RDD containing degree and labels of each vertex
-        JavaPairRDD<Integer, int[]> neighborRDD = neighborList.getOrCreate();
-        JavaPairRDD<Integer, String> labelRDD = loadLabels(neighborRDD);
+        JavaPairRDD<Integer, String> labelRDD = loadLabels(neighbors);
 
-        JavaPairRDD<Integer, Iterable<Tuple3<Integer, Integer, String>>> degreeLabelMessage = neighborRDD
+        JavaPairRDD<Integer, Iterable<Tuple3<Integer, Integer, String>>> degreeLabelMessage = neighbors
                 .leftOuterJoin(labelRDD)
                 .mapValues(v -> new Tuple2<>(v._1, v._2.or("_")))
                 .flatMapToPair(kv -> {
@@ -82,8 +83,7 @@ public class LabelTriangleFonl {
     }
 
     private JavaPairRDD<Integer, String> loadLabels(JavaPairRDD<Integer, int[]> neighborRDD) {
-        if (config.getGraphLabelPath() == null || config.getGraphLabelPath().equals("") ||
-                config.getGraphLabelPath().isEmpty()) {
+        if (config.getGraphLabelPath().isEmpty()) {
             logger.info("Loading default label for all vertices");
             return neighborRDD.mapValues(v -> "_")
                     .persist(config.getSparkAppConf().getStorageLevel());

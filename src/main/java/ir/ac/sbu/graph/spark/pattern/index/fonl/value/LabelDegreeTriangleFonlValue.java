@@ -3,6 +3,8 @@ package ir.ac.sbu.graph.spark.pattern.index.fonl.value;
 import ir.ac.sbu.graph.spark.pattern.query.Subquery;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -73,9 +75,10 @@ public class LabelDegreeTriangleFonlValue extends FonlValue <LabelDegreeTriangle
         int[] matchIndex = new int[selects.length];
         Set <int[]> resultSet = new HashSet<>();
 
+        IntSet set = new IntOpenHashSet();
         // Start with the subquery key
         for (int vertexIndex = 0; vertexIndex < selects[0].length; vertexIndex++) {
-            join(0, vertexIndex, matchIndex, selects, resultSet);
+            join(0, vertexIndex, matchIndex, selects, resultSet, set);
         }
 
         // Check the connectivity (edges, triangles) to find the true matchIndices
@@ -94,9 +97,13 @@ public class LabelDegreeTriangleFonlValue extends FonlValue <LabelDegreeTriangle
      * @param resultSet all of the completed matchIndices
      */
     private void join(int selectIndex, int currentVertexIndex, int[] partialMatch,
-                      int[][] selects, Set<int[]> resultSet) {
+                      int[][] selects, Set<int[]> resultSet, IntSet set) {
+        int matchIndex = selects[selectIndex][currentVertexIndex];
+        if (set.contains(matchIndex))
+            return;
 
-        partialMatch[selectIndex] = selects[selectIndex][currentVertexIndex];
+        partialMatch[selectIndex] = matchIndex;
+        set.add(matchIndex);
 
         if (selectIndex == selects.length - 1) {
             int[] pMatch = new int[partialMatch.length];
@@ -107,9 +114,11 @@ public class LabelDegreeTriangleFonlValue extends FonlValue <LabelDegreeTriangle
 
         // go to the right index array
         int nextIndex = selectIndex + 1;
+        set.add(matchIndex);
         for (int vertexIndex = 0; vertexIndex < selects[nextIndex].length; vertexIndex++) {
-            join(nextIndex, vertexIndex, partialMatch, selects, resultSet);
+            join(nextIndex, vertexIndex, partialMatch, selects, resultSet, set);
         }
+        set.remove(matchIndex);
     }
 
     /**

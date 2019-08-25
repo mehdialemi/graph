@@ -21,12 +21,12 @@ public class TriangleFonl {
         this.config = config;
     }
 
-    public JavaPairRDD<Integer, TriangleFonlValue> create(NeighborList neighborList) {
+    public JavaPairRDD<Integer, TriangleFonlValue> create(JavaPairRDD<Integer, int[]> neighbors) {
 
-        Triangle triangle = new Triangle(neighborList);
-        JavaPairRDD<Integer, int[]> fonlRDD = triangle.createFonl();
+        Triangle triangle = new Triangle(config.getSparkAppConf());
+
+        JavaPairRDD<Integer, int[]> fonlRDD = triangle.createFonl(neighbors);
         JavaPairRDD<Integer, int[]> candidates = triangle.createCandidates(fonlRDD);
-
         JavaPairRDD<Integer, Iterable<Edge>> triangleInfo = candidates.cogroup(fonlRDD)
                 .flatMapToPair(kv -> {
                     List<Tuple2<Integer, Edge>> output = new ArrayList<>();

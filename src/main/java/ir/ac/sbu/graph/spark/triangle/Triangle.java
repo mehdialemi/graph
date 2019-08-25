@@ -2,6 +2,7 @@ package ir.ac.sbu.graph.spark.triangle;
 
 import ir.ac.sbu.graph.spark.NeighborList;
 import ir.ac.sbu.graph.spark.SparkApp;
+import ir.ac.sbu.graph.spark.SparkAppConf;
 import ir.ac.sbu.graph.types.VertexDeg;
 import ir.ac.sbu.graph.utils.OrderedNeighborList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -25,6 +26,10 @@ public class Triangle extends SparkApp {
     public Triangle(NeighborList neighborList) {
         super(neighborList);
         this.neighborList = neighborList;
+    }
+
+    public Triangle(SparkAppConf conf) {
+        super(conf);
     }
 
     public JavaPairRDD <Integer, int[]> getOrCreateFonl() {

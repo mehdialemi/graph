@@ -25,6 +25,10 @@ public class NeighborList extends SparkApp {
         this.edgeLoader = edgeLoader;
     }
 
+    public NeighborList(SparkAppConf conf) {
+        super(conf);
+    }
+
     public JavaPairRDD <Integer, int[]> getOrCreate() {
         if (neighbors == null) {
             JavaPairRDD <Integer, Integer> edges = edgeLoader.create();
@@ -33,7 +37,7 @@ public class NeighborList extends SparkApp {
         return neighbors;
     }
 
-    private JavaPairRDD <Integer, int[]> createNeighbors(JavaPairRDD <Integer, Integer> edges) {
+    public JavaPairRDD <Integer, int[]> createNeighbors(JavaPairRDD <Integer, Integer> edges) {
         return edges.groupByKey(conf.getPartitionNum())
                 .mapToPair(t -> {
                     IntSet set = new IntOpenHashSet();

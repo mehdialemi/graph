@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 
-source bin/pattern/pattern-env.sh
+source $PWD/bin/pattern/pattern-env.sh
+LOG="$PWD/logs/pattern-index.log"
+
 cmd="$SPARK_HOME/bin/spark-submit --class ir.ac.sbu.graph.spark.pattern.index.GraphIndex $jar $conf"
 echo "running $cmd"
 
-sh $cmd
+nohup sh $cmd > $LOG 2>&1 &
+tail -f "$LOG"
 
 #$SPARK_HOME/bin/spark-submit --class $class $jar $conf
 #nohup ~/spark-2.2/bin/spark-submit --class $MAIN_CLASS $JAR_FILE $CONF_FILE > $log_file 2>&1 &
