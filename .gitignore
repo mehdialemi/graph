@@ -1,4 +1,3 @@
-out
 logs/*
 .idea/workspace.xml
 /.idea/
@@ -8,4 +7,3 @@ logs/*
 /target
 hs_err*
 src/main/sbm.iml
-

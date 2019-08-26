@@ -1,6 +1,6 @@
 package ir.ac.sbu.graph.spark.pattern.utils;
 
-import ir.ac.sbu.graph.spark.pattern.index.fonl.value.LabelDegreeTriangleFonlValue;
+import ir.ac.sbu.graph.spark.pattern.index.fonl.value.IndexValue;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,9 +10,9 @@ import scala.Tuple3;
 public class PatternDebugUtils {
     private static final Logger logger = LoggerFactory.getLogger(PatternDebugUtils.class);
 
-    public static void printFonlLabelDegreeTriangleFonlValue(JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> fonl) {
-        for (Tuple2<Integer, LabelDegreeTriangleFonlValue> t : fonl.collect()) {
-            logger.debug("LabelDegreeTriangleFonlValue: {}", t);
+    public static void printFonlLabelDegreeTriangleFonlValue(JavaPairRDD<Integer, IndexValue> fonl) {
+        for (Tuple2<Integer, IndexValue> t : fonl.collect()) {
+            logger.debug("IndexValue: {}", t);
         }
     }
 
@@ -34,8 +34,8 @@ public class PatternDebugUtils {
         }
     }
 
-    public static void printFonlSubset(JavaPairRDD<Integer, LabelDegreeTriangleFonlValue> fonlSubset) {
-        for (Tuple2<Integer, LabelDegreeTriangleFonlValue> t : fonlSubset.collect()) {
+    public static void printFonlSubset(JavaPairRDD<Integer, IndexValue> fonlSubset) {
+        for (Tuple2<Integer, IndexValue> t : fonlSubset.collect()) {
             logger.debug("FONL_SUBSET: ", t);
         }
     }

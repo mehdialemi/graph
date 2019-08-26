@@ -85,7 +85,7 @@ public class PatternConfig {
                 sparkConf.registerKryoClasses(new Class[]{
                         IndexRow.class,
                         FonlValue.class,
-                        LabelDegreeTriangleFonlValue.class,
+                        IndexValue.class,
                         TriangleFonlValue.class,
                         Meta.class,
                         LabelDegreeTriangleMeta.class,

@@ -5,7 +5,7 @@ import com.typesafe.config.ConfigFactory;
 import ir.ac.sbu.graph.spark.SparkApp;
 import ir.ac.sbu.graph.spark.pattern.PatternConfig;
 import ir.ac.sbu.graph.spark.pattern.index.GraphIndex;
-import ir.ac.sbu.graph.spark.pattern.index.fonl.value.LabelDegreeTriangleFonlValue;
+import ir.ac.sbu.graph.spark.pattern.index.fonl.value.IndexValue;
 import ir.ac.sbu.graph.spark.pattern.query.Query;
 import ir.ac.sbu.graph.spark.pattern.query.QuerySlice;
 import ir.ac.sbu.graph.spark.pattern.query.Subquery;
@@ -83,7 +83,7 @@ public class QueryMatcher extends SparkApp {
                         sliceMatch.filter(kv -> kv._2._2().equals(fonlValueIndex)).groupByKey();
                 PatternDebugUtils.printFonlLeft(fonlLeftKeys);
 
-                JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> indexSubset = fonlLeftKeys
+                JavaPairRDD <Integer, IndexValue> indexSubset = fonlLeftKeys
                         .join(graphIndex.indexRDD())
                         .mapValues(v -> v._2);
                 PatternDebugUtils.printFonlSubset(indexSubset);
@@ -139,7 +139,7 @@ public class QueryMatcher extends SparkApp {
      */
     private JavaPairRDD <Integer, Tuple3 <Integer, Integer, Integer>> findMatchCounts(
             final JavaSparkContext sc, QuerySlice querySlice,
-            JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> indexRDD) {
+            JavaPairRDD <Integer, IndexValue> indexRDD) {
 
         Broadcast <Subquery> broadcast = sc.broadcast(querySlice.subquery());
         return indexRDD.flatMapToPair(kv -> {

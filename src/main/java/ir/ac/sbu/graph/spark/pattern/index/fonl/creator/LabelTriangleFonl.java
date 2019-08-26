@@ -2,15 +2,12 @@ package ir.ac.sbu.graph.spark.pattern.index.fonl.creator;
 
 import ir.ac.sbu.graph.spark.pattern.PatternConfig;
 import ir.ac.sbu.graph.spark.pattern.index.IndexRow;
-import ir.ac.sbu.graph.spark.pattern.index.fonl.value.LabelDegreeTriangleFonlValue;
 import ir.ac.sbu.graph.spark.pattern.index.fonl.value.LabelDegreeTriangleMeta;
 import ir.ac.sbu.graph.spark.pattern.index.fonl.value.TriangleFonlValue;
 import it.unimi.dsi.fastutil.ints.Int2IntAVLTreeMap;
 import it.unimi.dsi.fastutil.ints.Int2IntSortedMap;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.RowFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
@@ -27,7 +24,7 @@ public class LabelTriangleFonl {
         this.config = config;
     }
 
-    public JavaRDD<Row> create(JavaPairRDD<Integer, int[]> neighbors) {
+    public JavaRDD<IndexRow> create(JavaPairRDD<Integer, int[]> neighbors) {
         TriangleFonl triangleFonl = new TriangleFonl(config);
 
         JavaPairRDD<Integer, TriangleFonlValue> triangleFonlRDD = triangleFonl.create(neighbors);
@@ -72,7 +69,7 @@ public class LabelTriangleFonl {
                         }
                     }
 
-                    return IndexRow.createRow(kv._1, triangleFonlValue.fonl, meta);
+                    return new IndexRow(kv._1, triangleFonlValue.fonl, meta);
                 }).repartition(config.getPartitionNum())
                 .persist(config.getSparkAppConf().getStorageLevel());
     }

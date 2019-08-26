@@ -6,7 +6,6 @@ import ir.ac.sbu.graph.spark.EdgeLoader;
 import ir.ac.sbu.graph.spark.NeighborList;
 import ir.ac.sbu.graph.spark.pattern.PatternConfig;
 import ir.ac.sbu.graph.spark.pattern.index.fonl.creator.LabelTriangleFonl;
-import ir.ac.sbu.graph.spark.pattern.index.fonl.value.LabelDegreeTriangleFonlValue;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -41,24 +40,22 @@ public class GraphIndex {
         logger.info("vertex count: {}", neighbors.count());
 
         LabelTriangleFonl labelTriangleFonl = new LabelTriangleFonl(config);
-        JavaRDD<Row> indexRows = labelTriangleFonl.create(neighbors);
+        JavaRDD<IndexRow> indexRows = labelTriangleFonl.create(neighbors);
 
         SQLContext sqlContext = config.getSparkAppConf().getSqlContext();
-
-        Dataset<Row> dataFrame = sqlContext.createDataFrame(indexRows, IndexRow.structType());
-
+        Dataset<Row> dataFrame = sqlContext.createDataFrame(indexRows, IndexRow.class);
         dataFrame.write().parquet(config.getIndexPath());
     }
 
-    private JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> indexRDD;
+    private JavaPairRDD <Integer, IndexRow> indexRDD;
 
-    public JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> indexRDD() {
+    public JavaPairRDD <Integer, IndexRow> indexRDD() {
         logger.info("loading index from hdfs");
         if (indexRDD == null) {
             SQLContext sqlContext = config.getSparkAppConf().getSqlContext();
-            indexRDD = sqlContext.read().schema(IndexRow.structType())
+            indexRDD = sqlContext.read()
                     .parquet(config.getIndexPath())
-                    .toJavaRDD().mapToPair(IndexRow::createTuple2)
+                    .toJavaRDD().mapToPair(row -> IndexRow.toTuple(row))
                     .repartition(config.getPartitionNum())
                     .persist(config.getSparkAppConf().getStorageLevel());
         }
