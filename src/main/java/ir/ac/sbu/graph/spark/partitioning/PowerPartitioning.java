@@ -106,14 +106,14 @@ public class PowerPartitioning extends SparkApp {
 
 
         // Nodes are able to send their partition numbers to their neighbors
-        JavaPairRDD<Integer, Tuple3<Integer, Integer, int[]>> agents = conf.getSc()
+        JavaPairRDD<Integer, Tuple3<Integer, Integer, int[]>> agents = conf.getJavaSparkContext()
                 .parallelizePairs(new ArrayList<Tuple2<Integer, Tuple3<Integer, Integer, int[]>>>())
                 .repartition(initNeighborPartitions); // Set num of partitions
 
         vCount = neighborList.count();
         // lower value more balanced partition sizes
         int avgPSize = (int) (vCount / partitionNum);
-        final Broadcast<Integer> pSizeBroadcast = conf.getSc().broadcast(avgPSize);
+        final Broadcast<Integer> pSizeBroadcast = conf.getJavaSparkContext().broadcast(avgPSize);
 
         Tuple2<PInfo, Long> pInfoResult = createPInfo(neighborList, avgPSize, ignoreHighestCount);
         long leafVertexCount = pInfoResult._2;
@@ -124,14 +124,14 @@ public class PowerPartitioning extends SparkApp {
 
         ArrayList<Tuple2<Integer, Integer>> highestVPartitions = new ArrayList<>();
 
-        JavaPairRDD<Integer, Integer> partitions = conf.getSc()
+        JavaPairRDD<Integer, Integer> partitions = conf.getJavaSparkContext()
                 .parallelizePairs(highestVPartitions)
                 .repartition(initNeighborPartitions);
 
         for (int i = 0; i < pInfo.partitionNum; i++) {
             pSizes.put(i, maxExcludeCount);
         }
-        Broadcast<PInfo> pInfoBroadcast = conf.getSc().broadcast(pInfo);
+        Broadcast<PInfo> pInfoBroadcast = conf.getJavaSparkContext().broadcast(pInfo);
 
         int iteration = 0;
         while (true) {
@@ -174,8 +174,8 @@ public class PowerPartitioning extends SparkApp {
                         break;
                 }
 
-                final Broadcast<int[]> dist = conf.getSc().broadcast(distArray);
-                final Broadcast<int[]> partitionNumbers = conf.getSc().broadcast(pNumArray);
+                final Broadcast<int[]> dist = conf.getJavaSparkContext().broadcast(distArray);
+                final Broadcast<int[]> partitionNumbers = conf.getJavaSparkContext().broadcast(pNumArray);
 
                 JavaPairRDD<Integer, Integer> finalPartitions = neighborList
                         .mapPartitionsToPair(p -> {
@@ -211,7 +211,7 @@ public class PowerPartitioning extends SparkApp {
             }
 
 
-            Broadcast<Map<Integer, Long>> partitionSizes = conf.getSc().broadcast(pSizes);
+            Broadcast<Map<Integer, Long>> partitionSizes = conf.getJavaSparkContext().broadcast(pSizes);
             neighborList = neighborList.subtractByKey(agents).persist(StorageLevel.MEMORY_AND_DISK());
 
             Tuple2<JavaPairRDD<Integer, Integer>, JavaPairRDD<Integer, Tuple3<Integer, Integer, int[]>>> result =

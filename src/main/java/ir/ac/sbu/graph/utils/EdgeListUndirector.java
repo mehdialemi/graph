@@ -38,7 +38,7 @@ public class EdgeListUndirector extends SparkApp  {
         });
 
         edges.saveAsTextFile(outPath);
-        conf.getSc().close();
+        conf.getJavaSparkContext().close();
     }
 
     public static void main(String[] args) {

@@ -167,7 +167,7 @@ public class HierarchicalPartitioning extends PowerPartitioning {
 
 
 
-        final Broadcast<Map<Integer, Integer>> pNumMapping = conf.getSc().broadcast(newPartitionNums);
+        final Broadcast<Map<Integer, Integer>> pNumMapping = conf.getJavaSparkContext().broadcast(newPartitionNums);
 
         JavaPairRDD<Integer, Integer> vPartition = vpRDD.mapPartitionsToPair(p -> {
             final Map<Integer, Integer> map = pNumMapping.getValue();

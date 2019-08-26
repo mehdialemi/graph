@@ -6,17 +6,17 @@
 ///**
 //  * RedisContext extends sparkContext's functionality with redis functions
 //  *
-//  * @param sc a spark context
+//  * @param javaSparkContext a spark context
 //  */
-//class RedisContext(@transient val sc: SparkContext) extends Serializable {
+//class RedisContext(@transient val javaSparkContext: SparkContext) extends Serializable {
 //
 //    def incr(kvs: RDD[(Long, Long)])
-//            (implicit redisEndpoint: RedisEndpoint = new RedisEndpoint(sc.getConf)): RDD[(Long, Long)] = {
+//            (implicit redisEndpoint: RedisEndpoint = new RedisEndpoint(javaSparkContext.getConf)): RDD[(Long, Long)] = {
 //        new RedisRDD(kvs, redisEndpoint)
 //    }
 //}
 //
 //trait RedisFunctions {
-//    implicit def toRedisContext(sc: SparkContext): RedisContext = new RedisContext(sc)
+//    implicit def toRedisContext(javaSparkContext: SparkContext): RedisContext = new RedisContext(javaSparkContext)
 //}
 //

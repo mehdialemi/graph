@@ -7,6 +7,7 @@ import ir.ac.sbu.graph.utils.Log;
 import it.unimi.dsi.fastutil.ints.*;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.SQLContext;
 import org.apache.spark.storage.StorageLevel;
 
 import java.io.File;
@@ -21,7 +22,8 @@ public class SparkAppConf {
     protected int partitionNum;
     protected SparkConf sparkConf;
     protected int cores;
-    protected JavaSparkContext sc;
+    protected JavaSparkContext javaSparkContext;
+    protected SQLContext sqlContext;
     private final StorageLevel storageLevel;
 
     public SparkAppConf() {
@@ -72,10 +74,14 @@ public class SparkAppConf {
                 IntCollection.class, Set.class, AbstractIntSet.class, AbstractIntCollection.class, MaxTSetValue.class
         });
 
-        sc = new JavaSparkContext(sparkConf);
+        javaSparkContext = new JavaSparkContext(sparkConf);
+        sqlContext = new SQLContext(javaSparkContext);
         Log.log(appName);
     }
 
+    public SQLContext getSqlContext() {
+        return sqlContext;
+    }
 
     public String getGraphInputPath() {
         return graphInputPath;
@@ -93,8 +99,8 @@ public class SparkAppConf {
         return sparkConf;
     }
 
-    public JavaSparkContext getSc() {
-        return sc;
+    public JavaSparkContext getJavaSparkContext() {
+        return javaSparkContext;
     }
 
     public final StorageLevel getStorageLevel() {

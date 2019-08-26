@@ -15,6 +15,14 @@ public class Meta implements Serializable {
         degree = meta.degree;
     }
 
+    public int getDegree() {
+        return degree;
+    }
+
+    public void setDegree(int degree) {
+        this.degree = degree;
+    }
+
     @Override
     public String toString() {
         return "degree: " + degree;

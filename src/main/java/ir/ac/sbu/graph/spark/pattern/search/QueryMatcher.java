@@ -59,7 +59,7 @@ public class QueryMatcher extends SparkApp {
 
             } else { // if the current query slice is not processed, then it should be processed
 
-                sliceMatch = findMatchCounts(config.getSparkAppConf().getSc(), querySlice, graphIndex.indexRDD());
+                sliceMatch = findMatchCounts(config.getSparkAppConf().getJavaSparkContext(), querySlice, graphIndex.indexRDD());
                 long count = sliceMatch.count();
 
                 logger.info("slice match count: {}, for vertex: {}", count, querySlice.getV());
@@ -89,7 +89,7 @@ public class QueryMatcher extends SparkApp {
                 PatternDebugUtils.printFonlSubset(indexSubset);
 
                 JavaPairRDD <Integer, Tuple3 <Integer, Integer, Integer>> linkSliceMatch =
-                        findMatchCounts(config.getSparkAppConf().getSc(), sliceLink, indexSubset);
+                        findMatchCounts(config.getSparkAppConf().getJavaSparkContext(), sliceLink, indexSubset);
 
                 // if nothing matched then no match exist
                 long count = linkSliceMatch.count();

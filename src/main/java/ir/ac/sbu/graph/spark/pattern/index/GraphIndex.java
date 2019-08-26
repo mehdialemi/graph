@@ -11,9 +11,11 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SQLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Tuple2;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,10 +41,13 @@ public class GraphIndex {
         logger.info("vertex count: {}", neighbors.count());
 
         LabelTriangleFonl labelTriangleFonl = new LabelTriangleFonl(config);
-        JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> ldtFonlRDD =
-                labelTriangleFonl.create(neighbors);
+        JavaRDD<Row> indexRows = labelTriangleFonl.create(neighbors);
 
-        ldtFonlRDD.saveAsObjectFile(config.getIndexPath());
+        SQLContext sqlContext = config.getSparkAppConf().getSqlContext();
+
+        Dataset<Row> dataFrame = sqlContext.createDataFrame(indexRows, IndexRow.structType());
+
+        dataFrame.write().parquet(config.getIndexPath());
     }
 
     private JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> indexRDD;
@@ -50,11 +55,10 @@ public class GraphIndex {
     public JavaPairRDD <Integer, LabelDegreeTriangleFonlValue> indexRDD() {
         logger.info("loading index from hdfs");
         if (indexRDD == null) {
-            JavaRDD <Object> file = config.getSparkAppConf()
-                    .getSc()
-                    .objectFile(config.getIndexPath());
-
-            indexRDD = file.mapToPair(o -> (Tuple2 <Integer, LabelDegreeTriangleFonlValue>) o)
+            SQLContext sqlContext = config.getSparkAppConf().getSqlContext();
+            indexRDD = sqlContext.read().schema(IndexRow.structType())
+                    .parquet(config.getIndexPath())
+                    .toJavaRDD().mapToPair(IndexRow::createTuple2)
                     .repartition(config.getPartitionNum())
                     .persist(config.getSparkAppConf().getStorageLevel());
         }

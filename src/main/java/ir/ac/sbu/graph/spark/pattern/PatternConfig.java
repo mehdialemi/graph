@@ -2,12 +2,14 @@ package ir.ac.sbu.graph.spark.pattern;
 
 import com.typesafe.config.Config;
 import ir.ac.sbu.graph.spark.SparkAppConf;
+import ir.ac.sbu.graph.spark.pattern.index.IndexRow;
 import ir.ac.sbu.graph.spark.pattern.index.fonl.value.*;
 import ir.ac.sbu.graph.spark.pattern.query.Subquery;
 import ir.ac.sbu.graph.types.Edge;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.SQLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
@@ -24,7 +26,6 @@ public class PatternConfig {
     private final String querySample;
 
     private final String indexDir;
-    private final String indexName;
 
     private final String sparkMaster;
     private final int partitionNum;
@@ -46,7 +47,6 @@ public class PatternConfig {
         querySample = conf.getString("querySample");
 
         indexDir = conf.getString("indexDir");
-        indexName = conf.getString("indexName");
 
         sparkMaster = conf.getString("sparkMaster");
         partitionNum = conf.getInt("partitionNum");
@@ -83,6 +83,7 @@ public class PatternConfig {
                 sparkConf.set("spark.driver.maxResultSize", PatternConfig.this.driverMemoryGB + "g");
                 sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
                 sparkConf.registerKryoClasses(new Class[]{
+                        IndexRow.class,
                         FonlValue.class,
                         LabelDegreeTriangleFonlValue.class,
                         TriangleFonlValue.class,
@@ -99,7 +100,8 @@ public class PatternConfig {
                         Tuple2[].class,
                 });
 
-                sc = new JavaSparkContext(sparkConf);
+                javaSparkContext = new JavaSparkContext(sparkConf);
+                sqlContext = new SQLContext(javaSparkContext);
             }
         };
     }
@@ -136,15 +138,11 @@ public class PatternConfig {
     }
 
     public String getIndexPath() {
-        return indexDir + indexName;
+        return indexDir + targetGraph + ".idx";
     }
 
     public String getIndexDir() {
         return indexDir;
-    }
-
-    public String getIndexName() {
-        return indexName;
     }
 
     public String getSparkMaster() {
@@ -171,7 +169,6 @@ public class PatternConfig {
                 "targetLabel: " + targetLabel + "\n" +
                 "querySample: " + querySample + "\n" +
                 "indexDir: " + indexDir + "\n" +
-                "indexName: " + indexName + "\n" +
                 "sparkMaster: " + sparkMaster + "\n" +
                 "partitionNum: " + partitionNum + "\n" +
                 "cores: " + cores + "\n" +

@@ -70,6 +70,30 @@ public class TriangleMeta extends Meta {
         return triangleEdges != null;
     }
 
+    public long[] getTriangleEdges() {
+        return triangleEdges;
+    }
+
+    public void setTriangleEdges(long[] triangleEdges) {
+        this.triangleEdges = triangleEdges;
+    }
+
+    public int[] getvTc() {
+        return vTc;
+    }
+
+    public void setvTc(int[] vTc) {
+        this.vTc = vTc;
+    }
+
+    public int getTc() {
+        return tc;
+    }
+
+    public void setTc(int tc) {
+        this.tc = tc;
+    }
+
     @Override
     public String toString() {
         return super.toString() + " TriangleMeta(tc: " + tc + ", triangleEdges: " + Arrays.toString(triangleEdges) +

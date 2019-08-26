@@ -17,7 +17,7 @@ public class EdgeLoader extends SparkApp {
     }
 
     public JavaPairRDD <Integer, Integer> create() {
-        return conf.getSc()
+        return conf.getJavaSparkContext()
                 .textFile(conf.getGraphInputPath(), conf.getPartitionNum())
                 .flatMapToPair(line -> {
                     if (line.startsWith("#"))

@@ -20,6 +20,6 @@ public class SparkApp {
     }
 
     public void close() {
-        this.conf.getSc().close();
+        this.conf.getJavaSparkContext().close();
     }
 }

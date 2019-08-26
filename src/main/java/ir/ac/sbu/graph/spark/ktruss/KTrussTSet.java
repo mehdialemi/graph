@@ -45,11 +45,11 @@ public class KTrussTSet extends SparkApp {
         this.neighborList = neighborList;
         this.k = ktConf.getKt();
         this.ktConf = ktConf;
-        String master = ktConf.getSc().master();
+        String master = ktConf.getJavaSparkContext().master();
         if (master.contains("local"))
             return;
-        String masterHost = new URI(ktConf.getSc().master()).getHost();
-        this.ktConf.getSc().setCheckpointDir("hdfs://" + masterHost + "/shared/checkpoint");
+        String masterHost = new URI(ktConf.getJavaSparkContext().master()).getHost();
+        this.ktConf.getJavaSparkContext().setCheckpointDir("hdfs://" + masterHost + "/shared/checkpoint");
     }
 
     public JavaPairRDD <Edge, int[]> generate() throws URISyntaxException {

@@ -16,6 +16,10 @@ public class LabelDegreeTriangleFonlValue extends FonlValue <LabelDegreeTriangle
 
     public LabelDegreeTriangleFonlValue() {  }
 
+    public LabelDegreeTriangleFonlValue(int[] fonl, LabelDegreeTriangleMeta meta) {
+        this(0, fonl, meta);
+    }
+
     public LabelDegreeTriangleFonlValue(int source, int[] fonl, LabelDegreeTriangleMeta meta) {
         this.source = source;
         this.fonl = fonl;

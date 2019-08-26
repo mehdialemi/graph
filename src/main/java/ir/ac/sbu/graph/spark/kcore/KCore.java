@@ -13,8 +13,6 @@ import scala.Tuple2;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,15 +30,15 @@ public class KCore extends NeighborList {
 
     public KCore(NeighborList neighborList, KCoreConf kConf) throws URISyntaxException {
         super(neighborList);
-        String master = conf.getSc().master();
-        this.conf.getSc().setCheckpointDir("/tmp/checkpoint");
+        String master = conf.getJavaSparkContext().master();
+        this.conf.getJavaSparkContext().setCheckpointDir("/tmp/checkpoint");
         this.kConf = kConf;
         neighborQueue = new LinkedList <>();
         if (master.contains("local")) {
             return;
         }
-        String masterHost = new URI(conf.getSc().master()).getHost();
-        this.conf.getSc().setCheckpointDir("hdfs://" + masterHost + "/shared/checkpoint");
+        String masterHost = new URI(conf.getJavaSparkContext().master()).getHost();
+        this.conf.getJavaSparkContext().setCheckpointDir("hdfs://" + masterHost + "/shared/checkpoint");
 
     }
 

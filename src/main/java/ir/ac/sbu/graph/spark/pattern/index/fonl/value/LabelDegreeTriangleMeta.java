@@ -42,6 +42,14 @@ public class LabelDegreeTriangleMeta extends TriangleMeta {
         degrees[index] = degree;
     }
 
+    public void setLabels(String[] labels) {
+        this.labels = labels;
+    }
+
+    public void setDegrees(int[] degrees) {
+        this.degrees = degrees;
+    }
+
     @Override
     public String toString() {
         return super.toString() + " LabelDegreeTriangleMeta(label: " + label + ", labels: " + Arrays.toString(labels) +

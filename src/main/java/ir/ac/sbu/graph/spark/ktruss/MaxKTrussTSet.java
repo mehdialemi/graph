@@ -77,7 +77,7 @@ public class MaxKTrussTSet extends KTrussTSet {
     public Tuple2<JavaRDD<Edge>, JavaPairRDD<Edge, int[]>> generate(
             int minSup, JavaPairRDD <Edge, int[]> tSet, int partitionNum, float consumptionRatio) {
 
-        JavaRDD<Edge> eTruss = conf.getSc().parallelize(new ArrayList <>());
+        JavaRDD<Edge> eTruss = conf.getJavaSparkContext().parallelize(new ArrayList <>());
 
         Queue<JavaPairRDD<Edge, int[]>> tSetQueue = new LinkedList<>();
         tSetQueue.add(tSet);

@@ -35,14 +35,14 @@ public class MaxTrussTSetRange extends SparkApp {
     public MaxTrussTSetRange(NeighborList neighborList, SparkAppConf conf) throws URISyntaxException {
         super(neighborList);
         this.neighborList = neighborList;
-        String master = conf.getSc().master();
-        this.conf.getSc().setCheckpointDir("/tmp/checkpoint");
+        String master = conf.getJavaSparkContext().master();
+        this.conf.getJavaSparkContext().setCheckpointDir("/tmp/checkpoint");
         kCoreConf = new KCoreConf(conf, 2, 1000);
         if (master.contains("local")) {
             return;
         }
-        String masterHost = new URI(conf.getSc().master()).getHost();
-        this.conf.getSc().setCheckpointDir("hdfs://" + masterHost + "/shared/checkpoint");
+        String masterHost = new URI(conf.getJavaSparkContext().master()).getHost();
+        this.conf.getJavaSparkContext().setCheckpointDir("hdfs://" + masterHost + "/shared/checkpoint");
 
     }
 
@@ -59,7 +59,7 @@ public class MaxTrussTSetRange extends SparkApp {
         JavaPairRDD <Integer, int[]> candidates = triangle.createCandidates(fonl);
 
         JavaPairRDD <Edge, MaxTSetValue> tSet = createTSet(fonl, candidates, numPartitions);
-        JavaPairRDD <Edge, Integer> maxTruss = conf.getSc().parallelizePairs(new ArrayList <>());
+        JavaPairRDD <Edge, Integer> maxTruss = conf.getJavaSparkContext().parallelizePairs(new ArrayList <>());
         long currentEdgeCount = tSet.count();
         long edgeCount = currentEdgeCount;
 

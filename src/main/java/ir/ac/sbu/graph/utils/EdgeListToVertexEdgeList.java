@@ -23,7 +23,7 @@ public class EdgeListToVertexEdgeList extends SparkApp  {
     }
 
     public void generate() throws FileNotFoundException {
-        JavaRDD<String> input = conf.getSc().textFile(conf.getGraphInputPath());
+        JavaRDD<String> input = conf.getJavaSparkContext().textFile(conf.getGraphInputPath());
         int numPartitions = input.getNumPartitions();
         long count = input.count();
         final int partitionLines = (int) Math.ceil(count / (float)numPartitions);
