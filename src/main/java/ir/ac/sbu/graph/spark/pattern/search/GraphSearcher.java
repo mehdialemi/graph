@@ -80,14 +80,14 @@ public class GraphSearcher extends SparkApp {
                 if (sliceLink.isProcessed())
                     continue;
 
-                final int fonlValueIndex = link._1;
-                JavaPairRDD<Integer, Iterable<MatchCount>> fonlLeftKeys = sliceMatch
-                        .filter(kv -> kv._2.equalLink(fonlValueIndex))
+                final int linkIndex = link._1;
+                JavaPairRDD<Integer, Iterable<MatchCount>> leftKey = sliceMatch
+                        .filter(kv -> kv._2.equalLink(linkIndex))
                         .groupByKey();
 
-                PatternDebugUtils.printFonlLeft(fonlLeftKeys);
+                PatternDebugUtils.printFonlLeft(leftKey);
 
-                JavaPairRDD<Integer, IndexRow> indexSubset = fonlLeftKeys
+                JavaPairRDD<Integer, IndexRow> indexSubset = leftKey
                         .join(graphIndexer.getIndex())
                         .mapValues(v -> v._2);
 
@@ -167,6 +167,11 @@ public class GraphSearcher extends SparkApp {
 
         PatternConfig config = new PatternConfig(conf, "search");
         Query querySample = QuerySamples.getSample(config.getQuerySample());
+        for (QuerySlice querySlice : querySample.getQuerySlices()) {
+            Subquery subquery = querySlice.subquery();
+            logger.info("Subquery: {}", subquery);
+        }
+
         GraphSearcher matcher = new GraphSearcher(config);
         long count = matcher.search(querySample);
         logger.info("final match count:{} ", count);

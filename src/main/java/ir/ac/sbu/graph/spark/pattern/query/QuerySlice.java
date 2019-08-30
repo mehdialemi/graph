@@ -97,7 +97,7 @@ public class QuerySlice {
     }
 
     public Subquery subquery() {
-        Subquery subquery = new Subquery(fonlValue.length + 1, links.size(), triangleIndex);
+        Subquery subquery = new Subquery(fonlValue.length + 1, triangleIndex);
         subquery.vertices[0] = v;
         subquery.labels[0] = label;
         subquery.degrees[0] = degree;
@@ -105,7 +105,7 @@ public class QuerySlice {
         System.arraycopy(labels, 0, subquery.labels, 1, labels.length);
         System.arraycopy(degrees, 0, subquery.degrees, 1, degrees.length);
         for (int i = 0; i < links.size(); i++) {
-            subquery.links.add(links.get(i)._1);
+            subquery.links.add(links.get(i)._1 + 1);
         }
 
        return subquery;

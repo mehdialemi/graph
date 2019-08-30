@@ -68,6 +68,7 @@ public class PatternCounter {
     public boolean finalize(int index) {
         if (selects[index] == null)
             return false;
+
         // if there is only one vertex for the current index,
         // then no others should have the current vertex
         if (selects[index].size() == 1) {
@@ -84,9 +85,14 @@ public class PatternCounter {
         return true;
     }
 
-    public void add(int index, int vertex, IntSet pIndices) {
-        if (pIndices != null) {
-            for (int srcIndex : pIndices) {
+    public void add(int index, int vertex, IntSet srcIndices) {
+        if (srcIndices != null) {
+            for (int srcIndex : srcIndices) {
+
+                if (selects[srcIndex] == null) {
+                    throw new RuntimeException("index: " + index + ", srcIndex: " + srcIndex +
+                            ", subquery: " + subquery);
+                }
 
                 // Check if the given vertex is connected with at least one item of the given vSet
                 for (int srcVertex : selects[srcIndex]) {

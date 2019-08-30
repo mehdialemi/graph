@@ -89,6 +89,7 @@ public class PatternConfig {
                         FonlValue.class,
                         MatchCount.class,
                         PatternCounter.class,
+                        Subquery.class,
                         TriangleFonlValue.class,
                         Meta.class,
                         LabelDegreeTriangleMeta.class,

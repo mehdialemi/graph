@@ -7,7 +7,6 @@ import ir.ac.sbu.graph.spark.pattern.search.PatternCounter;
 import ir.ac.sbu.graph.types.Edge;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import org.apache.spark.sql.Row;
 import scala.Tuple2;
 
 import java.io.Serializable;
@@ -21,14 +20,7 @@ public class IndexRow implements Serializable {
     private int[] tc;
     private long[] edges;
 
-    public IndexRow() { }
-
-    public IndexRow(Row row) {
-        vertices = (int[]) row.get(0);
-        labels = (String[]) row.get(1);
-        degrees = (int[]) row.get(2);
-        tc = (int[]) row.get(3);
-        edges = (long[]) row.get(4);
+    public IndexRow() {
     }
 
     public IndexRow(int v, int[] fonl, LabelDegreeTriangleMeta meta) {
@@ -44,12 +36,10 @@ public class IndexRow implements Serializable {
         degrees[0] = meta.getDegree();
         System.arraycopy(meta.getDegrees(), 0, degrees, 1, meta.getDegrees().length);
 
-        if (meta.getTc() > 0) {
-            tc = new int[vertices.length];
-            tc[0] = meta.getTc();
-            for (int i = 0; i < meta.getvTc().length; i++) {
-                tc[i + 1] = meta.getvTc()[i];
-            }
+        tc = new int[vertices.length];
+        tc[0] = meta.getTc();
+        for (int i = 0; i < meta.getvTc().length; i++) {
+            tc[i + 1] = meta.getvTc()[i];
         }
 
         edges = meta.getTriangleEdges();
@@ -70,16 +60,27 @@ public class IndexRow implements Serializable {
         Int2IntOpenHashMap vCounter = new Int2IntOpenHashMap();
         PatternCounter patternCounter = new PatternCounter(this, subquery);
 
+        if (size() < subquery.size() || maxDegree() < subquery.maxDegree())
+            return Collections.emptyIterator();
+
         for (int index = 0; index < subquery.size(); index++) {
+            IntSet srcIndices = subquery.srcEdgeIndices.get(index);
+
             for (int i = 0; i < size(); i++) {
-                IntSet pIndices = subquery.parentIndices.get(index);
-                if (!labels[i].equals(labels[index]) || degrees[i] < subquery.degrees[index] ||
-                        tc[i] < subquery.tc[i])
+                if (!labels[i].equals(subquery.labels[index]) ||
+                        degrees[i] < subquery.degrees[index])
                     continue;
 
+                if (subquery.tc[index] > 0) {
+                    if (tc == null)
+                        continue;
+                    if (tc[i] < subquery.tc[index])
+                        continue;
+                }
+
                 int vertex = vertices[i];
-                patternCounter.add(index, vertex, pIndices);
-                vCounter.addTo(vertices[i], 1);
+                patternCounter.add(index, vertex, srcIndices);
+                vCounter.addTo(vertex, 1);
             }
 
             if (!patternCounter.finalize(index))
