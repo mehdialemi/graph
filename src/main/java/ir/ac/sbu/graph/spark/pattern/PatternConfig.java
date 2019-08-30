@@ -5,6 +5,8 @@ import ir.ac.sbu.graph.spark.SparkAppConf;
 import ir.ac.sbu.graph.spark.pattern.index.IndexRow;
 import ir.ac.sbu.graph.spark.pattern.index.fonl.value.*;
 import ir.ac.sbu.graph.spark.pattern.query.Subquery;
+import ir.ac.sbu.graph.spark.pattern.search.MatchCount;
+import ir.ac.sbu.graph.spark.pattern.search.PatternCounter;
 import ir.ac.sbu.graph.types.Edge;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.SparkConf;
@@ -85,7 +87,8 @@ public class PatternConfig {
                 sparkConf.registerKryoClasses(new Class[]{
                         IndexRow.class,
                         FonlValue.class,
-                        IndexValue.class,
+                        MatchCount.class,
+                        PatternCounter.class,
                         TriangleFonlValue.class,
                         Meta.class,
                         LabelDegreeTriangleMeta.class,

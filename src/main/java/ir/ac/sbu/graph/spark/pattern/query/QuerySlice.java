@@ -97,75 +97,19 @@ public class QuerySlice {
     }
 
     public Subquery subquery() {
-
-        boolean hasTc = triangleIndex.size() + tc > 0;
-        Subquery subquery = new Subquery(fonlValue.length + 1, hasTc, links.size());
+        Subquery subquery = new Subquery(fonlValue.length + 1, links.size(), triangleIndex);
         subquery.vertices[0] = v;
         subquery.labels[0] = label;
         subquery.degrees[0] = degree;
         System.arraycopy(fonlValue, 0, subquery.vertices, 1, fonlValue.length);
         System.arraycopy(labels, 0, subquery.labels, 1, labels.length);
         System.arraycopy(degrees, 0, subquery.degrees, 1, degrees.length);
-
-        if (hasTc) {
-            subquery.tc[0] = tc;
-            for (Map.Entry<Integer, Integer> entry : triangleIndexCount.entrySet()) {
-                subquery.tc[entry.getKey() + 1] = entry.getValue();
-            }
-        }
-
         for (int i = 0; i < links.size(); i++) {
-            subquery.links[i] = links.get(i)._1;
-        }
-
-        // vertex in index 0 is connected to all other vertices in index 1 .. len - 1
-        Int2ObjectMap<IntSet> cMapSet = new Int2ObjectOpenHashMap<>();
-        for (Tuple2<Integer, Integer> edge : triangleIndex) {
-            cMapSet.computeIfAbsent(edge._1, v -> new IntOpenHashSet()).add(edge._2);
-        }
-        Int2ObjectMap<IntSet> cMapSetBackup = new Int2ObjectOpenHashMap<>(cMapSet);
-
-        int[] indices = cMapSet.keySet().toIntArray();
-        for (int i = 0; i < indices.length; i++) {
-            int index = indices[i];
-            IntSet vIdxNeighbors = cMapSet.get(index);
-            for (int vIdxNeighbor : vIdxNeighbors.toIntArray()) {
-                IntSet vIdxNeighbor2 = cMapSet.get(vIdxNeighbor);
-                vIdxNeighbors.retainAll(vIdxNeighbor2);
-                vIdxNeighbors.add(vIdxNeighbor);
-            }
-        }
-
-        for (int index : indices) {
-            IntSet vIdxNeighbors = cMapSetBackup.get(index);
-            vIdxNeighbors.removeAll(cMapSet.get(index));
-        }
-
-        List<int[]> list = createIdxCliques(cMapSet);
-        list.addAll(createIdxCliques(cMapSetBackup));
-
-        if (list.size() > 0) {
-            subquery.cliques = new int[list.size()][];
-            for (int i = 0; i < list.size(); i++) {
-                subquery.cliques[i] = list.get(i);
-            }
+            subquery.links.add(links.get(i)._1);
         }
 
        return subquery;
     }
-
-    private List<int[]> createIdxCliques(Int2ObjectMap<IntSet> map) {
-        List<int[]> cSet = new ArrayList<>();
-        for (Map.Entry<Integer, IntSet> entry : map.entrySet()) {
-            IntSet set = entry.getValue();
-            if (set.isEmpty())
-                continue;
-            set.add(entry.getKey());
-            cSet.add(set.toIntArray());
-        }
-        return cSet;
-    }
-
 
     private int fonlIndex(int v) {
         for (int i = 0; i < fonlValue.length; i++) {

@@ -35,7 +35,7 @@ public class TriangleMeta extends Meta {
         LongSortedSet edgeSet = new LongAVLTreeSet();
         Int2IntOpenHashMap tcMap = new Int2IntOpenHashMap();
         for (Edge edge : triangleEdges) {
-            edgeSet.add((long)edge.v1 << 32 | edge.v2 & 0xFFFFFFFFL);
+            edgeSet.add(edge.toLong());
             tcMap.addTo(edge.v1, 1);
             tcMap.addTo(edge.v2, 1);
             tc ++;

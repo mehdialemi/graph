@@ -1,18 +1,24 @@
 package ir.ac.sbu.graph.spark.pattern.index;
 
 import ir.ac.sbu.graph.spark.pattern.index.fonl.value.LabelDegreeTriangleMeta;
+import ir.ac.sbu.graph.spark.pattern.query.Subquery;
+import ir.ac.sbu.graph.spark.pattern.search.MatchCount;
+import ir.ac.sbu.graph.spark.pattern.search.PatternCounter;
+import ir.ac.sbu.graph.types.Edge;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.spark.sql.Row;
 import scala.Tuple2;
 
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.*;
 
 public class IndexRow implements Serializable {
 
     private int[] vertices;
     private String[] labels;
     private int[] degrees;
-    private int[] tCounts;
+    private int[] tc;
     private long[] edges;
 
     public IndexRow() { }
@@ -21,7 +27,7 @@ public class IndexRow implements Serializable {
         vertices = (int[]) row.get(0);
         labels = (String[]) row.get(1);
         degrees = (int[]) row.get(2);
-        tCounts = (int[]) row.get(3);
+        tc = (int[]) row.get(3);
         edges = (long[]) row.get(4);
     }
 
@@ -39,10 +45,10 @@ public class IndexRow implements Serializable {
         System.arraycopy(meta.getDegrees(), 0, degrees, 1, meta.getDegrees().length);
 
         if (meta.getTc() > 0) {
-            tCounts = new int[vertices.length];
-            tCounts[0] = meta.getTc();
+            tc = new int[vertices.length];
+            tc[0] = meta.getTc();
             for (int i = 0; i < meta.getvTc().length; i++) {
-                tCounts[i + 1] = meta.getvTc()[i];
+                tc[i + 1] = meta.getvTc()[i];
             }
         }
 
@@ -50,9 +56,52 @@ public class IndexRow implements Serializable {
         Arrays.sort(edges);
     }
 
-    public static Tuple2<Integer, IndexRow> toTuple(Row row) {
-        IndexRow r = new IndexRow(row);
-        return new Tuple2<>(r.vertices[0], r);
+    public Tuple2<Integer, IndexRow> toTuple() {
+        return new Tuple2<>(vertices[0], this);
+    }
+
+    public boolean hasEdge(int v1, int v2) {
+        long edge = Edge.longEdge(v1, v2);
+        return Arrays.binarySearch(edges, edge) >= 0;
+    }
+
+    public Iterator<Tuple2<Integer, MatchCount>> counts(Subquery subquery) {
+
+        Int2IntOpenHashMap vCounter = new Int2IntOpenHashMap();
+        PatternCounter patternCounter = new PatternCounter(this, subquery);
+
+        for (int index = 0; index < subquery.size(); index++) {
+            for (int i = 0; i < size(); i++) {
+                IntSet pIndices = subquery.parentIndices.get(index);
+                if (!labels[i].equals(labels[index]) || degrees[i] < subquery.degrees[index] ||
+                        tc[i] < subquery.tc[i])
+                    continue;
+
+                int vertex = vertices[i];
+                patternCounter.add(index, vertex, pIndices);
+                vCounter.addTo(vertices[i], 1);
+            }
+
+            if (!patternCounter.finalize(index))
+                return Collections.emptyIterator();
+        }
+
+        Int2IntOpenHashMap counts = patternCounter.counts();
+        List<Tuple2<Integer, MatchCount>> out = new ArrayList<>();
+        for (Map.Entry<Integer, Integer> entry : counts.entrySet()) {
+            MatchCount matchCount = new MatchCount(vertices[0], entry.getValue(), entry.getKey());
+            out.add(new Tuple2<>(vertices[entry.getKey()], matchCount));
+        }
+
+        return out.iterator();
+    }
+
+    private int size() {
+        return vertices.length;
+    }
+
+    private int maxDegree() {
+        return degrees[size() - 1];
     }
 
     public int[] getVertices() {
@@ -79,12 +128,12 @@ public class IndexRow implements Serializable {
         this.degrees = degrees;
     }
 
-    public int[] gettCounts() {
-        return tCounts;
+    public int[] getTc() {
+        return tc;
     }
 
-    public void settCounts(int[] tCounts) {
-        this.tCounts = tCounts;
+    public void setTc(int[] tc) {
+        this.tc = tc;
     }
 
     public long[] getEdges() {

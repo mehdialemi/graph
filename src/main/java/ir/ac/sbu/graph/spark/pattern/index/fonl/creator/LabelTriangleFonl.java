@@ -32,20 +32,24 @@ public class LabelTriangleFonl {
         // make an RDD containing degree and labels of each vertex
         JavaPairRDD<Integer, String> labelRDD = loadLabels(neighbors);
 
-        JavaPairRDD<Integer, Iterable<Tuple3<Integer, Integer, String>>> degreeLabelMessage = neighbors
-                .leftOuterJoin(labelRDD)
-                .mapValues(v -> new Tuple2<>(v._1, v._2.or("_")))
-                .flatMapToPair(kv -> {
+        JavaPairRDD<Integer, Iterable<Tuple3<Integer, Integer, String>>> degreeLabelMessage =
+                neighbors.leftOuterJoin(labelRDD)
+                        .mapValues(v -> new Tuple2<>(v._1, v._2.or("_")))
+                        .flatMapToPair(kv -> {
 
-                    List<Tuple2<Integer, Tuple3<Integer, Integer, String>>> out = new ArrayList<>();
-                    Tuple3<Integer, Integer, String> neighborDegreeLabel = new Tuple3<>(kv._1, kv._2._1.length, kv._2._2);
-                    for (int neighbor : kv._2._1) {
-                        out.add(new Tuple2<>(neighbor, neighborDegreeLabel));
-                    }
-                    // add itself
-                    out.add(new Tuple2<>(kv._1, neighborDegreeLabel));
-                    return out.iterator();
-                }).groupByKey(config.getPartitionNum());
+                            List<Tuple2<Integer, Tuple3<Integer, Integer, String>>> out =
+                                    new ArrayList<>();
+
+                            Tuple3<Integer, Integer, String> neighborDegreeLabel =
+                                    new Tuple3<>(kv._1, kv._2._1.length, kv._2._2);
+
+                            for (int neighbor : kv._2._1) {
+                                out.add(new Tuple2<>(neighbor, neighborDegreeLabel));
+                            }
+                            // add itself
+                            out.add(new Tuple2<>(kv._1, neighborDegreeLabel));
+                            return out.iterator();
+                        }).groupByKey(config.getPartitionNum());
 
         return triangleFonlRDD.join(degreeLabelMessage, config.getPartitionNum())
                 .map(kv -> {
@@ -55,8 +59,8 @@ public class LabelTriangleFonl {
                         v2Index.put(triangleFonlValue.fonl[i], i);
                     }
 
-                    LabelDegreeTriangleMeta meta =
-                            new LabelDegreeTriangleMeta(triangleFonlValue.meta, triangleFonlValue.fonl.length);
+                    LabelDegreeTriangleMeta meta = new LabelDegreeTriangleMeta(
+                            triangleFonlValue.meta, triangleFonlValue.fonl.length);
 
                     for (Tuple3<Integer, Integer, String> neighborDegreeLabel : kv._2._2) {
                         if (neighborDegreeLabel._1().equals(kv._1)) {
@@ -64,7 +68,8 @@ public class LabelTriangleFonl {
                         } else {
                             int index = v2Index.getOrDefault(neighborDegreeLabel._1(), -1);
                             if (index >= 0) {
-                                meta.setLabelDegree(index, neighborDegreeLabel._3(), neighborDegreeLabel._2());
+                                meta.setLabelDegree(index,
+                                        neighborDegreeLabel._3(), neighborDegreeLabel._2());
                             }
                         }
                     }

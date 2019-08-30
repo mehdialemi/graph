@@ -14,6 +14,16 @@ public class Edge {
         this.v2 = v2;
     }
 
+    public long toLong() {
+        return longEdge(v1, v2);
+    }
+
+    public static long longEdge(int v1, int v2) {
+        if (v1 < v2)
+            return (long)v1 << 32 | v2 & 0xFFFFFFFFL;
+        return (long)v2 << 32 | v1 & 0xFFFFFFFFL;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null)

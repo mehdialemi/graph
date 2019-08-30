@@ -45,22 +45,14 @@ public class LabelDegreeTriangleFonlValue extends FonlValue <LabelDegreeTriangle
         // Vertices are sorted by their degree accordingly.
         // Candidate vertices should have higher degree than that of sub-query
 
-        if (fonl.length < subquery.fonlValue.length || meta.maxDegree() < subquery.maxDegree())
+        if (fonl.length < subquery.vertices .length || meta.maxDegree() < subquery.maxDegree())
             return null;
 
-        // Find candidates for the key related properties of sub-query
-        IntList candidates = candidates(subquery.label, subquery.degree, subquery.tc);
-
-        // If no candidate found for the key then return without result
-        if (candidates == null)
-            return null;
-
-        IntList[] cIndices = new IntList[subquery.fonlValue.length + 1];
-        cIndices[0] = candidates;
+        IntList[] cIndices = new IntList[subquery.size()];
 
         // Iterate over vertices of sub-query and find all of the candidates per one separately.
-        for (int i = 0; i < subquery.fonlValue.length; i++) {
-            candidates = candidates(subquery.labels[i], subquery.degrees[i], subquery.vTc[i]);
+        for (int i = 0; i < subquery.vertices.length; i++) {
+            IntList candidates = candidates(subquery.labels[i], subquery.degrees[i], subquery.tc[i]);
 
             // if no candidate found for index i of sub query fonl value then return without result
             if (candidates == null)

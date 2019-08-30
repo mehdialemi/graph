@@ -11,7 +11,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
+import org.apache.spark.sql.Encoder;
+import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SQLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,12 +20,12 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 
-public class GraphIndex {
-    private static final Logger logger = LoggerFactory.getLogger(GraphIndex.class);
+public class GraphIndexer {
+    private static final Logger logger = LoggerFactory.getLogger(GraphIndexer.class);
 
     private PatternConfig config;
 
-    public GraphIndex(PatternConfig config) {
+    public GraphIndexer(PatternConfig config) {
         this.config = config;
     }
 
@@ -43,19 +44,25 @@ public class GraphIndex {
         JavaRDD<IndexRow> indexRows = labelTriangleFonl.create(neighbors);
 
         SQLContext sqlContext = config.getSparkAppConf().getSqlContext();
-        Dataset<Row> dataFrame = sqlContext.createDataFrame(indexRows, IndexRow.class);
-        dataFrame.write().parquet(config.getIndexPath());
+        Encoder<IndexRow> indexRowEncoder = Encoders.bean(IndexRow.class);
+        Dataset<IndexRow> dataset = sqlContext.createDataset(indexRows.rdd(), indexRowEncoder);
+        dataset.write().parquet(config.getIndexPath());
     }
 
     private JavaPairRDD <Integer, IndexRow> indexRDD;
 
-    public JavaPairRDD <Integer, IndexRow> indexRDD() {
+    public JavaPairRDD <Integer, IndexRow> getIndex() {
         logger.info("loading index from hdfs");
         if (indexRDD == null) {
+
+            Encoder<IndexRow> indexRowEncoder = Encoders.bean(IndexRow.class);
             SQLContext sqlContext = config.getSparkAppConf().getSqlContext();
+
             indexRDD = sqlContext.read()
                     .parquet(config.getIndexPath())
-                    .toJavaRDD().mapToPair(row -> IndexRow.toTuple(row))
+                    .as(indexRowEncoder)
+                    .toJavaRDD()
+                    .mapToPair(kv -> kv.toTuple())
                     .repartition(config.getPartitionNum())
                     .persist(config.getSparkAppConf().getStorageLevel());
         }
@@ -70,8 +77,8 @@ public class GraphIndex {
             conf = ConfigFactory.parseFile(new File(args[0]));
 
         PatternConfig config = new PatternConfig(conf, "index");
-        GraphIndex graphIndex = new GraphIndex(config);
-        graphIndex.constructIndex();
+        GraphIndexer graphIndexer = new GraphIndexer(config);
+        graphIndexer.constructIndex();
         logger.info("graph index is constructed successfully, index path: {}", config.getIndexPath());
     }
 }
