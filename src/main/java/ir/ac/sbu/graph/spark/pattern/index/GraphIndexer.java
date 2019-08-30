@@ -52,7 +52,8 @@ public class GraphIndexer {
     private JavaPairRDD <Integer, IndexRow> indexRDD;
 
     public JavaPairRDD <Integer, IndexRow> getIndex() {
-        logger.info("loading index from hdfs");
+        logger.info("loading index from hdfs, graph: {}", config.getTargetGraph());
+        long start = System.currentTimeMillis();
         if (indexRDD == null) {
 
             Encoder<IndexRow> indexRowEncoder = Encoders.bean(IndexRow.class);
@@ -66,6 +67,10 @@ public class GraphIndexer {
                     .repartition(config.getPartitionNum())
                     .persist(config.getSparkAppConf().getStorageLevel());
         }
+
+        long count = indexRDD.count();
+        long duration = System.currentTimeMillis() - start;
+        logger.info("successfully loaded index, num rows: {}, duration: {} ms", count, duration);
 
         return indexRDD;
     }

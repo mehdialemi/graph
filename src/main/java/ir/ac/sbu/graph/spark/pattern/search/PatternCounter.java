@@ -36,12 +36,10 @@ public class PatternCounter {
         if (!indexRow.labels[rIndex].equals(subquery.labels[qIndex]) ||
                 indexRow.degrees[rIndex] < subquery.degrees[qIndex])
             return false;
-        if (subquery.tc[qIndex] > 0) {
-            if (indexRow.tc == null)
-                return false;
-            if (indexRow.tc[rIndex] < subquery.tc[qIndex])
-                return false;
-        }
+
+        if (subquery.tc[qIndex] > 0)
+            return indexRow.tc != null && indexRow.tc[rIndex] >= subquery.tc[qIndex];
+
         return true;
     }
 

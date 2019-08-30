@@ -27,7 +27,7 @@ public class SparkAppConf {
     private final StorageLevel storageLevel;
 
     public SparkAppConf() {
-        storageLevel = StorageLevel.MEMORY_AND_DISK();
+        storageLevel = StorageLevel.MEMORY_ONLY();
     }
 
     public SparkAppConf(SparkAppConf conf) {
