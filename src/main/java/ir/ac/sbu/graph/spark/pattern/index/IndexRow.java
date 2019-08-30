@@ -14,11 +14,11 @@ import java.util.*;
 
 public class IndexRow implements Serializable {
 
-    private int[] vertices;
-    private String[] labels;
-    private int[] degrees;
-    private int[] tc;
-    private long[] edges;
+    public int[] vertices;
+    public String[] labels;
+    public int[] degrees;
+    public int[] tc;
+    public long[] edges;
 
     public IndexRow() {
     }
@@ -55,53 +55,11 @@ public class IndexRow implements Serializable {
         return Arrays.binarySearch(edges, edge) >= 0;
     }
 
-    public Iterator<Tuple2<Integer, MatchCount>> counts(Subquery subquery) {
-
-        Int2IntOpenHashMap vCounter = new Int2IntOpenHashMap();
-        PatternCounter patternCounter = new PatternCounter(this, subquery);
-
-        if (size() < subquery.size() || maxDegree() < subquery.maxDegree())
-            return Collections.emptyIterator();
-
-        for (int index = 0; index < subquery.size(); index++) {
-            IntSet srcIndices = subquery.srcEdgeIndices.get(index);
-
-            for (int i = 0; i < size(); i++) {
-                if (!labels[i].equals(subquery.labels[index]) ||
-                        degrees[i] < subquery.degrees[index])
-                    continue;
-
-                if (subquery.tc[index] > 0) {
-                    if (tc == null)
-                        continue;
-                    if (tc[i] < subquery.tc[index])
-                        continue;
-                }
-
-                int vertex = vertices[i];
-                patternCounter.add(index, vertex, srcIndices);
-                vCounter.addTo(vertex, 1);
-            }
-
-            if (!patternCounter.finalize(index))
-                return Collections.emptyIterator();
-        }
-
-        Int2IntOpenHashMap counts = patternCounter.counts();
-        List<Tuple2<Integer, MatchCount>> out = new ArrayList<>();
-        for (Map.Entry<Integer, Integer> entry : counts.entrySet()) {
-            MatchCount matchCount = new MatchCount(vertices[0], entry.getValue(), entry.getKey());
-            out.add(new Tuple2<>(vertices[entry.getKey()], matchCount));
-        }
-
-        return out.iterator();
-    }
-
-    private int size() {
+    public int size() {
         return vertices.length;
     }
 
-    private int maxDegree() {
+    public int maxDegree() {
         return degrees[size() - 1];
     }
 

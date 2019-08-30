@@ -29,9 +29,9 @@ public class GraphIndexer {
         this.config = config;
     }
 
-    public void constructIndex() throws IOException {
+    private void constructIndex() throws IOException {
         FileSystem fileSystem = FileSystem.newInstance(config.getHadoopConf());
-        fileSystem.delete(new Path(config.getIndexPath()));
+        fileSystem.delete(new Path(config.getIndexPath()), true);
 
         EdgeLoader edgeLoader = new EdgeLoader(config.getSparkAppConf());
         JavaPairRDD<Integer, Integer> edges = edgeLoader.create();
@@ -62,12 +62,11 @@ public class GraphIndexer {
                     .parquet(config.getIndexPath())
                     .as(indexRowEncoder)
                     .toJavaRDD()
-                    .mapToPair(kv -> kv.toTuple())
+                    .mapToPair(IndexRow::toTuple)
                     .repartition(config.getPartitionNum())
                     .persist(config.getSparkAppConf().getStorageLevel());
         }
 
-        logger.info("index row count: {}", indexRDD.count());
         return indexRDD;
     }
 

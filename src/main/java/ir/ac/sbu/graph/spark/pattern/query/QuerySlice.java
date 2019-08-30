@@ -29,6 +29,7 @@ public class QuerySlice {
     //     >
     private List<Tuple2<Integer, QuerySlice>> links = new ArrayList<>();
     private boolean hasParent = false;
+    private QuerySlice parent;
 
     public QuerySlice() {
     }
@@ -86,6 +87,19 @@ public class QuerySlice {
     public void addLink(int fonlValueIndex, QuerySlice sliceLink) {
         links.add(new Tuple2<>(fonlValueIndex, sliceLink));
         sliceLink.hasParent = true;
+        sliceLink.parent = this;
+    }
+
+    public QuerySlice getParentVertex() {
+        return parent;
+    }
+
+    public int getLinkIndex(QuerySlice querySlice) {
+        for (Tuple2<Integer, QuerySlice> tuple2 : links) {
+            if (querySlice == tuple2._2)
+                return tuple2._1 + 1;
+        }
+        return -1;
     }
 
     public boolean hasParent() {
@@ -96,16 +110,20 @@ public class QuerySlice {
         return fonlValue;
     }
 
+    private Subquery subquery = null;
     public Subquery subquery() {
-        Subquery subquery = new Subquery(fonlValue.length + 1, triangleIndex);
-        subquery.vertices[0] = v;
-        subquery.labels[0] = label;
-        subquery.degrees[0] = degree;
-        System.arraycopy(fonlValue, 0, subquery.vertices, 1, fonlValue.length);
-        System.arraycopy(labels, 0, subquery.labels, 1, labels.length);
-        System.arraycopy(degrees, 0, subquery.degrees, 1, degrees.length);
-        for (int i = 0; i < links.size(); i++) {
-            subquery.links.add(links.get(i)._1 + 1);
+        if (subquery == null) {
+            subquery = new Subquery(fonlValue.length + 1, triangleIndex);
+            subquery.vertices[0] = v;
+            subquery.labels[0] = label;
+            subquery.degrees[0] = degree;
+            System.arraycopy(fonlValue, 0, subquery.vertices, 1, fonlValue.length);
+            System.arraycopy(labels, 0, subquery.labels, 1, labels.length);
+            System.arraycopy(degrees, 0, subquery.degrees, 1, degrees.length);
+
+            for (int i = 0; i < links.size(); i++) {
+                subquery.links.add(links.get(i)._1 + 1);
+            }
         }
 
        return subquery;

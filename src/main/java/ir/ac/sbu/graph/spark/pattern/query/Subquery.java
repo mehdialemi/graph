@@ -40,13 +40,13 @@ public class Subquery implements Serializable {
         for (Tuple2<Integer, Integer> t : triangleIndex) {
             int v2Index = t._1 + 1;
             int v3Index = t._2 + 1;
-            if (v2Index != v1Index) {
-                srcEdgeIndices.computeIfAbsent(v2Index, v -> new IntOpenHashSet()).add(v1Index);
-            }
-
-            if (v3Index != v1Index) {
-                srcEdgeIndices.computeIfAbsent(v3Index, v -> new IntOpenHashSet()).add(v1Index);
-            }
+//            if (v2Index != v1Index) {
+//                srcEdgeIndices.computeIfAbsent(v2Index, v -> new IntOpenHashSet()).add(v1Index);
+//            }
+//
+//            if (v3Index != v1Index) {
+//                srcEdgeIndices.computeIfAbsent(v3Index, v -> new IntOpenHashSet()).add(v1Index);
+//            }
 
             if (v3Index != v2Index) {
                 srcEdgeIndices.computeIfAbsent(v3Index, v -> new IntOpenHashSet()).add(v2Index);

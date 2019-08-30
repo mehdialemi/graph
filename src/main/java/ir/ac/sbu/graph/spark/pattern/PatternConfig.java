@@ -8,6 +8,10 @@ import ir.ac.sbu.graph.spark.pattern.query.Subquery;
 import ir.ac.sbu.graph.spark.pattern.search.MatchCount;
 import ir.ac.sbu.graph.spark.pattern.search.PatternCounter;
 import ir.ac.sbu.graph.types.Edge;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -102,6 +106,10 @@ public class PatternConfig {
                         String[].class,
                         Subquery.class,
                         Tuple2[].class,
+                        Int2ObjectMap.class,
+                        IntSet.class,
+                        Int2ObjectOpenHashMap.class,
+                        IntOpenHashSet.class
                 });
 
                 javaSparkContext = new JavaSparkContext(sparkConf);
@@ -116,6 +124,10 @@ public class PatternConfig {
 
     public SparkAppConf getSparkAppConf() {
         return sparkAppConf;
+    }
+
+    public JavaSparkContext getSparkContext() {
+        return sparkAppConf.getJavaSparkContext();
     }
 
     public String getInputDir() {

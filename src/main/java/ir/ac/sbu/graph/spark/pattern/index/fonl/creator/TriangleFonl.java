@@ -59,6 +59,8 @@ public class TriangleFonl {
 
                             // add edge (v, w) to TriangleFonlValue to recognize a triangle in the fonl kv with key = u
                             output.add(new Tuple2<>(u, new Edge(v, w)));
+//                            output.add(new Tuple2<>(u, new Edge(u, v)));
+//                            output.add(new Tuple2<>(u, new Edge(u, w)));
                         }
                     } while (candidateIterator.hasNext());
 

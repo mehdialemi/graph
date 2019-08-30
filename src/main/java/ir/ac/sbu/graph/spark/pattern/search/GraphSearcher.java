@@ -9,110 +9,75 @@ import ir.ac.sbu.graph.spark.pattern.index.IndexRow;
 import ir.ac.sbu.graph.spark.pattern.query.Query;
 import ir.ac.sbu.graph.spark.pattern.query.QuerySlice;
 import ir.ac.sbu.graph.spark.pattern.query.Subquery;
-import ir.ac.sbu.graph.spark.pattern.utils.PatternDebugUtils;
 import ir.ac.sbu.graph.spark.pattern.utils.QuerySamples;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.broadcast.Broadcast;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GraphSearcher extends SparkApp {
     private static final Logger logger = LoggerFactory.getLogger(GraphSearcher.class);
-    private GraphIndexer graphIndexer;
     private PatternConfig config;
-    private final Map<QuerySlice, JavaPairRDD<Integer, MatchCount>> sliceMatches = new HashMap<>();
+    private final Map<QuerySlice, JavaPairRDD<Integer, MatchCount>> sliceMatches;
+    private final JavaPairRDD<Integer, IndexRow> index;
 
     public GraphSearcher(PatternConfig config) {
         super(config.getSparkAppConf());
         this.config = config;
-
-        this.graphIndexer = new GraphIndexer(config);
-        this.graphIndexer.getIndex(); // load index rdd for the first time
+        this.sliceMatches = new HashMap<>();
+        index = new GraphIndexer(config).getIndex(); // load index rdd for the first time
     }
 
     public long search(Query query) {
         List<QuerySlice> querySlices = query.getQuerySlices();
-        logger.info("Query: {}", query);
 
         if (querySlices.isEmpty())
             throw new RuntimeException("No query slice found");
 
-        for (QuerySlice querySlice : querySlices) {
+        Queue<QuerySlice> querySliceQueue = new LinkedList<>(querySlices);
+        while (!querySliceQueue.isEmpty()) {
+            QuerySlice querySlice = querySliceQueue.poll();
+            Subquery subquery = querySlice.subquery();
             JavaPairRDD<Integer, MatchCount> sliceMatch;
 
-            if (querySlice.isProcessed()) {
-                // if the current query slice and all of its links are processed
-                // then there are nothing to do
-                if (!querySlice.hasNotProcessedLink())
-                    continue;
+            JavaPairRDD<Integer, IndexRow> index;
+            if (querySlice.hasParent()) {
+                QuerySlice parentQuerySlice = querySlice.getParentVertex();
+                int linkIndex = parentQuerySlice.getLinkIndex(querySlice);
 
-                // if there are some unprocessed links, then we can get the result of
-                // current query slice from the map of computed matches.
-                sliceMatch = sliceMatches.get(querySlice);
-                logger.info("Match count from the sliceMatch, for vertex: {}", querySlice.getV());
+                Broadcast<Integer> linkIndexBroadcast = config
+                        .getSparkContext()
+                        .broadcast(linkIndex);
+
+                JavaPairRDD<Integer, MatchCount> parent = sliceMatches.get(parentQuerySlice);
+
+                index = parent
+                        .filter(kv -> kv._2.equalLink(linkIndexBroadcast.getValue()))
+                        .groupByKey(config.getPartitionNum())
+                        .distinct()
+                        .join(this.index)
+                        .mapValues(v -> v._2)
+                        .repartition(config.getPartitionNum())
+                        .persist(config.getSparkAppConf().getStorageLevel());
 
             } else {
-                // the current query slice is not processed, then it should be processed
-                sliceMatch = findMatchCounts(config.getSparkAppConf().getJavaSparkContext(),
-                        querySlice, graphIndexer.getIndex());
-                long count = sliceMatch.count();
-
-                logger.info("slice match count: {}, for vertex: {}", count, querySlice.getV());
-                if (count == 0)
-                    return 0;
-
-                querySlice.setProcessed(true);
-                sliceMatches.put(querySlice, sliceMatch);
-                PatternDebugUtils.printSliceMatch(sliceMatch, querySlice.getV());
+                index = this.index;
             }
 
-            // find the matchIndices for the links
-            for (Tuple2<Integer, QuerySlice> link : querySlice.getLinks()) {
+            // the current query slice is not processed, then it should be processed
+            sliceMatch = matches(index, subquery);
+            long count = sliceMatch.count();
 
-                QuerySlice sliceLink = link._2;
-                if (sliceLink.isProcessed())
-                    continue;
+            logger.info("slice match count: {}, for vertex: {}", count, querySlice.getV());
+            if (count == 0)
+                return 0;
 
-                final int linkIndex = link._1;
-                JavaPairRDD<Integer, Iterable<MatchCount>> leftKey = sliceMatch
-                        .filter(kv -> kv._2.equalLink(linkIndex))
-                        .groupByKey();
-
-                PatternDebugUtils.printFonlLeft(leftKey);
-
-                JavaPairRDD<Integer, IndexRow> indexSubset = leftKey
-                        .join(graphIndexer.getIndex())
-                        .mapValues(v -> v._2);
-
-                PatternDebugUtils.printFonlSubset(indexSubset);
-
-                JavaPairRDD<Integer, MatchCount> linkSliceMatch = findMatchCounts(
-                        config.getSparkAppConf().getJavaSparkContext(), sliceLink, indexSubset);
-
-                // if nothing matched then no match exist
-                long count = linkSliceMatch.count();
-                logger.info("link match, parent: {}, link: {}, count: {}", querySlice.getV(),
-                        sliceLink.getV(), count);
-                if (count == 0)
-                    return 0;
-
-                PatternDebugUtils.printLinkSliceMatch(linkSliceMatch);
-
-                querySlice.setProcessed(true);
-                sliceMatches.put(querySlice, linkSliceMatch);
-                PatternDebugUtils.printSliceMatch(linkSliceMatch, querySlice.getV());
-            }
-        }
-
-        for (QuerySlice querySlice : querySlices) {
-            querySlice.setProcessed(false);
+            querySlice.setProcessed(true);
+            sliceMatches.put(querySlice, sliceMatch);
         }
 
         JavaPairRDD<Integer, Long> counter = counter(querySlices.get(0));
@@ -124,7 +89,7 @@ public class GraphSearcher extends SparkApp {
 
         JavaPairRDD<Integer, Long> counts = sliceMatches
                 .get(querySlice)
-                .mapValues(v -> v.getCount());
+                .mapValues(MatchCount::getCount);
 
         if (querySlice.getLinks().isEmpty())
             return counts;
@@ -142,22 +107,17 @@ public class GraphSearcher extends SparkApp {
     /**
      * find matches based on the given ldtFonlRdd and querySlice.
      *
-     * @param sc         is used to broadcast subquery
-     * @param querySlice the current query part to constructIndex subquery
+     * @param subquery the current query part to constructIndex subquery
      * @return key-values => (key: vertex, Tuple3<>(value: source fonl key, linkIndex, count of matches for the key))
      */
-    private JavaPairRDD<Integer, MatchCount> findMatchCounts(final JavaSparkContext sc, QuerySlice querySlice,
-                                                          JavaPairRDD<Integer, IndexRow> indexRDD) {
+    private JavaPairRDD<Integer, MatchCount> matches(JavaPairRDD<Integer, IndexRow> indexRDD,
+                                                     Subquery subquery) {
 
-        Broadcast<Subquery> broadcast = sc.broadcast(querySlice.subquery());
-        return indexRDD.flatMapToPair(kv -> {
-
-            // get the subquery from the broadcast data
-            Subquery subquery = broadcast.getValue();
-
-            // get all of the matches for the current subquery
-            return kv._2.counts(subquery);
-        }).cache();
+        logger.info("index rows: {}, subquery: {} ", indexRDD.count(), subquery);
+        Broadcast<Subquery> subqueryBroadcast = config.getSparkContext().broadcast(subquery);
+        return indexRDD.flatMapToPair(kv ->
+                new PatternCounter(kv._2, subqueryBroadcast.getValue()).counts())
+                .persist(config.getSparkAppConf().getStorageLevel());
     }
 
     public static void main(String[] args) {
@@ -167,10 +127,6 @@ public class GraphSearcher extends SparkApp {
 
         PatternConfig config = new PatternConfig(conf, "search");
         Query querySample = QuerySamples.getSample(config.getQuerySample());
-        for (QuerySlice querySlice : querySample.getQuerySlices()) {
-            Subquery subquery = querySlice.subquery();
-            logger.info("Subquery: {}", subquery);
-        }
 
         GraphSearcher matcher = new GraphSearcher(config);
         long count = matcher.search(querySample);
