@@ -58,7 +58,6 @@ public class PatternConfig {
         partitionNum = conf.getInt("partitionNum");
         cores = conf.getInt("cores");
         driverMemoryGB = conf.getInt("driverMemoryGB");
-
         sparkAppConf = createSparkAppConf();
         sparkAppConf.init();
 
