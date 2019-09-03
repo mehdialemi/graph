@@ -17,7 +17,7 @@ package ir.ac.sbu.graph.ktruss.scala;
                 val support = k - 2
 
                 // Step 1: Create fonl
-                // Find neighbors, duplicate links are removed, no direction
+                // Find neighbors, duplicate linkIndices are removed, no direction
                 val neighbor = sc.textFile(inputPath, partitions)
                   .filter(t => !t.startsWith("#")).map(t => t.split("\\s+"))
                   .map(t => t(0).toLong -> t(1).toLong)

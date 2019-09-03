@@ -24,6 +24,7 @@ public class GraphSearcher extends SparkApp {
     private PatternConfig config;
     private final Map<QuerySlice, JavaPairRDD<Integer, MatchCount>> sliceMatches;
     private final JavaPairRDD<Integer, IndexRow> index;
+    private long searchTime;
 
     public GraphSearcher(PatternConfig config) {
         super(config.getSparkAppConf());
@@ -32,18 +33,23 @@ public class GraphSearcher extends SparkApp {
         index = new GraphIndexer(config).getIndex(); // load index rdd for the first time
     }
 
+    public long getSearchTime() {
+        return searchTime;
+    }
+
     public long search(Query query) {
         List<QuerySlice> querySlices = query.getQuerySlices();
 
         if (querySlices.isEmpty())
             throw new RuntimeException("No query slice found");
 
+        searchTime = 0;
         Queue<QuerySlice> querySliceQueue = new LinkedList<>(querySlices);
         while (!querySliceQueue.isEmpty()) {
             QuerySlice querySlice = querySliceQueue.poll();
             Subquery subquery = querySlice.subquery();
 
-
+            long start = System.currentTimeMillis();
             JavaPairRDD<Integer, IndexRow> index;
             if (querySlice.hasParent()) {
                 QuerySlice parentQuerySlice = querySlice.getParentVertex();
@@ -69,10 +75,11 @@ public class GraphSearcher extends SparkApp {
             }
 
             long indexRows = index.count();
-            long start = System.currentTimeMillis();
+
             JavaPairRDD<Integer, MatchCount> matches = matches(index, subquery);
             long matchCount = matches.count();
             long duration = System.currentTimeMillis() - start;
+            searchTime += duration;
             logger.info("index rows: {}, match count: {}, subquery vertex: {}, duration: {} ms",
                     indexRows, matchCount, querySlice.getV(), duration);
             if (matchCount == 0)
@@ -120,10 +127,9 @@ public class GraphSearcher extends SparkApp {
     private JavaPairRDD<Integer, MatchCount> matches(JavaPairRDD<Integer, IndexRow> indexRDD,
                                                      Subquery subquery) {
 
-
         Broadcast<Subquery> subqueryBroadcast = config.getSparkContext().broadcast(subquery);
         return indexRDD.flatMapToPair(kv ->
-                new PatternCounter(kv._2, subqueryBroadcast.getValue()).counts())
+                new PatternCounter(kv._2, subqueryBroadcast.getValue()).candidates())
                 .persist(config.getSparkAppConf().getStorageLevel());
     }
 
@@ -139,6 +145,6 @@ public class GraphSearcher extends SparkApp {
         long start = System.currentTimeMillis();
         matcher.search(querySample);
         long duration = System.currentTimeMillis() - start;
-        logger.info("total duration: {} ms", duration);
+        logger.info("total duration: {} ms, search time: {} ms", duration, matcher.getSearchTime());
     }
 }

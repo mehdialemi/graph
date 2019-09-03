@@ -3,7 +3,7 @@
 source $PWD/bin/pattern/pattern-env.sh
 LOG="$PWD/logs/pattern-search.log"
 
-cmd="$SPARK_HOME/bin/spark-submit --class ir.ac.sbu.graph.spark.pattern.search.GraphSearcher $jar $conf "
+cmd="$SPARK_HOME/bin/spark-submit --num-executors 4 --class ir.ac.sbu.graph.spark.pattern.search.GraphSearcher $jar $conf "
 echo "running $cmd"
 
 nohup sh $cmd > $LOG 2>&1 &

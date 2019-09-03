@@ -1,11 +1,9 @@
 package ir.ac.sbu.graph.spark.pattern.index;
 
 import ir.ac.sbu.graph.spark.pattern.index.fonl.value.LabelDegreeTriangleMeta;
-import ir.ac.sbu.graph.spark.pattern.query.Subquery;
-import ir.ac.sbu.graph.spark.pattern.search.MatchCount;
-import ir.ac.sbu.graph.spark.pattern.search.PatternCounter;
 import ir.ac.sbu.graph.types.Edge;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import scala.Tuple2;
 
@@ -19,6 +17,7 @@ public class IndexRow implements Serializable {
     public int[] degrees;
     public int[] tc;
     public long[] edges;
+    public Int2ObjectMap<IntSet> eIndices;
 
     public IndexRow() {
     }
@@ -44,6 +43,8 @@ public class IndexRow implements Serializable {
 
         edges = meta.getTriangleEdges();
         Arrays.sort(edges);
+
+        eIndices = meta.getEdgeMap();
     }
 
     public Tuple2<Integer, IndexRow> toTuple() {
@@ -102,4 +103,6 @@ public class IndexRow implements Serializable {
     public void setEdges(long[] edges) {
         this.edges = edges;
     }
+
+
 }

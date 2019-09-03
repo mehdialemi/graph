@@ -77,39 +77,39 @@ public class PatternConfig {
 
             @Override
             public void init() {
-
-                sparkConf = new SparkConf();
-                graphInputPath = PatternConfig.this.inputDir + PatternConfig.this.targetGraph;
                 partitionNum = PatternConfig.this.partitionNum;
-                cores = PatternConfig.this.cores;
-                sparkConf.setMaster(PatternConfig.this.sparkMaster);
-                sparkConf.setAppName("pattern-" + app + "[" + PatternConfig.this.targetGraph + "]");
-                sparkConf.set("spark.driver.memory", PatternConfig.this.driverMemoryGB + "g");
-                sparkConf.set("spark.driver.maxResultSize", PatternConfig.this.driverMemoryGB + "g");
-                sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-                sparkConf.registerKryoClasses(new Class[]{
-                        IndexRow.class,
-                        FonlValue.class,
-                        MatchCount.class,
-                        PatternCounter.class,
-                        Subquery.class,
-                        TriangleFonlValue.class,
-                        Meta.class,
-                        LabelDegreeTriangleMeta.class,
-                        TriangleMeta.class,
-                        Edge.class,
-                        List.class,
-                        Iterable.class,
-                        long[].class,
-                        int[].class,
-                        String[].class,
-                        Subquery.class,
-                        Tuple2[].class,
-                        Int2ObjectMap.class,
-                        IntSet.class,
-                        Int2ObjectOpenHashMap.class,
-                        IntOpenHashSet.class
-                });
+                graphInputPath = PatternConfig.this.inputDir + PatternConfig.this.targetGraph;
+
+                sparkConf = new SparkConf()
+                        .setAppName("pattern-" + app + "[" + PatternConfig.this.targetGraph + "]")
+                        .setMaster(PatternConfig.this.sparkMaster)
+                        .set("spark.cores.max", cores + "")
+                        .set("spark.driver.memory", PatternConfig.this.driverMemoryGB + "g")
+                        .set("spark.driver.maxResultSize", PatternConfig.this.driverMemoryGB + "g")
+                        .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+                        .registerKryoClasses(new Class[]{
+                                IndexRow.class,
+                                FonlValue.class,
+                                MatchCount.class,
+                                PatternCounter.class,
+                                Subquery.class,
+                                TriangleFonlValue.class,
+                                Meta.class,
+                                LabelDegreeTriangleMeta.class,
+                                TriangleMeta.class,
+                                Edge.class,
+                                List.class,
+                                Iterable.class,
+                                long[].class,
+                                int[].class,
+                                String[].class,
+                                Subquery.class,
+                                Tuple2[].class,
+                                Int2ObjectMap.class,
+                                IntSet.class,
+                                Int2ObjectOpenHashMap.class,
+                                IntOpenHashSet.class
+                        });
 
                 javaSparkContext = new JavaSparkContext(sparkConf);
                 sqlContext = new SQLContext(javaSparkContext);
@@ -179,7 +179,7 @@ public class PatternConfig {
     @Override
     public String toString() {
 
-        return  "inputDir: " + inputDir + "\n" +
+        return "inputDir: " + inputDir + "\n" +
                 "targetGraph: " + targetGraph + "\n" +
                 "targetLabel: " + targetLabel + "\n" +
                 "querySample: " + querySample + "\n" +

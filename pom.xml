@@ -72,6 +72,11 @@
             <version>7.0.13</version>
         </dependency>
         <dependency>
+            <groupId>org.lenskit</groupId>
+            <artifactId>lenskit-core</artifactId>
+            <version>3.0-M3</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-graphx_${scala.version}</artifactId>
             <version>${spark.version}</version>
