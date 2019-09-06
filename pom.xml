@@ -34,11 +34,9 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <compilerId>jdt</compilerId>
-        <spark.version>2.4.3</spark.version>
-        <flink.version>1.2.0</flink.version>
+        <spark.version>2.4.4</spark.version>
         <scala.version>2.11</scala.version>
         <scala.complete.version>${scala.version}.8</scala.complete.version>
-        <jedis.version>2.9.0</jedis.version>
         <graphulo.version>1.0.0-SNAPSHOT</graphulo.version>
         <gremlin.version>3.3.3</gremlin.version>
     </properties>

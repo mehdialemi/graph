@@ -83,7 +83,7 @@ public class PatternConfig {
                 sparkConf = new SparkConf()
                         .setAppName("pattern-" + app + "[" + PatternConfig.this.targetGraph + "]")
                         .setMaster(PatternConfig.this.sparkMaster)
-                        .set("spark.cores.max", cores + "")
+//                        .set("spark.cores.max", PatternConfig.this.cores + "")
                         .set("spark.driver.memory", PatternConfig.this.driverMemoryGB + "g")
                         .set("spark.driver.maxResultSize", PatternConfig.this.driverMemoryGB + "g")
                         .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
