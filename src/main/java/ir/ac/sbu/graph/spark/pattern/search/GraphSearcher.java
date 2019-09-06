@@ -48,6 +48,7 @@ public class GraphSearcher extends SparkApp {
         searchTime = 0;
         Queue<QuerySlice> querySliceQueue = new LinkedList<>(querySlices);
         while (!querySliceQueue.isEmpty()) {
+            long start = System.currentTimeMillis();
             QuerySlice querySlice = querySliceQueue.poll();
             Subquery subquery = querySlice.subquery();
 
@@ -76,7 +77,6 @@ public class GraphSearcher extends SparkApp {
             }
 
             long indexRows = index.count();
-            long start = System.currentTimeMillis();
             JavaPairRDD<Integer, MatchCount> matches = matches(index, subquery);
             long matchCount = matches.count();
             long duration = System.currentTimeMillis() - start;
@@ -91,6 +91,7 @@ public class GraphSearcher extends SparkApp {
             querySlice.setProcessed(true);
             sliceMatches.put(querySlice, matches);
         }
+
 
         long start = System.currentTimeMillis();
         JavaPairRDD<Integer, Long> counter = counter(querySlices.get(0));

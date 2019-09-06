@@ -66,9 +66,9 @@ public class PatternConfig {
         hadoopConf.set("fs.defaultFS", hdfsMaster);
         hadoopConf.set("io.serializations", "org.apache.hadoop.io.serializer.WritableSerialization");
 
-        logger.info("****************** Config Properties ******************");
-        logger.info(toString());
-        logger.info("*******************************************************");
+        logger.info("(SBM) ****************** Config Properties ******************");
+        logger.info("(SBM) " + toString());
+        logger.info("(SBM) *******************************************************");
     }
 
     private SparkAppConf createSparkAppConf() {
