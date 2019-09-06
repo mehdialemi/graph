@@ -70,7 +70,7 @@ public class GraphIndexer {
 
         long count = indexRDD.count();
         long duration = System.currentTimeMillis() - start;
-        logger.info("successfully loaded index, num rows: {}, duration: {} ms", count, duration);
+        logger.info("(SBM) successfully loaded index, num rows: {}, duration: {} ms", count, duration);
 
         return indexRDD;
     }
@@ -83,6 +83,6 @@ public class GraphIndexer {
         PatternConfig config = new PatternConfig(conf, "index");
         GraphIndexer graphIndexer = new GraphIndexer(config);
         graphIndexer.constructIndex();
-        logger.info("graph index is constructed successfully, index path: {}", config.getIndexPath());
+        logger.info("(SBM) graph index is constructed successfully, index path: {}", config.getIndexPath());
     }
 }

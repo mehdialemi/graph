@@ -81,7 +81,7 @@ public class GraphSearcher extends SparkApp {
             long matchCount = matches.count();
             long duration = System.currentTimeMillis() - start;
             searchTime += duration;
-            logger.info("(GRAPH_SEARCHER) index rows: {}, match count: {}, " +
+            logger.info("(SBM) index rows: {}, match count: {}, " +
                             "subquery vertex: {}, duration: {} ms",
                     indexRows, matchCount, querySlice.getV(), duration);
 
@@ -97,7 +97,7 @@ public class GraphSearcher extends SparkApp {
         long matchCount = counter.map(v -> v._2).reduce(Long::sum);
         long duration = System.currentTimeMillis() - start;
 
-        logger.info("(GRAPH_SEARCHER) match count: {}, duration: {} ms", matchCount, duration);
+        logger.info("(SBM) match count: {}, duration: {} ms", matchCount, duration);
 
         return matchCount;
     }
@@ -149,6 +149,6 @@ public class GraphSearcher extends SparkApp {
         long start = System.currentTimeMillis();
         matcher.search(querySample);
         long duration = System.currentTimeMillis() - start;
-        logger.info("(GRAPH_SEARCHER) total duration: {} ms, search time: {} ms", duration, matcher.getSearchTime());
+        logger.info("(SBM) total duration: {} ms, search time: {} ms", duration, matcher.getSearchTime());
     }
 }
