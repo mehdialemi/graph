@@ -179,7 +179,7 @@ public class PatternConfig {
     @Override
     public String toString() {
 
-        return "inputDir: " + inputDir + "\n" +
+        return  "inputDir: " + inputDir + "\n" +
                 "targetGraph: " + targetGraph + "\n" +
                 "targetLabel: " + targetLabel + "\n" +
                 "querySample: " + querySample + "\n" +

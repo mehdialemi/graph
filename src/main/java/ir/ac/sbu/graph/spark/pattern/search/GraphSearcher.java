@@ -51,7 +51,7 @@ public class GraphSearcher extends SparkApp {
             QuerySlice querySlice = querySliceQueue.poll();
             Subquery subquery = querySlice.subquery();
 
-            long start = System.currentTimeMillis();
+
             JavaPairRDD<Integer, IndexRow> index;
             if (querySlice.hasParent()) {
                 QuerySlice parentQuerySlice = querySlice.getParentVertex();
@@ -76,8 +76,8 @@ public class GraphSearcher extends SparkApp {
             }
 
             long indexRows = index.count();
-
-            final JavaPairRDD<Integer, MatchCount> matches = matches(index, subquery);
+            long start = System.currentTimeMillis();
+            JavaPairRDD<Integer, MatchCount> matches = matches(index, subquery);
             long matchCount = matches.count();
             long duration = System.currentTimeMillis() - start;
             searchTime += duration;
@@ -130,33 +130,10 @@ public class GraphSearcher extends SparkApp {
     private JavaPairRDD<Integer, MatchCount> matches(JavaPairRDD<Integer, IndexRow> indexRDD,
                                                      Subquery subquery) {
 
+
         Broadcast<Subquery> subqueryBroadcast = config.getSparkContext().broadcast(subquery);
         return indexRDD.flatMapToPair(kv ->
-                new PatternCounter(kv._2, subqueryBroadcast.getValue()).candidates())
-                .groupByKey(config.getPartitionNum()).flatMapToPair(kv -> {
-
-                    Object2IntMap<Tuple2<Integer, Integer>> map = new Object2IntArrayMap<>();
-
-                    for (MatchCount matchCount : kv._2) {
-                        Tuple2<Integer, Integer> key =
-                                new Tuple2<>(matchCount.getVertex(), matchCount.getLinkIndex());
-                        int count = (int) (map.getOrDefault(key,0) + matchCount.getCount());
-                        map.put(key, count);
-                    }
-
-                    List<Tuple2<Integer, MatchCount>> out = new ArrayList<>();
-                    for (Map.Entry<Tuple2<Integer, Integer>, Integer> entry : map.entrySet()) {
-                        out.add(new Tuple2<>(kv._1,
-                                new MatchCount(
-                                        entry.getKey()._1,
-                                        entry.getValue(),
-                                        entry.getKey()._2)
-                                )
-                        );
-                    }
-
-                    return out.iterator();
-                })
+                new PatternCounter(kv._2, subqueryBroadcast.getValue()).counts())
                 .persist(config.getSparkAppConf().getStorageLevel());
     }
 

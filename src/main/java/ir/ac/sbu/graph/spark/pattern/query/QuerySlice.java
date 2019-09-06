@@ -122,7 +122,7 @@ public class QuerySlice {
             System.arraycopy(degrees, 0, subquery.degrees, 1, degrees.length);
 
             for (int i = 0; i < links.size(); i++) {
-                subquery.linkIndices.add(links.get(i)._1 + 1);
+                subquery.links.add(links.get(i)._1 + 1);
             }
         }
 

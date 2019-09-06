@@ -1,7 +1,8 @@
 package ir.ac.sbu.graph.spark.pattern.index.fonl.value;
 
 import ir.ac.sbu.graph.types.Edge;
-import it.unimi.dsi.fastutil.ints.*;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongAVLTreeSet;
 import it.unimi.dsi.fastutil.longs.LongSortedSet;
 
@@ -11,7 +12,6 @@ import java.util.Map;
 public class TriangleMeta extends Meta {
 
     private long[] triangleEdges;
-    private Int2ObjectMap<IntSet> edgeMap;
     private int[] vTc;
     private int tc;
 
@@ -19,10 +19,9 @@ public class TriangleMeta extends Meta {
 
     TriangleMeta(TriangleMeta triangleMeta) {
         super(triangleMeta);
+        triangleEdges = triangleMeta.triangleEdges;
         tc = triangleMeta.tc;
         vTc = triangleMeta.vTc;
-        triangleEdges = triangleMeta.triangleEdges;
-        edgeMap = triangleMeta.edgeMap;
     }
 
     TriangleMeta(int degree, int[] fonl, Iterable<Edge> triangleEdges) {
@@ -50,16 +49,6 @@ public class TriangleMeta extends Meta {
             int index = v2Index.get(vertex);
             vTc[index] = count;
         }
-
-        for (Edge e : triangleEdges) {
-            if (edgeMap == null)
-                edgeMap = new Int2ObjectArrayMap<>();
-            edgeMap.computeIfAbsent(e.v1, v -> new IntOpenHashSet()).add(e.v2);
-        }
-    }
-
-    public Int2ObjectMap<IntSet> getEdgeMap() {
-        return edgeMap;
     }
 
     public int tc(int index) {

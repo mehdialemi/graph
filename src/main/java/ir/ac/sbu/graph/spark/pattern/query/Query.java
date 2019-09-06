@@ -117,7 +117,7 @@ public class Query {
             }
         }
 
-        // find the remaining linkIndices between the fonlValues
+        // find the remaining links between the fonlValues
         for (int i = 1; i < querySliceList.size(); i++) {
             QuerySlice querySlice = querySliceList.get(i);
             if (querySlice.hasParent())
@@ -144,14 +144,14 @@ public class Query {
             }
 
             if (!find)
-                throw new RuntimeException("Could not find linkIndices for vertex: " + querySlice.getV());
+                throw new RuntimeException("Could not find links for vertex: " + querySlice.getV());
         }
 
         for (QuerySlice querySlice : querySliceList) {
             querySlice.setProcessed(false);
         }
 
-        // add query slices based on highest slice and its linkIndices
+        // add query slices based on highest slice and its links
         for (int i = 0; i < querySliceList.size(); i++) {
             QuerySlice querySlice = querySliceList.get(i);
             if (!querySlice.isProcessed()) {

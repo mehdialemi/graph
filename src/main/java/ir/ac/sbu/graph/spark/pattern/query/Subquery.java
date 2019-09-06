@@ -16,7 +16,7 @@ import java.util.List;
  * - labels: labels corresponding to vertices
  * - degrees: degrees corresponding to vertices
  * - tc: triangle counts corresponding to vertices
- * - linkIndices: index of vertices to connect to other sub-queries
+ * - links: index of vertices to connect to other sub-queries
  * - cliques: index of vertices which are connected all together
  */
 public class Subquery implements Serializable {
@@ -24,9 +24,8 @@ public class Subquery implements Serializable {
     public String[] labels;
     public int[] degrees; // sorted ascending
     public int[] tc;
-    public IntSet linkIndices = new IntOpenHashSet(); // index vertices
-    public Int2ObjectMap<IntSet> right2Left = new Int2ObjectOpenHashMap<>();
-    public Int2ObjectMap<IntSet> l2rIndex = new Int2ObjectOpenHashMap<>();
+    public IntSet links = new IntOpenHashSet(); // index vertices
+    public Int2ObjectMap<IntSet> srcEdgeIndices = new Int2ObjectOpenHashMap<>();
 
     public Subquery() {
     }
@@ -41,10 +40,16 @@ public class Subquery implements Serializable {
         for (Tuple2<Integer, Integer> t : triangleIndex) {
             int v2Index = t._1 + 1;
             int v3Index = t._2 + 1;
+//            if (v2Index != v1Index) {
+//                srcEdgeIndices.computeIfAbsent(v2Index, v -> new IntOpenHashSet()).add(v1Index);
+//            }
+//
+//            if (v3Index != v1Index) {
+//                srcEdgeIndices.computeIfAbsent(v3Index, v -> new IntOpenHashSet()).add(v1Index);
+//            }
 
             if (v3Index != v2Index) {
-                right2Left.computeIfAbsent(v3Index, v -> new IntOpenHashSet()).add(v2Index);
-                l2rIndex.computeIfAbsent(v2Index, v -> new IntOpenHashSet()).add(v3Index);
+                srcEdgeIndices.computeIfAbsent(v3Index, v -> new IntOpenHashSet()).add(v2Index);
             }
 
             tc[v1Index]++;
@@ -52,7 +57,7 @@ public class Subquery implements Serializable {
             tc[v3Index]++;
         }
 
-        linkIndices = new IntOpenHashSet();
+        links = new IntOpenHashSet();
     }
 
     public int maxDegree() {
@@ -73,6 +78,6 @@ public class Subquery implements Serializable {
     public String toString() {
         return "vertices: " + Arrays.toString(vertices) + ", labels: " + Arrays.toString(labels) +
                 ", degrees: " + Arrays.toString(degrees) + ", tc: " + Arrays.toString(tc) +
-                ", linkIndices: " + linkIndices + ", right2Left: " + right2Left;
+                ", links: " + links + ", srcEdgeIndices: " + srcEdgeIndices;
     }
 }
