@@ -81,12 +81,12 @@ public class LabelTriangleFonl {
 
     private JavaPairRDD<Integer, String> loadLabels(JavaPairRDD<Integer, int[]> neighborRDD) {
         if (config.getGraphLabelPath().isEmpty()) {
-            logger.info("Loading default label for all vertices");
+            logger.info("(SBM) Loading default label for all vertices");
             return neighborRDD.mapValues(v -> "_")
                     .persist(config.getSparkAppConf().getStorageLevel());
         }
 
-        logger.info("Loading labels from hdfs");
+        logger.info("(SBM) Loading labels from hdfs");
         return config.getSparkAppConf().getJavaSparkContext()
                 .textFile(config.getGraphLabelPath(), config.getPartitionNum())
                 .filter(line -> !line.startsWith("#"))

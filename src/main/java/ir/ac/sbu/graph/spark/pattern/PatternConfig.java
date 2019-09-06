@@ -83,7 +83,7 @@ public class PatternConfig {
                 sparkConf = new SparkConf()
                         .setAppName("pattern-" + app + "[" + PatternConfig.this.targetGraph + "]")
                         .setMaster(PatternConfig.this.sparkMaster)
-//                        .set("spark.cores.max", PatternConfig.this.cores + "")
+                        .set("spark.cores.max", PatternConfig.this.cores + "")
                         .set("spark.driver.memory", PatternConfig.this.driverMemoryGB + "g")
                         .set("spark.driver.maxResultSize", PatternConfig.this.driverMemoryGB + "g")
                         .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
@@ -179,16 +179,16 @@ public class PatternConfig {
     @Override
     public String toString() {
 
-        return  "inputDir: " + inputDir + "\n" +
-                "targetGraph: " + targetGraph + "\n" +
-                "targetLabel: " + targetLabel + "\n" +
-                "querySample: " + querySample + "\n" +
-                "indexDir: " + indexDir + "\n" +
-                "sparkMaster: " + sparkMaster + "\n" +
-                "partitionNum: " + partitionNum + "\n" +
-                "cores: " + cores + "\n" +
-                "driverMemoryGB: " + driverMemoryGB + "\n";
-//                "hdfsMaster: " + hdfsMaster + "\n";
+        return  "inputDir: " + inputDir + ", " +
+                "targetGraph: " + targetGraph + ", " +
+                "targetLabel: " + targetLabel + ", " +
+                "querySample: " + querySample + ", " +
+                "indexDir: " + indexDir + ", " +
+                "sparkMaster: " + sparkMaster + ", " +
+                "partitionNum: " + partitionNum + ", " +
+                "cores: " + cores + ", " +
+                "driverMemoryGB: " + driverMemoryGB + ", " +
+                "hdfsMaster: " + hdfsMaster;
     }
 
 }

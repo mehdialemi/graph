@@ -38,7 +38,7 @@ public class GraphIndexer {
 
         NeighborList neighborList = new NeighborList(config.getSparkAppConf());
         JavaPairRDD<Integer, int[]> neighbors = neighborList.createNeighbors(edges);
-        logger.info("vertex count: {}", neighbors.count());
+        logger.info("(SBM) vertex count: {}", neighbors.count());
 
         LabelTriangleFonl labelTriangleFonl = new LabelTriangleFonl(config);
         JavaRDD<IndexRow> indexRows = labelTriangleFonl.create(neighbors);
@@ -52,7 +52,7 @@ public class GraphIndexer {
     private JavaPairRDD <Integer, IndexRow> indexRDD;
 
     public JavaPairRDD <Integer, IndexRow> getIndex() {
-        logger.info("loading index from hdfs, graph: {}", config.getTargetGraph());
+        logger.info("(SBM) loading index from hdfs, graph: {}", config.getTargetGraph());
         long start = System.currentTimeMillis();
         if (indexRDD == null) {
 
