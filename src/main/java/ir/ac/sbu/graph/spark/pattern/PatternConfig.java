@@ -83,11 +83,11 @@ public class PatternConfig {
                 partitionNum = PatternConfig.this.partitionNum;
                 graphInputPath = PatternConfig.this.inputDir + PatternConfig.this.targetGraph;
 
+                String query = app.matches("search") ? PatternConfig.this.querySample + "-": "";
                 int cores = PatternConfig.this.cores;
                 sparkConf = new SparkConf()
                         .setAppName("pattern-" + app + "-p" + partitionNum + "-c" + cores + "-" +
-                                PatternConfig.this.querySample + "-" +
-                                "[" + PatternConfig.this.targetGraph + "]")
+                                query + "[" + PatternConfig.this.targetGraph + "]")
                         .setMaster(PatternConfig.this.sparkMaster)
                         .set("spark.cores.max", cores + "")
                         .set("spark.driver.memory", PatternConfig.this.driverMemoryGB + "g")
