@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 source $PWD/bin/pattern/pattern-env.sh
-LOG="$PWD/logs/${graph}-p${partitions}-c${cores}-pattern-search.log"
+LOG="$PWD/logs/${graph}-p${partitions}-c${cores}-${query}-pattern-search.log"
 
 cmd="$SPARK_HOME/bin/spark-submit --class ir.ac.sbu.graph.spark.pattern.search.GraphSearcher $jar $conf "
 echo "running $cmd > $LOG"
