@@ -4,6 +4,7 @@ import ir.ac.sbu.graph.spark.pattern.PatternConfig;
 import ir.ac.sbu.graph.spark.pattern.index.IndexRow;
 import ir.ac.sbu.graph.spark.pattern.index.fonl.value.LabelDegreeTriangleMeta;
 import ir.ac.sbu.graph.spark.pattern.index.fonl.value.TriangleFonlValue;
+import ir.ac.sbu.graph.spark.pattern.label.LabelManager;
 import it.unimi.dsi.fastutil.ints.Int2IntAVLTreeMap;
 import it.unimi.dsi.fastutil.ints.Int2IntSortedMap;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -19,9 +20,11 @@ import java.util.List;
 public class LabelTriangleFonl {
     private static final Logger logger = LoggerFactory.getLogger(LabelTriangleFonl.class);
     private PatternConfig config;
+    private LabelManager labelManager;
 
     public LabelTriangleFonl(PatternConfig config) {
         this.config = config;
+        labelManager = new LabelManager(config);
     }
 
     public JavaRDD<IndexRow> create(JavaPairRDD<Integer, int[]> neighbors) {
@@ -30,7 +33,7 @@ public class LabelTriangleFonl {
         JavaPairRDD<Integer, TriangleFonlValue> triangleFonlRDD = triangleFonl.create(neighbors);
 
         // make an RDD containing degree and labels of each vertex
-        JavaPairRDD<Integer, String> labelRDD = loadLabels(neighbors);
+        JavaPairRDD<Integer, String> labelRDD = labelManager.loadLabels(neighbors);
 
         JavaPairRDD<Integer, Iterable<Tuple3<Integer, Integer, String>>> degreeLabelMessage =
                 neighbors.leftOuterJoin(labelRDD)
@@ -76,22 +79,6 @@ public class LabelTriangleFonl {
 
                     return new IndexRow(kv._1, triangleFonlValue.fonl, meta);
                 }).repartition(config.getPartitionNum())
-                .persist(config.getSparkAppConf().getStorageLevel());
-    }
-
-    private JavaPairRDD<Integer, String> loadLabels(JavaPairRDD<Integer, int[]> neighborRDD) {
-        if (config.getGraphLabelPath().isEmpty()) {
-            logger.info("(SBM) Loading default label for all vertices");
-            return neighborRDD.mapValues(v -> "_")
-                    .persist(config.getSparkAppConf().getStorageLevel());
-        }
-
-        logger.info("(SBM) Loading labels from hdfs");
-        return config.getSparkAppConf().getJavaSparkContext()
-                .textFile(config.getGraphLabelPath(), config.getPartitionNum())
-                .filter(line -> !line.startsWith("#"))
-                .map(line -> line.split("\\s+"))
-                .mapToPair(split -> new Tuple2<>(Integer.parseInt(split[0]), split[1]))
                 .persist(config.getSparkAppConf().getStorageLevel());
     }
 }

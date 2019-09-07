@@ -3,7 +3,7 @@
 source $PWD/bin/pattern/pattern-env.sh
 LOG="$PWD/logs/${graph}-p${partitions}-c${cores}-pattern-index.log"
 
-cmd="$SPARK_HOME/bin/spark-submit --class ir.ac.sbu.graph.spark.pattern.index.GraphIndexer $jar $conf"
+cmd="$SPARK_HOME/bin/spark-submit --class ir.ac.sbu.graph.spark.pattern.label.LabelManager $jar $conf"
 echo "running $cmd > $LOG"
 
 nohup sh $cmd > $LOG 2>&1 &

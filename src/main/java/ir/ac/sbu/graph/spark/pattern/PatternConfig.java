@@ -27,10 +27,12 @@ public class PatternConfig {
 
     private final String inputDir;
     private final String targetGraph;
-    private final String targetLabel;
+
+    private final boolean useDefaultLabel;
+    private final String labelPath;
+    private final List<String> labels;
 
     private final String querySample;
-
     private final String indexDir;
 
     private final String sparkMaster;
@@ -40,7 +42,6 @@ public class PatternConfig {
     private String app;
 
     private final String hdfsMaster;
-
     private final SparkAppConf sparkAppConf;
     private final Configuration hadoopConf;
 
@@ -48,7 +49,9 @@ public class PatternConfig {
         this.app = app;
         inputDir = conf.getString("inputDir");
         targetGraph = conf.getString("targetGraph");
-        targetLabel = conf.getString("targetLabel");
+        labelPath = inputDir + "/" + targetGraph + "." + "label";
+        useDefaultLabel = conf.getBoolean("defaultLabel");
+        labels = conf.getStringList("labels");
 
         querySample = conf.getString("querySample");
 
@@ -137,15 +140,8 @@ public class PatternConfig {
         return targetGraph;
     }
 
-    public String getGraphLabelPath() {
-        if ("".equals(targetLabel))
-            return "";
-
-        return inputDir + targetLabel;
-    }
-
-    public String getTargetLabel() {
-        return targetLabel;
+    public String getLabelPath() {
+        return labelPath;
     }
 
     public String getQuerySample() {
@@ -181,7 +177,7 @@ public class PatternConfig {
 
         return  "inputDir: " + inputDir + ", " +
                 "targetGraph: " + targetGraph + ", " +
-                "targetLabel: " + targetLabel + ", " +
+                "labelPath: " + labelPath + ", " +
                 "querySample: " + querySample + ", " +
                 "indexDir: " + indexDir + ", " +
                 "sparkMaster: " + sparkMaster + ", " +
@@ -191,4 +187,11 @@ public class PatternConfig {
                 "hdfsMaster: " + hdfsMaster;
     }
 
+    public List<String> getLabels() {
+        return labels;
+    }
+
+    public boolean isUseDefaultLabel() {
+        return useDefaultLabel;
+    }
 }

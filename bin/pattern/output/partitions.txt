@@ -1,0 +1,5 @@
+graph		        partitions	        cores
+youtube		            12  		      4
+cit-patents	            40	    	      20
+orkut		            300               40
+soc-LiveJournal         200               40
