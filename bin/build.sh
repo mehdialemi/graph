@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-mvn clean install -DskipTests -Dmaven.artifact.threads=20
+mvn clean -T 10 install -DskipTests -Dmaven.artifact.threads=20
