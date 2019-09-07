@@ -83,7 +83,7 @@ public class PatternConfig {
                 partitionNum = PatternConfig.this.partitionNum;
                 graphInputPath = PatternConfig.this.inputDir + PatternConfig.this.targetGraph;
 
-                String query = app.matches("search") ? PatternConfig.this.querySample + "-": "";
+                String query = app.contains("search") ? PatternConfig.this.querySample + "-": "";
                 int cores = PatternConfig.this.cores;
                 sparkConf = new SparkConf()
                         .setAppName("pattern-" + app + "-p" + partitionNum + "-c" + cores + "-" +
