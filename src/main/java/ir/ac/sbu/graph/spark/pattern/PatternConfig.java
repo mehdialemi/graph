@@ -86,6 +86,7 @@ public class PatternConfig {
                 int cores = PatternConfig.this.cores;
                 sparkConf = new SparkConf()
                         .setAppName("pattern-" + app + "-p" + partitionNum + "-c" + cores + "-" +
+                                PatternConfig.this.querySample + "-" +
                                 "[" + PatternConfig.this.targetGraph + "]")
                         .setMaster(PatternConfig.this.sparkMaster)
                         .set("spark.cores.max", cores + "")
