@@ -83,10 +83,12 @@ public class PatternConfig {
                 partitionNum = PatternConfig.this.partitionNum;
                 graphInputPath = PatternConfig.this.inputDir + PatternConfig.this.targetGraph;
 
+                int cores = PatternConfig.this.cores;
                 sparkConf = new SparkConf()
-                        .setAppName("pattern-" + app + "[" + PatternConfig.this.targetGraph + "]")
+                        .setAppName("pattern-" + app + "-p" + partitionNum + "-c" + cores + "-" +
+                                "[" + PatternConfig.this.targetGraph + "]")
                         .setMaster(PatternConfig.this.sparkMaster)
-                        .set("spark.cores.max", PatternConfig.this.cores + "")
+                        .set("spark.cores.max", cores + "")
                         .set("spark.driver.memory", PatternConfig.this.driverMemoryGB + "g")
                         .set("spark.driver.maxResultSize", PatternConfig.this.driverMemoryGB + "g")
                         .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
