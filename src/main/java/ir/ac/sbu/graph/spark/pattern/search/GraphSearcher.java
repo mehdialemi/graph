@@ -58,7 +58,7 @@ public class GraphSearcher extends SparkApp {
                 QuerySlice parentQuerySlice = querySlice.getParentVertex();
                 int linkIndex = parentQuerySlice.getLinkIndex(querySlice);
 
-                Broadcast<Integer> linkIndexBroadcast = config
+                final Broadcast<Integer> linkIndexBroadcast = config
                         .getSparkContext()
                         .broadcast(linkIndex);
 
