@@ -90,7 +90,7 @@ public class QuerySlice {
         sliceLink.parent = this;
     }
 
-    public QuerySlice getParentVertex() {
+    public QuerySlice getParent() {
         return parent;
     }
 

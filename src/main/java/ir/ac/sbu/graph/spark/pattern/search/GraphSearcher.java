@@ -10,8 +10,6 @@ import ir.ac.sbu.graph.spark.pattern.query.Query;
 import ir.ac.sbu.graph.spark.pattern.query.QuerySlice;
 import ir.ac.sbu.graph.spark.pattern.query.Subquery;
 import ir.ac.sbu.graph.spark.pattern.utils.QuerySamples;
-import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.broadcast.Broadcast;
 import org.slf4j.Logger;
@@ -55,7 +53,12 @@ public class GraphSearcher extends SparkApp {
 
             JavaPairRDD<Integer, IndexRow> index;
             if (querySlice.hasParent()) {
-                QuerySlice parentQuerySlice = querySlice.getParentVertex();
+                QuerySlice parentQuerySlice = querySlice.getParent();
+                if (!parentQuerySlice.isProcessed()) {
+                    querySliceQueue.add(querySlice);
+                    continue;
+                }
+
                 int linkIndex = parentQuerySlice.getLinkIndex(querySlice);
 
                 final Broadcast<Integer> linkIndexBroadcast = config
