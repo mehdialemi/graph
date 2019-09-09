@@ -1,0 +1,29 @@
+
+val sqlContext = new org.apache.spark.sql.SQLContext(sc)
+val v = sqlContext.read.textFile("hdfs://gmaster:8020/graphs/youtube.txt.lbl").map(_.split(" ")).map(t => Vertex(t(0).toInt, t(1))).repartition(40).toDF("id", "label")
+val e = sqlContext.read.textFile("hdfs://gmaster:8020/graphs/youtube.txt").filter(!_.startsWith("#")).map(_.split("\\s+")).map(t => Edge(t(0).toInt, t(1).toInt)).repartition(40).toDF("src", "dst")
+
+val q1_main = "(A)-[]->(B); (A)-[]->(C); (B)-[]->(C)"
+val q1_sub = "A.label = 'A' AND B.label = 'B' AND C.label = 'C'"
+
+val q2_main = "(A)-[]->(B); (A)-[]->(C); (B)-[]->(C); (A)-[]->(D)"
+val q2_sub = "A.label = 'A' AND B.label = 'B' AND C.label = 'C' AND D.label = 'A'"
+
+val q3_main = "(a)-[]->(b); (a)-[]->(c); (a)-[]->(d); (b)-[]->(c); (b)-[]->(d); (b)-[]->(e); (c)-[]->(d); (c)-[]->(e)"
+val q3_sub = "a.label = 'A' AND b.label = 'A' AND c.label = 'A' AND d.label = 'A' AND e.label = 'A'"
+
+val q4_main = "(a)-[]->(b); (a)-[]->(c); (a)-[]->(d); (a)-[]->(e); (b)-[]->(c); (b)-[]->(d); (b)-[]->(e); (c)-[]->(d); (c)-[]->(e); (d)-[]->(e)"
+val q4_sub = "a.label = 'A' AND b.label = 'B' AND c.label = 'C' AND d.label = 'D' AND e.label = 'E'"
+
+val g = GraphFrame(v, e)
+val matches = g.find(q4_main).filter(q4_sub)
+
+def time[R](block: => R): R = {
+    val t0 = System.nanoTime()
+    val result = block    // call-by-name
+    val t1 = System.nanoTime()
+    println("Elapsed time: " + (t1 - t0) + "ns")
+    result
+}
+
+time { matches.count() }

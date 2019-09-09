@@ -176,5 +176,6 @@
     <orderEntry type="library" name="Maven: org.apache.arrow:arrow-memory:0.10.0" level="project" />
     <orderEntry type="library" name="Maven: com.carrotsearch:hppc:0.7.2" level="project" />
     <orderEntry type="library" name="Maven: com.vlkan:flatbuffers:1.2.0-3f79e055" level="project" />
+    <orderEntry type="library" name="Maven: graphframes:graphframes:0.7.0-spark2.4-s_2.11" level="project" />
   </component>
 </module>
