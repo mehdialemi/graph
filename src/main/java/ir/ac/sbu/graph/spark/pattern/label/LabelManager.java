@@ -64,7 +64,8 @@ public class LabelManager {
 
         logger.info("(SBM) Loading labels from hdfs");
         return config.getSparkAppConf().getJavaSparkContext()
-                .textFile(config.getLabelPath(), config.getPartitionNum())
+                .wholeTextFiles(config.getLabelPath(), config.getPartitionNum())
+                .map(kv -> kv._2)
                 .filter(line -> !line.startsWith("#"))
                 .map(line -> line.split("\\s+"))
                 .mapToPair(split -> new Tuple2<>(Integer.parseInt(split[0]), split[1]))
