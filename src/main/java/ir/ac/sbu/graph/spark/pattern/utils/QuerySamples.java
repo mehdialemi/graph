@@ -1,6 +1,7 @@
 package ir.ac.sbu.graph.spark.pattern.utils;
 
 import ir.ac.sbu.graph.spark.pattern.query.Query;
+import ir.ac.sbu.graph.spark.pattern.query.QuerySlice;
 
 import java.util.*;
 
@@ -118,5 +119,17 @@ public class QuerySamples {
         labelMap.put(4, "_");
 
         return new Query(neighbors, labelMap);
+    }
+
+    public static void main(String[] args) {
+        for (int i = 0; i < 5; i++) {
+            String name = "Q" + (i + 1);
+            Query sample = QuerySamples.getSample(name);
+            System.out.println("Query: " + name);
+            List<QuerySlice> querySlices = sample.getQuerySlices();
+            for (QuerySlice querySlice : querySlices) {
+                System.out.println("" + querySlice.subquery());
+            }
+        }
     }
 }
