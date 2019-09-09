@@ -38,13 +38,14 @@ public class UndirectMaker {
         JavaPairRDD<Integer, int[]> neighbors = neighborList.createNeighbors(edges);
         logger.info("(SBM) vertex count: {}", neighbors.count());
 
-        neighbors.flatMapToPair(kv -> {
-            List<Tuple2<Integer, Integer>> out = new ArrayList<>();
+        neighbors.flatMap(kv -> {
+            List<String> out = new ArrayList<>();
             for (int v : kv._2) {
-                out.add(new Tuple2<>(kv._1, v));
+                out.add(kv._1 + "\t" + v);
             }
             return out.iterator();
-        }).saveAsTextFile(uPath);
+        }).repartition(1)
+                .saveAsTextFile(uPath);
     }
 
     public static void main(String[] args) throws IOException {
