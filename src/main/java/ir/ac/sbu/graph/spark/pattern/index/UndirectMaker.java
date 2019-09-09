@@ -30,7 +30,7 @@ public class UndirectMaker {
 
         String uPath = config.getInputDir() + "u_" + config.getTargetGraph();
         FileSystem fileSystem = FileSystem.newInstance(config.getHadoopConf());
-        fileSystem.delete(new Path(config.getLabelPath()), true);
+        fileSystem.delete(new Path(uPath), true);
 
         EdgeLoader edgeLoader = new EdgeLoader(config.getSparkAppConf());
         JavaPairRDD<Integer, Integer> edges = edgeLoader.create();
