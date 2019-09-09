@@ -49,7 +49,7 @@ public class PatternConfig {
         this.app = app;
         inputDir = conf.getString("inputDir");
         targetGraph = conf.getString("targetGraph");
-        labelPath = inputDir + "/" + targetGraph + "." + "label";
+        labelPath = inputDir + "/" + targetGraph + ".lbl";
         useDefaultLabel = conf.getBoolean("defaultLabel");
         labels = conf.getStringList("labels");
 
@@ -152,7 +152,7 @@ public class PatternConfig {
     }
 
     public String getIndexPath() {
-        return indexDir + targetGraph + ".idx";
+        return indexDir + "/" + targetGraph + ".idx";
     }
 
     public String getIndexDir() {
